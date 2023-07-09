@@ -1,0 +1,6 @@
+@use "css-template/import" as template;
+@include template.init;
+
+:root {
+  font-family: sans-serif;
+}
