@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import Wordmark from "../Wordmark.vue";
 import SimpleButton from "../common/SimpleButton.vue";
+import type { MenuItem } from "./Header.vue";
+
+defineProps<{
+  items: MenuItem[];
+}>();
+defineEmits<{
+  (e: "menuButtonClicked"): void;
+  (e: "searchButtonClicked"): void;
+}>();
 </script>
 
 <template>
@@ -11,33 +20,33 @@ import SimpleButton from "../common/SimpleButton.vue";
         <SimpleButton
           class="menu-button"
           :content="{ icon: 'uil:bars', altText: 'Menu' }"
+          @click="$emit('menuButtonClicked')"
         ></SimpleButton>
         <RouterLink class="app-name-button" :to="{ name: 'home' }">
           <Wordmark></Wordmark>
         </RouterLink>
         <div class="desktop-links">
           <SimpleButton
-            :content="{ icon: 'uil:map', text: 'Train map' }"
-          ></SimpleButton>
-          <SimpleButton
-            :content="{ icon: 'uil:code-branch', text: 'Lines' }"
-          ></SimpleButton>
-          <SimpleButton
-            :content="{ icon: 'uil:info-circle', text: 'About' }"
-            :to="{ name: 'about' }"
+            v-for="item in items"
+            :key="item.routeName"
+            :content="{ icon: item.icon, text: item.title }"
+            :to="{ name: item.routeName }"
           ></SimpleButton>
         </div>
         <div class="spacer"></div>
         <SimpleButton
           class="search-icon-button"
           :content="{ icon: 'uil:search', altText: 'Search' }"
+          @click="$emit('searchButtonClicked')"
         ></SimpleButton>
         <SimpleButton
           class="search-full-button"
           :content="{ icon: 'uil:search', text: 'Search' }"
+          @click="$emit('searchButtonClicked')"
         ></SimpleButton>
         <SimpleButton
           :content="{ icon: 'uil:setting', altText: 'Settings' }"
+          :to="{ name: 'settings' }"
         ></SimpleButton>
       </div>
     </div>
@@ -106,12 +115,12 @@ nav {
   }
 }
 
-@media screen and (min-width: 24rem) {
+@media screen and (min-width: 22rem) {
   .search-icon-button {
     @include template.gone;
   }
 }
-@media screen and (max-width: 23.999rem) {
+@media screen and (max-width: 21.999rem) {
   .search-full-button {
     @include template.gone;
   }

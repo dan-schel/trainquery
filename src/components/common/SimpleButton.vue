@@ -6,8 +6,20 @@ export type ButtonContent =
   | { icon: IconID; text?: never; altText: string }
   | { icon: IconID; text: string; altText?: never }
   | { icon?: never; text: string; altText?: never };
+export type ButtonLayout = "traditional" | "tile";
+export type ButtonTheme = "hover" | "filled" | "filled-neutral";
 
-defineProps<{ to?: RouteLocationRaw; content: ButtonContent }>();
+export interface Props {
+  to?: RouteLocationRaw;
+  content: ButtonContent;
+  layout?: ButtonLayout;
+  theme?: ButtonTheme;
+}
+withDefaults(defineProps<Props>(), {
+  layout: "traditional",
+  theme: "hover",
+});
+
 defineEmits<{ (e: "click", payload: MouseEvent): void }>();
 </script>
 
@@ -15,10 +27,14 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
   <RouterLink
     v-if="to != null"
     :to="to"
-    class="button"
     :class="{
       'with-icon': content.icon != null,
       'with-text': content.text != null,
+      button: layout == 'traditional',
+      tile: layout == 'tile',
+      'theme-hover': theme == 'hover',
+      'theme-filled': theme == 'filled',
+      'theme-filled-neutral': theme == 'filled-neutral',
     }"
     :title="content.altText"
   >
@@ -28,10 +44,14 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
   <button
     v-else
     @click="(e) => $emit('click', e)"
-    class="button"
     :class="{
       'with-icon': content.icon != null,
       'with-text': content.text != null,
+      button: layout == 'traditional',
+      tile: layout == 'tile',
+      'theme-hover': theme == 'hover',
+      'theme-filled': theme == 'filled',
+      'theme-filled-neutral': theme == 'filled-neutral',
     }"
     :title="content.altText"
   >
@@ -43,7 +63,6 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
 .button {
-  @include template.button-hover;
   @include template.content-text-icon;
   @include template.row;
   justify-content: center;
@@ -63,5 +82,28 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
   &:not(.with-text) {
     width: 2rem;
   }
+}
+.tile {
+  @include template.content-text-icon;
+  height: 4rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0rem 0.5rem;
+
+  :global(.icon) {
+    font-size: 1.2rem;
+  }
+  p {
+    margin-top: 0.25rem;
+  }
+}
+.theme-hover {
+  @include template.button-hover;
+}
+.theme-filled {
+  @include template.button-filled;
+}
+.theme-filled-neutral {
+  @include template.button-filled-neutral;
 }
 </style>
