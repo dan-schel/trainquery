@@ -9,7 +9,7 @@ import Navbar from "./Navbar.vue";
 </template>
 
 <style scoped lang="scss">
-#navbar-housing {
+header {
   position: fixed;
   top: 0;
   left: 0;

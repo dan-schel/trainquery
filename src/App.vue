@@ -15,5 +15,6 @@ import Footer from "./components/Footer.vue";
 <style scoped lang="scss">
 .page {
   flex-grow: 1;
+  margin-top: 3rem;
 }
 </style>

@@ -1,8 +1,16 @@
+<script setup lang="ts">
+import SimpleButton from "../common/SimpleButton.vue";
+</script>
+
 <template>
   <nav>
     <div class="bg"></div>
     <div class="content-wrapper">
-      <div class="content"></div>
+      <div class="content">
+        <SimpleButton
+          :content="{ icon: 'uil:info-circle', text: 'About' }"
+        ></SimpleButton>
+      </div>
     </div>
   </nav>
 </template>

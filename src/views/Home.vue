@@ -3,9 +3,9 @@
 <template>
   <main>
     <h1>Home page</h1>
-    <router-link :to="{ name: 'about' }" class="bacon">
+    <RouterLink :to="{ name: 'about' }" class="bacon">
       <p>Button to the About page</p>
-    </router-link>
+    </RouterLink>
   </main>
 </template>
 
