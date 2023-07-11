@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 
 declare module "vue-router" {
   interface RouteMeta {
-    title: string
+    title: string;
   }
 }
 
@@ -13,7 +13,7 @@ const router = createRouter({
       path: "/",
       name: "home",
       meta: {
-        title: "Home | TrainQuery"
+        title: "Home | TrainQuery",
       },
       component: () => import("../views/Home.vue"),
     },
@@ -21,7 +21,7 @@ const router = createRouter({
       path: "/:pathMatch(.*)*",
       name: "not-found",
       meta: {
-        title: "Not found | TrainQuery"
+        title: "Not found | TrainQuery",
       },
       component: () => import("../views/NotFound.vue"),
     },
@@ -29,7 +29,7 @@ const router = createRouter({
       path: "/about",
       name: "about",
       meta: {
-        title: "About | TrainQuery"
+        title: "About | TrainQuery",
       },
       component: () => import("../views/About.vue"),
     },
