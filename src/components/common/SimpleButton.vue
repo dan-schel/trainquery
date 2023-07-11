@@ -47,7 +47,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
   justify-content: center;
   height: 2rem;
 
-  .icon {
+  :global(.icon) {
     font-size: 1.2rem;
   }
 
