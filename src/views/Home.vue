@@ -3,9 +3,6 @@
 <template>
   <main>
     <h1>Home page</h1>
-    <RouterLink :to="{ name: 'about' }" class="bacon">
-      <p>Button to the About page</p>
-    </RouterLink>
   </main>
 </template>
 
@@ -20,14 +17,5 @@ h1 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
   color: var(--color-ink-100);
-}
-.bacon {
-  @include template.button-filled;
-  @include template.content-text-icon;
-  height: 2rem;
-  padding: 0rem 1rem;
-  p {
-    font-stretch: 75%;
-  }
 }
 </style>

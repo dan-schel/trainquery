@@ -34,7 +34,7 @@ import Logo from "./Logo.vue";
 .beta {
   @include template.no-select;
   font-size: 0.5em;
-  font-weight: 400;
+  font-weight: 700;
   font-style: italic;
   margin-left: 0.1em;
 }

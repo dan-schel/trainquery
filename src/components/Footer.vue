@@ -48,7 +48,7 @@ p {
   font-size: 0.75rem;
 }
 .disclaimer {
-  font-stretch: 75%;
+  font-stretch: 85%;
 }
 p:not(:last-child) {
   margin-bottom: 1rem;
