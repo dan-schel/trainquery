@@ -9,16 +9,17 @@
   </main>
 </template>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
 main {
   align-items: center;
   padding: 2rem;
-  gap: 1rem;
 }
 h1 {
   font-weight: 700;
   font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-ink-100);
 }
 .bacon {
   @include template.button-filled;

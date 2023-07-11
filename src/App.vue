@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
+import Header from "./components/header/Header.vue";
+import Footer from "./components/Footer.vue";
 </script>
 
 <template>
-  <header></header>
-  <RouterView />
+  <Header></Header>
+  <div class="page">
+    <RouterView />
+  </div>
+  <Footer></Footer>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+.page {
+  flex-grow: 1;
+}
+</style>

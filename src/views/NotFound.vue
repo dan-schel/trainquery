@@ -2,41 +2,25 @@
 
 <template>
   <main>
-    <h1>404</h1>
-    <p>Error &mdash; Page not found</p>
+    <div class="content">
+      <h1>Page not found</h1>
+      <p>This page doesn't exist, at least not anymore!</p>
+    </div>
   </main>
 </template>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
 main {
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  gap: 1rem;
-
-  // For the h1.
-  position: relative;
-  height: 100vh;
-  height: 100svh;
-  width: 100vw;
-  overflow: hidden;
+  @include template.page-centerer;
+}
+.content {
+  padding: 2rem 1rem;
 }
 h1 {
-  position: absolute;
-
-  color: var(--color-ink-10);
-  font-weight: 900;
-  font-size: min(36vw, 60vh);
-  font-stretch: 125%;
-  z-index: 0;
-
-  @include template.no-select;
-}
-p {
   font-weight: 700;
   font-size: 1.5rem;
-  z-index: 1;
-  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--color-ink-100);
 }
 </style>

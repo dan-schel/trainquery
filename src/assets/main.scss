@@ -28,3 +28,13 @@
 :root {
   font-family: "Archivo", sans-serif;
 }
+
+.link {
+  @include template.link;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
