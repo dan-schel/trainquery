@@ -20,6 +20,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       'with-icon': content.icon != null,
       'with-text': content.text != null,
     }"
+    :title="content.altText"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>
@@ -32,6 +33,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       'with-icon': content.icon != null,
       'with-text': content.text != null,
     }"
+    :title="content.altText"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>

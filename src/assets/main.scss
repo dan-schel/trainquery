@@ -25,8 +25,16 @@
     U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+@font-face {
+  font-family: "Mona Sans";
+  font-weight: 200 900;
+  font-stretch: 75% 125%;
+  font-display: swap;
+  src: url(/mona-sans.woff2) format("woff2");
+}
+
 :root {
-  font-family: "Archivo", sans-serif;
+  font-family: "Mona Sans", sans-serif;
 }
 
 .link {
