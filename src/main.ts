@@ -5,10 +5,9 @@ import "./assets/main.scss";
 
 import App from "./App.vue";
 import routes from "./router/routes";
-import viteSSR from 'vite-ssr/vue';
+import viteSSR from "vite-ssr/vue";
 
-export default viteSSR(App, { routes }, (context) => {
-});
+export default viteSSR(App, { routes }, (context) => {});
 
 // const app = createApp(App);
 
