@@ -1,4 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useHead } from "@vueuse/head";
+useHead({
+  title: "Settings | TrainQuery",
+});
+</script>
 
 <template>
   <main>
