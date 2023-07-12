@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite-ssr --host",
+    "dev": "node server/dev.js",
     "build": "run-p type-check build-only",
-    "preview": "vite preview",
-    "test:unit": "vitest",
+    "start": "node server/prod.js",
+    "test": "vitest",
     "build-only": "vite-ssr build",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "@vueuse/head": "^0.9.8",
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.1",
     "pinia": "^2.1.3",
     "vite-ssr": "^0.17.1",
     "vue": "^3.3.4",
