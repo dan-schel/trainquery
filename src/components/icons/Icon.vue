@@ -25,14 +25,20 @@ defineProps<{
 
 <template>
   <UilBars v-if="id == 'uil:bars'" class="icon"></UilBars>
-  <UilCodeBranch v-if="id == 'uil:code-branch'" class="icon"></UilCodeBranch>
-  <UilInfoCircle v-if="id == 'uil:info-circle'" class="icon"></UilInfoCircle>
-  <UilMap v-if="id == 'uil:map'" class="icon"></UilMap>
-  <UilMapMarker v-if="id == 'uil:map-marker'" class="icon"></UilMapMarker>
-  <UilSearch v-if="id == 'uil:search'" class="icon"></UilSearch>
-  <UilSetting v-if="id == 'uil:setting'" class="icon"></UilSetting>
+  <UilCodeBranch
+    v-else-if="id == 'uil:code-branch'"
+    class="icon"
+  ></UilCodeBranch>
+  <UilInfoCircle
+    v-else-if="id == 'uil:info-circle'"
+    class="icon"
+  ></UilInfoCircle>
+  <UilMap v-else-if="id == 'uil:map'" class="icon"></UilMap>
+  <UilMapMarker v-else-if="id == 'uil:map-marker'" class="icon"></UilMapMarker>
+  <UilSearch v-else-if="id == 'uil:search'" class="icon"></UilSearch>
+  <UilSetting v-else-if="id == 'uil:setting'" class="icon"></UilSetting>
   <UilSliderHRange
-    v-if="id == 'uil:slider-h-range'"
+    v-else-if="id == 'uil:slider-h-range'"
     class="icon"
   ></UilSliderHRange>
 </template>
