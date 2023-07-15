@@ -6,7 +6,7 @@ import "./assets/main.scss";
 import App from "./App.vue";
 import routes from "./router/routes";
 import viteSSR from "vite-ssr/vue";
-import { createHead } from '@vueuse/head';
+import { createHead } from "@vueuse/head";
 
 export default viteSSR(App, { routes }, ({ app }) => {
   const head = createHead();

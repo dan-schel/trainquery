@@ -1,5 +1,3 @@
-/*global require*/
-/*eslint no-undef: "error"*/
 const path = require("path");
 const express = require("express");
 

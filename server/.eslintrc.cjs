@@ -1,4 +1,6 @@
 /* eslint-env node */
 module.exports = {
-  extends: ["node"],
+  env: {
+    node: true,
+  },
 };
