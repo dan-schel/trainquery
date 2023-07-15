@@ -5,7 +5,10 @@ async function createServer() {
   const app = express();
 
   // Create vite-ssr server in middleware mode.
-  const viteServer = await createSsrServer({ server: { middlewareMode: true }, appType: "custom" });
+  const viteServer = await createSsrServer({
+    server: { middlewareMode: true },
+    appType: "custom",
+  });
 
   // Use vite's connect instance as middleware
   app.use(viteServer.middlewares);
