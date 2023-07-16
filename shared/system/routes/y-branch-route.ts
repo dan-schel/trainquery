@@ -17,15 +17,17 @@ export class Branch {
     this.stops = stops;
   }
 
-  static readonly json = z.object({
-    id: RouteVariantIDJson,
-    stops: RouteStop.json.array()
-  }).transform(x => new Branch(x.id, x.stops));
+  static readonly json = z
+    .object({
+      id: RouteVariantIDJson,
+      stops: RouteStop.json.array(),
+    })
+    .transform((x) => new Branch(x.id, x.stops));
 
   toJSON(): z.input<typeof Branch.json> {
     return {
       id: this.id,
-      stops: this.stops.map(s => s.toJSON())
+      stops: this.stops.map((s) => s.toJSON()),
     };
   }
 }
@@ -64,10 +66,18 @@ export class YBranchRoute extends Route {
     reverse: DirectionDefinition.json,
     firstBranch: Branch.json,
     secondBranch: Branch.json,
-    shared: RouteStop.json.array()
+    shared: RouteStop.json.array(),
   });
-  static readonly jsonTransform = (x: z.infer<typeof YBranchRoute.yBranchJson>) =>
-    new YBranchRoute(x.forward, x.reverse, x.firstBranch, x.secondBranch, x.shared);
+  static readonly jsonTransform = (
+    x: z.infer<typeof YBranchRoute.yBranchJson>
+  ) =>
+    new YBranchRoute(
+      x.forward,
+      x.reverse,
+      x.firstBranch,
+      x.secondBranch,
+      x.shared
+    );
 
   toJSON(): z.input<typeof YBranchRoute.yBranchJson> {
     return {
@@ -76,7 +86,7 @@ export class YBranchRoute extends Route {
       reverse: this.reverse,
       firstBranch: this.firstBranch.toJSON(),
       secondBranch: this.secondBranch.toJSON(),
-      shared: this.shared.map(s => s.toJSON())
+      shared: this.shared.map((s) => s.toJSON()),
     };
   }
 }

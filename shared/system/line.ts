@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { LineColor, LineColorJson } from "./enums";
-import { LineID, LineIDJson, ServiceTypeID, ServiceTypeIDJson, toServiceTypeID } from "./ids";
+import {
+  LineID,
+  LineIDJson,
+  ServiceTypeID,
+  ServiceTypeIDJson,
+  toServiceTypeID,
+} from "./ids";
 import { Route } from "./routes/line-route";
 
 /** Describes the name, route, etc. of a particular transit line. */
@@ -27,14 +33,26 @@ export class Line {
     this.route = route;
   }
 
-  static readonly json = z.object({
-    id: LineIDJson,
-    name: z.string(),
-    color: LineColorJson.default("none"),
-    specialEventsOnly: z.boolean().default(false),
-    serviceType: ServiceTypeIDJson.default(toServiceTypeID("normal")),
-    route: Route.json
-  }).transform(x => new Line(x.id, x.name, x.color, x.specialEventsOnly, x.serviceType, x.route));
+  static readonly json = z
+    .object({
+      id: LineIDJson,
+      name: z.string(),
+      color: LineColorJson.default("none"),
+      specialEventsOnly: z.boolean().default(false),
+      serviceType: ServiceTypeIDJson.default(toServiceTypeID("normal")),
+      route: Route.json,
+    })
+    .transform(
+      (x) =>
+        new Line(
+          x.id,
+          x.name,
+          x.color,
+          x.specialEventsOnly,
+          x.serviceType,
+          x.route
+        )
+    );
 
   toJSON(): z.input<typeof Line.json> {
     return {
@@ -43,7 +61,7 @@ export class Line {
       color: this.color == "none" ? undefined : this.color,
       specialEventsOnly: !this.specialEventsOnly ? undefined : false,
       serviceType: this.serviceType == "normal" ? undefined : this.serviceType,
-      route: this.route.toJSON()
+      route: this.route.toJSON(),
     };
   }
 }

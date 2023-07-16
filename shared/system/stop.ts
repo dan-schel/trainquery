@@ -10,23 +10,29 @@ export class Stop {
     /** E.g. 'Pakenham'. */
     readonly name: string,
     /** The platforms this stop has, if this transit system has platforms. */
-    readonly platforms: readonly Platform[]) {
+    readonly platforms: readonly Platform[]
+  ) {
     this.id = id;
     this.name = name;
     this.platforms = platforms;
   }
 
-  static readonly json = z.object({
-    id: StopIDJson,
-    name: z.string(),
-    platforms: Platform.json.array().default([])
-  }).transform(x => new Stop(x.id, x.name, x.platforms));
+  static readonly json = z
+    .object({
+      id: StopIDJson,
+      name: z.string(),
+      platforms: Platform.json.array().default([]),
+    })
+    .transform((x) => new Stop(x.id, x.name, x.platforms));
 
   toJSON(): z.input<typeof Stop.json> {
     return {
       id: this.id,
       name: this.name,
-      platforms: this.platforms.length == 0 ? undefined : this.platforms.map(p => p.toJSON())
+      platforms:
+        this.platforms.length == 0
+          ? undefined
+          : this.platforms.map((p) => p.toJSON()),
     };
   }
 }

@@ -38,7 +38,7 @@ export class HookRoute extends Route {
     reverse: DirectionDefinition.json,
     stops: RouteStop.json.array(),
     hooked: RouteStop.json.array(),
-    direct: RouteStop.json.array()
+    direct: RouteStop.json.array(),
   });
   static readonly jsonTransform = (x: z.infer<typeof HookRoute.hookJson>) =>
     new HookRoute(x.forward, x.reverse, x.stops, x.hooked, x.direct);
@@ -48,9 +48,9 @@ export class HookRoute extends Route {
       type: "hook",
       forward: this.forward,
       reverse: this.reverse,
-      stops: this.stops.map(s => s.toJSON()),
-      hooked: this.hooked.map(s => s.toJSON()),
-      direct: this.direct.map(s => s.toJSON())
+      stops: this.stops.map((s) => s.toJSON()),
+      hooked: this.hooked.map((s) => s.toJSON()),
+      direct: this.direct.map((s) => s.toJSON()),
     };
   }
 }

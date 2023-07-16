@@ -19,7 +19,7 @@
     "lint": "npm run lint-eslint && npm run lint-tsc",
     "lint-eslint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "lint-tsc": "tsc --project server/tsconfig.json --noemit && tsc --project shared/tsconfig.json --noemit",
-    "format": "prettier --write src --write server/"
+    "format": "prettier --write src --write server --write shared"
   },
   "dependencies": {
     "@vueuse/head": "^0.9.8",

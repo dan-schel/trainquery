@@ -14,17 +14,19 @@ export abstract class Route {
     this.type = type;
   }
 
-  static readonly json = z.discriminatedUnion("type", [
-    LinearRoute.linearJson,
-    YBranchRoute.yBranchJson,
-    HookRoute.hookJson
-  ]).transform((x): Route => {
-    return {
-      "linear": LinearRoute.jsonTransform,
-      "y-branch": YBranchRoute.jsonTransform,
-      "hook": HookRoute.jsonTransform
-    }[x.type](x as any);
-  });
+  static readonly json = z
+    .discriminatedUnion("type", [
+      LinearRoute.linearJson,
+      YBranchRoute.yBranchJson,
+      HookRoute.hookJson,
+    ])
+    .transform((x): Route => {
+      return {
+        linear: LinearRoute.jsonTransform,
+        "y-branch": YBranchRoute.jsonTransform,
+        hook: HookRoute.jsonTransform,
+      }[x.type](x as any);
+    });
 
   abstract toJSON(): z.input<typeof Route.json>;
 }
@@ -37,13 +39,15 @@ export class DirectionDefinition {
     this.id = id;
   }
 
-  static readonly json = z.object({
-    id: DirectionIDJson
-  }).transform(x => new DirectionDefinition(x.id));
+  static readonly json = z
+    .object({
+      id: DirectionIDJson,
+    })
+    .transform((x) => new DirectionDefinition(x.id));
 
   toJSON(): z.input<typeof DirectionDefinition.json> {
     return {
-      id: this.id
+      id: this.id,
     };
   }
 }
@@ -75,31 +79,36 @@ export class RouteStop {
     this.pickUp = pickUp;
   }
 
-  static readonly json = z.union([
-    z.object({
-      stops: StopIDJson,
-      via: z.undefined(),
-      setsDown: z.union([z.boolean(), z.string()]).default(true),
-      picksUp: z.union([z.boolean(), z.string()]).default(true)
-    }),
-    z.object({
-      stops: z.undefined(),
-      via: StopIDJson,
-      setsDown: z.undefined(),
-      picksUp: z.undefined()
-    })
-  ]).transform(x => new RouteStop(x.stops ?? x.via, x.via != null, x.setsDown, x.picksUp));
+  static readonly json = z
+    .union([
+      z.object({
+        stops: StopIDJson,
+        via: z.undefined(),
+        setsDown: z.union([z.boolean(), z.string()]).default(true),
+        picksUp: z.union([z.boolean(), z.string()]).default(true),
+      }),
+      z.object({
+        stops: z.undefined(),
+        via: StopIDJson,
+        setsDown: z.undefined(),
+        picksUp: z.undefined(),
+      }),
+    ])
+    .transform(
+      (x) =>
+        new RouteStop(x.stops ?? x.via, x.via != null, x.setsDown, x.picksUp)
+    );
 
   toJSON(): z.input<typeof RouteStop.json> {
     if (this.via) {
       return {
-        via: this.stop
+        via: this.stop,
       };
     }
     return {
       stops: this.stop,
       setsDown: this.setDown == true ? undefined : this.setDown,
-      picksUp: this.pickUp == true ? undefined : this.pickUp
+      picksUp: this.pickUp == true ? undefined : this.pickUp,
     };
   }
 }

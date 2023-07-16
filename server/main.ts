@@ -10,8 +10,7 @@ async function createServer() {
   const isProd = process.env.NODE_ENV == "production";
   if (isProd) {
     await setupProdServer(app);
-  }
-  else {
+  } else {
     await setupDevServer(app);
   }
 

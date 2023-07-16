@@ -21,7 +21,7 @@ export class LinearRoute extends Route {
     type: z.literal("linear"),
     forward: DirectionDefinition.json,
     reverse: DirectionDefinition.json,
-    stops: RouteStop.json.array()
+    stops: RouteStop.json.array(),
   });
   static readonly jsonTransform = (x: z.infer<typeof LinearRoute.linearJson>) =>
     new LinearRoute(x.forward, x.reverse, x.stops);
@@ -31,7 +31,7 @@ export class LinearRoute extends Route {
       type: "linear",
       forward: this.forward,
       reverse: this.reverse,
-      stops: this.stops.map(s => s.toJSON())
+      stops: this.stops.map((s) => s.toJSON()),
     };
   }
 }
