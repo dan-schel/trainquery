@@ -16,7 +16,9 @@
     "test": "vitest",
     "build-only": "vite-ssr build",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "lint": "npm run lint-eslint && npm run lint-tsc",
+    "lint-eslint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "lint-tsc": "tsc --project server/tsconfig.json --noemit && tsc --project shared/tsconfig.json --noemit",
     "format": "prettier --write src --write server/"
   },
   "dependencies": {
@@ -26,7 +28,8 @@
     "pinia": "^2.1.3",
     "vite-ssr": "^0.17.1",
     "vue": "^3.3.4",
-    "vue-router": "^4.2.2"
+    "vue-router": "^4.2.2",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.2.0",
