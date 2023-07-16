@@ -1,14 +1,23 @@
 import "./assets/main.scss";
 
-import { createApp } from "vue";
-import { createPinia } from "pinia";
+// import { createApp } from "vue";
+// import { createPinia } from "pinia";
 
 import App from "./App.vue";
-import router from "./router";
+import routes from "./router/routes";
+import viteSSR from "vite-ssr/vue";
+import { createHead } from "@vueuse/head";
 
-const app = createApp(App);
+export default viteSSR(App, { routes }, ({ app }) => {
+  const head = createHead();
+  app.use(head);
 
-app.use(createPinia());
-app.use(router);
+  return { head };
+});
 
-app.mount("#app");
+// const app = createApp(App);
+
+// app.use(createPinia());
+// app.use(router);
+
+// app.mount("#app");
