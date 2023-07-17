@@ -1,3 +1,10 @@
+import { ZodType, z } from "zod";
+
+export type JsonLoader = <T extends ZodType>(
+  path: string,
+  schema: T
+) => Promise<z.infer<T>>;
+
 /** Replace a string property in an object with a computed value. */
 export async function populateOn<
   O extends { [P in keyof O]: P extends K ? string : unknown },
@@ -12,7 +19,11 @@ export async function populateOn<
   retriever: (path: string) => Promise<T>
 ): Promise<{ [P in keyof O]: P extends K ? T : O[P] }> {
   // Get the current value of the property.
-  const value = (await obj)[key] as string;
+  const value = (await obj)[key];
+
+  if (typeof value != "string") {
+    throw new Error(`Cannot populate ${value}. It was not a string.`);
+  }
 
   // Make a copy of the object.
   const result = { ...obj };

@@ -1,29 +1,24 @@
-import { ZodType, z } from "zod";
+import { z } from "zod";
 import { ServiceTypeID, ServiceTypeIDJson } from "./ids";
 import { Line } from "./line";
 import { Stop } from "./stop";
-import { PopulateBuilder } from "./populate";
+import { JsonLoader, PopulateBuilder } from "./populate";
 
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
   | {
-      /** E.g. '10' for AEST, or '11' for AEDT. */
-      offset: number;
-    }
+    /** E.g. '10' for AEST, or '11' for AEDT. */
+    offset: number;
+  }
   | {
-      /** E.g. 'Australia/Melbourne'. */
-      id: string;
-      /**
-       * Which hour of the day to use when checking the offset, since DST doesn't
-       * start at midnight.
-       */
-      offsetCheckHour: number;
-    };
-
-type JsonLoader = <T extends ZodType>(
-  path: string,
-  schema: T
-) => Promise<z.infer<T>>;
+    /** E.g. 'Australia/Melbourne'. */
+    id: string;
+    /**
+     * Which hour of the day to use when checking the offset, since DST doesn't
+     * start at midnight.
+     */
+    offsetCheckHour: number;
+  };
 
 /** The config properties required by both the frontend and backend. */
 export class SharedConfig {
@@ -86,24 +81,18 @@ export class SharedConfig {
     };
   }
 
+  /** Parse from file (some props reference other files instead of providing data). */
   static async fromFile(
     json: unknown,
     loader: JsonLoader
   ): Promise<SharedConfig> {
-    const schema = z
-      .object({
-        stops: z.string(),
-        lines: z.string(),
-      })
+    const replacementSchema = z
+      .object({ stops: z.string(), lines: z.string() })
       .passthrough();
-    const stopsYml = z.object({
-      stops: z.any(),
-    });
-    const linesYml = z.object({
-      lines: z.any(),
-    });
+    const stopsYml = z.object({ stops: z.any() });
+    const linesYml = z.object({ lines: z.any() });
 
-    const value = await new PopulateBuilder(schema.parse(json))
+    const value = await new PopulateBuilder(replacementSchema.parse(json))
       .populate("stops", async (x) => (await loader(x, stopsYml)).stops)
       .populate("lines", async (x) => (await loader(x, linesYml)).lines)
       .build();
@@ -164,15 +153,49 @@ export class FrontendOnlyConfig {
       metaDescription: this.metaDescription,
     };
   }
+
+  /** Parse from file (some props reference other files instead of providing data). */
+  static async fromFile(
+    json: unknown,
+    loader: JsonLoader
+  ): Promise<FrontendOnlyConfig> {
+    const replacementSchema = z
+      .object({ departureFeeds: z.string() })
+      .passthrough();
+    const departureFeedsYml = z.any();
+
+    const value = await new PopulateBuilder(replacementSchema.parse(json))
+      .populate("departureFeeds", async (x) => (await loader(x, departureFeedsYml)))
+      .build();
+
+    return FrontendOnlyConfig.json.parse(value);
+  }
 }
 
 /** The config properties used by the server and never sent to the frontend. */
 export class ServerOnlyConfig {
-  constructor(/* todo: continuation */) {}
+  constructor(/* todo: continuation */) { }
 
   static readonly json = z.object({}).transform((_x) => new ServerOnlyConfig());
 
   toJSON(): z.input<typeof ServerOnlyConfig.json> {
     return {};
+  }
+
+  /** Parse from file (some props reference other files instead of providing data). */
+  static async fromFile(
+    json: unknown,
+    loader: JsonLoader
+  ): Promise<ServerOnlyConfig> {
+    const replacementSchema = z
+      .object({ continuation: z.string() })
+      .passthrough();
+    const continuationYml = z.any();
+
+    const value = await new PopulateBuilder(replacementSchema.parse(json))
+      .populate("continuation", async (x) => (await loader(x, continuationYml)))
+      .build();
+
+    return ServerOnlyConfig.json.parse(value);
   }
 }

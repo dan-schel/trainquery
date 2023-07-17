@@ -4,6 +4,7 @@ import {
   ServerOnlyConfig,
   SharedConfig,
 } from "./config-elements";
+import { JsonLoader } from "./populate";
 
 /** The server's config object, which includes the shared properties. */
 export class ServerConfig {
@@ -37,6 +38,30 @@ export class ServerConfig {
       server: this.server.toJSON(),
       frontend: this.frontend.toJSON(),
     };
+  }
+
+  /** Parse from file (some props reference other files instead of providing data). */
+  static async fromFile(
+    json: unknown,
+    loader: JsonLoader
+  ): Promise<ServerOnlyConfig> {
+    const data = z
+      .object({
+        shared: z.any(),
+        server: z.any(),
+        frontend: z.any(),
+      })
+      .parse(json);
+
+    const shared = await SharedConfig.fromFile(data.shared, loader);
+    const server = await ServerOnlyConfig.fromFile(data.server, loader);
+    const frontend = await FrontendOnlyConfig.fromFile(data.frontend, loader);
+
+    return new ServerConfig(shared, server, frontend);
+  }
+
+  forFrontend(): FrontendConfig {
+    return new FrontendConfig(this.shared, this.frontend);
   }
 }
 
