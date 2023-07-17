@@ -1,4 +1,4 @@
-import { ZodAny, ZodType, z } from "zod";
+import { ZodType, z } from "zod";
 import { ServiceTypeID, ServiceTypeIDJson } from "./ids";
 import { Line } from "./line";
 import { Stop } from "./stop";
@@ -6,20 +6,23 @@ import { Stop } from "./stop";
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
   | {
-    /** E.g. '10' for AEST, or '11' for AEDT. */
-    offset: number;
-  }
+      /** E.g. '10' for AEST, or '11' for AEDT. */
+      offset: number;
+    }
   | {
-    /** E.g. 'Australia/Melbourne'. */
-    id: string;
-    /**
-     * Which hour of the day to use when checking the offset, since DST doesn't
-     * start at midnight.
-     */
-    offsetCheckHour: number;
-  };
+      /** E.g. 'Australia/Melbourne'. */
+      id: string;
+      /**
+       * Which hour of the day to use when checking the offset, since DST doesn't
+       * start at midnight.
+       */
+      offsetCheckHour: number;
+    };
 
-type JsonLoader = <T extends ZodType>(path: string, schema: T) => Promise<z.infer<T>>;
+type JsonLoader = <T extends ZodType>(
+  path: string,
+  schema: T
+) => Promise<z.infer<T>>;
 
 /** The config properties required by both the frontend and backend. */
 export class SharedConfig {
@@ -82,22 +85,31 @@ export class SharedConfig {
     };
   }
 
-  static async fromFile(json: unknown, loader: JsonLoader): Promise<SharedConfig> {
-    const schema = z.object({
-      stops: z.string(),
-      lines: z.string()
-    }).passthrough();
+  static async fromFile(
+    json: unknown,
+    loader: JsonLoader
+  ): Promise<SharedConfig> {
+    const schema = z
+      .object({
+        stops: z.string(),
+        lines: z.string(),
+      })
+      .passthrough();
     const stopsYml = z.object({
-      stops: z.any()
+      stops: z.any(),
     });
     const linesYml = z.object({
-      lines: z.any()
+      lines: z.any(),
     });
 
-    const value = (await (await new PopulateBuilder(schema.parse(json))
-      .populate("stops", async (x) => (await loader(x, stopsYml)).stops))
-      .populate("lines", async (x) => (await loader(x, linesYml)).lines))
-      .build();
+    const value = (
+      await (
+        await new PopulateBuilder(schema.parse(json)).populate(
+          "stops",
+          async (x) => (await loader(x, stopsYml)).stops
+        )
+      ).populate("lines", async (x) => (await loader(x, linesYml)).lines)
+    ).build();
 
     return SharedConfig.json.parse(value);
   }
@@ -118,10 +130,8 @@ export class FrontendOnlyConfig {
      * Used in the SEO description, e.g. 'Navigate Melbourne's train network
      * with TrainQuery'.
      */
-    readonly metaDescription: string
-  ) // Todo: departure feeds
-  // Todo: search tags
-  {
+    readonly metaDescription: string // Todo: departure feeds // Todo: search tags
+  ) {
     this.appName = appName;
     this.beta = beta;
     this.tagline = tagline;
@@ -161,7 +171,7 @@ export class FrontendOnlyConfig {
 
 /** The config properties used by the server and never sent to the frontend. */
 export class ServerOnlyConfig {
-  constructor(/* todo: continuation */) { }
+  constructor(/* todo: continuation */) {}
 
   static readonly json = z.object({}).transform((_x) => new ServerOnlyConfig());
 
@@ -174,12 +184,16 @@ export async function populateOn<
   O extends { [P in keyof O]: P extends K ? string : unknown } & object,
   K extends keyof O,
   T
->(obj: O, key: K, retriever: (path: string) => Promise<T>): Promise<{
+>(
+  obj: O,
+  key: K,
+  retriever: (path: string) => Promise<T>
+): Promise<{
   [P in keyof O]: P extends K ? T : O[P];
 }> {
   const value = obj[key] as string;
   const result = { ...obj };
-  (result as any)[key] = await retriever(value) as T;
+  (result as any)[key] = (await retriever(value)) as T;
   return result;
 }
 
@@ -187,7 +201,10 @@ export class PopulateBuilder<O extends object> {
   constructor(readonly value: O) {
     this.value = value;
   }
-  async populate<K extends keyof O, T>(key: K, retriever: (path: string) => Promise<T>) {
+  async populate<K extends keyof O, T>(
+    key: K,
+    retriever: (path: string) => Promise<T>
+  ) {
     return new PopulateBuilder(await populateOn(this.value, key, retriever));
   }
   build(): O {

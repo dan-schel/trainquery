@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { FrontendOnlyConfig, ServerOnlyConfig, SharedConfig } from "./config-elements";
+import {
+  FrontendOnlyConfig,
+  ServerOnlyConfig,
+  SharedConfig,
+} from "./config-elements";
 
 /** The server's config object, which includes the shared properties. */
 export class ServerConfig {
