@@ -4,18 +4,20 @@ import { Line } from "./line";
 import { Stop } from "./stop";
 
 /** Describes how to calculate the timezone offset of the timetables. */
-export type TimezoneConfig = {
-  /** E.g. '10' for AEST, or '11' for AEDT. */
-  offset: number;
-} | {
-  /** E.g. 'Australia/Melbourne'. */
-  id: string;
-  /**
-   * Which hour of the day to use when checking the offset, since DST doesn't
-   * start at midnight.
-   */
-  offsetCheckHour: number;
-}
+export type TimezoneConfig =
+  | {
+      /** E.g. '10' for AEST, or '11' for AEDT. */
+      offset: number;
+    }
+  | {
+      /** E.g. 'Australia/Melbourne'. */
+      id: string;
+      /**
+       * Which hour of the day to use when checking the offset, since DST doesn't
+       * start at midnight.
+       */
+      offsetCheckHour: number;
+    };
 
 /** The config properties required by both the frontend and backend. */
 export class SharedConfig {
@@ -41,29 +43,40 @@ export class SharedConfig {
     this.serviceTypes = serviceTypes;
   }
 
-  static readonly json = z.object({
-    stops: Stop.json.array(),
-    lines: Line.json.array(),
-    usePlatforms: z.boolean(),
-    timezone: z.union([
-      z.object({
-        offset: z.number(),
-      }),
-      z.object({
-        id: z.string(),
-        offsetCheckHour: z.number()
-      })
-    ]),
-    serviceTypes: ServiceTypeIDJson.array().default(["normal"])
-  }).transform(x => new SharedConfig(x.stops, x.lines, x.usePlatforms, x.timezone, x.serviceTypes));
+  static readonly json = z
+    .object({
+      stops: Stop.json.array(),
+      lines: Line.json.array(),
+      usePlatforms: z.boolean(),
+      timezone: z.union([
+        z.object({
+          offset: z.number(),
+        }),
+        z.object({
+          id: z.string(),
+          offsetCheckHour: z.number(),
+        }),
+      ]),
+      serviceTypes: ServiceTypeIDJson.array().default(["normal"]),
+    })
+    .transform(
+      (x) =>
+        new SharedConfig(
+          x.stops,
+          x.lines,
+          x.usePlatforms,
+          x.timezone,
+          x.serviceTypes
+        )
+    );
 
   toJSON(): z.input<typeof SharedConfig.json> {
     return {
-      stops: this.stops.map(s => s.toJSON()),
-      lines: this.lines.map(l => l.toJSON()),
+      stops: this.stops.map((s) => s.toJSON()),
+      lines: this.lines.map((l) => l.toJSON()),
       usePlatforms: this.usePlatforms,
       timezone: this.timezone,
-      serviceTypes: this.serviceTypes
+      serviceTypes: this.serviceTypes,
     };
   }
 }
@@ -84,9 +97,9 @@ export class FrontendOnlyConfig {
      * with TrainQuery'.
      */
     readonly metaDescription: string
-    // Todo: departure feeds
-    // Todo: search tags
-  ) {
+  ) // Todo: departure feeds
+  // Todo: search tags
+  {
     this.appName = appName;
     this.beta = beta;
     this.tagline = tagline;
@@ -94,13 +107,24 @@ export class FrontendOnlyConfig {
     this.metaDescription = metaDescription;
   }
 
-  static readonly json = z.object({
-    appName: z.string(),
-    beta: z.boolean().default(false),
-    tagline: z.string(),
-    footer: z.string(),
-    metaDescription: z.string()
-  }).transform(x => new FrontendOnlyConfig(x.appName, x.beta, x.tagline, x.footer, x.metaDescription));
+  static readonly json = z
+    .object({
+      appName: z.string(),
+      beta: z.boolean().default(false),
+      tagline: z.string(),
+      footer: z.string(),
+      metaDescription: z.string(),
+    })
+    .transform(
+      (x) =>
+        new FrontendOnlyConfig(
+          x.appName,
+          x.beta,
+          x.tagline,
+          x.footer,
+          x.metaDescription
+        )
+    );
 
   toJSON(): z.input<typeof FrontendOnlyConfig.json> {
     return {
@@ -108,16 +132,16 @@ export class FrontendOnlyConfig {
       beta: !this.beta ? undefined : true,
       tagline: this.tagline,
       footer: this.footer,
-      metaDescription: this.metaDescription
+      metaDescription: this.metaDescription,
     };
   }
 }
 
 /** The config properties used by the server and never sent to the frontend. */
 export class ServerOnlyConfig {
-  constructor(/* todo: continuation */) { }
+  constructor(/* todo: continuation */) {}
 
-  static readonly json = z.object({}).transform(_x => new ServerOnlyConfig());
+  static readonly json = z.object({}).transform((_x) => new ServerOnlyConfig());
 
   toJSON(): z.input<typeof ServerOnlyConfig.json> {
     return {};
@@ -142,17 +166,19 @@ export class ServerConfig {
     this.frontend = frontend;
   }
 
-  static readonly json = z.object({
-    shared: SharedConfig.json,
-    server: ServerOnlyConfig.json,
-    frontend: FrontendOnlyConfig.json
-  }).transform(x => new ServerConfig(x.shared, x.server, x.frontend));
+  static readonly json = z
+    .object({
+      shared: SharedConfig.json,
+      server: ServerOnlyConfig.json,
+      frontend: FrontendOnlyConfig.json,
+    })
+    .transform((x) => new ServerConfig(x.shared, x.server, x.frontend));
 
   toJSON(): z.input<typeof ServerConfig.json> {
     return {
       shared: this.shared.toJSON(),
       server: this.server.toJSON(),
-      frontend: this.frontend.toJSON()
+      frontend: this.frontend.toJSON(),
     };
   }
 }
@@ -169,15 +195,17 @@ export class FrontendConfig {
     this.frontend = frontend;
   }
 
-  static readonly json = z.object({
-    shared: SharedConfig.json,
-    frontend: FrontendOnlyConfig.json
-  }).transform(x => new FrontendConfig(x.shared, x.frontend));
+  static readonly json = z
+    .object({
+      shared: SharedConfig.json,
+      frontend: FrontendOnlyConfig.json,
+    })
+    .transform((x) => new FrontendConfig(x.shared, x.frontend));
 
   toJSON(): z.input<typeof FrontendConfig.json> {
     return {
       shared: this.shared.toJSON(),
-      frontend: this.frontend.toJSON()
+      frontend: this.frontend.toJSON(),
     };
   }
 }
