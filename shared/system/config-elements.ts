@@ -2,6 +2,7 @@ import { ZodType, z } from "zod";
 import { ServiceTypeID, ServiceTypeIDJson } from "./ids";
 import { Line } from "./line";
 import { Stop } from "./stop";
+import { PopulateBuilder } from "./populate";
 
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
@@ -102,14 +103,10 @@ export class SharedConfig {
       lines: z.any(),
     });
 
-    const value = (
-      await (
-        await new PopulateBuilder(schema.parse(json)).populate(
-          "stops",
-          async (x) => (await loader(x, stopsYml)).stops
-        )
-      ).populate("lines", async (x) => (await loader(x, linesYml)).lines)
-    ).build();
+    const value = await new PopulateBuilder(schema.parse(json))
+      .populate("stops", async (x) => (await loader(x, stopsYml)).stops)
+      .populate("lines", async (x) => (await loader(x, linesYml)).lines)
+      .build();
 
     return SharedConfig.json.parse(value);
   }
@@ -177,37 +174,5 @@ export class ServerOnlyConfig {
 
   toJSON(): z.input<typeof ServerOnlyConfig.json> {
     return {};
-  }
-}
-
-export async function populateOn<
-  O extends { [P in keyof O]: P extends K ? string : unknown } & object,
-  K extends keyof O,
-  T
->(
-  obj: O,
-  key: K,
-  retriever: (path: string) => Promise<T>
-): Promise<{
-  [P in keyof O]: P extends K ? T : O[P];
-}> {
-  const value = obj[key] as string;
-  const result = { ...obj };
-  (result as any)[key] = (await retriever(value)) as T;
-  return result;
-}
-
-export class PopulateBuilder<O extends object> {
-  constructor(readonly value: O) {
-    this.value = value;
-  }
-  async populate<K extends keyof O, T>(
-    key: K,
-    retriever: (path: string) => Promise<T>
-  ) {
-    return new PopulateBuilder(await populateOn(this.value, key, retriever));
-  }
-  build(): O {
-    return this.value;
   }
 }
