@@ -17,7 +17,7 @@ async function createServer() {
     await setupDevServer(app);
   }
 
-  trainQuery(() => new ExpressServer(app), new OnlineConfigProvider("https://static.trainquery.com/data.yml"));
+  await trainQuery(() => new ExpressServer(app), new OnlineConfigProvider("https://static.trainquery.com/data.yml"));
 
   const port = 3000;
   app.listen(port, () => {

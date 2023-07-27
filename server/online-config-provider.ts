@@ -36,7 +36,7 @@ export class OnlineConfigProvider extends ConfigProvider {
 
     const config = await loadConfigFromZip(dataFolder, zipPath);
 
-    // todo: delete data folder, since we're done with it now
+    await fsp.rm(dataFolder, { recursive: true, force: true, retryDelay: 100, maxRetries: 5 });
 
     return config;
   }
