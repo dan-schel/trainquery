@@ -44,7 +44,7 @@ export class ServerConfig {
   static async fromFile(
     json: unknown,
     loader: JsonLoader
-  ): Promise<ServerOnlyConfig> {
+  ): Promise<ServerConfig> {
     const data = z
       .object({
         shared: z.any(),

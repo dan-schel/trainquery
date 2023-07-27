@@ -19,14 +19,15 @@ export async function populateOn<
   retriever: (path: string) => Promise<T>
 ): Promise<{ [P in keyof O]: P extends K ? T : O[P] }> {
   // Get the current value of the property.
-  const value = (await obj)[key];
+  const awaitedObj = await obj;
+  const value = awaitedObj[key];
 
   if (typeof value != "string") {
     throw new Error(`Cannot populate ${value}. It was not a string.`);
   }
 
   // Make a copy of the object.
-  const result = { ...obj };
+  const result = { ...awaitedObj };
 
   // Replace the current value with the new computed value.
   (result as any)[key] = (await retriever(value)) as T;

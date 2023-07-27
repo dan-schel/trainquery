@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import { ServerConfig } from "../shared/system/config";
 import { ConfigProvider } from "./trainquery";
 import YAML from 'yaml';
-import { ZodType, z } from "zod";
+import { z } from "zod";
 import fs from "fs";
 import fsp from "fs/promises";
 import { uuid } from "schel-d-utils";
@@ -22,7 +22,7 @@ export class OnlineConfigProvider extends ConfigProvider {
 
   async fetchConfig(): Promise<ServerConfig> {
     const manifestYml = await (await fetch(this.manifestUrl)).text();
-    const manifest = parseYML(manifestYml, manifestJson);
+    const manifest = manifestJson.parse(YAML.parse(manifestYml));
 
     if (!(supportedVersion in manifest)) {
       throw new Error(`"${supportedVersion}" data is unavailable at "${this.manifestUrl}"`);
@@ -66,10 +66,6 @@ async function download(url: string, destinationPath: string) {
     destination.on("error", () => reject());
     destination.on("finish", resolve);
   });
-}
-
-function parseYML<T extends ZodType>(text: string, jsonSchema: T): z.infer<T> {
-  return jsonSchema.parse(YAML.parse(text));
 }
 
 function generateDataFolderPath(): string {
