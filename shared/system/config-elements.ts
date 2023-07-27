@@ -7,18 +7,18 @@ import { JsonLoader, PopulateBuilder } from "./populate";
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
   | {
-    /** E.g. '10' for AEST, or '11' for AEDT. */
-    offset: number;
-  }
+      /** E.g. '10' for AEST, or '11' for AEDT. */
+      offset: number;
+    }
   | {
-    /** E.g. 'Australia/Melbourne'. */
-    id: string;
-    /**
-     * Which hour of the day to use when checking the offset, since DST doesn't
-     * start at midnight.
-     */
-    offsetCheckHour: number;
-  };
+      /** E.g. 'Australia/Melbourne'. */
+      id: string;
+      /**
+       * Which hour of the day to use when checking the offset, since DST doesn't
+       * start at midnight.
+       */
+      offsetCheckHour: number;
+    };
 
 /** The config properties required by both the frontend and backend. */
 export class SharedConfig {
@@ -165,7 +165,10 @@ export class FrontendOnlyConfig {
     const departureFeedsYml = z.any();
 
     const value = await new PopulateBuilder(replacementSchema.parse(json))
-      .populate("departureFeeds", async (x) => (await loader(x, departureFeedsYml)))
+      .populate(
+        "departureFeeds",
+        async (x) => await loader(x, departureFeedsYml)
+      )
       .build();
 
     return FrontendOnlyConfig.json.parse(value);
@@ -174,7 +177,7 @@ export class FrontendOnlyConfig {
 
 /** The config properties used by the server and never sent to the frontend. */
 export class ServerOnlyConfig {
-  constructor(/* todo: continuation */) { }
+  constructor(/* todo: continuation */) {}
 
   static readonly json = z.object({}).transform((_x) => new ServerOnlyConfig());
 
@@ -193,7 +196,7 @@ export class ServerOnlyConfig {
     const continuationYml = z.any();
 
     const value = await new PopulateBuilder(replacementSchema.parse(json))
-      .populate("continuation", async (x) => (await loader(x, continuationYml)))
+      .populate("continuation", async (x) => await loader(x, continuationYml))
       .build();
 
     return ServerOnlyConfig.json.parse(value);

@@ -53,4 +53,8 @@ export class HookRoute extends Route {
       direct: this.direct.map((s) => s.toJSON()),
     };
   }
+
+  static detect(route: Route): route is HookRoute {
+    return route.type == "hook";
+  }
 }

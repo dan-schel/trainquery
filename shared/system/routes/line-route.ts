@@ -1,9 +1,6 @@
 import { z } from "zod";
 import { LineRouteType } from "../enums";
 import { DirectionID, DirectionIDJson, StopID, StopIDJson } from "../ids";
-import { LinearRoute } from "./linear-route";
-import { HookRoute } from "./hook-route";
-import { YBranchRoute } from "./y-branch-route";
 
 /** Describes the stops and route a line takes. */
 export abstract class Route {
@@ -13,22 +10,6 @@ export abstract class Route {
   ) {
     this.type = type;
   }
-
-  static readonly json = z
-    .discriminatedUnion("type", [
-      LinearRoute.linearJson,
-      YBranchRoute.yBranchJson,
-      HookRoute.hookJson,
-    ])
-    .transform((x): Route => {
-      return {
-        linear: LinearRoute.jsonTransform,
-        "y-branch": YBranchRoute.jsonTransform,
-        hook: HookRoute.jsonTransform,
-      }[x.type](x as any);
-    });
-
-  abstract toJSON(): z.input<typeof Route.json>;
 }
 
 export class DirectionDefinition {

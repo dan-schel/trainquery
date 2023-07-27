@@ -8,6 +8,7 @@ import {
   toServiceTypeID,
 } from "./ids";
 import { Route } from "./routes/line-route";
+import { RouteJson, routeToJson } from "./routes/route-json";
 
 /** Describes the name, route, etc. of a particular transit line. */
 export class Line {
@@ -40,7 +41,7 @@ export class Line {
       color: LineColorJson.default("none"),
       specialEventsOnly: z.boolean().default(false),
       serviceType: ServiceTypeIDJson.default(toServiceTypeID("normal")),
-      route: Route.json,
+      route: RouteJson,
     })
     .transform(
       (x) =>
@@ -61,7 +62,7 @@ export class Line {
       color: this.color == "none" ? undefined : this.color,
       specialEventsOnly: !this.specialEventsOnly ? undefined : false,
       serviceType: this.serviceType == "normal" ? undefined : this.serviceType,
-      route: this.route.toJSON(),
+      route: routeToJson(this.route),
     };
   }
 }

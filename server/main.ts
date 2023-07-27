@@ -1,6 +1,9 @@
 import express, { Express } from "express";
 import path from "path";
 import { createSsrServer } from "vite-ssr/dev";
+import { trainQuery } from "./trainquery";
+import { OnlineConfigProvider } from "./online-config-provider";
+import { ExpressServer } from "./express-server";
 
 createServer();
 
@@ -13,6 +16,8 @@ async function createServer() {
   } else {
     await setupDevServer(app);
   }
+
+  trainQuery(() => new ExpressServer(app), new OnlineConfigProvider("https://static.trainquery.com/data.yml"));
 
   const port = 3000;
   app.listen(port, () => {

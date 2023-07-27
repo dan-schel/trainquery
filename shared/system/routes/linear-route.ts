@@ -34,4 +34,8 @@ export class LinearRoute extends Route {
       stops: this.stops.map((s) => s.toJSON()),
     };
   }
+
+  static detect(route: Route): route is LinearRoute {
+    return route.type == "linear";
+  }
 }

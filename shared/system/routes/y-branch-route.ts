@@ -89,4 +89,8 @@ export class YBranchRoute extends Route {
       shared: this.shared.map((s) => s.toJSON()),
     };
   }
+
+  static detect(route: Route): route is YBranchRoute {
+    return route.type == "y-branch";
+  }
 }
