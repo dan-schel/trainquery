@@ -27,10 +27,10 @@ export async function populateOn<
   }
 
   // Make a copy of the object.
-  const result = { ...awaitedObj };
+  const result = { ...awaitedObj } as any;
 
   // Replace the current value with the new computed value.
-  (result as any)[key] = (await retriever(value)) as T;
+  result[key] = await retriever(value);
 
   return result;
 }

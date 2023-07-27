@@ -21,11 +21,9 @@ export const RouteJson = z
 export function routeToJson(route: Route): z.input<typeof RouteJson> {
   if (LinearRoute.detect(route)) {
     return route.toJSON();
-  }
-  else if (YBranchRoute.detect(route)) {
+  } else if (YBranchRoute.detect(route)) {
     return route.toJSON();
-  }
-  else if (HookRoute.detect(route)) {
+  } else if (HookRoute.detect(route)) {
     return route.toJSON();
   }
   throw new Error(`Unrecognized route type: "${route.type}"`);

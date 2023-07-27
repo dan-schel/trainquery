@@ -21,7 +21,9 @@ export async function trainQuery(
 
   refreshData(true);
 
-  console.log(`Loaded config (${config.shared.stops.length} stops, ${config.shared.lines.length} lines)`);
+  console.log(
+    `Loaded config (${config.shared.stops.length} stops, ${config.shared.lines.length} lines)`
+  );
 
   const server = serverBuilder(() => config);
   server.start();
