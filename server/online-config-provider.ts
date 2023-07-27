@@ -7,7 +7,7 @@ import fs from "fs";
 import fsp from "fs/promises";
 import { uuid } from "schel-d-utils";
 import path from "path";
-import { FrontendOnlyConfig, ServerOnlyConfig, SharedConfig } from "../shared/system/config-elements";
+import { loadConfigFromZip } from "./config-zip";
 
 const refreshMs = 1000 * 60 * 10;
 const supportedVersion = "v1";
@@ -30,14 +30,15 @@ export class OnlineConfigProvider extends ConfigProvider {
     const zipUrl = manifest[supportedVersion].latest;
 
     const dataFolder = generateDataFolderPath();
+    const zipPath = path.join(dataFolder, "data.zip");
     await fsp.mkdir(dataFolder);
-    await download(zipUrl, path.join(dataFolder, "data.zip"));
+    await download(zipUrl, zipPath);
 
-    return new ServerConfig(
-      new SharedConfig([], [], true, { offset: 0 }, []),
-      new ServerOnlyConfig(),
-      new FrontendOnlyConfig("", false, "", "", "")
-    );
+    const config = await loadConfigFromZip(dataFolder, zipPath);
+
+    // todo: delete data folder, since we're done with it now
+
+    return config;
   }
 
   getRefreshMs(): number | null {
@@ -59,10 +60,11 @@ async function download(url: string, destinationPath: string) {
     }
 
     const destination = fs.createWriteStream(destinationPath);
-    destination.on("error", () => reject());
 
     response.body.pipe(destination);
-    response.body.on("end", () => resolve());
+    response.body.on("error", () => reject());
+    destination.on("error", () => reject());
+    destination.on("finish", resolve);
   });
 }
 
