@@ -14,7 +14,10 @@ export class ConsoleLogger extends Logger {
   logConfigRefresh(config: ServerConfig, initial: boolean): void {
     const stopCount = config.shared.stops.length;
     const lineCount = config.shared.lines.length;
+    const hash = config.hash;
     const verb = initial ? "Loaded" : "Refreshed";
-    console.log(`${verb} config (${stopCount} stop(s), ${lineCount} line(s)).`);
+    console.log(
+      `${verb} config "${hash}" (${stopCount} stop(s), ${lineCount} line(s)).`
+    );
   }
 }

@@ -11,11 +11,20 @@ export class ExpressServer extends Server {
     this._setupFrontend = _setupFrontend;
   }
 
-  async start(): Promise<void> {
+  async start(
+    requestListener: (endpoint: string) => Promise<unknown>
+  ): Promise<void> {
     const app = express();
 
-    app.get("/api/hello", (_req, res) => {
-      res.json({ hello: "world" });
+    app.get("/api/*", async (req, res) => {
+      const path = req.path.replace(/^\/api\//, "");
+      const data = await requestListener(path);
+
+      if (data != null) {
+        res.json(data);
+      } else {
+        res.sendStatus(404);
+      }
     });
 
     this._setupFrontend(app);

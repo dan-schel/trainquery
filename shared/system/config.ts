@@ -5,9 +5,13 @@ import {
   SharedConfig,
 } from "./config-elements";
 import { JsonLoader } from "./populate";
+import { hashString } from "./cyrb53";
 
 /** The server's config object, which includes the shared properties. */
 export class ServerConfig {
+  /** Used to quickly determine if cached config is outdated. */
+  readonly hash: string;
+
   constructor(
     /** Shared config properties. */
     readonly shared: SharedConfig,
@@ -22,6 +26,7 @@ export class ServerConfig {
     this.shared = shared;
     this.server = server;
     this.frontend = frontend;
+    this.hash = hashString(JSON.stringify(this.toJSON()));
   }
 
   static readonly json = z
@@ -61,31 +66,36 @@ export class ServerConfig {
   }
 
   forFrontend(): FrontendConfig {
-    return new FrontendConfig(this.shared, this.frontend);
+    return new FrontendConfig(this.hash, this.shared, this.frontend);
   }
 }
 
 /** The frontend's config object, which includes the shared properties. */
 export class FrontendConfig {
   constructor(
+    /** Used to quickly determine if cached config is outdated. */
+    readonly hash: string,
     /** Shared config properties. */
     readonly shared: SharedConfig,
     /** Frontend config properties. */
     readonly frontend: FrontendOnlyConfig
   ) {
+    this.hash = hash;
     this.shared = shared;
     this.frontend = frontend;
   }
 
   static readonly json = z
     .object({
+      hash: z.string(),
       shared: SharedConfig.json,
       frontend: FrontendOnlyConfig.json,
     })
-    .transform((x) => new FrontendConfig(x.shared, x.frontend));
+    .transform((x) => new FrontendConfig(x.hash, x.shared, x.frontend));
 
   toJSON(): z.input<typeof FrontendConfig.json> {
     return {
+      hash: this.hash,
       shared: this.shared.toJSON(),
       frontend: this.frontend.toJSON(),
     };

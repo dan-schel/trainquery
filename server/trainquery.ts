@@ -1,4 +1,5 @@
 import { ServerConfig } from "../shared/system/config";
+import { configApi } from "./config-api";
 
 export type ServerBuilder = () => Server;
 
@@ -24,12 +25,19 @@ export async function trainQuery(
   refreshData(true);
 
   const server = serverBuilder();
-  await server.start();
+  await server.start(async (endpoint: string) => {
+    if (endpoint == "config") {
+      return await configApi(config);
+    }
+    return null;
+  });
   logger.logListening(server);
 }
 
 export abstract class Server {
-  abstract start(): Promise<void>;
+  abstract start(
+    requestListener: (endpoint: string) => Promise<unknown>
+  ): Promise<void>;
 }
 
 export abstract class ConfigProvider {
