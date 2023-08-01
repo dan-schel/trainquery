@@ -3,6 +3,7 @@ import { ServerConfig } from "../shared/system/config";
 import fsp from "fs/promises";
 import path from "path";
 import YAML from "yaml";
+import { uuid } from "schel-d-utils";
 
 export async function loadConfigFromZip(
   dataFolder: string,
@@ -33,4 +34,8 @@ async function extractZip(zip: AdmZip, location: string): Promise<void> {
       }
     });
   });
+}
+
+export function generateDataFolderPath(): string {
+  return `data-${uuid()}`;
 }

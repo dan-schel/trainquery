@@ -1,18 +1,22 @@
 import express, { Express } from "express";
 import path from "path";
 import { createSsrServer } from "vite-ssr/dev";
-import { trainQuery } from "./trainquery";
+import { ConfigProvider, trainQuery } from "./trainquery";
 import { OnlineConfigProvider } from "./online-config-provider";
 import { ExpressServer } from "./express-server";
 import { ConsoleLogger } from "./console-logger";
 import { parseIntThrow } from "schel-d-utils";
 import "dotenv/config";
+import { OfflineConfigProvider } from "./offline-config-provider";
 
 createServer();
 
 async function createServer() {
+  const isProd = process.env.NODE_ENV == "production";
+  const isOffline = process.env.OFFLINE == "true";
+  const port = process.env.PORT ?? "3000";
+
   const serveFrontend = async (app: Express) => {
-    const isProd = process.env.NODE_ENV == "production";
     if (isProd) {
       await setupProdServer(app);
     } else {
@@ -20,20 +24,27 @@ async function createServer() {
     }
   };
 
-  const configUrl = process.env.CONFIG;
-  if (configUrl == null) {
-    throw new Error("CONFIG environment variable not provided.");
-  }
-
   await trainQuery(
-    () =>
-      new ExpressServer(
-        parseIntThrow(process.env.PORT ?? "3000"),
-        serveFrontend
-      ),
-    new OnlineConfigProvider(configUrl),
+    () => new ExpressServer(parseIntThrow(port), serveFrontend),
+    getConfigProvider(isOffline),
     new ConsoleLogger()
   );
+}
+
+function getConfigProvider(isOffline: boolean): ConfigProvider {
+  if (isOffline) {
+    const zipPath = process.env.CONFIG_OFFLINE;
+    if (zipPath == null) {
+      throw new Error("CONFIG_OFFLINE environment variable not provided.");
+    }
+    return new OfflineConfigProvider(zipPath);
+  } else {
+    const configUrl = process.env.CONFIG;
+    if (configUrl == null) {
+      throw new Error("CONFIG environment variable not provided.");
+    }
+    return new OnlineConfigProvider(configUrl);
+  }
 }
 
 async function setupDevServer(app: Express) {

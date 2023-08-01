@@ -11,7 +11,7 @@ export async function trainQuery(
   let config = await configProvider.fetchConfig();
   logger.logConfigRefresh(config, true);
 
-  const refreshData = async (skipFetch: boolean) => {
+  const refreshConfig = async (skipFetch: boolean) => {
     if (!skipFetch) {
       config = await configProvider.fetchConfig();
       logger.logConfigRefresh(config, false);
@@ -19,10 +19,10 @@ export async function trainQuery(
 
     const refreshMs = configProvider.getRefreshMs();
     if (refreshMs != null) {
-      setTimeout(() => refreshData(false), refreshMs);
+      setTimeout(() => refreshConfig(false), refreshMs);
     }
   };
-  refreshData(true);
+  refreshConfig(true);
 
   const server = serverBuilder();
   await server.start(async (endpoint: string) => {

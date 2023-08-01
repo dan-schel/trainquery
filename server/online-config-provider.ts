@@ -5,9 +5,8 @@ import YAML from "yaml";
 import { z } from "zod";
 import fs from "fs";
 import fsp from "fs/promises";
-import { uuid } from "schel-d-utils";
 import path from "path";
-import { loadConfigFromZip } from "./config-zip";
+import { generateDataFolderPath, loadConfigFromZip } from "./config-zip";
 
 const refreshMs = 1000 * 60 * 10;
 const supportedVersion = "v1";
@@ -73,8 +72,4 @@ async function download(url: string, destinationPath: string) {
     destination.on("error", () => reject());
     destination.on("finish", resolve);
   });
-}
-
-function generateDataFolderPath(): string {
-  return `data-${uuid()}`;
 }
