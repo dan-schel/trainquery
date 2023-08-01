@@ -20,13 +20,18 @@ async function createServer() {
     }
   };
 
+  const configUrl = process.env.CONFIG;
+  if (configUrl == null) {
+    throw new Error("CONFIG environment variable not provided.");
+  }
+
   await trainQuery(
     () =>
       new ExpressServer(
         parseIntThrow(process.env.PORT ?? "3000"),
         serveFrontend
       ),
-    new OnlineConfigProvider("https://static.trainquery.com/data.yml"),
+    new OnlineConfigProvider(configUrl),
     new ConsoleLogger()
   );
 }
