@@ -1,15 +1,25 @@
-import { Express } from "express";
 import { Server } from "./trainquery";
+import express, { Express } from "express";
 
 export class ExpressServer extends Server {
-  constructor(private readonly _app: Express) {
+  constructor(
+    readonly port: number,
+    private readonly _setupFrontend: (app: Express) => Promise<void>
+  ) {
     super();
-    this._app = _app;
+    this.port = port;
+    this._setupFrontend = _setupFrontend;
   }
 
-  start(): void {
-    this._app.get("/api/hello", (_req, res) => {
+  async start(): Promise<void> {
+    const app = express();
+
+    app.get("/api/hello", (_req, res) => {
       res.json({ hello: "world" });
     });
+
+    this._setupFrontend(app);
+
+    await new Promise<void>((resolve) => app.listen(this.port, resolve));
   }
 }

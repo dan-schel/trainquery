@@ -4,28 +4,31 @@ import { createSsrServer } from "vite-ssr/dev";
 import { trainQuery } from "./trainquery";
 import { OnlineConfigProvider } from "./online-config-provider";
 import { ExpressServer } from "./express-server";
+import { ConsoleLogger } from "./console-logger";
+import { parseIntThrow } from "schel-d-utils";
+import "dotenv/config";
 
 createServer();
 
 async function createServer() {
-  const app = express();
-
-  const isProd = process.env.NODE_ENV == "production";
-  if (isProd) {
-    await setupProdServer(app);
-  } else {
-    await setupDevServer(app);
-  }
+  const serveFrontend = async (app: Express) => {
+    const isProd = process.env.NODE_ENV == "production";
+    if (isProd) {
+      await setupProdServer(app);
+    } else {
+      await setupDevServer(app);
+    }
+  };
 
   await trainQuery(
-    () => new ExpressServer(app),
-    new OnlineConfigProvider("https://static.trainquery.com/data.yml")
+    () =>
+      new ExpressServer(
+        parseIntThrow(process.env.PORT ?? "3000"),
+        serveFrontend
+      ),
+    new OnlineConfigProvider("https://static.trainquery.com/data.yml"),
+    new ConsoleLogger()
   );
-
-  const port = 3000;
-  app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
-  });
 }
 
 async function setupDevServer(app: Express) {

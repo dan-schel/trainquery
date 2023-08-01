@@ -49,6 +49,7 @@ export class PopulateBuilder<O extends object> {
     key: K,
     retriever: (path: string) => Promise<T>
   ) {
+    // @ts-ignore
     return new PopulateBuilder(populateOn(this.value, key, retriever));
   }
 
