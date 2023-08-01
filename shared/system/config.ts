@@ -4,7 +4,7 @@ import {
   ServerOnlyConfig,
   SharedConfig,
 } from "./config-elements";
-import { JsonLoader } from "./populate";
+import { type JsonLoader } from "./populate";
 import { hashString } from "./cyrb53";
 
 /** The server's config object, which includes the shared properties. */

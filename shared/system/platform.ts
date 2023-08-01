@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PlatformID, PlatformIDJson, toPlatformID } from "./ids";
+import { type PlatformID, PlatformIDJson, toPlatformID } from "./ids";
 
 /** Describes the name of a platform. */
 export class Platform {

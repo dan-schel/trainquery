@@ -1,4 +1,4 @@
-import { StopID, StopIDJson } from "./ids";
+import { type StopID, StopIDJson } from "./ids";
 import { z } from "zod";
 import { Platform } from "./platform";
 

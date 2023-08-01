@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { DirectionDefinition, Route, RouteStop } from "./line-route";
-import { RouteVariantID, RouteVariantIDJson } from "../ids";
+import { type RouteVariantID, RouteVariantIDJson } from "../ids";
 
 /** The details of a single branch in a {@link YBranchRoute}. */
 export class Branch {

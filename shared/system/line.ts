@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { LineColor, LineColorJson } from "./enums";
+import { type LineColor, LineColorJson } from "./enums";
 import {
-  LineID,
+  type LineID,
   LineIDJson,
-  ServiceTypeID,
+  type ServiceTypeID,
   ServiceTypeIDJson,
   toServiceTypeID,
 } from "./ids";
