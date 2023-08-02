@@ -4,6 +4,8 @@ import App from "./App.vue";
 import routes from "./router/routes";
 import viteSSR from "vite-ssr/vue";
 import { createHead } from "@vueuse/head";
+import { initConfig, provideConfig } from "./cached-config";
+import { FrontendConfig } from "../shared/system/config";
 
 export default viteSSR(
   App,
@@ -35,6 +37,14 @@ export default viteSSR(
       to.meta.state = await res.json();
       next();
     });
+
+    if (import.meta.env.SSR) {
+      const res = await fetch(`${baseUrl}/api/config`);
+      const json = await res.json();
+      provideConfig(FrontendConfig.json.parse(json));
+    } else {
+      await initConfig(initialState.props.configHash);
+    }
 
     return { head };
   }

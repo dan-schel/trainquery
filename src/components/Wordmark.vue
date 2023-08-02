@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import { useContext } from "vite-ssr";
 import Logo from "./Logo.vue";
 import { ref } from "vue";
+import { getConfig } from "@/cached-config";
 
-const context = useContext();
-const configHash = ref(context.initialState.props.configHash);
+const appName = ref(getConfig().frontend.appName);
 </script>
 
 <template>
   <div class="wordmark">
     <Logo class="logo"></Logo>
     <div class="text">
-      <p class="main">TrainQuery</p>
-      <p class="beta">{{ configHash }}</p>
+      <p class="main">{{ appName }}</p>
+      <p class="beta">BETA</p>
     </div>
   </div>
 </template>

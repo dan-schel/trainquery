@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { formatPageTitle } from "@/utils";
 import { useHead } from "@vueuse/head";
 useHead({
-  title: "Train map | TrainQuery",
+  title: formatPageTitle("Train map"),
 });
 </script>
 
