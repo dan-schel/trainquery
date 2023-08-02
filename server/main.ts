@@ -1,13 +1,14 @@
 import express, { Express } from "express";
 import path from "path";
 import { createSsrServer } from "vite-ssr/dev";
-import { ConfigProvider, trainQuery } from "./trainquery";
+import { ConfigProvider, TrainQuery, trainQuery } from "./trainquery";
 import { OnlineConfigProvider } from "./online-config-provider";
 import { ExpressServer } from "./express-server";
 import { ConsoleLogger } from "./console-logger";
 import { parseIntThrow } from "schel-d-utils";
 import "dotenv/config";
 import { OfflineConfigProvider } from "./offline-config-provider";
+import { ssrAppPropsApi } from "./ssr-props-api";
 
 createServer();
 
@@ -16,9 +17,9 @@ async function createServer() {
   const isOffline = process.env.OFFLINE == "true";
   const port = process.env.PORT ?? "3000";
 
-  const serveFrontend = async (app: Express) => {
+  const serveFrontend = async (ctx: TrainQuery, app: Express) => {
     if (isProd) {
-      await setupProdServer(app);
+      await setupProdServer(ctx, app);
     } else {
       await setupDevServer(app);
     }
@@ -56,7 +57,7 @@ async function setupDevServer(app: Express) {
   app.use(viteServer.middlewares);
 }
 
-async function setupProdServer(app: Express) {
+async function setupProdServer(ctx: TrainQuery, app: Express) {
   const dist = `../dist`;
 
   // Serve static assets.
@@ -76,10 +77,9 @@ async function setupProdServer(app: Express) {
     const { html, status, statusText, headers } = await renderPage(url, {
       manifest,
       preload: true,
-      // Anything passed here will be available in the main hook
       request: req,
       response: res,
-      // initialState: { ... } // <- This would also be available
+      initialState: { props: await ssrAppPropsApi(ctx) },
     });
 
     res.type("html");

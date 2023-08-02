@@ -1,5 +1,5 @@
-import { ServerConfig } from "../shared/system/config";
+import { TrainQuery } from "./trainquery";
 
-export async function configApi(config: ServerConfig) {
-  return config.forFrontend().toJSON();
+export async function configApi(ctx: TrainQuery) {
+  return ctx.getConfig().forFrontend().toJSON();
 }

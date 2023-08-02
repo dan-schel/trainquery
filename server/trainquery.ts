@@ -1,7 +1,9 @@
 import { ServerConfig } from "../shared/system/config";
 import { configApi } from "./config-api";
+import { ssrAppPropsApi, ssrRoutePropsApi } from "./ssr-props-api";
 
 export type ServerBuilder = () => Server;
+export type TrainQuery = { getConfig: () => ServerConfig; server: Server };
 
 export async function trainQuery(
   serverBuilder: ServerBuilder,
@@ -25,18 +27,37 @@ export async function trainQuery(
   refreshConfig(true);
 
   const server = serverBuilder();
-  await server.start(async (endpoint: string) => {
+
+  const ctx: TrainQuery = {
+    getConfig: () => config,
+    server: server,
+  };
+
+  await server.start(ctx, async (endpoint: string, params: ServerParams) => {
+    if (endpoint == "ssrAppProps") {
+      return await ssrAppPropsApi(ctx);
+    }
+    if (endpoint == "ssrRouteProps") {
+      return await ssrRoutePropsApi(ctx, params);
+    }
     if (endpoint == "config") {
-      return await configApi(config);
+      return await configApi(ctx);
     }
     return null;
   });
   logger.logListening(server);
+  return ctx;
 }
+
+export type ServerParams = Record<string, string>;
 
 export abstract class Server {
   abstract start(
-    requestListener: (endpoint: string) => Promise<unknown>
+    ctx: TrainQuery,
+    requestListener: (
+      endpoint: string,
+      params: ServerParams
+    ) => Promise<unknown>
   ): Promise<void>;
 }
 

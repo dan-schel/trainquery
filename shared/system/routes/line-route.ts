@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { type LineRouteType } from "../enums";
-import { type DirectionID, DirectionIDJson, type StopID, StopIDJson } from "../ids";
+import {
+  type DirectionID,
+  DirectionIDJson,
+  type StopID,
+  StopIDJson,
+} from "../ids";
 
 /** Describes the stops and route a line takes. */
 export abstract class Route {

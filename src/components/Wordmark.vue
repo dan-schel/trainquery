@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { useContext } from "vite-ssr";
 import Logo from "./Logo.vue";
+import { ref } from "vue";
+
+const context = useContext();
+const configHash = ref(context.initialState.props.configHash);
 </script>
 
 <template>
@@ -7,7 +12,7 @@ import Logo from "./Logo.vue";
     <Logo class="logo"></Logo>
     <div class="text">
       <p class="main">TrainQuery</p>
-      <p class="beta">BETA</p>
+      <p class="beta">{{ configHash }}</p>
     </div>
   </div>
 </template>
