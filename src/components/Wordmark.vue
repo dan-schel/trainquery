@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import Logo from "./Logo.vue";
-import { ref } from "vue";
 import { getConfig } from "@/cached-config";
-
-const appName = ref(getConfig().frontend.appName);
 </script>
 
 <template>
   <div class="wordmark">
     <Logo class="logo"></Logo>
     <div class="text">
-      <p class="main">{{ appName }}</p>
-      <p class="beta">BETA</p>
+      <p class="main">{{ getConfig().frontend.appName }}</p>
+      <p class="beta" v-if="getConfig().frontend.beta">BETA</p>
     </div>
   </div>
 </template>

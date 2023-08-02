@@ -15,7 +15,6 @@ export async function initConfig(latestHash: string) {
   const existing = getExistingConfig();
 
   if (existing != null && existing.hash == latestHash) {
-    console.log("Using existing config.");
     config = existing;
     return;
   }
@@ -23,7 +22,6 @@ export async function initConfig(latestHash: string) {
   const res = await fetch("/api/config");
   const json = await res.json();
   config = FrontendConfig.json.parse(json);
-  console.log(`Updated config to '${config.hash}'.`);
   localStorage.setItem(lsKey, JSON.stringify(config.toJSON()));
 }
 

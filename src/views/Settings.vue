@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { formatPageTitle } from "@/utils";
 import { useHead } from "@vueuse/head";
 useHead({
-  title: formatPageTitle("Settings"),
+  title: "Settings",
 });
 </script>
 

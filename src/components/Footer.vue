@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Wordmark from "./Wordmark.vue";
+import { getConfig } from "@/cached-config";
 </script>
 
 <template>
@@ -7,15 +8,10 @@ import Wordmark from "./Wordmark.vue";
     <div class="content">
       <div class="divider"></div>
       <Wordmark class="wordmark"></Wordmark>
-      <p class="disclaimer">
-        © Dan Schellekens 2023 &mdash; Not affiliated with PTV, Metro Trains
-        Melbourne, or V/Line. Data accuracy cannot be guaranteed. For official
-        timetables visit
-        <a href="https://www.ptv.vic.gov.au" class="link">ptv.vic.gov.au</a>.
-      </p>
+      <p class="disclaimer" v-html="getConfig().frontend.footer"></p>
       <p>
         <RouterLink :to="{ name: 'about' }" class="link">
-          About TrainQuery
+          About {{ getConfig().frontend.appName }}
         </RouterLink>
       </p>
     </div>
