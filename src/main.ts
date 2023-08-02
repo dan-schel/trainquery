@@ -1,8 +1,5 @@
 import "./assets/main.scss";
 
-// import { createApp } from "vue";
-// import { createPinia } from "pinia";
-
 import App from "./App.vue";
 import routes from "./router/routes";
 import viteSSR from "vite-ssr/vue";
@@ -14,7 +11,9 @@ export default viteSSR(
   async ({ app, router, initialState, isClient, url }) => {
     const baseUrl = isClient ? "" : url.origin;
 
-    if (initialState.props == null) {
+    // Download app props during SSR. They will be already set if using the
+    // prod server, so this is only really for dev mode.
+    if (import.meta.env.SSR && initialState.props == null) {
       const res = await fetch(`${baseUrl}/api/ssrAppProps`);
       initialState.props = await res.json();
     }
@@ -22,9 +21,11 @@ export default viteSSR(
     const head = createHead();
     app.use(head);
 
+    // Download route props when navigating pages (the first route's props are
+    // downloaded with this code too, but on the server during SSR).
     router.beforeEach(async (to, _from, next) => {
       // Check if route props are already provided.
-      if (!!to.meta.state && Object.keys(to.meta.state).length > 0) {
+      if (to.meta.state != null) {
         return next();
       }
 
@@ -38,10 +39,3 @@ export default viteSSR(
     return { head };
   }
 );
-
-// const app = createApp(App);
-
-// app.use(createPinia());
-// app.use(router);
-
-// app.mount("#app");
