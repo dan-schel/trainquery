@@ -52,7 +52,9 @@ watch(route, () => {
         :class="{ open: openExpandable == 'search' }"
       >
         <div class="expandable">
-          <ExpandableSearch></ExpandableSearch>
+          <ExpandableSearch
+            :open="openExpandable == 'search'"
+          ></ExpandableSearch>
         </div>
       </div>
     </div>

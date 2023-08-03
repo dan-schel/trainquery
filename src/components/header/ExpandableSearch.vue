@@ -1,26 +1,41 @@
 <script setup lang="ts">
+import { ref, watch } from "vue";
 import Icon from "../icons/Icon.vue";
-import SearchResult from "./SearchResult.vue";
+import SearchResults from "./SearchResults.vue";
+
+const props = defineProps<{
+  open: boolean;
+}>();
+
+const query = ref("");
+const input = ref<HTMLInputElement | null>(null);
+
+watch(
+  () => props.open,
+  (value: boolean) => {
+    if (value) {
+      query.value = "";
+
+      // Doesn't work without the delay for some reason :/
+      setTimeout(() => input.value?.focus(), 50);
+    }
+  }
+);
 </script>
 
 <template>
   <form autocomplete="off">
     <Icon id="uil:search"></Icon>
-    <input type="search" placeholder="Search stops, lines, or pages" />
+    <input
+      type="search"
+      placeholder="Search stops, lines, or pages"
+      v-model="query"
+      ref="input"
+    />
   </form>
   <div class="divider"></div>
   <div class="results">
-    <SearchResult
-      icon="uil:map-marker"
-      title="Berwick Station"
-      subtitle="Gippsland and Pakenham lines"
-    ></SearchResult>
-    <SearchResult icon="uil:info-circle" title="About"></SearchResult>
-    <SearchResult
-      icon="uil:slider-h-range"
-      title="Sunbury Line"
-      subtitle="Suburban train line"
-    ></SearchResult>
+    <SearchResults :query="query" mode="all"></SearchResults>
   </div>
 </template>
 
@@ -48,7 +63,7 @@ input {
   height: 1px;
   border-top: 1px solid var(--color-ink-10);
 }
-#navbar-expandable-search-results {
+.results {
   max-height: min(60vh, 20rem);
   overflow-y: scroll;
   padding-top: 0.5rem;
