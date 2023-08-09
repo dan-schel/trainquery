@@ -5,7 +5,7 @@ import { ConfigProvider, TrainQuery, trainQuery } from "./trainquery";
 import { OnlineConfigProvider } from "./online-config-provider";
 import { ExpressServer } from "./express-server";
 import { ConsoleLogger } from "./console-logger";
-import { parseIntThrow } from "schel-d-utils";
+import { parseIntThrow } from "@schel-d/js-utils";
 import "dotenv/config";
 import { OfflineConfigProvider } from "./offline-config-provider";
 import { ssrAppPropsApi } from "./ssr-props-api";

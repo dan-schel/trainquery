@@ -3,7 +3,7 @@ import { RouterView } from "vue-router";
 import Header from "./components/header/Header.vue";
 import Footer from "./components/Footer.vue";
 import { useHead } from "@vueuse/head";
-import { getConfig } from "./cached-config";
+import { getConfig } from "./utils/cached-config";
 
 useHead({
   titleTemplate: (title?: string) =>
@@ -28,3 +28,4 @@ useHead({
   margin-top: 3rem;
 }
 </style>
+./utils/cached-config

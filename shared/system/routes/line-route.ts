@@ -15,6 +15,8 @@ export abstract class Route {
   ) {
     this.type = type;
   }
+
+  abstract stopsAt(stop: StopID): boolean;
 }
 
 export class DirectionDefinition {
@@ -97,4 +99,9 @@ export class RouteStop {
       picksUp: this.pickUp == true ? undefined : this.pickUp,
     };
   }
+}
+
+/** True if one of the passed arrays contains this stop. */
+export function containsStop(stop: StopID, ...stopArrays: RouteStop[][]): boolean {
+  return stopArrays.some(a => a.some(s => s.stop == stop && !s.via));
 }

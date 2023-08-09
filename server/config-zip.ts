@@ -3,7 +3,7 @@ import { ServerConfig } from "../shared/system/config";
 import fsp from "fs/promises";
 import path from "path";
 import YAML from "yaml";
-import { uuid } from "schel-d-utils";
+import { uuid } from "@schel-d/js-utils";
 
 export async function loadConfigFromZip(
   dataFolder: string,

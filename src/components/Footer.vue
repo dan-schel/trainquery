@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Wordmark from "./Wordmark.vue";
-import { getConfig } from "@/cached-config";
+import { getConfig } from "@/utils/cached-config";
 </script>
 
 <template>

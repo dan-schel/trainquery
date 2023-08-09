@@ -4,7 +4,7 @@ import App from "./App.vue";
 import routes from "./router/routes";
 import viteSSR from "vite-ssr/vue";
 import { createHead } from "@vueuse/head";
-import { initConfig, provideConfig } from "./cached-config";
+import { initConfig, provideConfig } from "./utils/cached-config";
 import { FrontendConfig } from "../shared/system/config";
 
 export default viteSSR(

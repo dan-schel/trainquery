@@ -1,5 +1,7 @@
-import { getConfig } from "@/cached-config";
+import { getConfig } from "@/utils/cached-config";
 import type { IconID } from "../icons/Icon.vue";
+import { listifyAnd } from "@schel-d/js-utils";
+import { linesThatStopAt } from "@/utils/config-utils";
 
 /** An entry in a list of searchable pages. */
 export type SearchOption = {
@@ -18,9 +20,10 @@ export function searchOptionsStops(): SearchOption[] {
 
   options.push(
     ...getConfig().shared.stops.map((s) => {
+      const lineNames = linesThatStopAt(s.id).map(l => l.name);
       return {
         title: `${s.name} Station`,
-        subtitle: "[todo]",
+        subtitle: `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "Lines"}`,
         icon: "uil:map-marker" as IconID,
         url: `/stops/${s.id.toFixed()}`,
         tags: [],
