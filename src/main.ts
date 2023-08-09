@@ -6,6 +6,7 @@ import viteSSR from "vite-ssr/vue";
 import { createHead } from "@vueuse/head";
 import { initConfig, provideConfig } from "./utils/cached-config";
 import { FrontendConfig } from "../shared/system/config";
+import { getLine, requireLineID } from "./utils/config-utils";
 
 export default viteSSR(
   App,
@@ -36,6 +37,18 @@ export default viteSSR(
       );
       to.meta.state = await res.json();
       next();
+    });
+
+    router.beforeEach(async (to, _from, next) => {
+      if (to.name != "line") {
+        return next();
+      }
+
+      if (getLine(requireLineID(to.params.id as string)) == null) {
+        await router.replace("/not-found");
+      }
+
+      return next();
     });
 
     if (import.meta.env.SSR) {

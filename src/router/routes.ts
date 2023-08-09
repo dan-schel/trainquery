@@ -15,6 +15,11 @@ export default [
     component: () => import("../views/Lines.vue"),
   },
   {
+    path: "/lines/:id(\\d+)",
+    name: "line",
+    component: () => import("../views/Line.vue"),
+  },
+  {
     path: "/about",
     name: "about",
     component: () => import("../views/About.vue"),

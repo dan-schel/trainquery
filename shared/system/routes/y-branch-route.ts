@@ -1,6 +1,11 @@
 import { z } from "zod";
-import { DirectionDefinition, Route, RouteStop, containsStop } from "./line-route";
-import { type RouteVariantID, RouteVariantIDJson, StopID } from "../ids";
+import {
+  DirectionDefinition,
+  Route,
+  RouteStop,
+  containsStop,
+} from "./line-route";
+import { type RouteVariantID, RouteVariantIDJson, type StopID } from "../ids";
 
 /** The details of a single branch in a {@link YBranchRoute}. */
 export class Branch {
@@ -95,6 +100,11 @@ export class YBranchRoute extends Route {
   }
 
   stopsAt(stop: StopID): boolean {
-    return containsStop(stop, this.shared, this.firstBranch.stops, this.secondBranch.stops);
+    return containsStop(
+      stop,
+      this.shared,
+      this.firstBranch.stops,
+      this.secondBranch.stops
+    );
   }
 }

@@ -1,6 +1,11 @@
 import { z } from "zod";
-import { DirectionDefinition, Route, RouteStop, containsStop } from "./line-route";
-import { StopID } from "../ids";
+import {
+  DirectionDefinition,
+  Route,
+  RouteStop,
+  containsStop,
+} from "./line-route";
+import { type StopID } from "../ids";
 
 /** Route with a balloon loop section where services terminate inside the loop. */
 export class HookRoute extends Route {

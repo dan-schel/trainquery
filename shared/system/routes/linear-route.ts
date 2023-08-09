@@ -1,6 +1,11 @@
 import { z } from "zod";
-import { DirectionDefinition, Route, RouteStop, containsStop } from "./line-route";
-import { StopID } from "../ids";
+import {
+  DirectionDefinition,
+  Route,
+  RouteStop,
+  containsStop,
+} from "./line-route";
+import { type StopID } from "../ids";
 
 /** The simplest type of line route. */
 export class LinearRoute extends Route {
