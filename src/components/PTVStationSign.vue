@@ -54,11 +54,13 @@ defineProps<{
   font-weight: bold;
   padding: 0 1em;
   align-self: center;
+  color: #333333;
 }
 .platform {
   font-size: 2em;
   font-weight: 500;
   padding: 0em 0.5em;
   align-self: center;
+  color: #333333;
 }
 </style>
