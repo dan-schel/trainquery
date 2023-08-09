@@ -29,11 +29,15 @@ export default [
     name: "settings",
     component: () => import("../views/Settings.vue"),
   },
+  {
+    path: "/error/notfound",
+    name: "notfound",
+    component: () => import("../views/NotFound.vue"),
+  },
 
   // Catch-all
   {
     path: "/:pathMatch(.*)*",
-    name: "not-found",
-    component: () => import("../views/NotFound.vue"),
+    redirect: "/error/notfound",
   },
 ];

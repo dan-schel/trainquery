@@ -1,5 +1,56 @@
 @use "css-template/import" as template;
-@include template.init;
+@include template.init(
+  $custom-colors: (
+    "accent-red": (
+      "light": #dc0f0f,
+      "dark": #ff5252,
+    ),
+    "accent-yellow": (
+      "light": #d19700,
+      "dark": #ffc122,
+    ),
+    "accent-green": (
+      "light": #1bae0e,
+      "dark": #32cf25,
+    ),
+    "accent-cyan": (
+      "light": #00a5ca,
+      "dark": #19d6ff,
+    ),
+    "accent-blue": (
+      "light": #3453c2,
+      "dark": #8aa4ff,
+    ),
+    "accent-purple": (
+      "light": #a236e3,
+      "dark": #cd7bff,
+    ),
+    "accent-pink": (
+      "light": #d73aab,
+      "dark": #ff60d2,
+    ),
+    "accent-grey": (
+      "light": #666666,
+      "dark": #999999,
+    ),
+    "error": (
+      "light": #dc0f0f,
+      "dark": #ff5252,
+    ),
+    "stop-notch-inner": (
+      "light": white,
+      "dark": black,
+    ),
+    "stop-notch-outer": (
+      "light": black,
+      "dark": white,
+    ),
+    "map-track": (
+      "light": #bac3d2,
+      "dark": #2f3644,
+    ),
+  )
+);
 
 @font-face {
   font-family: "Archivo";

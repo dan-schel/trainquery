@@ -45,7 +45,7 @@ export default viteSSR(
       }
 
       if (getLine(requireLineID(to.params.id as string)) == null) {
-        await router.replace("/not-found");
+        await router.replace("/error/notfound");
       }
 
       return next();

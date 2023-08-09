@@ -28,4 +28,3 @@ useHead({
   margin-top: 3rem;
 }
 </style>
-./utils/cached-config
