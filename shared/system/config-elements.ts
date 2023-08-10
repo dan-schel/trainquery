@@ -8,18 +8,18 @@ import { UrlNames } from "./url-names";
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
   | {
-    /** E.g. '10' for AEST, or '11' for AEDT. */
-    offset: number;
-  }
+      /** E.g. '10' for AEST, or '11' for AEDT. */
+      offset: number;
+    }
   | {
-    /** E.g. 'Australia/Melbourne'. */
-    id: string;
-    /**
-     * Which hour of the day to use when checking the offset, since DST doesn't
-     * start at midnight.
-     */
-    offsetCheckHour: number;
-  };
+      /** E.g. 'Australia/Melbourne'. */
+      id: string;
+      /**
+       * Which hour of the day to use when checking the offset, since DST doesn't
+       * start at midnight.
+       */
+      offsetCheckHour: number;
+    };
 
 /** The config properties required by both the frontend and backend. */
 export class SharedConfig {
@@ -102,7 +102,7 @@ export class SharedConfig {
     const value = await new PopulateBuilder(replacementSchema.parse(json))
       .populate("stops", async (x) => (await loader(x, stopsYml)).stops)
       .populate("lines", async (x) => (await loader(x, linesYml)).lines)
-      .populate("urlNames", async (x) => (await loader(x, urlNamesYml)))
+      .populate("urlNames", async (x) => await loader(x, urlNamesYml))
       .build();
 
     return SharedConfig.json.parse(value);
@@ -185,7 +185,7 @@ export class FrontendOnlyConfig {
 
 /** The config properties used by the server and never sent to the frontend. */
 export class ServerOnlyConfig {
-  constructor(/* todo: continuation */) { }
+  constructor(/* todo: continuation */) {}
 
   static readonly json = z.object({}).transform((_x) => new ServerOnlyConfig());
 

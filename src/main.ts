@@ -6,7 +6,7 @@ import viteSSR from "vite-ssr/vue";
 import { createHead } from "@vueuse/head";
 import { initConfig, provideConfig } from "./utils/cached-config";
 import { FrontendConfig } from "../shared/system/config";
-import { getLine, requireLineID } from "./utils/config-utils";
+import { getLineFromUrlName, getStopFromUrlName } from "./utils/config-utils";
 
 export default viteSSR(
   App,
@@ -40,11 +40,16 @@ export default viteSSR(
     });
 
     router.beforeEach(async (to, _from, next) => {
-      if (to.name != "line") {
-        return next();
+      if (
+        to.name == "line" &&
+        getLineFromUrlName(to.params.id as string) == null
+      ) {
+        await router.replace("/error/notfound");
       }
-
-      if (getLine(requireLineID(to.params.id as string)) == null) {
+      if (
+        to.name == "stop" &&
+        getStopFromUrlName(to.params.id as string) == null
+      ) {
         await router.replace("/error/notfound");
       }
 

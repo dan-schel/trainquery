@@ -97,8 +97,8 @@ export const StopIDJson = z
 /** Matches a positive integer printed as a string. */
 export const StopIDStringJson = z
   .string()
-  .refine(s => parseIntNull(s) != null && isStopID(parseIntThrow(s)))
-  .transform(s => StopIDJson.parse(parseIntThrow(s)));
+  .refine((s) => parseIntNull(s) != null && isStopID(parseIntThrow(s)))
+  .transform((s) => StopIDJson.parse(parseIntThrow(s)));
 /** Matches a positive integer. */
 export const LineIDJson = z
   .number()
@@ -107,8 +107,8 @@ export const LineIDJson = z
 /** Matches a positive integer printed as a string. */
 export const LineIDStringJson = z
   .string()
-  .refine(l => parseIntNull(l) != null && isLineID(parseIntThrow(l)))
-  .transform(s => LineIDJson.parse(parseIntThrow(s)));
+  .refine((l) => parseIntNull(l) != null && isLineID(parseIntThrow(l)))
+  .transform((s) => LineIDJson.parse(parseIntThrow(s)));
 /** Matches a kebab-case string. */
 export const PlatformIDJson = z
   .string()

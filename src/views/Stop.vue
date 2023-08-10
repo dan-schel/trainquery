@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useHead } from "@vueuse/head";
 import { useRoute } from "vue-router";
-import { requireLineFromUrlName } from "@/utils/config-utils";
+import { requireStopFromUrlName } from "@/utils/config-utils";
 import { computed, ref, watch } from "vue";
 
 const route = useRoute();
@@ -13,16 +13,16 @@ watch(
   }
 );
 
-const line = computed(() => requireLineFromUrlName(params.value.id as string));
+const stop = computed(() => requireStopFromUrlName(params.value.id as string));
 
 useHead({
-  title: `${line.value.name} Line`,
+  title: stop.value.name,
 });
 </script>
 
 <template>
   <main>
-    <h1>{{ line.name }} Line</h1>
+    <h1>{{ stop.name }} Station</h1>
   </main>
 </template>
 
