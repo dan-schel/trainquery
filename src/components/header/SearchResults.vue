@@ -18,7 +18,7 @@ const results = computed(() => search(props.query, searchOptionsWholeSite()));
   <RouterLink
     v-for="result in results"
     :key="result.url"
-    :to="{ name: 'about' }"
+    :to="result.url"
     class="result"
   >
     <Icon :id="result.icon"></Icon>

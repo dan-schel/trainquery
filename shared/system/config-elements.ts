@@ -3,22 +3,23 @@ import { type ServiceTypeID, ServiceTypeIDJson } from "./ids";
 import { Line } from "./line";
 import { Stop } from "./stop";
 import { type JsonLoader, PopulateBuilder } from "./populate";
+import { UrlNames } from "./url-names";
 
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
   | {
-      /** E.g. '10' for AEST, or '11' for AEDT. */
-      offset: number;
-    }
+    /** E.g. '10' for AEST, or '11' for AEDT. */
+    offset: number;
+  }
   | {
-      /** E.g. 'Australia/Melbourne'. */
-      id: string;
-      /**
-       * Which hour of the day to use when checking the offset, since DST doesn't
-       * start at midnight.
-       */
-      offsetCheckHour: number;
-    };
+    /** E.g. 'Australia/Melbourne'. */
+    id: string;
+    /**
+     * Which hour of the day to use when checking the offset, since DST doesn't
+     * start at midnight.
+     */
+    offsetCheckHour: number;
+  };
 
 /** The config properties required by both the frontend and backend. */
 export class SharedConfig {
@@ -27,6 +28,8 @@ export class SharedConfig {
     readonly stops: Stop[],
     /** The lines in the transit system. */
     readonly lines: Line[],
+    /** Maps stops to more memorable URLs. */
+    readonly urlNames: UrlNames,
     /** True if stops should list their platforms. Enables platform filtering. */
     readonly usePlatforms: boolean,
     /** The timezone the transit system's timetables use. */
@@ -48,6 +51,7 @@ export class SharedConfig {
     .object({
       stops: Stop.json.array(),
       lines: Line.json.array(),
+      urlNames: UrlNames.json,
       usePlatforms: z.boolean(),
       timezone: z.union([
         z.object({
@@ -65,6 +69,7 @@ export class SharedConfig {
         new SharedConfig(
           x.stops,
           x.lines,
+          x.urlNames,
           x.usePlatforms,
           x.timezone,
           x.serviceTypes
@@ -75,6 +80,7 @@ export class SharedConfig {
     return {
       stops: this.stops.map((s) => s.toJSON()),
       lines: this.lines.map((l) => l.toJSON()),
+      urlNames: this.urlNames.toJSON(),
       usePlatforms: this.usePlatforms,
       timezone: this.timezone,
       serviceTypes: this.serviceTypes,
@@ -87,14 +93,16 @@ export class SharedConfig {
     loader: JsonLoader
   ): Promise<SharedConfig> {
     const replacementSchema = z
-      .object({ stops: z.string(), lines: z.string() })
+      .object({ stops: z.string(), lines: z.string(), urlNames: z.string() })
       .passthrough();
     const stopsYml = z.object({ stops: z.any() });
     const linesYml = z.object({ lines: z.any() });
+    const urlNamesYml = z.any();
 
     const value = await new PopulateBuilder(replacementSchema.parse(json))
       .populate("stops", async (x) => (await loader(x, stopsYml)).stops)
       .populate("lines", async (x) => (await loader(x, linesYml)).lines)
+      .populate("urlNames", async (x) => (await loader(x, urlNamesYml)))
       .build();
 
     return SharedConfig.json.parse(value);
@@ -177,7 +185,7 @@ export class FrontendOnlyConfig {
 
 /** The config properties used by the server and never sent to the frontend. */
 export class ServerOnlyConfig {
-  constructor(/* todo: continuation */) {}
+  constructor(/* todo: continuation */) { }
 
   static readonly json = z.object({}).transform((_x) => new ServerOnlyConfig());
 

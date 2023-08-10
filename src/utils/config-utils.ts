@@ -33,3 +33,11 @@ export function requireLineID(value: string): LineID {
   }
   return lineID;
 }
+
+export function getStopUrlName(stop: StopID): string | null {
+  return getConfig().shared.urlNames.stops[stop] ?? null;
+}
+
+export function getLineUrlName(line: LineID): string | null {
+  return getConfig().shared.urlNames.lines[line] ?? null;
+}
