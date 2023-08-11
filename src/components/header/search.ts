@@ -2,8 +2,8 @@ import { getConfig } from "@/utils/cached-config";
 import type { IconID } from "../icons/Icon.vue";
 import { listifyAnd } from "@schel-d/js-utils";
 import {
-  getLineUrlName,
-  getStopUrlName,
+  getLinePageRoute,
+  getStopPageRoute,
   linesThatStopAt,
 } from "@/utils/config-utils";
 
@@ -27,11 +27,10 @@ export function searchOptionsStops(): SearchOption[] {
       const lineNames = linesThatStopAt(s.id).map((l) => l.name);
       return {
         title: `${s.name} Station`,
-        subtitle: `${listifyAnd(lineNames)} ${
-          lineNames.length == 1 ? "Line" : "Lines"
-        }`,
+        subtitle: `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "Lines"
+          }`,
         icon: "uil:map-marker" as IconID,
-        url: `/stops/${getStopUrlName(s.id) ?? s.id.toFixed()}`,
+        url: getStopPageRoute(s),
         tags: [],
         data: { stop: s.id },
         boost: 2,
@@ -52,7 +51,7 @@ export function searchOptionsLines(): SearchOption[] {
         title: `${l.name} Line`,
         subtitle: "[todo]",
         icon: "uil:slider-h-range" as IconID,
-        url: `/lines/${getLineUrlName(l.id) ?? l.id.toFixed()}`,
+        url: getLinePageRoute(l),
         tags: [],
         data: { line: l.id },
         boost: 1,

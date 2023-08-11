@@ -70,16 +70,16 @@ export function requireStopID(value: string): StopID {
 }
 
 export function getStopUrlName(stop: StopID): string | null {
-  return getConfig().shared.urlNames.stops[stop] ?? null;
+  return getConfig().shared.urlNames.stops.get(stop) ?? null;
 }
 
 export function getLineUrlName(line: LineID): string | null {
-  return getConfig().shared.urlNames.lines[line] ?? null;
+  return getConfig().shared.urlNames.lines.get(line) ?? null;
 }
 
 export function getStopFromUrlName(param: string): Stop | null {
   const urlNameMatch = getConfig().shared.stops.find(
-    (s) => getConfig().shared.urlNames.stops[s.id] == param
+    (s) => getConfig().shared.urlNames.stops.get(s.id) == param
   );
   if (urlNameMatch != null) {
     return urlNameMatch;
@@ -98,7 +98,7 @@ export function requireStopFromUrlName(param: string): Stop {
 
 export function getLineFromUrlName(param: string): Line | null {
   const urlNameMatch = getConfig().shared.lines.find(
-    (l) => getConfig().shared.urlNames.lines[l.id] == param
+    (l) => getConfig().shared.urlNames.lines.get(l.id) == param
   );
   if (urlNameMatch != null) {
     return urlNameMatch;
@@ -113,4 +113,14 @@ export function requireLineFromUrlName(param: string): Line {
     throw new Error(`No line matching ID or url name "${param}".`);
   }
   return line;
+}
+
+/** E.g. "/stops/pakenham" or "/stops/20". */
+export function getStopPageRoute(stop: Stop): string {
+  return `/stops/${getStopUrlName(stop.id) ?? stop.id.toFixed()}`;
+}
+
+/** E.g. "/lines/pakenham" or "/lines/20". */
+export function getLinePageRoute(line: Line): string {
+  return `/lines/${getLineUrlName(line.id) ?? line.id.toFixed()}`;
 }

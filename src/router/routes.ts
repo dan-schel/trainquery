@@ -12,7 +12,7 @@ export default [
   {
     path: "/lines",
     name: "lines",
-    component: () => import("../views/Lines.vue"),
+    component: () => import("../views/LinesOverview.vue"),
   },
   {
     path: "/lines/:id",

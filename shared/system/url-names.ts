@@ -4,8 +4,8 @@ import { type LineID, LineIDStringJson, type StopID, StopIDStringJson } from "./
 /** Provides the strings used for the stop and line page URLs. */
 export class UrlNames {
   constructor(
-    readonly stops: Partial<Record<StopID, string>>,
-    readonly lines: Partial<Record<LineID, string>>
+    readonly stops: Map<StopID, string>,
+    readonly lines: Map<LineID, string>
   ) {
     this.stops = stops;
     this.lines = lines;
@@ -16,12 +16,15 @@ export class UrlNames {
       stops: z.record(StopIDStringJson, z.string()),
       lines: z.record(LineIDStringJson, z.string()),
     })
-    .transform((x) => new UrlNames(x.stops, x.lines));
+    .transform((x) => new UrlNames(
+      new Map(Object.entries(x.stops).map(x => [StopIDStringJson.parse(x[0]), x[1]!])),
+      new Map(Object.entries(x.lines).map(x => [LineIDStringJson.parse(x[0]), x[1]!]))
+    ));
 
   toJSON(): z.input<typeof UrlNames.json> {
     return {
-      stops: this.stops as Record<StopID, string>,
-      lines: this.lines as Record<StopID, string>,
+      stops: Object.fromEntries(this.stops),
+      lines: Object.fromEntries(this.lines),
     };
   }
 }
