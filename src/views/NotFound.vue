@@ -38,8 +38,8 @@ h1 {
 }
 .decor {
   @include template.no-select;
-  align-self: flex-start;
+  --size: 1;
   margin-bottom: 2rem;
-  box-shadow: 0rem 0.2rem 0.2rem var(--color-shadow-10);
+  align-self: flex-start;
 }
 </style>
