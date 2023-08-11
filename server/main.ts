@@ -1,23 +1,51 @@
 import express, { Express } from "express";
 import path from "path";
 import { createSsrServer } from "vite-ssr/dev";
+import { ConfigProvider, TrainQuery, trainQuery } from "./trainquery";
+import { OnlineConfigProvider } from "./online-config-provider";
+import { ExpressServer } from "./express-server";
+import { ConsoleLogger } from "./console-logger";
+import { parseIntThrow } from "@schel-d/js-utils";
+import "dotenv/config";
+import { OfflineConfigProvider } from "./offline-config-provider";
+import { ssrAppPropsApi } from "./ssr-props-api";
 
 createServer();
 
 async function createServer() {
-  const app = express();
-
   const isProd = process.env.NODE_ENV == "production";
-  if (isProd) {
-    await setupProdServer(app);
-  } else {
-    await setupDevServer(app);
-  }
+  const isOffline = process.env.OFFLINE == "true";
+  const port = process.env.PORT ?? "3000";
 
-  const port = 3000;
-  app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
-  });
+  const serveFrontend = async (ctx: TrainQuery, app: Express) => {
+    if (isProd) {
+      await setupProdServer(ctx, app);
+    } else {
+      await setupDevServer(app);
+    }
+  };
+
+  await trainQuery(
+    () => new ExpressServer(parseIntThrow(port), serveFrontend),
+    getConfigProvider(isOffline),
+    new ConsoleLogger()
+  );
+}
+
+function getConfigProvider(isOffline: boolean): ConfigProvider {
+  if (isOffline) {
+    const zipPath = process.env.CONFIG_OFFLINE;
+    if (zipPath == null) {
+      throw new Error("CONFIG_OFFLINE environment variable not provided.");
+    }
+    return new OfflineConfigProvider(zipPath);
+  } else {
+    const configUrl = process.env.CONFIG;
+    if (configUrl == null) {
+      throw new Error("CONFIG environment variable not provided.");
+    }
+    return new OnlineConfigProvider(configUrl);
+  }
 }
 
 async function setupDevServer(app: Express) {
@@ -29,7 +57,7 @@ async function setupDevServer(app: Express) {
   app.use(viteServer.middlewares);
 }
 
-async function setupProdServer(app: Express) {
+async function setupProdServer(ctx: TrainQuery, app: Express) {
   const dist = `../dist`;
 
   // Serve static assets.
@@ -49,10 +77,9 @@ async function setupProdServer(app: Express) {
     const { html, status, statusText, headers } = await renderPage(url, {
       manifest,
       preload: true,
-      // Anything passed here will be available in the main hook
       request: req,
       response: res,
-      // initialState: { ... } // <- This would also be available
+      initialState: { props: await ssrAppPropsApi(ctx) },
     });
 
     res.type("html");

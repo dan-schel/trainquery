@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useHead } from "@vueuse/head";
 useHead({
-  title: "Settings | TrainQuery",
+  title: "Settings",
 });
 </script>
 

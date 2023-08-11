@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { DirectionDefinition, Route, RouteStop } from "./line-route";
+import {
+  DirectionDefinition,
+  Route,
+  RouteStop,
+  containsStop,
+} from "./line-route";
+import { type StopID } from "../ids";
 
 /** The simplest type of line route. */
 export class LinearRoute extends Route {
@@ -33,5 +39,13 @@ export class LinearRoute extends Route {
       reverse: this.reverse,
       stops: this.stops.map((s) => s.toJSON()),
     };
+  }
+
+  static detect(route: Route): route is LinearRoute {
+    return route.type == "linear";
+  }
+
+  stopsAt(stop: StopID): boolean {
+    return containsStop(stop, this.stops);
   }
 }

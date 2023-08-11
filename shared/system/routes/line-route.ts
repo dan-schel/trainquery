@@ -1,9 +1,11 @@
 import { z } from "zod";
-import { LineRouteType } from "../enums";
-import { DirectionID, DirectionIDJson, StopID, StopIDJson } from "../ids";
-import { LinearRoute } from "./linear-route";
-import { HookRoute } from "./hook-route";
-import { YBranchRoute } from "./y-branch-route";
+import { type LineRouteType } from "../enums";
+import {
+  type DirectionID,
+  DirectionIDJson,
+  type StopID,
+  StopIDJson,
+} from "../ids";
 
 /** Describes the stops and route a line takes. */
 export abstract class Route {
@@ -14,21 +16,7 @@ export abstract class Route {
     this.type = type;
   }
 
-  static readonly json = z
-    .discriminatedUnion("type", [
-      LinearRoute.linearJson,
-      YBranchRoute.yBranchJson,
-      HookRoute.hookJson,
-    ])
-    .transform((x): Route => {
-      return {
-        linear: LinearRoute.jsonTransform,
-        "y-branch": YBranchRoute.jsonTransform,
-        hook: HookRoute.jsonTransform,
-      }[x.type](x as any);
-    });
-
-  abstract toJSON(): z.input<typeof Route.json>;
+  abstract stopsAt(stop: StopID): boolean;
 }
 
 export class DirectionDefinition {
@@ -111,4 +99,12 @@ export class RouteStop {
       picksUp: this.pickUp == true ? undefined : this.pickUp,
     };
   }
+}
+
+/** True if one of the passed arrays contains this stop. */
+export function containsStop(
+  stop: StopID,
+  ...stopArrays: RouteStop[][]
+): boolean {
+  return stopArrays.some((a) => a.some((s) => s.stop == stop && !s.via));
 }

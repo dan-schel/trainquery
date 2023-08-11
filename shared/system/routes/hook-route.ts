@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { DirectionDefinition, Route, RouteStop } from "./line-route";
+import {
+  DirectionDefinition,
+  Route,
+  RouteStop,
+  containsStop,
+} from "./line-route";
+import { type StopID } from "../ids";
 
 /** Route with a balloon loop section where services terminate inside the loop. */
 export class HookRoute extends Route {
@@ -52,5 +58,13 @@ export class HookRoute extends Route {
       hooked: this.hooked.map((s) => s.toJSON()),
       direct: this.direct.map((s) => s.toJSON()),
     };
+  }
+
+  static detect(route: Route): route is HookRoute {
+    return route.type == "hook";
+  }
+
+  stopsAt(stop: StopID): boolean {
+    return containsStop(stop, this.stops, this.hooked, this.direct);
   }
 }

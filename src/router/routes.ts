@@ -12,7 +12,17 @@ export default [
   {
     path: "/lines",
     name: "lines",
-    component: () => import("../views/Lines.vue"),
+    component: () => import("../views/LinesOverview.vue"),
+  },
+  {
+    path: "/lines/:id",
+    name: "line",
+    component: () => import("../views/Line.vue"),
+  },
+  {
+    path: "/stops/:id",
+    name: "stop",
+    component: () => import("../views/Stop.vue"),
   },
   {
     path: "/about",
@@ -24,11 +34,15 @@ export default [
     name: "settings",
     component: () => import("../views/Settings.vue"),
   },
+  {
+    path: "/error/notfound",
+    name: "notfound",
+    component: () => import("../views/NotFound.vue"),
+  },
 
   // Catch-all
   {
     path: "/:pathMatch(.*)*",
-    name: "not-found",
-    component: () => import("../views/NotFound.vue"),
+    redirect: "/error/notfound",
   },
 ];

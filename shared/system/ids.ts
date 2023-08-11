@@ -1,3 +1,4 @@
+import { parseIntNull, parseIntThrow } from "@schel-d/js-utils";
 import { z } from "zod";
 
 declare const StopIDBrand: unique symbol;
@@ -93,11 +94,21 @@ export const StopIDJson = z
   .number()
   .refine((x) => isStopID(x))
   .transform((x) => toStopID(x));
+/** Matches a positive integer printed as a string. */
+export const StopIDStringJson = z
+  .string()
+  .refine((s) => parseIntNull(s) != null && isStopID(parseIntThrow(s)))
+  .transform((s) => StopIDJson.parse(parseIntThrow(s)));
 /** Matches a positive integer. */
 export const LineIDJson = z
   .number()
   .refine((x) => isLineID(x))
   .transform((x) => toLineID(x));
+/** Matches a positive integer printed as a string. */
+export const LineIDStringJson = z
+  .string()
+  .refine((l) => parseIntNull(l) != null && isLineID(parseIntThrow(l)))
+  .transform((s) => LineIDJson.parse(parseIntThrow(s)));
 /** Matches a kebab-case string. */
 export const PlatformIDJson = z
   .string()
