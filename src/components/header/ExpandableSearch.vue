@@ -2,6 +2,7 @@
 import { ref, watch } from "vue";
 import Icon from "../icons/Icon.vue";
 import SearchResults from "./SearchResults.vue";
+import { useRouter } from "vue-router";
 
 const props = defineProps<{
   open: boolean;
@@ -17,14 +18,24 @@ watch(
       query.value = "";
 
       // Doesn't work without the delay for some reason :/
-      setTimeout(() => input.value?.focus(), 50);
+      setTimeout(() => input.value?.focus(), 100);
     }
   }
 );
+
+const router = useRouter();
+const topResultUrl = ref<string | null>(null);
+
+const onSearchEnter = (e: Event) => {
+  e.preventDefault();
+  if (topResultUrl.value != null) {
+    router.push(topResultUrl.value);
+  }
+};
 </script>
 
 <template>
-  <form autocomplete="off">
+  <form autocomplete="off" @submit="onSearchEnter">
     <Icon id="uil:search"></Icon>
     <input
       type="search"
@@ -35,7 +46,11 @@ watch(
   </form>
   <div class="divider"></div>
   <div class="results">
-    <SearchResults :query="query" mode="all"></SearchResults>
+    <SearchResults
+      :query="query"
+      mode="all"
+      @top-result-change="(e) => (topResultUrl = e.url)"
+    ></SearchResults>
   </div>
 </template>
 

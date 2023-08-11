@@ -27,8 +27,9 @@ export function searchOptionsStops(): SearchOption[] {
       const lineNames = linesThatStopAt(s.id).map((l) => l.name);
       return {
         title: `${s.name} Station`,
-        subtitle: `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "Lines"
-          }`,
+        subtitle: `${listifyAnd(lineNames)} ${
+          lineNames.length == 1 ? "Line" : "Lines"
+        }`,
         icon: "uil:map-marker" as IconID,
         url: getStopPageRoute(s),
         tags: [],

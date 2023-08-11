@@ -7,8 +7,15 @@ const props = defineProps<{
   query: string;
   mode: "all" | "stops-only";
 }>();
+const emits = defineEmits<{
+  (e: "topResultChange", payload: { url: string }): void;
+}>();
 
-const results = computed(() => search(props.query, searchOptionsWholeSite()));
+const results = computed(() => {
+  const results = search(props.query, searchOptionsWholeSite());
+  emits("topResultChange", { url: results[0]?.url });
+  return results;
+});
 </script>
 
 <template>
