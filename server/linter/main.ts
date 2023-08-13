@@ -1,5 +1,4 @@
 import { ZodError } from "zod";
-import { toLineID, toStopID } from "../../shared/system/ids";
 import { OfflineConfigProvider } from "../offline-config-provider";
 import { OnlineConfigProvider } from "../online-config-provider";
 import { lint } from "./lint";
@@ -32,24 +31,28 @@ async function main() {
         console.log(`${severityHeader(r.severity)} | ${r.message}`);
       });
     }
-  }
-  catch (error) {
+  } catch (error) {
     if (error instanceof ZodError) {
       console.log(error.toString());
-      console.log(`${severityHeader("fatal")} Failed to parse config (invalid schema). See above for details.`);
-    }
-    else {
+      console.log(
+        `${severityHeader(
+          "fatal"
+        )} Failed to parse config (invalid schema). See above for details.`
+      );
+    } else {
       console.error(`${severityHeader("fatal")} ${error}`);
     }
   }
 }
 
-function severityHeader(severity: "pass" | "suggestion" | "warning" | "error" | "fatal") {
+function severityHeader(
+  severity: "pass" | "suggestion" | "warning" | "error" | "fatal"
+) {
   return {
-    "pass": chalk.bgGreen.bold(" PASS "),
-    "suggestion": chalk.bgWhite.bold(" INFO "),
-    "warning": chalk.bgYellow.bold(" WARN "),
-    "error": chalk.bgRed.bold(" FAIL "),
-    "fatal": chalk.bgRed.bold(" FAIL "),
+    pass: chalk.bgGreen.bold(" PASS "),
+    suggestion: chalk.bgWhite.bold(" INFO "),
+    warning: chalk.bgYellow.bold(" WARN "),
+    error: chalk.bgRed.bold(" FAIL "),
+    fatal: chalk.bgRed.bold(" FAIL "),
   }[severity];
 }
