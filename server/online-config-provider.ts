@@ -12,21 +12,32 @@ const refreshMs = 1000 * 60 * 10;
 const supportedVersion = "v1";
 
 export class OnlineConfigProvider extends ConfigProvider {
-  constructor(readonly manifestUrl: string) {
+  constructor(
+    /** Either the url to a manifest file (.yml) or config zip file. */
+    readonly url: string
+  ) {
     super();
-    this.manifestUrl = manifestUrl;
+    this.url = url;
   }
 
   async fetchConfig(): Promise<ServerConfig> {
-    const manifestYml = await (await fetch(this.manifestUrl)).text();
-    const manifest = manifestJson.parse(YAML.parse(manifestYml));
+    const zipUrl = await (async () => {
+      // This URL might be the zip file...
+      if (this.url.endsWith(".zip")) {
+        return this.url;
+      }
 
-    if (!(supportedVersion in manifest)) {
-      throw new Error(
-        `"${supportedVersion}" data is unavailable at "${this.manifestUrl}"`
-      );
-    }
-    const zipUrl = manifest[supportedVersion].latest;
+      // ...otherwise it's the manifest file.
+      const manifestYml = await (await fetch(this.url)).text();
+      const manifest = manifestJson.parse(YAML.parse(manifestYml));
+
+      if (!(supportedVersion in manifest)) {
+        throw new Error(
+          `"${supportedVersion}" data is unavailable at "${this.url}"`
+        );
+      }
+      return manifest[supportedVersion].latest;
+    })();
 
     const dataFolder = generateDataFolderPath();
     const zipPath = path.join(dataFolder, "data.zip");
