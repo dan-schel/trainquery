@@ -20,7 +20,7 @@
     "lint-eslint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "lint-tsc": "tsc --project server/tsconfig.json --noemit && tsc --project shared/tsconfig.json --noemit",
     "format": "prettier --write src --write server --write shared",
-    "pretqlint": "esbuild server/lint.ts --bundle --platform=node --minify --outfile=dist/lint.js",
+    "pretqlint": "esbuild server/linter/main.ts --bundle --platform=node --minify --outfile=dist/lint.js",
     "tqlint": "node dist/lint.js"
   },
   "dependencies": {
