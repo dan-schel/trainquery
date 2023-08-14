@@ -4,22 +4,23 @@ import { Line } from "./line";
 import { Stop } from "./stop";
 import { type JsonLoader, PopulateBuilder } from "./populate";
 import { UrlNames } from "./url-names";
+import { LinterRules } from "./linter-rules";
 
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
   | {
-      /** E.g. '10' for AEST, or '11' for AEDT. */
-      offset: number;
-    }
+    /** E.g. '10' for AEST, or '11' for AEDT. */
+    offset: number;
+  }
   | {
-      /** E.g. 'Australia/Melbourne'. */
-      id: string;
-      /**
-       * Which hour of the day to use when checking the offset, since DST doesn't
-       * start at midnight.
-       */
-      offsetCheckHour: number;
-    };
+    /** E.g. 'Australia/Melbourne'. */
+    id: string;
+    /**
+     * Which hour of the day to use when checking the offset, since DST doesn't
+     * start at midnight.
+     */
+    offsetCheckHour: number;
+  };
 
 /** The config properties required by both the frontend and backend. */
 export class SharedConfig {
@@ -97,12 +98,11 @@ export class SharedConfig {
       .passthrough();
     const stopsYml = z.object({ stops: z.any() });
     const linesYml = z.object({ lines: z.any() });
-    const urlNamesYml = z.any();
 
     const value = await new PopulateBuilder(replacementSchema.parse(json))
       .populate("stops", async (x) => (await loader(x, stopsYml)).stops)
       .populate("lines", async (x) => (await loader(x, linesYml)).lines)
-      .populate("urlNames", async (x) => await loader(x, urlNamesYml))
+      .populate("urlNames", async (x) => await loader(x, z.any()))
       .build();
 
     return SharedConfig.json.parse(value);
@@ -170,13 +170,9 @@ export class FrontendOnlyConfig {
     const replacementSchema = z
       .object({ departureFeeds: z.string() })
       .passthrough();
-    const departureFeedsYml = z.any();
 
     const value = await new PopulateBuilder(replacementSchema.parse(json))
-      .populate(
-        "departureFeeds",
-        async (x) => await loader(x, departureFeedsYml)
-      )
+      .populate("departureFeeds", async (x) => await loader(x, z.any()))
       .build();
 
     return FrontendOnlyConfig.json.parse(value);
@@ -185,12 +181,19 @@ export class FrontendOnlyConfig {
 
 /** The config properties used by the server and never sent to the frontend. */
 export class ServerOnlyConfig {
-  constructor(/* todo: continuation */) {}
+  constructor(
+    /* todo: continuation */
+    readonly linter: LinterRules
+  ) { }
 
-  static readonly json = z.object({}).transform((_x) => new ServerOnlyConfig());
+  static readonly json = z.object({
+    linter: LinterRules.json,
+  }).transform((x) => new ServerOnlyConfig(x.linter));
 
   toJSON(): z.input<typeof ServerOnlyConfig.json> {
-    return {};
+    return {
+      linter: this.linter.toJSON()
+    };
   }
 
   /** Parse from file (some props reference other files instead of providing data). */
@@ -199,12 +202,12 @@ export class ServerOnlyConfig {
     loader: JsonLoader
   ): Promise<ServerOnlyConfig> {
     const replacementSchema = z
-      .object({ continuation: z.string() })
+      .object({ continuation: z.string(), linter: z.string() })
       .passthrough();
-    const continuationYml = z.any();
 
     const value = await new PopulateBuilder(replacementSchema.parse(json))
-      .populate("continuation", async (x) => await loader(x, continuationYml))
+      .populate("continuation", async (x) => await loader(x, z.any()))
+      .populate("linter", async (x) => await loader(x, z.any()))
       .build();
 
     return ServerOnlyConfig.json.parse(value);
