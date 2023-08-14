@@ -70,7 +70,7 @@ defineProps<{
 }
 .platform {
   font-size: var(--2p5);
-  font-weight: 400;
+  font-weight: 550;
   padding: 0 var(--0p75);
   align-self: center;
   justify-self: center;

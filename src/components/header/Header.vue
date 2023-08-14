@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import ExpandableMenu from "./ExpandableMenu.vue";
 import ExpandableSearch from "./ExpandableSearch.vue";
 import Navbar from "./Navbar.vue";
@@ -18,7 +18,7 @@ const menuItems = ref<MenuItem[]>([
   { icon: "uil:info-circle", title: "About", routeName: "about" },
 ]);
 
-const openExpandable = ref<"none" | "menu" | "search">();
+const openExpandable = ref<"none" | "menu" | "search">("none");
 function menuButtonClicked() {
   openExpandable.value = openExpandable.value == "menu" ? "none" : "menu";
 }
@@ -31,10 +31,44 @@ const route = useRoute();
 watch(route, () => {
   openExpandable.value = "none";
 });
+
+const handleEscKey = (e: KeyboardEvent) => {
+  if (e.code == "KeyK" && e.ctrlKey) {
+    openExpandable.value = "search";
+    e.preventDefault();
+  }
+  if (e.code == "Escape") {
+    openExpandable.value = "none";
+  }
+};
+
+const headerRef = ref<HTMLElement>();
+const handleOutsideClick = (e: MouseEvent) => {
+  if (headerRef.value == null || openExpandable.value == "none") {
+    return;
+  }
+  const target = e.target as HTMLElement;
+  if (!headerRef.value.contains(target)) {
+    openExpandable.value = "none";
+
+    // This doesn't work for RouterLinks unfortunately, a transparent div might
+    // be needed at some point :/
+    e.preventDefault();
+  }
+};
+
+onMounted(() => {
+  window.addEventListener("keydown", handleEscKey);
+  window.addEventListener("click", handleOutsideClick);
+});
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleEscKey);
+  window.removeEventListener("click", handleOutsideClick);
+});
 </script>
 
 <template>
-  <header>
+  <header ref="headerRef">
     <Navbar
       :items="menuItems"
       @menu-button-clicked="menuButtonClicked"

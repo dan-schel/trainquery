@@ -1,4 +1,5 @@
-import { LintContext, examplify } from "./utils";
+import { nonNull } from "@schel-d/js-utils";
+import { LintContext, examplify, listDuplicated } from "./utils";
 
 export function lintMissingUrlNames(ctx: LintContext) {
   const stopsWithoutUrls = ctx.shared.stops
@@ -76,5 +77,33 @@ export function lintUrlNamesAgainstRegex(ctx: LintContext) {
     (a) => `${a} contains illegal characters for a line URL.`,
     (a) => `${a} contain illegal characters for line URLs.`,
     examplify(badLines, 3)
+  );
+}
+
+export function lintUniqueUrlNames(ctx: LintContext) {
+  const duplicatedStopUrls = listDuplicated(
+    ctx.shared.stops
+      .map((s) => ctx.shared.urlNames.stops.get(s.id) ?? null)
+      .filter(nonNull),
+    (a, b) => a == b
+  ).map((s) => `"${s}"`);
+  const duplicatedLineUrls = listDuplicated(
+    ctx.shared.lines
+      .map((l) => ctx.shared.urlNames.lines.get(l.id) ?? null)
+      .filter(nonNull),
+    (a, b) => a == b
+  ).map((l) => `"${l}"`);
+
+  ctx.logPluralizedError(
+    duplicatedStopUrls,
+    (a) => `Multiple stops use the stop URL ${a}`,
+    (a) => `Multiple stops use the stop URLs ${a}`,
+    examplify(duplicatedStopUrls, 3)
+  );
+  ctx.logPluralizedError(
+    duplicatedLineUrls,
+    (a) => `Multiple lines use the stop URL ${a}`,
+    (a) => `Multiple lines use the stop URLs ${a}`,
+    examplify(duplicatedLineUrls, 3)
   );
 }

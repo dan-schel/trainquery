@@ -2,6 +2,7 @@ import { ServerConfig } from "../../shared/system/config";
 import { LintContext, LintMessage, Linter } from "./utils";
 import {
   lintMissingUrlNames,
+  lintUniqueUrlNames,
   lintUrlNameSimilarity,
   lintUrlNamesAgainstRegex,
 } from "./url-names";
@@ -26,6 +27,7 @@ export async function lint(data: ServerConfig): Promise<LintMessage[]> {
     lintUrlNamesAgainstRegex,
     lintPlatforms,
     lintLineServiceTypes,
+    lintUniqueUrlNames,
   ];
 
   for (const rule of rules) {
