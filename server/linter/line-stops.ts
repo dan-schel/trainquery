@@ -39,6 +39,19 @@ export function lintMissingLineStops(ctx: LintContext) {
   }
 }
 
+export function lintLineServiceTypes(ctx: LintContext) {
+  const badLines = ctx.shared.lines
+    .filter((l) => !ctx.shared.serviceTypes.includes(l.serviceType))
+    .map((l) => l.name);
+
+  ctx.logPluralizedError(
+    badLines,
+    (a) => `${a} refers to a service type which is not listed.`,
+    (a) => `${a} refer to service types which are not listed.`,
+    examplify(badLines, 3)
+  );
+}
+
 function stopsOnRoute(route: Route) {
   if (route instanceof LinearRoute) {
     return route.stops;

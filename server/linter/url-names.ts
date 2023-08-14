@@ -24,18 +24,22 @@ export function lintMissingUrlNames(ctx: LintContext) {
 
 export function lintUrlNameSimilarity(ctx: LintContext) {
   const oddStopUrlNames = ctx.shared.stops
-    .filter(
-      (s) =>
-        s.name.toLowerCase().replace(/ /g, "") !=
-        ctx.shared.urlNames.stops.get(s.id)
-    )
+    .filter((s) => {
+      const urlName = ctx.shared.urlNames.stops.get(s.id);
+      if (urlName == null) {
+        return false;
+      }
+      return urlName != s.name.toLowerCase().replace(/ /g, "");
+    })
     .map((s) => `${s.name} (${ctx.shared.urlNames.stops.get(s.id)})`);
   const oddLineUrlNames = ctx.shared.lines
-    .filter(
-      (l) =>
-        l.name.toLowerCase().replace(/ /g, "") !=
-        ctx.shared.urlNames.lines.get(l.id)
-    )
+    .filter((l) => {
+      const urlName = ctx.shared.urlNames.lines.get(l.id);
+      if (urlName == null) {
+        return false;
+      }
+      return urlName != l.name.toLowerCase().replace(/ /g, "");
+    })
     .map((l) => `${l.name} (${ctx.shared.urlNames.lines.get(l.id)})`);
 
   ctx.logPluralizedWarning(

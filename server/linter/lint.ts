@@ -6,7 +6,11 @@ import {
   lintUrlNamesAgainstRegex,
 } from "./url-names";
 import { lintStopAndLineNames, lintUniqueIDs } from "./ids-and-names";
-import { lintMissingLineStops, lintOrphanStops } from "./line-stops";
+import {
+  lintLineServiceTypes,
+  lintMissingLineStops,
+  lintOrphanStops,
+} from "./line-stops";
 import { lintPlatforms } from "./platforms";
 
 export async function lint(data: ServerConfig): Promise<LintMessage[]> {
@@ -21,6 +25,7 @@ export async function lint(data: ServerConfig): Promise<LintMessage[]> {
     lintMissingLineStops,
     lintUrlNamesAgainstRegex,
     lintPlatforms,
+    lintLineServiceTypes,
   ];
 
   for (const rule of rules) {
