@@ -12,8 +12,10 @@ The offline folder is "gitignored" for this purpose.
 
 ## Checking for static data errors
 
-Run `npm run tqlint -- [data source]`, where `[data source]` is either:
+Run `npm run tqlint -- [data source]`, where `[data source]` is one of:
 
+- Literally "`online`" to use the value of the `CONFIG` environment variable.
+- Literally "`offline`" to use the value of the `CONFIG_OFFLINE` environment variable.
 - A path to a local zip archive, e.g. `./offline/config.zip`
 - The URL for an online zip archive, e.g. `"https://static.trainquery.com/data/2023-08-14.zip"`
 - The URL of the manifest file, e.g. `"https://static.trainquery.com/data.yml"`

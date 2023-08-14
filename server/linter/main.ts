@@ -3,6 +3,7 @@ import { OfflineConfigProvider } from "../offline-config-provider";
 import { OnlineConfigProvider } from "../online-config-provider";
 import { lint } from "./lint";
 import chalk from "chalk";
+import "dotenv/config";
 
 main();
 
@@ -14,7 +15,23 @@ async function main() {
 
   const arg = process.argv[2];
   const provider = (() => {
-    if (arg.startsWith("http://") || arg.startsWith("https://")) {
+    if (arg == "online") {
+      const configUrl = process.env.CONFIG;
+      if (configUrl == null) {
+        throw new Error("CONFIG environment variable not set.");
+      }
+      console.log(`Linting "${configUrl}"...`);
+      return new OnlineConfigProvider(configUrl);
+    }
+    else if (arg == "offline") {
+      const zipPath = process.env.CONFIG_OFFLINE;
+      if (zipPath == null) {
+        throw new Error("CONFIG_OFFLINE environment variable not set.");
+      }
+      console.log(`Linting "${zipPath}"...`);
+      return new OfflineConfigProvider(zipPath);
+    }
+    else if (arg.startsWith("http://") || arg.startsWith("https://")) {
       return new OnlineConfigProvider(arg);
     }
     return new OfflineConfigProvider(arg);
