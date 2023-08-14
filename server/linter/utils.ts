@@ -2,9 +2,10 @@ import { listifyAnd } from "@schel-d/js-utils";
 import { ServerConfig } from "../../shared/system/config";
 
 export type LintMessage = {
-  severity: "suggestion" | "warning" | "error";
+  severity: LintSeverity;
   message: string;
 };
+export type LintSeverity = "suggestion" | "warning" | "error";
 
 export type Linter = (ctx: LintContext) => void | Promise<void>;
 
@@ -31,18 +32,48 @@ export class LintContext {
     return this._messages;
   }
 
-  suggest(message: string) {
+  logSuggestion(message: string) {
     this._messages.push({ severity: "suggestion", message: message });
   }
-  warn(message: string) {
+  logWarning(message: string) {
     this._messages.push({ severity: "warning", message: message });
   }
-  throw(message: string) {
+  logError(message: string) {
     this._messages.push({ severity: "error", message: message });
+  }
+
+  private logPluralized(
+    severity: LintSeverity,
+    ...params: Parameters<typeof pluralize>
+  ) {
+    const quantifier = params[0];
+    if (typeof quantifier == "number") {
+      if (quantifier == 0) {
+        return;
+      }
+    } else {
+      if (quantifier.length == 0) {
+        return;
+      }
+    }
+    this._messages.push({ severity: severity, message: pluralize(...params) });
+  }
+
+  /** Uses {@link pluralize} to build message. Does nothing if item count is 0. */
+  logPluralizedSuggestion(...params: Parameters<typeof pluralize>) {
+    this.logPluralized("suggestion", ...params);
+  }
+  /** Uses {@link pluralize} to build message. Does nothing if item count is 0. */
+  logPluralizedWarning(...params: Parameters<typeof pluralize>) {
+    this.logPluralized("warning", ...params);
+  }
+  /** Uses {@link pluralize} to build message. Does nothing if item count is 0. */
+  logPluralizedError(...params: Parameters<typeof pluralize>) {
+    this.logPluralized("error", ...params);
   }
 }
 
-export function examples(items: string[], max: number) {
+export function examplify(items: string[], max: number) {
   if (items.length <= max) {
     return listifyAnd(items);
   }

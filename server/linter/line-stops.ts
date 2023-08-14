@@ -2,25 +2,20 @@ import { HookRoute } from "../../shared/system/routes/hook-route";
 import { Route } from "../../shared/system/routes/line-route";
 import { LinearRoute } from "../../shared/system/routes/linear-route";
 import { YBranchRoute } from "../../shared/system/routes/y-branch-route";
-import { LintContext, examples } from "./utils";
+import { LintContext, examplify } from "./utils";
 import { getStop } from "../../shared/system/config-utils";
 
 export function lintOrphanStops(ctx: LintContext) {
-  const orphanStops = ctx.shared.stops.filter((s) =>
-    ctx.shared.lines.every((l) => !l.route.stopsAt(s.id))
+  const orphanStops = ctx.shared.stops
+    .filter((s) => ctx.shared.lines.every((l) => !l.route.stopsAt(s.id)))
+    .map((s) => s.name);
+
+  ctx.logPluralizedWarning(
+    orphanStops,
+    (a) => `${a} is not served by any line.`,
+    (a) => `${a} are not served by any lines.`,
+    examplify(orphanStops, 3)
   );
-  if (orphanStops.length > 0) {
-    ctx.warn(
-      `${examples(
-        orphanStops.map((s) => s.name),
-        3
-      )} ${
-        orphanStops.length == 1
-          ? "is not served by any line"
-          : "are not served by any lines"
-      }.`
-    );
-  }
 }
 
 export function lintMissingLineStops(ctx: LintContext) {
@@ -36,10 +31,10 @@ export function lintMissingLineStops(ctx: LintContext) {
   }
 
   for (const pair of pairs) {
-    ctx.throw(
-      `The ${
-        pair.lineName
-      } line references stop "${pair.stop.toFixed()}", which doesn't exist.`
+    const line = pair.lineName;
+    const stop = pair.stop.toFixed();
+    ctx.logError(
+      `The ${line} Line references the non-existent stop "${stop}".`
     );
   }
 }

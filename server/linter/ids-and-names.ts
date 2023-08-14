@@ -1,94 +1,70 @@
-import { LintContext, examples, listDuplicated } from "./utils";
+import { LintContext, examplify, listDuplicated } from "./utils";
 
 export function lintUniqueIDs(ctx: LintContext) {
   const duplicatedStopIDs = listDuplicated(
     ctx.shared.stops.map((s) => s.id),
     (a, b) => a == b
-  );
+  ).map((s) => s.toFixed());
   const duplicatedLineIDs = listDuplicated(
     ctx.shared.lines.map((s) => s.id),
     (a, b) => a == b
-  );
+  ).map((l) => l.toFixed());
 
-  if (duplicatedStopIDs.length > 0) {
-    ctx.throw(
-      `${examples(
-        duplicatedStopIDs.map((s) => s.toFixed()),
-        3
-      )} ${
-        duplicatedStopIDs.length == 1
-          ? "is used as a stop ID"
-          : "are used as stop IDs"
-      } more than once.`
-    );
-  }
-  if (duplicatedLineIDs.length > 0) {
-    ctx.throw(
-      `${examples(
-        duplicatedLineIDs.map((s) => s.toFixed()),
-        3
-      )} ${
-        duplicatedLineIDs.length == 1
-          ? "is used as a line ID"
-          : "are used as line IDs"
-      } more than once.`
-    );
-  }
+  ctx.logPluralizedError(
+    duplicatedStopIDs,
+    (a) => `${a} is used as a stop ID more than once.`,
+    (a) => `${a} are used as stop IDs more than once.`,
+    examplify(duplicatedStopIDs, 3)
+  );
+  ctx.logPluralizedError(
+    duplicatedLineIDs,
+    (a) => `${a} is used as a stop ID more than once.`,
+    (a) => `${a} are used as stop IDs more than once.`,
+    examplify(duplicatedLineIDs, 3)
+  );
 }
 
 export function lintUniqueNames(ctx: LintContext) {
   const duplicatedStopNames = listDuplicated(
     ctx.shared.stops.map((s) => s.name),
     (a, b) => a == b
-  );
+  ).map((s) => `"${s}"`);
   const duplicatedLineNames = listDuplicated(
     ctx.shared.lines.map((s) => s.name),
     (a, b) => a == b
-  );
+  ).map((l) => `"${l}"`);
 
   if (duplicatedStopNames.length > 0) {
-    ctx.throw(
-      `There are multiple stops named ${examples(
-        duplicatedStopNames.map((s) => `"${s}"`),
-        3
-      )}.`
-    );
+    const examples = examplify(duplicatedStopNames, 3);
+    ctx.logError(`There are multiple stops named ${examples}.`);
   }
   if (duplicatedLineNames.length > 0) {
-    ctx.throw(
-      `There are multiple lines named ${examples(
-        duplicatedLineNames.map((l) => `"${l}"`),
-        3
-      )}.`
-    );
+    const examples = examplify(duplicatedLineNames, 3);
+    ctx.logError(`There are multiple lines named ${examples}.`);
   }
 }
 
 export function lintStopAndLineNames(ctx: LintContext) {
   const stopRegex = ctx.server.linter.stopNameRegex;
   const lineRegex = ctx.server.linter.lineNameRegex;
-  const failingStops = ctx.shared.stops.filter((s) => !stopRegex.test(s.name));
-  const failingLines = ctx.shared.lines.filter((l) => !lineRegex.test(l.name));
+  const failingStops = ctx.shared.stops
+    .filter((s) => !stopRegex.test(s.name))
+    .map((s) => `"${s.name}"`);
+  const failingLines = ctx.shared.lines
+    .filter((l) => !lineRegex.test(l.name))
+    .map((l) => `"${l.name}"`);
 
-  if (failingStops.length > 0) {
-    ctx.warn(
-      `${examples(
-        failingStops.map((s) => `"${s.name}"`),
-        3
-      )} ${
-        failingStops.length == 1 ? "breaks" : "break"
-      } the stop naming rule given to the linter.`
-    );
-  }
+  ctx.logPluralizedWarning(
+    failingStops,
+    (a) => `${a} does not follow the stop naming convention.`,
+    (a) => `${a} do not follow the stop naming convention.`,
+    examplify(failingStops, 3)
+  );
 
-  if (failingLines.length > 0) {
-    ctx.warn(
-      `${examples(
-        failingLines.map((s) => `"${s.name}"`),
-        3
-      )} ${
-        failingLines.length == 1 ? "breaks" : "break"
-      } the line naming rule given to the linter.`
-    );
-  }
+  ctx.logPluralizedWarning(
+    failingLines,
+    (a) => `${a} does not follow the line naming convention.`,
+    (a) => `${a} do not follow the line naming convention.`,
+    examplify(failingLines, 3)
+  );
 }
