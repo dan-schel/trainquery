@@ -6,10 +6,41 @@ export type LintMessage = {
   message: string;
 };
 
-export type Linter = (
-  data: ServerConfig,
-  messages: LintMessage[]
-) => void | Promise<void>;
+export type Linter = (ctx: LintContext) => void | Promise<void>;
+
+export class LintContext {
+  private readonly _messages: LintMessage[] = [];
+  constructor(private readonly _data: ServerConfig) {
+    this._data = _data;
+  }
+
+  get frontend() {
+    return this._data.frontend;
+  }
+  get server() {
+    return this._data.server;
+  }
+  get shared() {
+    return this._data.shared;
+  }
+  get hash() {
+    return this._data.hash;
+  }
+
+  getMessages() {
+    return this._messages;
+  }
+
+  suggest(message: string) {
+    this._messages.push({ severity: "suggestion", message: message });
+  }
+  warn(message: string) {
+    this._messages.push({ severity: "warning", message: message });
+  }
+  throw(message: string) {
+    this._messages.push({ severity: "error", message: message });
+  }
+}
 
 export function examples(items: string[], max: number) {
   if (items.length <= max) {
@@ -33,4 +64,18 @@ export function listDuplicated<T>(
   }
 
   return Array.from(duplicated);
+}
+
+export function pluralize<T extends string[]>(
+  quantifier: number | any[],
+  singular: (...data: T) => string,
+  plural: (...data: T) => string,
+  ...data: T
+) {
+  const count = typeof quantifier == "number" ? quantifier : quantifier.length;
+
+  if (count == 1) {
+    return singular(...data);
+  }
+  return plural(...data);
 }

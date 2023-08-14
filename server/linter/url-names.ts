@@ -1,121 +1,105 @@
-import { ServerConfig } from "../../shared/system/config";
-import { LintMessage, examples } from "./utils";
+import { LintContext, examples } from "./utils";
 
-export function lintMissingUrlNames(
-  data: ServerConfig,
-  messages: LintMessage[]
-) {
-  const stopsWithoutUrls = data.shared.stops.filter(
-    (s) => data.shared.urlNames.stops.get(s.id) == null
+export function lintMissingUrlNames(ctx: LintContext) {
+  const stopsWithoutUrls = ctx.shared.stops.filter(
+    (s) => ctx.shared.urlNames.stops.get(s.id) == null
   );
-  const linesWithoutUrls = data.shared.lines.filter(
-    (l) => data.shared.urlNames.lines.get(l.id) == null
+  const linesWithoutUrls = ctx.shared.lines.filter(
+    (l) => ctx.shared.urlNames.lines.get(l.id) == null
   );
 
   if (stopsWithoutUrls.length > 0) {
-    messages.push({
-      severity: "warning",
-      message: `Missing stop URL ${
+    ctx.warn(
+      `Missing stop URL ${
         stopsWithoutUrls.length == 1 ? "name" : "names"
       } for ${examples(
         stopsWithoutUrls.map((s) => s.name),
         3
-      )}.`,
-    });
+      )}.`
+    );
   }
 
   if (linesWithoutUrls.length > 0) {
-    messages.push({
-      severity: "warning",
-      message: `Missing line URL ${
+    ctx.warn(
+      `Missing line URL ${
         linesWithoutUrls.length == 1 ? "name" : "names"
       } for ${examples(
         linesWithoutUrls.map((l) => l.name),
         3
-      )}.`,
-    });
+      )}.`
+    );
   }
 }
 
-export function lintUrlNameSimilarity(
-  data: ServerConfig,
-  messages: LintMessage[]
-) {
-  const oddStopUrlNames = data.shared.stops.filter(
+export function lintUrlNameSimilarity(ctx: LintContext) {
+  const oddStopUrlNames = ctx.shared.stops.filter(
     (s) =>
       s.name.toLowerCase().replace(/ /g, "") !=
-      data.shared.urlNames.stops.get(s.id)
+      ctx.shared.urlNames.stops.get(s.id)
   );
-  const oddLineUrlNames = data.shared.lines.filter(
+  const oddLineUrlNames = ctx.shared.lines.filter(
     (l) =>
       l.name.toLowerCase().replace(/ /g, "") !=
-      data.shared.urlNames.lines.get(l.id)
+      ctx.shared.urlNames.lines.get(l.id)
   );
 
   if (oddStopUrlNames.length > 0) {
-    messages.push({
-      severity: "warning",
-      message: `${examples(
+    ctx.warn(
+      `${examples(
         oddStopUrlNames.map(
-          (s) => `${s.name} (${data.shared.urlNames.stops.get(s.id)})`
+          (s) => `${s.name} (${ctx.shared.urlNames.stops.get(s.id)})`
         ),
         3
       )} ${
         oddStopUrlNames.length == 1
           ? "has an unconventional URL, given its name"
           : "have unconventional URLs, given their names"
-      }.`,
-    });
+      }.`
+    );
   }
   if (oddLineUrlNames.length > 0) {
-    messages.push({
-      severity: "warning",
-      message: `${examples(
+    ctx.warn(
+      `${examples(
         oddLineUrlNames.map(
-          (l) => `${l.name} (${data.shared.urlNames.lines.get(l.id)})`
+          (l) => `${l.name} (${ctx.shared.urlNames.lines.get(l.id)})`
         ),
         3
       )} ${
         oddLineUrlNames.length == 1
           ? "has an unconventional URL, given its name"
           : "have unconventional URLs, given their names"
-      }.`,
-    });
+      }.`
+    );
   }
 }
 
-export function lintUrlNamesAgainstRegex(
-  data: ServerConfig,
-  messages: LintMessage[]
-) {
+export function lintUrlNamesAgainstRegex(ctx: LintContext) {
   const urlNameRegex = /^[a-z]+$/;
-  const badStops = Array.from(data.shared.urlNames.stops.values()).filter(
+  const badStops = Array.from(ctx.shared.urlNames.stops.values()).filter(
     (n) => !urlNameRegex.test(n)
   );
-  const badLines = Array.from(data.shared.urlNames.lines.values()).filter(
+  const badLines = Array.from(ctx.shared.urlNames.lines.values()).filter(
     (n) => !urlNameRegex.test(n)
   );
 
   if (badStops.length > 0) {
-    messages.push({
-      severity: "error",
-      message: `${examples(
+    ctx.throw(
+      `${examples(
         badStops.map((n) => `"${n}"`),
         3
       )} ${
         badStops.length == 1 ? "contains" : "contain"
-      } illegal characters for a stop URL.`,
-    });
+      } illegal characters for a stop URL.`
+    );
   }
   if (badLines.length > 0) {
-    messages.push({
-      severity: "error",
-      message: `${examples(
+    ctx.throw(
+      `${examples(
         badLines.map((n) => `"${n}"`),
         3
       )} ${
         badLines.length == 1 ? "contains" : "contain"
-      } illegal characters for a line URL.`,
-    });
+      } illegal characters for a line URL.`
+    );
   }
 }
