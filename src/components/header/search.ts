@@ -1,11 +1,12 @@
 import { getConfig } from "@/utils/cached-config";
 import type { IconID } from "../icons/Icon.vue";
-import { listifyAnd } from "@schel-d/js-utils";
 import {
   getLinePageRoute,
   getStopPageRoute,
   linesThatStopAt,
 } from "../../../shared/system/config-utils";
+import type { Stop } from "../../../shared/system/stop";
+import { listifyAnd } from "@schel-d/js-utils";
 
 /** An entry in a list of searchable pages. */
 export type SearchOption = {
@@ -24,12 +25,9 @@ export function searchOptionsStops(): SearchOption[] {
 
   options.push(
     ...getConfig().shared.stops.map((s) => {
-      const lineNames = linesThatStopAt(getConfig(), s.id).map((l) => l.name);
       return {
         title: `${s.name} Station`,
-        subtitle: `${listifyAnd(lineNames)} ${
-          lineNames.length == 1 ? "Line" : "Lines"
-        }`,
+        subtitle: stopSubtitle(s),
         icon: "uil:map-marker" as IconID,
         url: getStopPageRoute(getConfig(), s),
         tags: [],
@@ -206,4 +204,17 @@ function similarity(query: string, tag: string): number {
     mismatch += 1 * Math.pow(0.95, i);
   }
   return 1 * Math.pow(0.75, mismatch);
+}
+
+function stopSubtitle(stop: Stop): string {
+  let lines = linesThatStopAt(getConfig(), stop.id);
+
+  // Unless every line is "special events only", hide those that are.
+  if (!lines.every(l => l.specialEventsOnly)) {
+    lines = lines.filter(l => !l.specialEventsOnly);
+  }
+
+  const lineNames = lines.map(l => l.name).sort((a, b) => a.localeCompare(b));
+
+  return `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "lines"}`;
 }

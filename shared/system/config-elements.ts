@@ -9,18 +9,18 @@ import { LinterRules } from "./linter-rules";
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
   | {
-      /** E.g. '10' for AEST, or '11' for AEDT. */
-      offset: number;
-    }
+    /** E.g. '10' for AEST, or '11' for AEDT. */
+    offset: number;
+  }
   | {
-      /** E.g. 'Australia/Melbourne'. */
-      id: string;
-      /**
-       * Which hour of the day to use when checking the offset, since DST doesn't
-       * start at midnight.
-       */
-      offsetCheckHour: number;
-    };
+    /** E.g. 'Australia/Melbourne'. */
+    id: string;
+    /**
+     * Which hour of the day to use when checking the offset, since DST doesn't
+     * start at midnight.
+     */
+    offsetCheckHour: number;
+  };
 
 /** The config properties required by both the frontend and backend. */
 export class SharedConfig {
@@ -155,7 +155,7 @@ export class FrontendOnlyConfig {
   toJSON(): z.input<typeof FrontendOnlyConfig.json> {
     return {
       appName: this.appName,
-      beta: !this.beta ? undefined : true,
+      beta: this.beta ? true : undefined,
       tagline: this.tagline,
       footer: this.footer,
       metaDescription: this.metaDescription,
@@ -184,7 +184,7 @@ export class ServerOnlyConfig {
   constructor(
     /* todo: continuation */
     readonly linter: LinterRules
-  ) {}
+  ) { }
 
   static readonly json = z
     .object({

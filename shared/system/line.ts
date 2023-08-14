@@ -60,7 +60,7 @@ export class Line {
       id: this.id,
       name: this.name,
       color: this.color == "none" ? undefined : this.color,
-      specialEventsOnly: !this.specialEventsOnly ? undefined : false,
+      specialEventsOnly: this.specialEventsOnly ? true : undefined,
       serviceType: this.serviceType == "normal" ? undefined : this.serviceType,
       route: routeToJson(this.route),
     };
