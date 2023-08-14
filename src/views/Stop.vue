@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { useHead } from "@vueuse/head";
 import { useRoute } from "vue-router";
-import { getStopPageRoute, requireStopFromUrlName } from "@/utils/config-utils";
+import {
+  getStopPageRoute,
+  requireStopFromUrlName,
+} from "../../shared/system/config-utils";
 import { computed, ref, watch } from "vue";
+import { getConfig } from "@/utils/cached-config";
 
 const route = useRoute();
 const params = ref(route.params);
@@ -13,14 +17,17 @@ watch(
   }
 );
 
-const stop = computed(() => requireStopFromUrlName(params.value.id as string));
+const stop = computed(() =>
+  requireStopFromUrlName(getConfig(), params.value.id as string)
+);
 
 useHead({
   title: stop.value.name,
   link: [
     {
       rel: "canonical",
-      href: "https://trainquery.com" + getStopPageRoute(stop.value),
+      href:
+        "https://trainquery.com" + getStopPageRoute(getConfig(), stop.value),
     },
   ],
 });

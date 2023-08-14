@@ -5,7 +5,7 @@ import {
   getLinePageRoute,
   getStopPageRoute,
   linesThatStopAt,
-} from "@/utils/config-utils";
+} from "../../../shared/system/config-utils";
 
 /** An entry in a list of searchable pages. */
 export type SearchOption = {
@@ -24,14 +24,13 @@ export function searchOptionsStops(): SearchOption[] {
 
   options.push(
     ...getConfig().shared.stops.map((s) => {
-      const lineNames = linesThatStopAt(s.id).map((l) => l.name);
+      const lineNames = linesThatStopAt(getConfig(), s.id).map((l) => l.name);
       return {
         title: `${s.name} Station`,
-        subtitle: `${listifyAnd(lineNames)} ${
-          lineNames.length == 1 ? "Line" : "Lines"
-        }`,
+        subtitle: `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "Lines"
+          }`,
         icon: "uil:map-marker" as IconID,
-        url: getStopPageRoute(s),
+        url: getStopPageRoute(getConfig(), s),
         tags: [],
         data: { stop: s.id },
         boost: 2,
@@ -52,7 +51,7 @@ export function searchOptionsLines(): SearchOption[] {
         title: `${l.name} Line`,
         subtitle: "[todo]",
         icon: "uil:slider-h-range" as IconID,
-        url: getLinePageRoute(l),
+        url: getLinePageRoute(getConfig(), l),
         tags: [],
         data: { line: l.id },
         boost: 1,

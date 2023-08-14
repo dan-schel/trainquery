@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { useHead } from "@vueuse/head";
 import { useRoute } from "vue-router";
-import { getLinePageRoute, requireLineFromUrlName } from "@/utils/config-utils";
+import {
+  getLinePageRoute,
+  requireLineFromUrlName,
+} from "../../shared/system/config-utils";
 import { computed, ref, watch } from "vue";
+import { getConfig } from "@/utils/cached-config";
 
 const route = useRoute();
 const params = ref(route.params);
@@ -13,14 +17,17 @@ watch(
   }
 );
 
-const line = computed(() => requireLineFromUrlName(params.value.id as string));
+const line = computed(() =>
+  requireLineFromUrlName(getConfig(), params.value.id as string)
+);
 
 useHead({
   title: `${line.value.name} Line`,
   link: [
     {
       rel: "canonical",
-      href: "https://trainquery.com" + getLinePageRoute(line.value),
+      href:
+        "https://trainquery.com" + getLinePageRoute(getConfig(), line.value),
     },
   ],
 });
