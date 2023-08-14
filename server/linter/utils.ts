@@ -6,7 +6,10 @@ export type LintMessage = {
   message: string;
 };
 
-export type Linter = (data: ServerConfig, messages: LintMessage[]) => void | Promise<void>;
+export type Linter = (
+  data: ServerConfig,
+  messages: LintMessage[]
+) => void | Promise<void>;
 
 export function examples(items: string[], max: number) {
   if (items.length <= max) {
@@ -15,7 +18,10 @@ export function examples(items: string[], max: number) {
   return `${items.slice(0, max).join(", ")} + ${items.length - max} more`;
 }
 
-export function listDuplicated<T>(items: T[], equalityFunc: (a: T, b: T) => boolean): T[] {
+export function listDuplicated<T>(
+  items: T[],
+  equalityFunc: (a: T, b: T) => boolean
+): T[] {
   const duplicated = new Set<T>();
 
   for (let i = 0; i < items.length - 1; i++) {

@@ -1,10 +1,5 @@
 import type { Stop } from "./stop";
-import {
-  type LineID,
-  type StopID,
-  isLineID,
-  isStopID,
-} from "./ids";
+import { type LineID, type StopID, isLineID, isStopID } from "./ids";
 import { parseIntNull } from "@schel-d/js-utils";
 import type { Line } from "./line";
 import { SharedConfig } from "./config-elements";
@@ -71,15 +66,24 @@ export function requireStopID(value: string): StopID {
   return stopID;
 }
 
-export function getStopUrlName(config: HasSharedConfig, stop: StopID): string | null {
+export function getStopUrlName(
+  config: HasSharedConfig,
+  stop: StopID
+): string | null {
   return config.shared.urlNames.stops.get(stop) ?? null;
 }
 
-export function getLineUrlName(config: HasSharedConfig, line: LineID): string | null {
+export function getLineUrlName(
+  config: HasSharedConfig,
+  line: LineID
+): string | null {
   return config.shared.urlNames.lines.get(line) ?? null;
 }
 
-export function getStopFromUrlName(config: HasSharedConfig, param: string): Stop | null {
+export function getStopFromUrlName(
+  config: HasSharedConfig,
+  param: string
+): Stop | null {
   const urlNameMatch = config.shared.stops.find(
     (s) => config.shared.urlNames.stops.get(s.id) == param
   );
@@ -90,7 +94,10 @@ export function getStopFromUrlName(config: HasSharedConfig, param: string): Stop
   return config.shared.stops.find((s) => s.id.toFixed() == param) ?? null;
 }
 
-export function requireStopFromUrlName(config: HasSharedConfig, param: string): Stop {
+export function requireStopFromUrlName(
+  config: HasSharedConfig,
+  param: string
+): Stop {
   const stop = getStopFromUrlName(config, param);
   if (stop == null) {
     throw new Error(`No stop matching ID or url name "${param}".`);
@@ -98,7 +105,10 @@ export function requireStopFromUrlName(config: HasSharedConfig, param: string): 
   return stop;
 }
 
-export function getLineFromUrlName(config: HasSharedConfig, param: string): Line | null {
+export function getLineFromUrlName(
+  config: HasSharedConfig,
+  param: string
+): Line | null {
   const urlNameMatch = config.shared.lines.find(
     (l) => config.shared.urlNames.lines.get(l.id) == param
   );
@@ -109,7 +119,10 @@ export function getLineFromUrlName(config: HasSharedConfig, param: string): Line
   return config.shared.lines.find((l) => l.id.toFixed() == param) ?? null;
 }
 
-export function requireLineFromUrlName(config: HasSharedConfig, param: string): Line {
+export function requireLineFromUrlName(
+  config: HasSharedConfig,
+  param: string
+): Line {
   const line = getLineFromUrlName(config, param);
   if (line == null) {
     throw new Error(`No line matching ID or url name "${param}".`);

@@ -6,7 +6,10 @@ import viteSSR from "vite-ssr/vue";
 import { createHead } from "@vueuse/head";
 import { getConfig, initConfig, provideConfig } from "./utils/cached-config";
 import { FrontendConfig } from "../shared/system/config";
-import { getLineFromUrlName, getStopFromUrlName } from "../shared/system/config-utils";
+import {
+  getLineFromUrlName,
+  getStopFromUrlName,
+} from "../shared/system/config-utils";
 
 export default viteSSR(
   App,

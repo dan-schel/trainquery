@@ -7,16 +7,28 @@ import { LintMessage, examples } from "./utils";
 import { getStop } from "../../shared/system/config-utils";
 
 export function lintOrphanStops(data: ServerConfig, messages: LintMessage[]) {
-  const orphanStops = data.shared.stops.filter(s => data.shared.lines.every(l => !l.route.stopsAt(s.id)));
+  const orphanStops = data.shared.stops.filter((s) =>
+    data.shared.lines.every((l) => !l.route.stopsAt(s.id))
+  );
   if (orphanStops.length > 0) {
     messages.push({
       severity: "warning",
-      message: `${examples(orphanStops.map((s) => s.name), 3)} ${orphanStops.length == 1 ? "is not served by any line" : "are not served by any lines"}.`,
+      message: `${examples(
+        orphanStops.map((s) => s.name),
+        3
+      )} ${
+        orphanStops.length == 1
+          ? "is not served by any line"
+          : "are not served by any lines"
+      }.`,
     });
   }
 }
 
-export function lintMissingLineStops(data: ServerConfig, messages: LintMessage[]) {
+export function lintMissingLineStops(
+  data: ServerConfig,
+  messages: LintMessage[]
+) {
   const pairs = [];
   for (const line of data.shared.lines) {
     const stops = stopsOnRoute(line.route);
@@ -31,7 +43,9 @@ export function lintMissingLineStops(data: ServerConfig, messages: LintMessage[]
   for (const pair of pairs) {
     messages.push({
       severity: "error",
-      message: `The ${pair.lineName} line references stop "${pair.stop.toFixed()}", which doesn't exist.`
+      message: `The ${
+        pair.lineName
+      } line references stop "${pair.stop.toFixed()}", which doesn't exist.`,
     });
   }
 }
@@ -39,14 +53,15 @@ export function lintMissingLineStops(data: ServerConfig, messages: LintMessage[]
 function stopsOnRoute(route: Route) {
   if (route instanceof LinearRoute) {
     return route.stops;
-  }
-  else if (route instanceof YBranchRoute) {
-    return [...route.firstBranch.stops, ...route.secondBranch.stops, ...route.shared];
-  }
-  else if (route instanceof HookRoute) {
+  } else if (route instanceof YBranchRoute) {
+    return [
+      ...route.firstBranch.stops,
+      ...route.secondBranch.stops,
+      ...route.shared,
+    ];
+  } else if (route instanceof HookRoute) {
     return [...route.stops, ...route.direct, ...route.hooked];
-  }
-  else {
+  } else {
     throw new Error(`Unrecognised line route type "${route.type}".`);
   }
 }
