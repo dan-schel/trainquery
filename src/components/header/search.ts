@@ -210,11 +210,11 @@ function stopSubtitle(stop: Stop): string {
   let lines = linesThatStopAt(getConfig(), stop.id);
 
   // Unless every line is "special events only", hide those that are.
-  if (!lines.every(l => l.specialEventsOnly)) {
-    lines = lines.filter(l => !l.specialEventsOnly);
+  if (!lines.every((l) => l.specialEventsOnly)) {
+    lines = lines.filter((l) => !l.specialEventsOnly);
   }
 
-  const lineNames = lines.map(l => l.name).sort((a, b) => a.localeCompare(b));
+  const lineNames = lines.map((l) => l.name).sort((a, b) => a.localeCompare(b));
 
   return `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "lines"}`;
 }
