@@ -15,7 +15,7 @@ export abstract class QDateTime<T extends QDateTime<T>> {
 
     return this.date.asDecimal() * 1000000 + this.time.asDecimal();
   }
-  /** E.g. "20230815T10:46:00Z" or "20230815T20:46:00+10:00" */
+  /** E.g. "2023-08-15T10:46:00Z" or "2023-08-15T20:46:00+10:00" */
   abstract toISO(): string;
   /** Adds `d` days, `h` hours, `m` minutes, and `s` seconds. `d`/`h`/`m`/`s` can be negative. */
   abstract add(units: { d: number, h: number, m: number, s: number }): T;

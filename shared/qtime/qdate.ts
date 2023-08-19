@@ -43,13 +43,16 @@ export class QDate {
 
     return { valid: true };
   }
-  /** E.g. "20230815" for 15th Aug 2023. */
+  /** E.g. 20230815 for 15th Aug 2023. */
   asDecimal(): number {
     return this.year * 1000 + this.month * 100 + this.day;
   }
-  /** E.g. "20230815" for 15th Aug 2023. */
+  /** E.g. "2023-08-15" for 15th Aug 2023. */
   toISO() {
-    return this.asDecimal().toFixed().padStart(8, "0");
+    const y = this.year.toFixed().padStart(4, "0");
+    const m = this.month.toFixed().padStart(2, "0");
+    const d = this.day.toFixed().padStart(2, "0");
+    return `${y}-${m}-${d}`;
   }
   /** Returns the date when `x` days have passed. `x` can be negative. */
   addDays(x: number): QDate {

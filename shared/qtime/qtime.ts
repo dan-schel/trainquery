@@ -29,8 +29,10 @@ export class QTime {
   }
   /** E.g. "14:59:00" for 2:59pm. */
   toISO() {
-    const padTwo = (x: number) => x.toFixed().padStart(2, "0");
-    return `${padTwo(this.hour)}:${padTwo(this.minute)}:${padTwo(this.second)}`;
+    const h = this.hour.toFixed().padStart(2, "0");
+    const m = this.minute.toFixed().padStart(2, "0");
+    const s = this.second.toFixed().padStart(2, "0");
+    return `${h}:${m}:${s}`;
   }
   /** Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can be negative. */
   add({ h, m, s }: { h?: number, m?: number, s?: number }): { time: QTime, days: number } {
