@@ -1,9 +1,7 @@
-import { HookRoute } from "../../shared/system/routes/hook-route";
 import { Route } from "../../shared/system/routes/line-route";
-import { LinearRoute } from "../../shared/system/routes/linear-route";
-import { YBranchRoute } from "../../shared/system/routes/y-branch-route";
 import { LintContext, examplify } from "./utils";
 import { getStop } from "../../shared/system/config-utils";
+import { fromRouteType } from "../../shared/system/routes/line-routes";
 
 export function lintOrphanStops(ctx: LintContext) {
   const orphanStops = ctx.shared.stops
@@ -53,17 +51,13 @@ export function lintLineServiceTypes(ctx: LintContext) {
 }
 
 function stopsOnRoute(route: Route) {
-  if (route instanceof LinearRoute) {
-    return route.stops;
-  } else if (route instanceof YBranchRoute) {
-    return [
-      ...route.firstBranch.stops,
-      ...route.secondBranch.stops,
-      ...route.shared,
-    ];
-  } else if (route instanceof HookRoute) {
-    return [...route.stops, ...route.direct, ...route.hooked];
-  } else {
-    throw new Error(`Unrecognised line route type "${route.type}".`);
-  }
+  return fromRouteType(route, {
+    linear: (r) => r.stops,
+    "y-branch": (r) => [
+      ...r.firstBranch.stops,
+      ...r.secondBranch.stops,
+      ...r.shared,
+    ],
+    hook: (r) => [...r.stops, ...r.direct, ...r.hooked],
+  });
 }

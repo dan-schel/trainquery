@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import { useHead } from "@vueuse/head";
-import { useRoute } from "vue-router";
+import { RouterLink, useRoute } from "vue-router";
 import {
   getLinePageRoute,
+  getStopPageRoute,
   requireLineFromUrlName,
+  requireStop,
 } from "../../shared/system/config-utils";
-import { computed, ref, watch } from "vue";
+import { computed } from "vue";
 import { getConfig } from "@/utils/cached-config";
+import PageContent from "@/components/common/PageContent.vue";
+import LineDiagram from "@/components/line/LineDiagram.vue";
+import { getRouteDiagram } from "../../shared/system/routes/line-routes";
 
 const route = useRoute();
-const params = ref(route.params);
-watch(
-  () => route.params,
-  () => {
-    params.value = route.params;
-  }
-);
+const params = computed(() => route.params);
 
 const line = computed(() =>
   requireLineFromUrlName(getConfig(), params.value.id as string)
 );
+const diagram = computed(() => getRouteDiagram(line.value));
 
 useHead({
   title: `${line.value.name} Line`,
@@ -34,19 +34,26 @@ useHead({
 </script>
 
 <template>
-  <main>
-    <h1>{{ line.name }} Line</h1>
-  </main>
+  <PageContent :title="line.name + ' Line'">
+    <LineDiagram :diagram="diagram">
+      <template v-slot:stop="slotProps">
+        <p>
+          <RouterLink
+            class="link"
+            :to="
+              getStopPageRoute(
+                getConfig(),
+                requireStop(getConfig(), slotProps.stop)
+              )
+            "
+            >{{ requireStop(getConfig(), slotProps.stop).name }}</RouterLink
+          >
+        </p>
+      </template>
+    </LineDiagram>
+  </PageContent>
 </template>
 
 <style scoped lang="scss">
-main {
-  align-items: center;
-  padding: 2rem;
-}
-h1 {
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: var(--color-ink-100);
-}
+@use "@/assets/css-template/import" as template;
 </style>

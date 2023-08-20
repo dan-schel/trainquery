@@ -5,17 +5,11 @@ import {
   getStopPageRoute,
   requireStopFromUrlName,
 } from "../../shared/system/config-utils";
-import { computed, ref, watch } from "vue";
+import { computed } from "vue";
 import { getConfig } from "@/utils/cached-config";
 
 const route = useRoute();
-const params = ref(route.params);
-watch(
-  () => route.params,
-  () => {
-    params.value = route.params;
-  }
-);
+const params = computed(() => route.params);
 
 const stop = computed(() =>
   requireStopFromUrlName(getConfig(), params.value.id as string)

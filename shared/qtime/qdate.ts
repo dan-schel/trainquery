@@ -1,12 +1,27 @@
 const _daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-const _monthAcronyms = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const _monthAcronyms = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 function isLeapYear(year: number): boolean {
-  return (year % 4 == 0) && (year % 100 != 0 || year % 400 == 0);
+  return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
 }
 
 function getDaysInMonth(year: number, month: number): number {
-  if (month == 2 && isLeapYear(year)) { return 29; }
+  if (month == 2 && isLeapYear(year)) {
+    return 29;
+  }
   return _daysInMonth[month - 1];
 }
 
@@ -18,12 +33,13 @@ export class QDate {
   constructor(
     readonly year: number,
     readonly month: number,
-    readonly day: number) {
+    readonly day: number
+  ) {
     this.year = year;
     this.month = month;
     this.day = day;
   }
-  isValid(): { valid: true } | { valid: false, issue: string } {
+  isValid(): { valid: true } | { valid: false; issue: string } {
     const invalid = (issue: string) => ({ valid: false, issue: issue });
 
     if (!Number.isInteger(this.year) || this.year < 0) {
@@ -38,7 +54,11 @@ export class QDate {
 
     const daysInMonth = getDaysInMonth(this.year, this.month);
     if (this.day > daysInMonth) {
-      return invalid(`${getMonthAcronym(this.month)} ${this.year} only has ${daysInMonth} days.`);
+      return invalid(
+        `${getMonthAcronym(this.month)} ${
+          this.year
+        } only has ${daysInMonth} days.`
+      );
     }
 
     return { valid: true };
@@ -77,11 +97,25 @@ export class QDate {
     }
     return new QDate(year, month, day);
   }
-  tomorrow() { return this.addDays(1); }
-  yesterday() { return this.addDays(-1); }
-  equals(other: QDate) { return this.asDecimal() == other.asDecimal(); }
-  isBefore(other: QDate) { return this.asDecimal() < other.asDecimal(); }
-  isBeforeOrEqual(other: QDate) { return this.asDecimal() <= other.asDecimal(); }
-  isAfter(other: QDate) { return this.asDecimal() > other.asDecimal(); }
-  isAfterOrEqual(other: QDate) { return this.asDecimal() >= other.asDecimal(); }
+  tomorrow() {
+    return this.addDays(1);
+  }
+  yesterday() {
+    return this.addDays(-1);
+  }
+  equals(other: QDate) {
+    return this.asDecimal() == other.asDecimal();
+  }
+  isBefore(other: QDate) {
+    return this.asDecimal() < other.asDecimal();
+  }
+  isBeforeOrEqual(other: QDate) {
+    return this.asDecimal() <= other.asDecimal();
+  }
+  isAfter(other: QDate) {
+    return this.asDecimal() > other.asDecimal();
+  }
+  isAfterOrEqual(other: QDate) {
+    return this.asDecimal() >= other.asDecimal();
+  }
 }
