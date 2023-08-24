@@ -11,10 +11,7 @@ export class UrlNames {
   constructor(
     readonly stops: Map<StopID, string>,
     readonly lines: Map<LineID, string>
-  ) {
-    this.stops = stops;
-    this.lines = lines;
-  }
+  ) {}
 
   static readonly json = z
     .object({

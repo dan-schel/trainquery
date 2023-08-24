@@ -34,11 +34,7 @@ export class QDate {
     readonly year: number,
     readonly month: number,
     readonly day: number
-  ) {
-    this.year = year;
-    this.month = month;
-    this.day = day;
-  }
+  ) {}
   isValid(): { valid: true } | { valid: false; issue: string } {
     const invalid = (issue: string) => ({ valid: false, issue: issue });
 

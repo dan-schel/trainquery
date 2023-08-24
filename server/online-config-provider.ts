@@ -17,7 +17,6 @@ export class OnlineConfigProvider extends ConfigProvider {
     readonly url: string
   ) {
     super();
-    this.url = url;
   }
 
   async fetchConfig(): Promise<ServerConfig> {

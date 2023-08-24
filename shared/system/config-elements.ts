@@ -40,13 +40,7 @@ export class SharedConfig {
      * service type filtering.
      */
     readonly serviceTypes: ServiceTypeID[]
-  ) {
-    this.stops = stops;
-    this.lines = lines;
-    this.usePlatforms = usePlatforms;
-    this.timezone = timezone;
-    this.serviceTypes = serviceTypes;
-  }
+  ) {}
 
   static readonly json = z
     .object({
@@ -125,13 +119,7 @@ export class FrontendOnlyConfig {
      * with TrainQuery'.
      */
     readonly metaDescription: string // Todo: departure feeds // Todo: search tags
-  ) {
-    this.appName = appName;
-    this.beta = beta;
-    this.tagline = tagline;
-    this.footer = footer;
-    this.metaDescription = metaDescription;
-  }
+  ) {}
 
   static readonly json = z
     .object({

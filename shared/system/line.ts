@@ -25,14 +25,7 @@ export class Line {
     readonly serviceType: ServiceTypeID,
     /** Describes the stops and route this line takes. */
     readonly route: Route
-  ) {
-    this.id = id;
-    this.name = name;
-    this.color = color;
-    this.specialEventsOnly = specialEventsOnly;
-    this.serviceType = serviceType;
-    this.route = route;
-  }
+  ) {}
 
   static readonly json = z
     .object({

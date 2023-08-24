@@ -6,7 +6,6 @@ import { generateDataFolderPath, loadConfigFromZip } from "./config-zip";
 export class OfflineConfigProvider extends ConfigProvider {
   constructor(readonly zipPath: string) {
     super();
-    this.zipPath = zipPath;
   }
 
   async fetchConfig(): Promise<ServerConfig> {

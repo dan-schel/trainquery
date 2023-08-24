@@ -1,10 +1,7 @@
 import { z } from "zod";
 
 export class LinterRules {
-  constructor(readonly stopNameRegex: RegExp, readonly lineNameRegex: RegExp) {
-    this.stopNameRegex = stopNameRegex;
-    this.lineNameRegex = lineNameRegex;
-  }
+  constructor(readonly stopNameRegex: RegExp, readonly lineNameRegex: RegExp) {}
 
   static readonly json = z
     .object({

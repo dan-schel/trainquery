@@ -31,11 +31,6 @@ export class HookRoute extends Route {
     readonly direct: RouteStop[]
   ) {
     super("hook");
-    this.forward = forward;
-    this.reverse = reverse;
-    this.stops = stops;
-    this.hooked = hooked;
-    this.direct = direct;
   }
 
   static readonly hookJson = z.object({

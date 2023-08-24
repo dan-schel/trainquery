@@ -3,11 +3,7 @@ export class QTime {
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) {
-    this.hour = hour;
-    this.minute = minute;
-    this.second = second;
-  }
+  ) {}
   isValid(): { valid: true } | { valid: false; issue: string } {
     const invalid = (issue: string) => ({ valid: false, issue: issue });
 

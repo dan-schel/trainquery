@@ -2,10 +2,8 @@ import { QDate } from "./qdate";
 import { QTime } from "./qtime";
 
 export abstract class QDateTime<T extends QDateTime<T>> {
-  constructor(readonly date: QDate, readonly time: QTime) {
-    this.date = date;
-    this.time = time;
-  }
+  constructor(readonly date: QDate, readonly time: QTime) {}
+
   /** E.g. 145900 for 2:59pm. */
   asDecimal(): number {
     // Beware: Assuming 4 digit years, this number gets close to the maximum

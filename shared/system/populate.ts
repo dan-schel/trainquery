@@ -40,9 +40,7 @@ export class PopulateBuilder<O extends object> {
   constructor(
     /** The starting value. */
     readonly value: Promise<O> | O
-  ) {
-    this.value = value;
-  }
+  ) {}
 
   /** Replace a property in the object with the result of the passed function. */
   populate<K extends keyof O, T>(

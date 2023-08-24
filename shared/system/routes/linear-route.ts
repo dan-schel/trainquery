@@ -18,9 +18,6 @@ export class LinearRoute extends Route {
     readonly stops: RouteStop[]
   ) {
     super("linear");
-    this.forward = forward;
-    this.reverse = reverse;
-    this.stops = stops;
   }
 
   static readonly linearJson = z.object({

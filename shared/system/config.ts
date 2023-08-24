@@ -23,9 +23,6 @@ export class ServerConfig {
      */
     readonly frontend: FrontendOnlyConfig
   ) {
-    this.shared = shared;
-    this.server = server;
-    this.frontend = frontend;
     this.hash = hashString(JSON.stringify(this.toJSON()));
   }
 
@@ -79,11 +76,7 @@ export class FrontendConfig {
     readonly shared: SharedConfig,
     /** Frontend config properties. */
     readonly frontend: FrontendOnlyConfig
-  ) {
-    this.hash = hash;
-    this.shared = shared;
-    this.frontend = frontend;
-  }
+  ) {}
 
   static readonly json = z
     .object({

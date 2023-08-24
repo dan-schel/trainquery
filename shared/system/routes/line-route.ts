@@ -12,9 +12,7 @@ export abstract class Route {
   constructor(
     /** E.g. 'linear', 'y-branch', etc. */
     readonly type: LineRouteType
-  ) {
-    this.type = type;
-  }
+  ) {}
 
   abstract stopsAt(stop: StopID): boolean;
 }
@@ -23,9 +21,7 @@ export class DirectionDefinition {
   constructor(
     /** Uniquely identify this direction from others on this line. */
     readonly id: DirectionID
-  ) {
-    this.id = id;
-  }
+  ) {}
 
   static readonly json = z
     .object({
@@ -60,12 +56,7 @@ export class RouteStop {
      * rule (e.g. 'direction-up').
      */
     readonly pickUp?: boolean | string
-  ) {
-    this.stop = stop;
-    this.via = via;
-    this.setDown = setDown;
-    this.pickUp = pickUp;
-  }
+  ) {}
 
   static readonly json = z
     .union([

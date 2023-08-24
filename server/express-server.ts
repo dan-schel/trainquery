@@ -10,8 +10,6 @@ export class ExpressServer extends Server {
     ) => Promise<void>
   ) {
     super();
-    this.port = port;
-    this._setupFrontend = _setupFrontend;
   }
 
   async start(

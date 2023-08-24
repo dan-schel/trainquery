@@ -11,9 +11,7 @@ export type Linter = (ctx: LintContext) => void | Promise<void>;
 
 export class LintContext {
   private readonly _messages: LintMessage[] = [];
-  constructor(private readonly _data: ServerConfig) {
-    this._data = _data;
-  }
+  constructor(private readonly _data: ServerConfig) {}
 
   get frontend() {
     return this._data.frontend;
