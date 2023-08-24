@@ -11,8 +11,12 @@ export function getTheme(): Theme {
 
   const retrieveTheme = () => {
     const value = localStorage.getItem(lsKey);
-    if (value == "light") { return "light"; }
-    if (value == "dark") { return "dark"; }
+    if (value == "light") {
+      return "light";
+    }
+    if (value == "dark") {
+      return "dark";
+    }
     return "auto";
   };
 
@@ -26,8 +30,7 @@ export function setTheme(newTheme: Theme) {
   document.documentElement.classList.toggle("dark", newTheme == "dark");
   if (newTheme == "auto") {
     localStorage.removeItem(lsKey);
-  }
-  else {
+  } else {
     localStorage.setItem(lsKey, newTheme);
   }
 }
