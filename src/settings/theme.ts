@@ -20,13 +20,14 @@ export function getTheme(): Theme {
   return theme;
 }
 
-export function setTheme(theme: Theme) {
-  document.documentElement.classList.toggle("light", theme == "light");
-  document.documentElement.classList.toggle("dark", theme == "dark");
-  if (theme == "auto") {
+export function setTheme(newTheme: Theme) {
+  theme = newTheme;
+  document.documentElement.classList.toggle("light", newTheme == "light");
+  document.documentElement.classList.toggle("dark", newTheme == "dark");
+  if (newTheme == "auto") {
     localStorage.removeItem(lsKey);
   }
   else {
-    localStorage.setItem(lsKey, theme);
+    localStorage.setItem(lsKey, newTheme);
   }
 }

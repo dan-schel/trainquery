@@ -3,15 +3,20 @@ import { useHead } from "@vueuse/head";
 import PageContent from "@/components/common/PageContent.vue";
 import CupertinoPicker from "@/components/common/CupertinoPicker.vue";
 import { onMounted, ref } from "vue";
-import type { Theme } from "@/settings/theme";
+import { getTheme, setTheme, type Theme } from "@/settings/theme";
+
 useHead({
   title: "Settings",
 });
 
-const theme = ref<Theme | null>(null);
+const theme = ref<Theme>();
 onMounted(() => {
-  // todo
+  theme.value = getTheme();
 });
+
+const onThemeChanged = (newTheme: Theme) => {
+  setTheme(newTheme);
+};
 </script>
 
 <template>
@@ -26,10 +31,13 @@ onMounted(() => {
       <CupertinoPicker
         group="theme"
         :options="[
-          { key: 'auto', data: { theme: 'auto', name: 'Auto' } },
-          { key: 'light', data: { theme: 'light', name: 'Light' } },
-          { key: 'dark', data: { theme: 'dark', name: 'Dark' } },
+          { theme: 'auto' as const, name: 'Auto' },
+          { theme: 'light' as const, name: 'Light' },
+          { theme: 'dark' as const, name: 'Dark' },
         ]"
+        :keyify="(option) => option.theme"
+        :modelValue="theme"
+        @update:modelValue="onThemeChanged"
         class="theme-picker"
       >
         <template v-slot="slotProps">
