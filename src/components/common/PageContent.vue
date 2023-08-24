@@ -1,13 +1,16 @@
 <script setup lang="ts">
 defineProps<{
   title: string;
+  titleMargin?: string;
 }>();
 </script>
 
 <template>
   <main>
     <div class="content">
-      <h1>{{ title }}</h1>
+      <h1 :style="{ 'margin-bottom': titleMargin }">
+        {{ title }}
+      </h1>
       <slot></slot>
     </div>
   </main>

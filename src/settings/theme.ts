@@ -1,6 +1,6 @@
 const lsKey = "trainquery-theme";
 
-type Theme = "auto" | "light" | "dark";
+export type Theme = "auto" | "light" | "dark";
 
 let theme: Theme | null = null;
 
