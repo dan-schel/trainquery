@@ -79,3 +79,10 @@ body,
   min-height: 100vh;
   min-height: 100svh;
 }
+
+:root.light {
+  @include template.theme-light;
+}
+:root.dark {
+  @include template.theme-dark;
+}

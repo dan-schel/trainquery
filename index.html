@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
+    <script>
+      const theme = localStorage.getItem("trainquery-theme");
+      if (theme == "light" || theme == "dark") {
+        document.documentElement.classList.add(theme);
+      }
+    </script>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
