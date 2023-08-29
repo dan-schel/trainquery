@@ -1,27 +1,31 @@
 <script setup lang="ts">
 import OneLineP from "@/components/common/OneLineP.vue";
+import Icon from "../icons/Icon.vue";
+import { RouterLink } from "vue-router";
 </script>
 
 <template>
-  <div class="departure accent-purple">
+  <RouterLink class="departure accent-cyan" to="/home">
     <div class="primary">
-      <OneLineP class="terminus">Traralgon</OneLineP>
-      <OneLineP class="via">via Pakenham</OneLineP>
-      <OneLineP class="time">4:57pm Monday</OneLineP>
+      <OneLineP class="terminus">Flinders Street</OneLineP>
+      <OneLineP class="via">via City Loop</OneLineP>
+      <OneLineP class="time">2 mins</OneLineP>
     </div>
     <div class="details">
-      <OneLineP>
-        Express Dandenong &gt; Garfield, also skipping Yarragon and Trafalgar
-      </OneLineP>
-      <OneLineP class="disruption">
-        Potentially replaced by buses after Berwick
-      </OneLineP>
+      <OneLineP> Express Malvern → South Yarra </OneLineP>
+      <div class="disruption">
+        <Icon id="uil:exclamation-circle"></Icon>
+        <OneLineP> Potentially replaced by buses after Westall</OneLineP>
+      </div>
     </div>
     <div class="platform">
       <p>Platform</p>
       <p class="platform-number">2</p>
     </div>
-  </div>
+    <div class="arrow">
+      <Icon id="uil:angle-right"></Icon>
+    </div>
+  </RouterLink>
 </template>
 
 <style scoped lang="scss">
@@ -29,14 +33,17 @@ import OneLineP from "@/components/common/OneLineP.vue";
 @use "@/assets/line-colors" as line-colors;
 .departure {
   @include line-colors.accent-classes;
+  @include template.button-hover;
+  --button-rounding: 0;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   grid-template-rows: 1rem 2.3rem;
   grid-template-areas:
-    "primary primary"
-    "details platform";
+    "primary primary arrow"
+    "details platform arrow";
 
   padding: 1rem;
+  padding-right: 0.5rem;
   row-gap: 0.5rem;
   column-gap: 0.5rem;
 }
@@ -80,19 +87,25 @@ import OneLineP from "@/components/common/OneLineP.vue";
 .details {
   grid-area: details;
   min-width: 0;
-
+  display: grid;
+  grid-template-columns: auto 1fr 1rem;
   justify-content: flex-end;
-  gap: 0.6rem;
 
   > * {
     min-width: 0;
   }
-  :nth-child(2) {
+  .disruption {
+    @include template.row;
     grid-row: 3;
-  }
-  .disruption :deep(p) {
-    font-weight: bold;
-    color: var(--color-error);
+    gap: 0.25rem;
+
+    &:deep(p) {
+      font-weight: bold;
+    }
+    &:deep(p),
+    .icon {
+      color: var(--color-error);
+    }
   }
 }
 
@@ -102,7 +115,7 @@ import OneLineP from "@/components/common/OneLineP.vue";
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 2.3rem;
-  padding: 0.2rem 0.5rem;
+  padding: 0.2rem 0.4rem;
   justify-items: center;
 
   border: 2px solid var(--color-ink-20);
@@ -115,5 +128,10 @@ import OneLineP from "@/components/common/OneLineP.vue";
   .platform-number {
     grid-row: 3;
   }
+}
+.arrow {
+  grid-area: arrow;
+  align-self: center;
+  font-size: 1rem;
 }
 </style>

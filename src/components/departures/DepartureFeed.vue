@@ -26,6 +26,7 @@ import Departure from "./Departure.vue";
   border-radius: 0.75rem;
   border: 1px solid var(--color-ink-10);
   box-shadow: 0 0.1rem 0.2rem var(--color-shadow-10);
+  overflow: hidden;
 }
 .divider {
   height: 1px;
