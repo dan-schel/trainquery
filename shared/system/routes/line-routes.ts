@@ -1,3 +1,4 @@
+import { type LineColor } from "../enums";
 import { type StopID } from "../ids";
 import { Line } from "../line";
 import { HookRoute } from "./hook-route";
@@ -6,10 +7,12 @@ import { LinearRoute } from "./linear-route";
 import { YBranchRoute } from "./y-branch-route";
 
 export type LineDiagramData = {
-  loop: StopID[];
-  stops: StopID[];
-  firstBranch: StopID[];
-  secondBranch: StopID[];
+  loop: { stop: StopID; express: boolean }[];
+  stops: { stop: StopID; express: boolean }[];
+  firstBranch: { stop: StopID; express: boolean }[];
+  secondBranch: { stop: StopID; express: boolean }[];
+  transparentTo: number;
+  color: LineColor;
 };
 
 type Then<T> = {
@@ -33,7 +36,7 @@ export function getRouteDiagram(line: Line): LineDiagramData {
   const stopIDs = (...a: RouteStop[][]) =>
     a
       .flat()
-      .map((s) => s.stop)
+      .map((s) => ({ stop: s.stop, express: s.via }))
       .reverse();
 
   return {
@@ -57,5 +60,7 @@ export function getRouteDiagram(line: Line): LineDiagramData {
       "y-branch": (r) => stopIDs(r.secondBranch.stops),
       hook: (_r) => [],
     }),
+    transparentTo: 0,
+    color: line.color,
   };
 }
