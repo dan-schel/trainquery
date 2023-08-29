@@ -27,8 +27,8 @@
   .accent-pink {
     --color-accent: var(--color-accent-pink);
   }
-  &.accent-grey,
-  .accent-grey {
-    --color-accent: var(--color-accent-grey);
+  &.accent-none,
+  .accent-none {
+    --color-accent: var(--color-accent-none);
   }
 }

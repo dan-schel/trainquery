@@ -1,5 +1,5 @@
 import type { Stop } from "./stop";
-import { type LineID, type StopID, isLineID, isStopID } from "./ids";
+import { type LineID, type StopID, isLineID, isStopID, ServiceTypeID } from "./ids";
 import { parseIntNull } from "@schel-d/js-utils";
 import type { Line } from "./line";
 import { SharedConfig } from "./config-elements";
@@ -138,4 +138,16 @@ export function getStopPageRoute(config: HasSharedConfig, stop: Stop): string {
 /** E.g. "/lines/pakenham" or "/lines/20". */
 export function getLinePageRoute(config: HasSharedConfig, line: Line): string {
   return `/lines/${getLineUrlName(config, line.id) ?? line.id.toFixed()}`;
+}
+
+export function getServiceType(config: HasSharedConfig, serviceType: ServiceTypeID) {
+  return config.shared.serviceTypes.find((l) => l.id == serviceType) ?? null;
+}
+
+export function requireServiceType(config: HasSharedConfig, serviceType: ServiceTypeID) {
+  const serviceTypeData = getServiceType(config, serviceType);
+  if (serviceTypeData == null) {
+    throw new Error(`No service type with ID "${serviceType}".`);
+  }
+  return serviceTypeData;
 }

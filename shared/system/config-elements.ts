@@ -1,26 +1,26 @@
 import { z } from "zod";
-import { type ServiceTypeID, ServiceTypeIDJson } from "./ids";
 import { Line } from "./line";
 import { Stop } from "./stop";
 import { type JsonLoader, PopulateBuilder } from "./populate";
 import { UrlNames } from "./url-names";
 import { LinterRules } from "./linter-rules";
+import { ServiceType } from "./service-type";
 
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
   | {
-      /** E.g. '10' for AEST, or '11' for AEDT. */
-      offset: number;
-    }
+    /** E.g. '10' for AEST, or '11' for AEDT. */
+    offset: number;
+  }
   | {
-      /** E.g. 'Australia/Melbourne'. */
-      id: string;
-      /**
-       * Which hour of the day to use when checking the offset, since DST doesn't
-       * start at midnight.
-       */
-      offsetCheckHour: number;
-    };
+    /** E.g. 'Australia/Melbourne'. */
+    id: string;
+    /**
+     * Which hour of the day to use when checking the offset, since DST doesn't
+     * start at midnight.
+     */
+    offsetCheckHour: number;
+  };
 
 /** The config properties required by both the frontend and backend. */
 export class SharedConfig {
@@ -39,8 +39,8 @@ export class SharedConfig {
      * Array of all possible service types, e.g. [suburban, regional]. Enables
      * service type filtering.
      */
-    readonly serviceTypes: ServiceTypeID[]
-  ) {}
+    readonly serviceTypes: ServiceType[]
+  ) { }
 
   static readonly json = z
     .object({
@@ -57,7 +57,7 @@ export class SharedConfig {
           offsetCheckHour: z.number(),
         }),
       ]),
-      serviceTypes: ServiceTypeIDJson.array().default(["normal"]),
+      serviceTypes: ServiceType.json.array(),
     })
     .transform(
       (x) =>
@@ -78,7 +78,7 @@ export class SharedConfig {
       urlNames: this.urlNames.toJSON(),
       usePlatforms: this.usePlatforms,
       timezone: this.timezone,
-      serviceTypes: this.serviceTypes,
+      serviceTypes: this.serviceTypes.map(s => s.toJSON()),
     };
   }
 
@@ -119,7 +119,7 @@ export class FrontendOnlyConfig {
      * with TrainQuery'.
      */
     readonly metaDescription: string // Todo: departure feeds // Todo: search tags
-  ) {}
+  ) { }
 
   static readonly json = z
     .object({
@@ -172,7 +172,7 @@ export class ServerOnlyConfig {
   constructor(
     /* todo: continuation */
     readonly linter: LinterRules
-  ) {}
+  ) { }
 
   static readonly json = z
     .object({
