@@ -69,7 +69,7 @@ nav {
   z-index: 0;
 
   background-color: var(--color-paper-30);
-  box-shadow: 0px 2px 4px var(--color-shadow-10);
+  box-shadow: 0 0.1rem 0.2rem var(--color-shadow-10);
   opacity: 100%;
   transition: opacity 0.25s;
 
