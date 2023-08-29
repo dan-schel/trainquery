@@ -34,7 +34,7 @@ useHead({
 </script>
 
 <template>
-  <PageContent :title="line.name + ' Line'">
+  <PageContent :title="line.name + ' Line'" title-margin="1rem">
     <LineDiagram :diagram="diagram" class="diagram">
       <template #stop="slotProps">
         <p>
@@ -65,6 +65,8 @@ useHead({
 @use "@/assets/css-template/import" as template;
 .diagram {
   --stop-gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem 0rem;
 }
 .link {
   --color-accent: var(--color-ink-100);

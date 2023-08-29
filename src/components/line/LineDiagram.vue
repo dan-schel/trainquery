@@ -47,10 +47,10 @@ const stopList = computed(() => {
       v-for="entry of stopList"
       :key="entry.stop"
       :class="{
+        [entry.type]: true,
         transparent: entry.transparent,
         'transparent-threshold': entry.transparentThreshold,
         indented: entry.indented,
-        [entry.type]: true,
         'first-of-type': entry.firstOfType,
         'last-of-type': entry.lastOfType,
       }"
@@ -60,6 +60,7 @@ const stopList = computed(() => {
           class="rod-top"
           v-if="!(entry.firstEver || (entry.indented && entry.firstOfType))"
         ></div>
+
         <div
           class="tick"
           :class="{
@@ -70,13 +71,14 @@ const stopList = computed(() => {
             express: entry.express,
           }"
         ></div>
+
         <div
           class="rod-bottom"
           v-if="!(entry.lastEver || (entry.indented && entry.lastOfType))"
         ></div>
+
         <div class="rod-unindented" v-if="entry.indented"></div>
 
-        <!-- Loop cap SVG -->
         <svg
           width="48"
           height="24"
@@ -94,7 +96,6 @@ const stopList = computed(() => {
           />
         </svg>
 
-        <!-- Loop join SVG -->
         <svg
           width="48"
           height="24"
@@ -112,7 +113,6 @@ const stopList = computed(() => {
           />
         </svg>
 
-        <!-- Branch split SVG -->
         <svg
           width="48"
           height="24"
@@ -130,9 +130,11 @@ const stopList = computed(() => {
           />
         </svg>
       </div>
+
       <div class="label">
         <slot name="stop" :stop="entry.stop" :express="entry.express"></slot>
       </div>
+
       <div class="visual-extra">
         <div
           class="rod-extra"
@@ -140,6 +142,7 @@ const stopList = computed(() => {
         ></div>
         <div class="rod-unindented-extra" v-if="entry.indented"></div>
       </div>
+
       <div class="label-extra">
         <slot
           name="stop-extra"
@@ -158,14 +161,14 @@ const stopList = computed(() => {
 $rod-width: 0.4rem;
 $tick-width: 0.3rem;
 $tick-height: 0.4rem;
-$loop-cap-margin: 1rem;
+$loop-cap-margin: 0.9rem;
 $loop-join-margin: 0.75rem;
 $branch-split-margin: 0.75rem;
 $branch-end-margin: 0.5rem;
 
 .diagram {
-  padding: 2rem 0rem;
   @include line-colors.accent-classes;
+  --stop-gap: 0.5rem;
 }
 .stop {
   // For positioning the visual, and not having it interfere with the labels.
@@ -183,6 +186,7 @@ $branch-end-margin: 0.5rem;
     margin-bottom: var(--stop-gap);
   }
 
+  // Indented stops give more space to the "visual" diagram elements.
   &.indented {
     grid-template-columns: 3.5rem 1fr;
 
@@ -195,31 +199,37 @@ $branch-end-margin: 0.5rem;
 
 .visual,
 .visual-extra {
-  position: relative;
   --indent: 0rem;
 
+  // For positioning stop ticks, rods, and SVGs.
+  position: relative;
   > * {
     position: absolute;
   }
 }
+
 .tick {
   background-color: var(--color-accent);
 
-  left: $tick-width;
   width: $rod-width + $tick-width;
-
-  top: 50%;
   height: $tick-height;
+
+  left: $tick-width;
+  top: 50%;
   transform: translate(var(--indent), -50%);
 
+  // Show a tick on both sides if this is a terminus.
   &.end {
     left: 0;
     width: $tick-width + $rod-width + $tick-width;
   }
+
+  // Use this tick mark as the rod if it runs express.
   &.express {
     width: $rod-width;
   }
 }
+
 .rod-top,
 .rod-bottom,
 .rod-extra,
@@ -232,42 +242,57 @@ $branch-end-margin: 0.5rem;
   top: 0;
   bottom: 0;
 }
+
+// These types of rod should follow the --indent variable...
 .rod-top,
 .rod-bottom,
 .rod-extra {
   left: calc(var(--indent) + $tick-width);
 }
+// ... and these don't need to.
 .rod-unindented,
 .rod-unindented-extra {
   left: $tick-width;
 }
+
+// Stretch from the top of the first row to the top of the stop tick.
 .rod-top {
   bottom: calc(50% + $tick-height * 0.5);
 }
+
+// Stretch from the bottom of the stop tick to the bottom of the first row.
 .rod-bottom {
   top: calc(50% + $tick-height * 0.5);
 }
+
+// Stretch from the top of the second row, across the margin between stops, to
+// the top of the first row of the next stop.
 .rod-extra,
 .rod-unindented-extra {
   bottom: calc(var(--stop-gap) * -1);
 }
+
 .visual svg {
   color: var(--color-accent);
+
+  // SVGs re-used from melbpt project, which are slightly oversized, so this
+  // adjustment is needed.
   left: -0.25rem;
 }
-.loop-cap {
-  bottom: calc(50% + $tick-width * 0.5);
-}
-.loop-join {
-  top: calc(50% + $tick-width * 0.5);
-}
+
+// These SVGs align their bottoms with the top of the stop tick.
+.loop-cap,
 .branch-split {
   bottom: calc(50% + $tick-width * 0.5);
 }
 
-.loop.first-of-type .rod-unindented {
-  top: calc(50% - $tick-height * 0.5);
+// This SVG aligns it's top with the bottom of the stop tick.
+.loop-join {
+  top: calc(50% + $tick-width * 0.5);
 }
+
+// The last loop stop has extra space beneath itself to the next stop, to allow
+// enough space for the loop join SVG.
 .loop.last-of-type {
   margin-bottom: calc(var(--stop-gap) + $loop-join-margin);
   .rod-unindented-extra {
@@ -275,6 +300,8 @@ $branch-end-margin: 0.5rem;
   }
 }
 
+// The first stop after branching has extra space above itself to allow enough
+// space for the branch split SVG.
 .first-branch.first-of-type {
   margin-top: $branch-split-margin;
   .rod-unindented {
@@ -282,10 +309,20 @@ $branch-end-margin: 0.5rem;
   }
 }
 
+// The first loop stop has extra space above itself to allow enough space for
+// the loop cap SVG.
 .loop.first-of-type {
   margin-top: $loop-cap-margin;
+
+  // Shorten the unindented rod to line up with the bottom of the loop cap SVG.
+  .rod-unindented {
+    top: calc(50% - $tick-height * 0.5);
+  }
 }
 
+// The last stop in the first branch has extra space beneath itself to the next
+// stop, just because it looks better (provides a bit of visual separation
+// between the two branches).
 .first-branch.last-of-type {
   margin-bottom: calc(var(--stop-gap) + $branch-end-margin);
   .rod-unindented-extra {
