@@ -8,7 +8,7 @@ import {
   requireStop,
 } from "../../shared/system/config-utils";
 import { computed } from "vue";
-import { getConfig } from "@/utils/cached-config";
+import { getConfig } from "@/utils/get-config";
 import PageContent from "@/components/common/PageContent.vue";
 import LineDiagram from "@/components/line/LineDiagram.vue";
 import { getRouteDiagram } from "../../shared/system/routes/line-routes";

@@ -6,7 +6,7 @@ import {
   requireStopFromUrlName,
 } from "../../shared/system/config-utils";
 import { computed } from "vue";
-import { getConfig } from "@/utils/cached-config";
+import { getConfig } from "@/utils/get-config";
 
 const route = useRoute();
 const params = computed(() => route.params);

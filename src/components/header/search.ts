@@ -1,4 +1,4 @@
-import { getConfig } from "@/utils/cached-config";
+import { getConfig } from "@/utils/get-config";
 import type { IconID } from "../icons/Icon.vue";
 import {
   getLinePageRoute,

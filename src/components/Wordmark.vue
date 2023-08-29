@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Logo from "./Logo.vue";
-import { getConfig } from "@/utils/cached-config";
+import { getConfig } from "@/utils/get-config";
 </script>
 
 <template>
