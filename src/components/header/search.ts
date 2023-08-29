@@ -5,8 +5,8 @@ import {
   getStopPageRoute,
   linesThatStopAt,
   requireServiceType,
-} from "../../../shared/system/config-utils";
-import type { Stop } from "../../../shared/system/stop";
+} from "shared/system/config-utils";
+import type { Stop } from "shared/system/stop";
 import { listifyAnd } from "@schel-d/js-utils";
 
 /** An entry in a list of searchable pages. */
@@ -51,7 +51,7 @@ export function searchOptionsLines(): SearchOption[] {
         title: `${l.name} Line`,
         subtitle: {
           "suburban-train": "Suburban train line",
-          "regional-train": "Regional train line"
+          "regional-train": "Regional train line",
         }[requireServiceType(getConfig(), l.serviceType).mode],
         icon: "uil:slider-h-range" as IconID,
         url: getLinePageRoute(getConfig(), l),

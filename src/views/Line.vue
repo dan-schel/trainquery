@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { useHead } from "@vueuse/head";
-import { RouterLink, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import {
   getLinePageRoute,
-  getStopPageRoute,
   requireLineFromUrlName,
-  requireStop,
-} from "../../shared/system/config-utils";
+} from "shared/system/config-utils";
 import { computed } from "vue";
 import { getConfig } from "@/utils/get-config";
 import PageContent from "@/components/common/PageContent.vue";
 import LineDiagram from "@/components/line/LineDiagram.vue";
-import { getRouteDiagram } from "../../shared/system/routes/line-routes";
+import { getRouteDiagram } from "shared/system/routes/line-routes";
+import LinePageStop from "@/components/line/LinePageStop.vue";
 
 const route = useRoute();
 const params = computed(() => route.params);
@@ -37,26 +36,8 @@ useHead({
   <PageContent :title="line.name + ' Line'" title-margin="1rem">
     <LineDiagram :diagram="diagram" class="diagram">
       <template #stop="slotProps">
-        <p>
-          <RouterLink
-            class="link"
-            :class="{ express: slotProps.express }"
-            :to="
-              getStopPageRoute(
-                getConfig(),
-                requireStop(getConfig(), slotProps.stop)
-              )
-            "
-            >{{ slotProps.express ? "Skips " : ""
-            }}{{ requireStop(getConfig(), slotProps.stop).name }}</RouterLink
-          >
-        </p>
+        <LinePageStop :stop="slotProps.stop" :express="slotProps.express" />
       </template>
-      <!-- <template #stop-extra="slotProps">
-        <p class="extra" v-if="!slotProps.express">
-          Change here for hopes and dreams
-        </p>
-      </template> -->
     </LineDiagram>
   </PageContent>
 </template>
@@ -67,20 +48,5 @@ useHead({
   --stop-gap: 1rem;
   margin-bottom: 1.5rem;
   padding: 0.5rem 0rem;
-}
-.link {
-  --color-accent: var(--color-ink-100);
-  font-weight: bold;
-
-  &.express {
-    --color-accent: var(--color-ink-80);
-    font-weight: normal;
-    font-size: 0.8rem;
-    font-style: italic;
-  }
-}
-.extra {
-  margin-top: 0.25rem;
-  font-size: 0.8rem;
 }
 </style>

@@ -4,7 +4,7 @@ import { useRoute } from "vue-router";
 import {
   getStopPageRoute,
   requireStopFromUrlName,
-} from "../../shared/system/config-utils";
+} from "shared/system/config-utils";
 import { computed } from "vue";
 import { getConfig } from "@/utils/get-config";
 

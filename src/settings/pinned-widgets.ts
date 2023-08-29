@@ -1,4 +1,4 @@
-import { type StopID, StopIDJson } from "../../shared/system/ids";
+import { type StopID, StopIDJson } from "shared/system/ids";
 import { z } from "zod";
 
 export class PinnedWidget {

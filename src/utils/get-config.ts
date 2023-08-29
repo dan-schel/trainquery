@@ -1,4 +1,4 @@
-import { FrontendConfig } from "../../shared/system/config";
+import { FrontendConfig } from "shared/system/config";
 
 const lsKey = "trainquery-config";
 

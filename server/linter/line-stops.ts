@@ -39,7 +39,7 @@ export function lintMissingLineStops(ctx: LintContext) {
 
 export function lintLineServiceTypes(ctx: LintContext) {
   const badLines = ctx.shared.lines
-    .filter((l) => !ctx.shared.serviceTypes.includes(l.serviceType))
+    .filter((l) => !ctx.shared.serviceTypes.some((s) => s.id == l.serviceType))
     .map((l) => l.name);
 
   ctx.logPluralizedError(

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { type LineDiagramData } from "../../../shared/system/routes/line-routes";
-import type { StopID } from "../../../shared/system/ids";
+import { type LineDiagramData } from "shared/system/routes/line-routes";
+import type { StopID } from "shared/system/ids";
 
 const props = defineProps<{
   diagram: LineDiagramData;
