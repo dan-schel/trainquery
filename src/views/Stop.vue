@@ -31,7 +31,7 @@ useHead({
 <template>
   <main>
     <h1>{{ stop.name }} Station</h1>
-    <DepartureFeed class="feed"></DepartureFeed>
+    <DepartureFeed class="feed" :count="5"></DepartureFeed>
   </main>
 </template>
 
@@ -48,5 +48,6 @@ h1 {
 }
 .feed {
   max-width: 25rem;
+  width: 100%;
 }
 </style>

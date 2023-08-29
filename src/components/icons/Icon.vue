@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import MajesticonsPin from "./MajesticonsPin.vue";
+import MajesticonsPinLine from "./MajesticonsPinLine.vue";
 import UilAngleLeft from "./UilAngleLeft.vue";
 import UilAngleRight from "./UilAngleRight.vue";
 import UilBars from "./UilBars.vue";
@@ -12,6 +14,8 @@ import UilSetting from "./UilSetting.vue";
 import UilSliderHRange from "./UilSliderHRange.vue";
 
 export type IconID =
+  | "majesticons:pin"
+  | "majesticons:pin-line"
   | "uil:angle-left"
   | "uil:angle-right"
   | "uil:bars"
@@ -30,7 +34,12 @@ defineProps<{
 </script>
 
 <template>
-  <UilAngleLeft v-if="id == 'uil:angle-left'" class="icon"></UilAngleLeft>
+  <MajesticonsPin v-if="id == 'majesticons:pin'" class="icon"></MajesticonsPin>
+  <MajesticonsPinLine
+    v-else-if="id == 'majesticons:pin-line'"
+    class="icon"
+  ></MajesticonsPinLine>
+  <UilAngleLeft v-else-if="id == 'uil:angle-left'" class="icon"></UilAngleLeft>
   <UilAngleRight
     v-else-if="id == 'uil:angle-right'"
     class="icon"

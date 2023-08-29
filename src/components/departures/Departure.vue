@@ -12,10 +12,12 @@ import { RouterLink } from "vue-router";
       <OneLineP class="time">2 mins</OneLineP>
     </div>
     <div class="details">
-      <OneLineP> Express Malvern → South Yarra </OneLineP>
+      <OneLineP>Express Malvern → South Yarra</OneLineP>
       <div class="disruption">
         <Icon id="uil:exclamation-circle"></Icon>
-        <OneLineP> Potentially replaced by buses after Westall</OneLineP>
+        <OneLineP class="disruption-text">
+          Potentially replaced by buses after Westall
+        </OneLineP>
       </div>
     </div>
     <div class="platform">
@@ -43,7 +45,6 @@ import { RouterLink } from "vue-router";
     "details platform arrow";
 
   padding: 1rem;
-  padding-right: 0.5rem;
   row-gap: 0.5rem;
   column-gap: 0.5rem;
 }
@@ -99,6 +100,10 @@ import { RouterLink } from "vue-router";
     grid-row: 3;
     gap: 0.25rem;
 
+    .disruption-text {
+      min-width: 0;
+      flex-shrink: 1;
+    }
     &:deep(p) {
       font-weight: bold;
     }
@@ -133,5 +138,6 @@ import { RouterLink } from "vue-router";
   grid-area: arrow;
   align-self: center;
   font-size: 1rem;
+  margin-right: -0.5rem;
 }
 </style>
