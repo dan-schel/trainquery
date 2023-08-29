@@ -18,6 +18,7 @@ defineProps<{
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
+@use "@/assets/utils" as utils;
 main {
   @include template.page-centerer;
 }
@@ -25,9 +26,7 @@ main {
   padding: 0rem 1rem;
 }
 h1 {
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: var(--color-ink-100);
+  @include utils.h1;
   margin-top: 2rem;
 }
 </style>

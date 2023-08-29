@@ -1,0 +1,10 @@
+@mixin h1 {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: var(--color-ink-100);
+}
+@mixin h2 {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--color-ink-100);
+}
