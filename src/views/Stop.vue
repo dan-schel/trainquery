@@ -7,7 +7,8 @@ import {
 } from "shared/system/config-utils";
 import { computed } from "vue";
 import { getConfig } from "@/utils/get-config";
-import DepartureFeed from "@/components/departures/DepartureFeed.vue";
+import DepartureGroup from "@/components/departures/DepartureGroup.vue";
+import PageContent from "@/components/common/PageContent.vue";
 
 const route = useRoute();
 const params = computed(() => route.params);
@@ -29,25 +30,18 @@ useHead({
 </script>
 
 <template>
-  <main>
-    <h1>{{ stop.name }} Station</h1>
-    <DepartureFeed class="feed" :count="5"></DepartureFeed>
-  </main>
+  <PageContent :title="`${stop.name} Station`" title-margin="2rem">
+    <h1></h1>
+    <DepartureGroup
+      class="group"
+      :allow-pinning="true"
+      :count="4"
+    ></DepartureGroup>
+  </PageContent>
 </template>
 
 <style scoped lang="scss">
-main {
-  align-items: center;
-  padding: 2rem 1rem;
-}
-h1 {
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: var(--color-ink-100);
-  margin-bottom: 1rem;
-}
-.feed {
-  max-width: 25rem;
-  width: 100%;
+.group {
+  margin-bottom: 2rem;
 }
 </style>

@@ -1,6 +1,4 @@
-<script setup lang="ts">
-// todo
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div class="one-line">

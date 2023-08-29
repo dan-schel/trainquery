@@ -5,6 +5,7 @@ import Departure from "./Departure.vue";
 
 defineProps<{
   count: number;
+  allowPinning: boolean;
 }>();
 </script>
 
@@ -22,12 +23,11 @@ defineProps<{
         <a class="link subtitle">Citybound trains</a>
       </OneLineP>
       <SimpleButton
+        v-if="allowPinning"
         :content="{ icon: 'majesticons:pin-line', altText: 'Pin widget' }"
       ></SimpleButton>
     </div>
     <div class="departures">
-      <Departure class="departure"></Departure>
-      <Departure class="departure"></Departure>
       <Departure class="departure"></Departure>
       <Departure class="departure"></Departure>
       <Departure class="departure"></Departure>

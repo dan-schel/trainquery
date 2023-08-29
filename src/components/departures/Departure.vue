@@ -5,7 +5,7 @@ import { RouterLink } from "vue-router";
 </script>
 
 <template>
-  <RouterLink class="departure accent-cyan" to="/home">
+  <RouterLink class="departure accent-cyan" to="">
     <div class="primary">
       <OneLineP class="terminus">Flinders Street</OneLineP>
       <OneLineP class="via">via City Loop</OneLineP>

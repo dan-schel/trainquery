@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import DepartureGroup from "@/components/departures/DepartureGroup.vue";
+import Icon from "@/components/icons/Icon.vue";
 import { useHead } from "@vueuse/head";
 useHead({
   title: "Home",
@@ -7,20 +9,40 @@ useHead({
 
 <template>
   <main>
-    <h1>Home page</h1>
+    <div>
+      <div class="pinned-widgets">
+        <div class="section-title">
+          <Icon id="majesticons:pin-line"></Icon>
+          <p>Pinned widgets</p>
+        </div>
+        <DepartureGroup :allow-pinning="false" :count="2"></DepartureGroup>
+      </div>
+    </div>
   </main>
 </template>
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
 main {
-  align-items: center;
-  padding: 2rem;
+  @include template.page-centerer;
 }
-h1 {
-  font-weight: 700;
-  font-size: 1.5rem;
+.pinned-widgets {
+  margin-top: 20rem;
+  margin-bottom: 2rem;
+  padding: 0rem 1rem;
+}
+.section-title {
+  @include template.row;
+  gap: 0.5rem;
+  align-self: center;
   margin-bottom: 1rem;
-  color: var(--color-ink-100);
+  p {
+    font-weight: bold;
+    color: var(--color-ink-100);
+    font-size: 1rem;
+  }
+  .icon {
+    font-size: 1.2rem;
+  }
 }
 </style>
