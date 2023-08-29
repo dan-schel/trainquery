@@ -37,6 +37,7 @@ defineProps<{
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
+@use "@/assets/utils" as utils;
 .header-row {
   @include template.row;
   height: 2rem;
@@ -62,11 +63,8 @@ defineProps<{
   display: grid;
   grid-template-rows: repeat(var(--count), 5.8rem);
 
-  background-color: var(--color-paper-20);
+  @include utils.raised-surface;
   border-radius: 0.75rem;
-  border: 1px solid var(--color-ink-10);
-  box-shadow: 0 0.1rem 0.2rem var(--color-shadow-10);
-  overflow: hidden;
 }
 .departure {
   // For the divider.

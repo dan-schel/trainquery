@@ -97,6 +97,7 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
+@use "@/assets/utils" as utils;
 header {
   position: fixed;
   top: 0;
@@ -117,7 +118,7 @@ header {
   right: 0;
 
   background-color: var(--color-paper-20);
-  box-shadow: 0px 0.1rem 0.2rem var(--color-shadow-10);
+  @include utils.shadow;
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
   transition: opacity 0.2s, transform 0.2s, visibility 0.2s;

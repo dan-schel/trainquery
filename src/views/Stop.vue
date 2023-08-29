@@ -8,6 +8,7 @@ import {
 import { computed } from "vue";
 import { getConfig } from "@/utils/get-config";
 import DepartureGroup from "@/components/departures/DepartureGroup.vue";
+import DepartureControls from "@/components/departures/DepartureControls.vue";
 import PageContent from "@/components/common/PageContent.vue";
 
 const route = useRoute();
@@ -30,8 +31,8 @@ useHead({
 </script>
 
 <template>
-  <PageContent :title="`${stop.name} Station`" title-margin="2rem">
-    <h1></h1>
+  <PageContent :title="`${stop.name} Station`" title-margin="1rem">
+    <DepartureControls class="controls"></DepartureControls>
     <DepartureGroup
       class="group"
       :allow-pinning="true"
@@ -43,5 +44,8 @@ useHead({
 <style scoped lang="scss">
 .group {
   margin-bottom: 2rem;
+}
+.controls {
+  margin-bottom: 1.5rem;
 }
 </style>

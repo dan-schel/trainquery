@@ -23,12 +23,16 @@ defineProps<{
 @use "@/assets/css-template/import" as template;
 .group {
   display: grid;
-  // 22.25rem so that it merges to one when the navbar enters mobile mode.
-  grid-template-columns: repeat(auto-fit, minmax(22.25rem, 1fr));
+  grid-template-columns: 1fr;
   row-gap: 1.5rem;
   column-gap: 1.5rem;
 }
 .feed {
   max-width: 40rem;
+}
+@media screen and (min-width: 48rem) {
+  .group {
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  }
 }
 </style>
