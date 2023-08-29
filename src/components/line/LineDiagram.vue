@@ -23,6 +23,7 @@ const stopList = computed(() => {
       lastOfType: i == stops.length - 1,
       firstEver: false,
       lastEver: false,
+      indented: type == "loop" || type == "first-branch",
     }));
   }
 
@@ -47,25 +48,97 @@ const stopList = computed(() => {
       :key="entry.stop"
       :class="{
         transparent: entry.transparent,
-        transparentThreshold: entry.transparentThreshold,
+        'transparent-threshold': entry.transparentThreshold,
+        indented: entry.indented,
+        [entry.type]: true,
+        'first-of-type': entry.firstOfType,
+        'last-of-type': entry.lastOfType,
       }"
     >
       <div class="visual">
-        <div class="rod-top" v-if="!entry.firstEver"></div>
+        <div
+          class="rod-top"
+          v-if="!(entry.firstEver || (entry.indented && entry.firstOfType))"
+        ></div>
         <div
           class="tick"
           :class="{
-            end: entry.firstEver || entry.lastEver,
+            end:
+              (entry.firstEver && entry.type != 'loop') ||
+              entry.lastEver ||
+              (entry.type == 'first-branch' && entry.lastOfType),
             express: entry.express,
           }"
         ></div>
-        <div class="rod-bottom" v-if="!entry.lastEver"></div>
+        <div
+          class="rod-bottom"
+          v-if="!(entry.lastEver || (entry.indented && entry.lastOfType))"
+        ></div>
+        <div class="rod-unindented" v-if="entry.indented"></div>
+
+        <!-- Loop cap SVG -->
+        <svg
+          width="48"
+          height="24"
+          view-box="0 0 48 24"
+          v-if="entry.type == 'loop' && entry.firstOfType"
+          class="loop-cap"
+        >
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="6.4"
+            d="M 12 24 v -6 C 12 6, 36 6, 36 18 v 6"
+          />
+        </svg>
+
+        <!-- Loop join SVG -->
+        <svg
+          width="48"
+          height="24"
+          view-box="0 0 48 24"
+          v-if="entry.type == 'loop' && entry.lastOfType"
+          class="loop-join"
+        >
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="6.4"
+            d="M 36 0 C 36 18, 12 12, 12 24"
+          />
+        </svg>
+
+        <!-- Branch split SVG -->
+        <svg
+          width="48"
+          height="24"
+          view-box="0 0 48 24"
+          v-if="entry.type == 'first-branch' && entry.firstOfType"
+          class="branch-split"
+        >
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="6.4"
+            d="M 12 0 C 12 12, 36 6, 36 24"
+          />
+        </svg>
       </div>
       <div class="label">
         <slot name="stop" :stop="entry.stop" :express="entry.express"></slot>
       </div>
       <div class="visual-extra">
-        <div class="rod-extra" v-if="!entry.lastEver"></div>
+        <div
+          class="rod-extra"
+          v-if="!(entry.lastEver || (entry.indented && entry.lastOfType))"
+        ></div>
+        <div class="rod-unindented-extra" v-if="entry.indented"></div>
       </div>
       <div class="label-extra">
         <slot
@@ -85,6 +158,10 @@ const stopList = computed(() => {
 $rod-width: 0.4rem;
 $tick-width: 0.3rem;
 $tick-height: 0.4rem;
+$loop-cap-margin: 1rem;
+$loop-join-margin: 0.75rem;
+$branch-split-margin: 0.75rem;
+$branch-end-margin: 0.5rem;
 
 .diagram {
   padding: 2rem 0rem;
@@ -99,20 +176,33 @@ $tick-height: 0.4rem;
   &.transparent {
     opacity: 0.5;
   }
-  &.transparentThreshold .rod-top {
+  &.transparent-threshold .rod-top {
     opacity: 0.5;
   }
   &:not(:last-child) {
     margin-bottom: var(--stop-gap);
+  }
+
+  &.indented {
+    grid-template-columns: 3.5rem 1fr;
+
+    .visual,
+    .visual-extra {
+      --indent: 1.5rem;
+    }
   }
 }
 
 .visual,
 .visual-extra {
   position: relative;
+  --indent: 0rem;
+
+  > * {
+    position: absolute;
+  }
 }
 .tick {
-  position: absolute;
   background-color: var(--color-accent);
 
   left: $tick-width;
@@ -120,7 +210,7 @@ $tick-height: 0.4rem;
 
   top: 50%;
   height: $tick-height;
-  transform: translate(0, -50%);
+  transform: translate(var(--indent), -50%);
 
   &.end {
     left: 0;
@@ -132,15 +222,24 @@ $tick-height: 0.4rem;
 }
 .rod-top,
 .rod-bottom,
-.rod-extra {
-  position: absolute;
+.rod-extra,
+.rod-unindented,
+.rod-unindented-extra {
   background-color: var(--color-accent);
 
-  left: $tick-width;
   width: $rod-width;
 
   top: 0;
   bottom: 0;
+}
+.rod-top,
+.rod-bottom,
+.rod-extra {
+  left: calc(var(--indent) + $tick-width);
+}
+.rod-unindented,
+.rod-unindented-extra {
+  left: $tick-width;
 }
 .rod-top {
   bottom: calc(50% + $tick-height * 0.5);
@@ -148,7 +247,49 @@ $tick-height: 0.4rem;
 .rod-bottom {
   top: calc(50% + $tick-height * 0.5);
 }
-.rod-extra {
+.rod-extra,
+.rod-unindented-extra {
   bottom: calc(var(--stop-gap) * -1);
+}
+.visual svg {
+  color: var(--color-accent);
+  left: -0.25rem;
+}
+.loop-cap {
+  bottom: calc(50% + $tick-width * 0.5);
+}
+.loop-join {
+  top: calc(50% + $tick-width * 0.5);
+}
+.branch-split {
+  bottom: calc(50% + $tick-width * 0.5);
+}
+
+.loop.first-of-type .rod-unindented {
+  top: calc(50% - $tick-height * 0.5);
+}
+.loop.last-of-type {
+  margin-bottom: calc(var(--stop-gap) + $loop-join-margin);
+  .rod-unindented-extra {
+    bottom: calc(var(--stop-gap) * -1 - $loop-join-margin);
+  }
+}
+
+.first-branch.first-of-type {
+  margin-top: $branch-split-margin;
+  .rod-unindented {
+    top: -$branch-split-margin;
+  }
+}
+
+.loop.first-of-type {
+  margin-top: $loop-cap-margin;
+}
+
+.first-branch.last-of-type {
+  margin-bottom: calc(var(--stop-gap) + $branch-end-margin);
+  .rod-unindented-extra {
+    bottom: calc(var(--stop-gap) * -1 - $branch-end-margin);
+  }
 }
 </style>
