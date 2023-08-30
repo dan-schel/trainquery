@@ -3,6 +3,8 @@ import DepartureGroup from "@/components/departures/DepartureGroup.vue";
 import Icon from "@/components/icons/Icon.vue";
 import { useHead } from "@vueuse/head";
 import BigSearch from "@/components/BigSearch.vue";
+import Wordmark from "@/components/Wordmark.vue";
+import { getConfig } from "@/utils/get-config";
 useHead({
   title: "Home",
 });
@@ -11,9 +13,13 @@ useHead({
 <template>
   <main>
     <div>
+      <div class="spacer"></div>
       <div class="hero">
+        <Wordmark class="wordmark"></Wordmark>
+        <p class="tagline">{{ getConfig().frontend.tagline }}</p>
         <BigSearch class="big-search"></BigSearch>
       </div>
+      <div class="spacer"></div>
       <div class="pinned-widgets">
         <div class="section-title">
           <Icon id="majesticons:pin-line"></Icon>
@@ -30,13 +36,24 @@ useHead({
 main {
   @include template.page-centerer;
 }
+.hero {
+  align-items: center;
+  padding: 0rem 1rem;
+}
+.wordmark {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+.tagline {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
 .big-search {
-  margin-top: 10rem;
-  width: 36rem;
-  align-self: center;
+  width: 100%;
+  max-width: 36rem;
 }
 .pinned-widgets {
-  margin-top: 5rem;
   margin-bottom: 2rem;
   padding: 0rem 1rem;
 }
@@ -53,5 +70,9 @@ main {
   .icon {
     font-size: 1.2rem;
   }
+}
+.spacer {
+  min-height: 5rem;
+  flex-grow: 1;
 }
 </style>

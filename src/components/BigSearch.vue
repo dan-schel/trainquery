@@ -27,7 +27,9 @@ const onSearchEnter = (e: Event) => {
         ref="input"
       />
     </form>
-    <div class="results-container">
+
+    <!-- Tab index 0 here makes focus-within work correctly for iOS Safari (shrug) -->
+    <div class="results-container" tabindex="0">
       <div class="results-bg"></div>
       <SearchResults
         class="results"
@@ -113,5 +115,6 @@ form {
   overflow-y: scroll;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+  margin: 1px;
 }
 </style>
