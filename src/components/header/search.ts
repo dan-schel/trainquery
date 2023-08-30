@@ -33,7 +33,7 @@ export function searchOptionsStops(): SearchOption[] {
         url: getStopPageRoute(getConfig(), s),
         tags: [],
         data: { stop: s.id },
-        boost: 2,
+        boost: 1.2,
       };
     })
   );
@@ -72,7 +72,7 @@ export function searchOptionsWholeSite(): SearchOption[] {
     url: "/map",
     tags: ["diagram", "interactive", "geographic", "location", "live"],
     data: null,
-    boost: 1,
+    boost: 0.6,
   });
 
   options.push({
@@ -82,7 +82,7 @@ export function searchOptionsWholeSite(): SearchOption[] {
     url: "/lines",
     tags: ["network", "stops"],
     data: null,
-    boost: 1,
+    boost: 0.6,
   });
 
   options.push({
@@ -92,7 +92,7 @@ export function searchOptionsWholeSite(): SearchOption[] {
     url: "/about",
     tags: ["contact", "legal", "timetables", "github"],
     data: null,
-    boost: 1,
+    boost: 0.6,
   });
 
   options.push({
@@ -111,7 +111,7 @@ export function searchOptionsWholeSite(): SearchOption[] {
       "widgets",
     ],
     data: null,
-    boost: 1,
+    boost: 0.6,
   });
 
   return options;
