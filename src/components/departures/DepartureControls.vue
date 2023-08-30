@@ -12,7 +12,7 @@ import Icon from "../icons/Icon.vue";
     </button>
     <button class="filter-button">
       <Icon id="uil:filter"></Icon>
-      <OneLineP class="text">Citybound Gippsland trains</OneLineP>
+      <OneLineP class="text"><b>Citybound Gippsland trains</b></OneLineP>
       <Icon id="uil:angle-down"></Icon>
     </button>
     <!-- <button class="reset-button" title="Reset">

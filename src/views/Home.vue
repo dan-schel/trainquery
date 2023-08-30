@@ -2,6 +2,7 @@
 import DepartureGroup from "@/components/departures/DepartureGroup.vue";
 import Icon from "@/components/icons/Icon.vue";
 import { useHead } from "@vueuse/head";
+import BigSearch from "@/components/BigSearch.vue";
 useHead({
   title: "Home",
 });
@@ -10,6 +11,9 @@ useHead({
 <template>
   <main>
     <div>
+      <div class="hero">
+        <BigSearch class="big-search"></BigSearch>
+      </div>
       <div class="pinned-widgets">
         <div class="section-title">
           <Icon id="majesticons:pin-line"></Icon>
@@ -26,8 +30,13 @@ useHead({
 main {
   @include template.page-centerer;
 }
+.big-search {
+  margin-top: 10rem;
+  width: 36rem;
+  align-self: center;
+}
 .pinned-widgets {
-  margin-top: 20rem;
+  margin-top: 5rem;
   margin-bottom: 2rem;
   padding: 0rem 1rem;
 }

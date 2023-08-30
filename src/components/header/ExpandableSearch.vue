@@ -45,13 +45,12 @@ const onSearchEnter = (e: Event) => {
     />
   </form>
   <div class="divider"></div>
-  <div class="results">
-    <SearchResults
-      :query="query"
-      mode="all"
-      @top-result-change="(e) => (topResultUrl = e.url)"
-    ></SearchResults>
-  </div>
+  <SearchResults
+    class="results"
+    :query="query"
+    mode="all"
+    @top-result-change="(e) => (topResultUrl = e.url)"
+  ></SearchResults>
 </template>
 
 <style scoped lang="scss">
