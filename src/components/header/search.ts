@@ -30,7 +30,7 @@ export function searchOptionsStops(): SearchOption[] {
         title: `${s.name} Station`,
         subtitle: stopSubtitle(s),
         icon: "uil:map-marker" as IconID,
-        url: getStopPageRoute(getConfig(), s),
+        url: getStopPageRoute(getConfig(), s.id),
         tags: [],
         data: { stop: s.id },
         boost: 1.2,
@@ -51,7 +51,7 @@ export function searchOptionsLines(): SearchOption[] {
         title: `${l.name} Line`,
         subtitle: getServiceTypeModeString(l.serviceType),
         icon: "uil:slider-h-range" as IconID,
-        url: getLinePageRoute(getConfig(), l),
+        url: getLinePageRoute(getConfig(), l.id),
         tags: [],
         data: { line: l.id },
         boost: 1,
@@ -208,14 +208,13 @@ function similarity(query: string, tag: string): number {
 }
 
 function stopSubtitle(stop: Stop): string {
-  let lines = linesThatStopAt(getConfig(), stop.id);
-
-  // Unless every line is "special events only", hide those that are.
-  if (!lines.every((l) => l.specialEventsOnly)) {
-    lines = lines.filter((l) => !l.specialEventsOnly);
+  const lineNames = linesThatStopAt(getConfig(), stop.id, {
+    ignoreSpecialEventsOnlyLines: true,
+    sortAlphabetically: true,
+  }).map((l) => l.name);
+  if (lineNames.length == 0) {
+    return "No lines";
   }
-
-  const lineNames = lines.map((l) => l.name).sort((a, b) => a.localeCompare(b));
 
   return `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "lines"}`;
 }

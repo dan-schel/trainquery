@@ -12,8 +12,25 @@ import { SharedConfig } from "./config-elements";
 
 type HasSharedConfig = { shared: SharedConfig };
 
-export function linesThatStopAt(config: HasSharedConfig, stop: StopID) {
-  return config.shared.lines.filter((l) => l.route.stopsAt(stop));
+export function linesThatStopAt(
+  config: HasSharedConfig,
+  stop: StopID,
+  options?: {
+    ignoreSpecialEventsOnlyLines?: boolean;
+    sortAlphabetically?: boolean;
+  }
+) {
+  let lines = config.shared.lines.filter((l) => l.route.stopsAt(stop));
+  if (
+    (options?.ignoreSpecialEventsOnlyLines ?? false) &&
+    !lines.every((l) => l.specialEventsOnly)
+  ) {
+    lines = lines.filter((l) => !l.specialEventsOnly);
+  }
+  if (options?.sortAlphabetically ?? false) {
+    lines.sort((a, b) => a.name.localeCompare(b.name));
+  }
+  return lines;
 }
 
 export function getLine(config: HasSharedConfig, line: LineID) {
@@ -137,13 +154,19 @@ export function requireLineFromUrlName(
 }
 
 /** E.g. "/stops/pakenham" or "/stops/20". */
-export function getStopPageRoute(config: HasSharedConfig, stop: Stop): string {
-  return `/stops/${getStopUrlName(config, stop.id) ?? stop.id.toFixed()}`;
+export function getStopPageRoute(
+  config: HasSharedConfig,
+  stop: StopID
+): string {
+  return `/stops/${getStopUrlName(config, stop) ?? stop.toFixed()}`;
 }
 
 /** E.g. "/lines/pakenham" or "/lines/20". */
-export function getLinePageRoute(config: HasSharedConfig, line: Line): string {
-  return `/lines/${getLineUrlName(config, line.id) ?? line.id.toFixed()}`;
+export function getLinePageRoute(
+  config: HasSharedConfig,
+  line: LineID
+): string {
+  return `/lines/${getLineUrlName(config, line) ?? line.toFixed()}`;
 }
 
 export function getServiceType(

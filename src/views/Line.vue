@@ -30,7 +30,7 @@ useHead({
     {
       rel: "canonical",
       href:
-        "https://trainquery.com" + getLinePageRoute(getConfig(), line.value),
+        "https://trainquery.com" + getLinePageRoute(getConfig(), line.value.id),
     },
   ],
 });

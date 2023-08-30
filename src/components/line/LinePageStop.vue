@@ -18,7 +18,7 @@ const stopData = computed(() => requireStop(getConfig(), props.stop));
     <RouterLink
       class="link"
       :class="{ express: express }"
-      :to="getStopPageRoute(getConfig(), stopData)"
+      :to="getStopPageRoute(getConfig(), stopData.id)"
       >{{ express ? "Skips " : "" }}{{ stopData.name }}</RouterLink
     >
   </p>

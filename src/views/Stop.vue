@@ -10,6 +10,7 @@ import { getConfig } from "@/utils/get-config";
 import DepartureGroup from "@/components/departures/DepartureGroup.vue";
 import DepartureControls from "@/components/departures/DepartureControls.vue";
 import PageContent from "@/components/common/PageContent.vue";
+import LineList from "@/components/LineList.vue";
 
 const route = useRoute();
 const params = computed(() => route.params);
@@ -24,14 +25,15 @@ useHead({
     {
       rel: "canonical",
       href:
-        "https://trainquery.com" + getStopPageRoute(getConfig(), stop.value),
+        "https://trainquery.com" + getStopPageRoute(getConfig(), stop.value.id),
     },
   ],
 });
 </script>
 
 <template>
-  <PageContent :title="`${stop.name} Station`" title-margin="1rem">
+  <PageContent :title="`${stop.name} Station`" title-margin="0.5rem">
+    <LineList :stop="stop.id"></LineList>
     <DepartureControls class="controls"></DepartureControls>
     <DepartureGroup
       class="group"
@@ -42,10 +44,14 @@ useHead({
 </template>
 
 <style scoped lang="scss">
-.group {
-  margin-bottom: 2rem;
+@use "@/assets/css-template/import" as template;
+.lines {
+  margin-bottom: 1rem;
 }
 .controls {
   margin-bottom: 1.5rem;
+}
+.group {
+  margin-bottom: 2rem;
 }
 </style>

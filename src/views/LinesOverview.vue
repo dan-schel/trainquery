@@ -36,7 +36,7 @@ useHead({
           <p>
             <RouterLink
               class="link"
-              :to="getLinePageRoute(getConfig(), line)"
+              :to="getLinePageRoute(getConfig(), line.id)"
               >{{ line.name }}</RouterLink
             >
             {{ line.specialEventsOnly ? " (special events only)" : "" }}
