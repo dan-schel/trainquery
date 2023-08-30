@@ -86,3 +86,9 @@ body,
 :root.dark {
   @include template.theme-dark;
 }
+
+// When using element IDs and urls with # to jump around the page, this rule
+// ensures the navbar's height of 3rem is taken into account when scrolling.
+:target {
+  scroll-margin-top: 3rem;
+}

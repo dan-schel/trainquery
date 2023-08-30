@@ -15,16 +15,45 @@ useHead({
 </script>
 
 <template>
+  <a href="#content" class="skip">
+    <p>Skip to content</p>
+  </a>
   <Header></Header>
-  <div class="page">
+  <div class="page" id="content">
     <RouterView />
   </div>
   <Footer></Footer>
 </template>
 
 <style scoped lang="scss">
+@use "@/assets/css-template/import" as template;
+@use "@/assets/utils" as utils;
 .page {
   flex-grow: 1;
   margin-top: 3rem;
+}
+.skip {
+  // Navbar is 9999 ;)
+  z-index: 10000;
+
+  position: fixed;
+  left: 1rem;
+  top: -4rem;
+  transition: top 0.1s;
+
+  @include template.button-filled;
+  @include template.content-text;
+  @include utils.shadow;
+  padding: 0 1rem;
+  width: fit-content;
+  height: 2rem;
+  margin-bottom: -2rem;
+  justify-content: center;
+
+  &:active,
+  &:focus,
+  &:hover {
+    top: 0.5rem;
+  }
 }
 </style>
