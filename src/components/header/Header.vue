@@ -32,21 +32,10 @@ watch(route, () => {
   openExpandable.value = "none";
 });
 
-const headerRef = ref<HTMLElement>();
-const handleOutsideClick = (e: MouseEvent) => {
-  if (headerRef.value == null || openExpandable.value == "none") {
-    return;
-  }
-  const target = e.target as HTMLElement;
-  if (!headerRef.value.contains(target)) {
-    openExpandable.value = "none";
-
-    // This doesn't work for RouterLinks unfortunately, a transparent div might
-    // be needed at some point :/
-    e.preventDefault();
-  }
+const handleOutsideClick = () => {
+  openExpandable.value = "none";
 };
-const handleEscKey = (e: KeyboardEvent) => {
+function handleEscKey(e: KeyboardEvent) {
   if (e.code == "KeyK" && e.ctrlKey) {
     openExpandable.value = "search";
     e.preventDefault();
@@ -54,20 +43,18 @@ const handleEscKey = (e: KeyboardEvent) => {
   if (e.code == "Escape") {
     openExpandable.value = "none";
   }
-};
+}
 
 onMounted(() => {
   window.addEventListener("keydown", handleEscKey);
-  window.addEventListener("click", handleOutsideClick);
 });
 onUnmounted(() => {
   window.removeEventListener("keydown", handleEscKey);
-  window.removeEventListener("click", handleOutsideClick);
 });
 </script>
 
 <template>
-  <header ref="headerRef">
+  <header>
     <Navbar
       :items="menuItems"
       @menu-button-clicked="menuButtonClicked"
@@ -91,6 +78,11 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
+    <div
+      class="expandables-cover"
+      v-if="openExpandable != 'none'"
+      @click="handleOutsideClick"
+    ></div>
   </header>
 </template>
 
@@ -107,7 +99,7 @@ header {
 }
 .expandables {
   position: relative;
-  z-index: 0;
+  z-index: 1;
 }
 .expandable-container {
   @include template.page-centerer;
@@ -134,5 +126,13 @@ header {
     visibility: hidden;
     pointer-events: none;
   }
+}
+.expandables-cover {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 0;
 }
 </style>

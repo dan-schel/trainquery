@@ -14,19 +14,8 @@ const handleFilterButtonClick = () => {
   openDropdown.value = openDropdown.value == "filter" ? "none" : "filter";
 };
 
-const controlsRef = ref<HTMLElement>();
-const handleOutsideClick = (e: MouseEvent) => {
-  if (controlsRef.value == null || openDropdown.value == "none") {
-    return;
-  }
-  const target = e.target as HTMLElement;
-  if (!controlsRef.value.contains(target)) {
-    openDropdown.value = "none";
-
-    // This doesn't work for RouterLinks unfortunately, a transparent div might
-    // be needed at some point :/
-    e.preventDefault();
-  }
+const handleOutsideClick = () => {
+  openDropdown.value = "none";
 };
 const handleEscKey = (e: KeyboardEvent) => {
   if (e.code == "Escape") {
@@ -36,16 +25,14 @@ const handleEscKey = (e: KeyboardEvent) => {
 
 onMounted(() => {
   window.addEventListener("keydown", handleEscKey);
-  window.addEventListener("click", handleOutsideClick);
 });
 onUnmounted(() => {
   window.removeEventListener("keydown", handleEscKey);
-  window.removeEventListener("click", handleOutsideClick);
 });
 </script>
 
 <template>
-  <div class="controls" :class="{ 'can-reset': resetButton }" ref="controlsRef">
+  <div class="controls" :class="{ 'can-reset': resetButton }">
     <div class="buttons">
       <button class="time-button" @click="handleTimeButtonClick">
         <Icon id="uil:clock" title="Time"></Icon>
@@ -84,6 +71,11 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
+      <div
+        class="dropdown-cover"
+        v-if="openDropdown != 'none'"
+        @click="handleOutsideClick"
+      ></div>
     </div>
   </div>
 </template>
@@ -184,7 +176,7 @@ onUnmounted(() => {
   top: 3rem;
   left: 0;
   right: 0;
-  z-index: 99;
+  z-index: 14000;
   pointer-events: all;
 
   &:not(.open) {
@@ -205,6 +197,16 @@ onUnmounted(() => {
     padding: 2rem 1rem;
     z-index: 1;
   }
+}
+
+.dropdown-cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 12000;
+  pointer-events: all;
 }
 
 @media screen and (min-width: 48rem) {

@@ -59,7 +59,7 @@ defineEmits<{
 nav {
   // Allow .bg to position itself.
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 .bg {
   position: absolute;
