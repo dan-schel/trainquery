@@ -32,16 +32,6 @@ watch(route, () => {
   openExpandable.value = "none";
 });
 
-const handleEscKey = (e: KeyboardEvent) => {
-  if (e.code == "KeyK" && e.ctrlKey) {
-    openExpandable.value = "search";
-    e.preventDefault();
-  }
-  if (e.code == "Escape") {
-    openExpandable.value = "none";
-  }
-};
-
 const headerRef = ref<HTMLElement>();
 const handleOutsideClick = (e: MouseEvent) => {
   if (headerRef.value == null || openExpandable.value == "none") {
@@ -54,6 +44,15 @@ const handleOutsideClick = (e: MouseEvent) => {
     // This doesn't work for RouterLinks unfortunately, a transparent div might
     // be needed at some point :/
     e.preventDefault();
+  }
+};
+const handleEscKey = (e: KeyboardEvent) => {
+  if (e.code == "KeyK" && e.ctrlKey) {
+    openExpandable.value = "search";
+    e.preventDefault();
+  }
+  if (e.code == "Escape") {
+    openExpandable.value = "none";
   }
 };
 

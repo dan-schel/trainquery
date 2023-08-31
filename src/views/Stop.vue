@@ -32,7 +32,7 @@ useHead({
 </script>
 
 <template>
-  <PageContent :title="`${stop.name} Station`" title-margin="0.5rem">
+  <PageContent :title="`${stop.name}`" title-margin="0.5rem">
     <LineList :stop="stop.id"></LineList>
     <DepartureControls class="controls"></DepartureControls>
     <DepartureGroup
