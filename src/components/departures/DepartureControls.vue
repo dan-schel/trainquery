@@ -3,6 +3,7 @@ import { onMounted, onUnmounted, ref } from "vue";
 import OneLineP from "../common/OneLineP.vue";
 import Icon from "../icons/Icon.vue";
 import FilterControls from "./FilterControls.vue";
+import TimeControls from "./TimeControls.vue";
 
 const resetButton = false;
 
@@ -56,9 +57,7 @@ onUnmounted(() => {
           :class="{ open: openDropdown == 'time' }"
         >
           <div class="bg"></div>
-          <div class="content">
-            <p>Hello.</p>
-          </div>
+          <TimeControls class="content"></TimeControls>
         </div>
       </div>
       <div class="filter-dropdown-locator">
