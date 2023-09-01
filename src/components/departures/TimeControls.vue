@@ -1,13 +1,28 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import NumberWheel from "../common/NumberWheel.vue";
+import { posMod } from "@schel-d/js-utils";
+
+const hours = ref(7);
+const minutes = ref(10);
 </script>
 
 <template>
   <div class="time-controls">
     <div class="time">
-      <NumberWheel></NumberWheel>
+      <NumberWheel
+        v-model="hours"
+        :next="(c) => (c >= 12 ? null : c + 1)"
+        :prev="(c) => (c <= 1 ? null : c - 1)"
+        :stringify="(c) => c.toFixed()"
+      ></NumberWheel>
       <p class="time-colon">:</p>
-      <NumberWheel></NumberWheel>
+      <NumberWheel
+        v-model="minutes"
+        :next="(c) => posMod(c + 1, 60)"
+        :prev="(c) => posMod(c - 1, 60)"
+        :stringify="(c) => c.toFixed().padStart(2, '0')"
+      ></NumberWheel>
     </div>
   </div>
 </template>

@@ -1,17 +1,32 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import Icon from "../icons/Icon.vue";
 
 const COUNTS_AS_HOME = 0.01;
 const SENSITIVITY_TOUCH = 0.03;
-const SENSITIVITY_MOUSE = 0.1;
+const SENSITIVITY_MOUSE = 0.06;
 
-const value = ref(0);
-const next = computed(() => value.value + (offset.value > 0 ? 1 : -1));
+const props = defineProps<{
+  modelValue: T;
+  next: (current: T) => T | null;
+  prev: (current: T) => T | null;
+  stringify: (value: T) => string;
+}>();
+
+const emit = defineEmits<{
+  (e: "update:modelValue", newValue: T): void;
+}>();
+
 const offset = ref(0);
+const alternate = computed(() =>
+  offset.value >= 0
+    ? props.next(props.modelValue)
+    : props.prev(props.modelValue)
+);
 const dragging = ref(false);
 
-function handlePointerDown() {
+function handlePointerDown(e: PointerEvent) {
+  e.preventDefault();
   if (dragging.value) {
     return;
   }
@@ -26,11 +41,21 @@ function handlePointerMove(e: PointerEvent) {
     (e.pointerType == "mouse" ? SENSITIVITY_MOUSE : SENSITIVITY_TOUCH);
 
   while (offset.value > 0.5) {
-    value.value++;
+    const nextValue = props.next(props.modelValue);
+    if (nextValue == null) {
+      offset.value = 0.5;
+      break;
+    }
+    emit("update:modelValue", nextValue);
     offset.value--;
   }
   while (offset.value < -0.5) {
-    value.value--;
+    const prevValue = props.prev(props.modelValue);
+    if (prevValue == null) {
+      offset.value = -0.5;
+      break;
+    }
+    emit("update:modelValue", prevValue);
     offset.value++;
   }
 }
@@ -60,12 +85,20 @@ function animateHome() {
   requestAnimationFrame(animateHome);
 }
 function handleUpButton() {
-  value.value++;
+  const nextValue = props.next(props.modelValue);
+  if (nextValue == null) {
+    return;
+  }
+  emit("update:modelValue", nextValue);
   offset.value = -1;
   animateHome();
 }
 function handleDownButton() {
-  value.value--;
+  const prevValue = props.prev(props.modelValue);
+  if (prevValue == null) {
+    return;
+  }
+  emit("update:modelValue", prevValue);
   offset.value = 1;
   animateHome();
 }
@@ -84,9 +117,9 @@ function handleDownButton() {
       <Icon id="uil:angle-up"></Icon>
     </button>
 
-    <p class="current">{{ value }}</p>
+    <p class="current">{{ stringify(modelValue as T) }}</p>
     <p class="next" :style="{ opacity: `${Math.abs(offset) * 100}%` }">
-      {{ next }}
+      {{ alternate == null ? "" : stringify(alternate as T) }}
     </p>
 
     <button class="down-button" @click="handleDownButton">
