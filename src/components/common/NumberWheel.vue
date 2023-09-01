@@ -23,22 +23,27 @@ const alternate = computed(() =>
     ? props.next(props.modelValue)
     : props.prev(props.modelValue)
 );
-const dragging = ref(false);
+const dragOffset = ref<number | null>(null);
 
 function handlePointerDown(e: PointerEvent) {
   e.preventDefault();
-  if (dragging.value) {
+  if (dragOffset.value != null) {
     return;
   }
-  dragging.value = true;
+  dragOffset.value = e.pageY;
 }
 function handlePointerMove(e: PointerEvent) {
-  if (!dragging.value) {
+  if (dragOffset.value == null) {
     return;
   }
+
+  // e.movementY is undefined on iPad Safari (otherwise remembering the
+  // dragOffset wouldn't be necessary!)
   offset.value +=
-    e.movementY *
+    (e.pageY - dragOffset.value) *
     (e.pointerType == "mouse" ? SENSITIVITY_MOUSE : SENSITIVITY_TOUCH);
+
+  dragOffset.value = e.pageY;
 
   while (offset.value > 0.5) {
     const nextValue = props.next(props.modelValue);
@@ -60,10 +65,10 @@ function handlePointerMove(e: PointerEvent) {
   }
 }
 function handlePointerUp() {
-  if (!dragging.value) {
+  if (dragOffset.value == null) {
     return;
   }
-  dragging.value = false;
+  dragOffset.value = null;
   animateHome();
 }
 onMounted(() => {
