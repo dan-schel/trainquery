@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useHead } from "@vueuse/head";
 import PageContent from "@/components/common/PageContent.vue";
-import CupertinoPicker from "@/components/common/CupertinoPicker.vue";
+import Picker from "@/components/common/Picker.vue";
 import { onMounted, ref } from "vue";
 import { getTheme, setTheme, type Theme } from "@/settings/theme";
 
@@ -28,7 +28,7 @@ const onThemeChanged = (newTheme: Theme) => {
         "Auto" means the colour theme should follow your device's/browser's
         settings.
       </p>
-      <CupertinoPicker
+      <Picker
         group="theme"
         :options="[
           { theme: 'auto' as const, name: 'Auto' },
@@ -43,7 +43,7 @@ const onThemeChanged = (newTheme: Theme) => {
         <template v-slot="slotProps">
           <p>{{ slotProps.data.name }}</p>
         </template>
-      </CupertinoPicker>
+      </Picker>
     </div>
   </PageContent>
 </template>

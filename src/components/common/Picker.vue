@@ -1,11 +1,17 @@
 <script setup lang="ts" generic="T, K extends string">
-const props = defineProps<{
+export type PickerTheme = "cupertino" | "subtle";
+
+export interface Props<T, K> {
   group: string;
   options: T[];
   keyify: (option: T) => K;
   modelValue?: K;
   contentClass?: string;
-}>();
+  theme?: PickerTheme;
+}
+const props = withDefaults(defineProps<Props<T, K>>(), {
+  theme: "cupertino",
+});
 
 defineEmits<{
   (e: "update:modelValue", newValue: K): void;
@@ -20,7 +26,12 @@ const isSelected = (option: T) => {
 </script>
 
 <template>
-  <div class="group">
+  <div
+    :class="{
+      cupertino: theme == 'cupertino',
+      subtle: theme == 'subtle',
+    }"
+  >
     <label v-for="option in options" :key="keyify(option)">
       <input
         type="radio"
@@ -38,7 +49,10 @@ const isSelected = (option: T) => {
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
-.group {
+.cupertino {
   @include template.picker-cupertino($content-class: "content");
+}
+.subtle {
+  @include template.picker-subtle($content-class: "content");
 }
 </style>

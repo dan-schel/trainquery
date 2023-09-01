@@ -133,7 +133,7 @@ function handleDownButton() {
 
 .wheel {
   display: grid;
-  width: 4rem;
+  min-width: 3rem;
   height: 8rem;
   grid-template-columns: 1fr;
   grid-template-rows: 2fr 4fr 2fr;
