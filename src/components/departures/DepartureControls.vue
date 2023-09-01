@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import OneLineP from "../common/OneLineP.vue";
 import Icon from "../icons/Icon.vue";
+import FilterControls from "./FilterControls.vue";
 
 const resetButton = false;
 
@@ -66,9 +67,7 @@ onUnmounted(() => {
           :class="{ open: openDropdown == 'filter' }"
         >
           <div class="bg"></div>
-          <div class="content">
-            <p>Hello.</p>
-          </div>
+          <FilterControls class="content"></FilterControls>
         </div>
       </div>
       <div
@@ -103,7 +102,7 @@ onUnmounted(() => {
 }
 .buttons {
   @include utils.raised-surface;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
 }
 
 .time-button,
@@ -176,8 +175,10 @@ onUnmounted(() => {
   top: 3rem;
   left: 0;
   right: 0;
-  z-index: 14000;
   pointer-events: all;
+
+  // Needs to be above ".dropdown-cover" (which is 12000).
+  z-index: 14000;
 
   &:not(.open) {
     @include utils.dropdown-closed;
@@ -194,7 +195,6 @@ onUnmounted(() => {
     border-radius: 0.75rem;
   }
   .content {
-    padding: 2rem 1rem;
     z-index: 1;
   }
 }
@@ -205,8 +205,10 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 12000;
   pointer-events: all;
+
+  // Needs to be above the navbar (which is 9999).
+  z-index: 12000;
 }
 
 @media screen and (min-width: 48rem) {

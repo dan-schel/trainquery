@@ -6,6 +6,7 @@ import UilAngleLeft from "./UilAngleLeft.vue";
 import UilAngleRight from "./UilAngleRight.vue";
 import UilAngleUp from "./UilAngleUp.vue";
 import UilBars from "./UilBars.vue";
+import UilCheck from "./UilCheck.vue";
 import UilClock from "./UilClock.vue";
 import UilCodeBranch from "./UilCodeBranch.vue";
 import UilExclamationCircle from "./UilExclamationCircle.vue";
@@ -26,6 +27,7 @@ export type IconID =
   | "uil:angle-right"
   | "uil:angle-up"
   | "uil:bars"
+  | "uil:check"
   | "uil:clock"
   | "uil:code-branch"
   | "uil:exclamation-circle"
@@ -57,6 +59,7 @@ defineProps<{
   ></UilAngleRight>
   <UilAngleUp v-else-if="id == 'uil:angle-up'" class="icon"></UilAngleUp>
   <UilBars v-else-if="id == 'uil:bars'" class="icon"></UilBars>
+  <UilCheck v-else-if="id == 'uil:check'" class="icon"></UilCheck>
   <UilClock v-else-if="id == 'uil:clock'" class="icon"></UilClock>
   <UilCodeBranch
     v-else-if="id == 'uil:code-branch'"
