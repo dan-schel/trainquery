@@ -6,21 +6,18 @@ export type ButtonContent =
   | { icon: IconID; text?: never; altText: string }
   | { icon: IconID; text: string; altText?: never }
   | { icon?: never; text: string; altText?: never };
-export type ButtonLayout = "traditional" | "tile";
+export type ButtonLayout = "traditional" | "tile" | "traditional-wide";
 export type ButtonTheme = "hover" | "filled" | "filled-neutral";
-export type ButtonPadding = "normal" | "wider";
 
 export interface Props {
   to?: RouteLocationRaw;
   content: ButtonContent;
   layout?: ButtonLayout;
   theme?: ButtonTheme;
-  padding?: ButtonPadding;
 }
 withDefaults(defineProps<Props>(), {
   layout: "traditional",
   theme: "hover",
-  padding: "normal",
 });
 
 defineEmits<{ (e: "click", payload: MouseEvent): void }>();
@@ -34,11 +31,11 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       'with-icon': content.icon != null,
       'with-text': content.text != null,
       button: layout == 'traditional',
+      'button-wide': layout == 'traditional-wide',
       tile: layout == 'tile',
       'theme-hover': theme == 'hover',
       'theme-filled': theme == 'filled',
       'theme-filled-neutral': theme == 'filled-neutral',
-      wider: padding == 'wider',
     }"
     :title="content.altText"
   >
@@ -52,11 +49,11 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       'with-icon': content.icon != null,
       'with-text': content.text != null,
       button: layout == 'traditional',
+      'button-wide': layout == 'traditional-wide',
       tile: layout == 'tile',
       'theme-hover': theme == 'hover',
       'theme-filled': theme == 'filled',
       'theme-filled-neutral': theme == 'filled-neutral',
-      wider: padding == 'wider',
     }"
     :title="content.altText"
   >
@@ -67,7 +64,8 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
-.button {
+.button,
+.button-wide {
   @include template.content-text-icon;
   @include template.row;
   justify-content: center;
@@ -83,14 +81,14 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
   &.with-text {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
-    &.wider {
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
   }
   &:not(.with-text) {
     width: 2rem;
   }
+}
+.button-wide.with-text {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 .tile {
   @include template.content-text-icon;

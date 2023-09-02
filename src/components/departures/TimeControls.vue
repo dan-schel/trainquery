@@ -3,6 +3,7 @@ import { ref } from "vue";
 import NumberWheel from "../common/NumberWheel.vue";
 import { posMod } from "@schel-d/js-utils";
 import Picker from "../common/Picker.vue";
+import SimpleButton from "../common/SimpleButton.vue";
 
 const hours = ref(7);
 const minutes = ref(10);
@@ -12,6 +13,12 @@ const ampm = ref("am");
 <template>
   <div class="time-controls">
     <h5>Set departure time</h5>
+    <SimpleButton
+      :content="{ text: 'Now', icon: 'uil:clock' }"
+      theme="filled-neutral"
+      class="now"
+      layout="traditional-wide"
+    ></SimpleButton>
     <div class="time">
       <NumberWheel
         v-model="hours"
@@ -39,6 +46,12 @@ const ampm = ref("am");
         </template>
       </Picker>
     </div>
+    <SimpleButton
+      :content="{ text: 'Set', icon: 'uil:check' }"
+      theme="filled"
+      class="submit"
+      layout="traditional-wide"
+    ></SimpleButton>
   </div>
 </template>
 
@@ -47,10 +60,16 @@ const ampm = ref("am");
 .time-controls {
   padding: 1rem;
 }
-h5 {
+h5,
+h6 {
   font-weight: bold;
   color: var(--color-ink-100);
+}
+h5 {
   font-size: 1rem;
+  margin-bottom: 1rem;
+}
+h6 {
   margin-bottom: 0.5rem;
 }
 .time {
@@ -59,6 +78,7 @@ h5 {
   align-items: center;
   border-top: 1px solid var(--color-ink-20);
   border-bottom: 1px solid var(--color-ink-20);
+  margin-bottom: 1rem;
 }
 .time-colon {
   font-size: 2.5rem;
@@ -67,8 +87,18 @@ h5 {
 .ampm-picker {
   :deep(.content) {
     @include template.content-text;
-    font-weight: bold;
     padding: 0.5rem 1rem;
+    p {
+      font-weight: bold;
+      font-size: 1rem;
+    }
   }
+}
+.now {
+  align-self: flex-start;
+  margin-bottom: 1rem;
+}
+.submit {
+  align-self: flex-end;
 }
 </style>

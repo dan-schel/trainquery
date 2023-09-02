@@ -31,8 +31,8 @@ import Switch from "../common/Switch.vue";
       class="submit"
       to=""
       :content="{ icon: 'uil:check', text: 'Set' }"
+      layout="traditional-wide"
       theme="filled"
-      padding="wider"
     ></SimpleButton>
   </div>
 </template>

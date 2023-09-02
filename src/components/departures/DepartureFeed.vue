@@ -2,6 +2,7 @@
 import OneLineP from "../common/OneLineP.vue";
 import SimpleButton from "../common/SimpleButton.vue";
 import Departure from "./Departure.vue";
+import { RouterLink } from "vue-router";
 
 defineProps<{
   count: number;
@@ -18,9 +19,9 @@ defineProps<{
   >
     <div class="header-row">
       <OneLineP class="header">
-        <a class="link title">Officer</a>
+        <RouterLink class="link title" to="">Officer</RouterLink>
         <span class="dot">•</span>
-        <a class="link subtitle">Citybound trains</a>
+        <RouterLink class="link subtitle" to="">Citybound trains</RouterLink>
       </OneLineP>
       <SimpleButton
         v-if="allowPinning"
