@@ -7,6 +7,7 @@ declare const PlatformIDBrand: unique symbol;
 declare const DirectionIDBrand: unique symbol;
 declare const RouteVariantIDBrand: unique symbol;
 declare const ServiceTypeIDBrand: unique symbol;
+declare const TimetableIDBrand: unique symbol;
 
 /** Guaranteed to be a positive integer. */
 export type StopID = number & { [StopIDBrand]: true };
@@ -20,6 +21,8 @@ export type DirectionID = string & { [DirectionIDBrand]: true };
 export type RouteVariantID = string & { [RouteVariantIDBrand]: true };
 /** Guaranteed to be a kebab-case string. */
 export type ServiceTypeID = string & { [ServiceTypeIDBrand]: true };
+/** Guaranteed to be a positive integer. */
+export type TimetableID = number & { [TimetableIDBrand]: true };
 
 /** Matches a positive integer. */
 export function isStopID(id: number): id is StopID {
@@ -44,6 +47,10 @@ export function isRouteVariantID(id: string): id is RouteVariantID {
 /** Matches a kebab-case string. */
 export function isServiceTypeID(id: string): id is ServiceTypeID {
   return isKebabCase(id);
+}
+/** Matches a positive integer. */
+export function isTimetableID(id: number): id is TimetableID {
+  return isPositiveInteger(id);
 }
 
 /** Throws unless provided a positive integer. */
@@ -88,6 +95,13 @@ export function toServiceTypeID(id: string): ServiceTypeID {
   }
   throw badID("service type", id);
 }
+/** Throws unless provided a positive integer. */
+export function toTimetableID(id: number): TimetableID {
+  if (isTimetableID(id)) {
+    return id;
+  }
+  throw badID("timetable", id);
+}
 
 /** Matches a positive integer. */
 export const StopIDJson = z
@@ -129,6 +143,11 @@ export const ServiceTypeIDJson = z
   .string()
   .refine((x) => isServiceTypeID(x))
   .transform((x) => toServiceTypeID(x));
+/** Matches a positive integer. */
+export const TimetableIDJson = z
+  .number()
+  .refine((x) => isTimetableID(x))
+  .transform((x) => toTimetableID(x));
 
 function isPositiveInteger(val: number) {
   return Number.isInteger(val) && val >= 1;
@@ -143,7 +162,8 @@ function badID(
     | "platform"
     | "direction"
     | "route variant"
-    | "service type",
+    | "service type"
+    | "timetable",
   val: number | string
 ): Error {
   return new Error(`Bad ${type} ID: ${val}`);

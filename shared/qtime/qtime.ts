@@ -1,13 +1,16 @@
-export class QTime {
+export abstract class QTimeBase<T extends QTimeBase<T>> {
   constructor(
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) {}
+  ) { }
+
+  protected abstract _getNumOfHours(): number;
+
   isValid(): { valid: true } | { valid: false; issue: string } {
     const invalid = (issue: string) => ({ valid: false, issue: issue });
 
-    if (!Number.isInteger(this.hour) || this.hour < 0 || this.hour > 23) {
+    if (!Number.isInteger(this.hour) || this.hour < 0 || this.hour >= this._getNumOfHours()) {
       return invalid(`"${this.hour}" is not a valid hour.`);
     }
     if (!Number.isInteger(this.minute) || this.minute < 0 || this.minute > 59) {
@@ -23,6 +26,38 @@ export class QTime {
   asDecimal(): number {
     return this.hour * 1000 + this.minute * 100 + this.second;
   }
+
+
+  equals(other: T) {
+    return this.asDecimal() == other.asDecimal();
+  }
+  isBefore(other: T) {
+    return this.asDecimal() < other.asDecimal();
+  }
+  isBeforeOrEqual(other: T) {
+    return this.asDecimal() <= other.asDecimal();
+  }
+  isAfter(other: T) {
+    return this.asDecimal() > other.asDecimal();
+  }
+  isAfterOrEqual(other: T) {
+    return this.asDecimal() >= other.asDecimal();
+  }
+}
+
+export class QTime extends QTimeBase<QTime> {
+  constructor(
+    hour: number,
+    minute: number,
+    second: number
+  ) {
+    super(hour, minute, second);
+  }
+
+  _getNumOfHours(): number {
+    return 24;
+  }
+
   /** E.g. "14:59:00" for 2:59pm. */
   toISO() {
     const h = this.hour.toFixed().padStart(2, "0");
@@ -30,6 +65,7 @@ export class QTime {
     const s = this.second.toFixed().padStart(2, "0");
     return `${h}:${m}:${s}`;
   }
+
   /** Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can be negative. */
   add({ h, m, s }: { h?: number; m?: number; s?: number }): {
     time: QTime;
@@ -65,19 +101,46 @@ export class QTime {
     }
     return { time: new QTime(hour, minute, second), days: days };
   }
-  equals(other: QTime) {
-    return this.asDecimal() == other.asDecimal();
+}
+
+export class QTimetableTime extends QTimeBase<QTimetableTime> {
+  constructor(
+    hour: number,
+    minute: number,
+    second: number
+  ) {
+    super(hour, minute, second);
   }
-  isBefore(other: QTime) {
-    return this.asDecimal() < other.asDecimal();
+
+  _getNumOfHours(): number {
+    return 48;
   }
-  isBeforeOrEqual(other: QTime) {
-    return this.asDecimal() <= other.asDecimal();
-  }
-  isAfter(other: QTime) {
-    return this.asDecimal() > other.asDecimal();
-  }
-  isAfterOrEqual(other: QTime) {
-    return this.asDecimal() >= other.asDecimal();
+
+  /** Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can be negative. */
+  add({ h, m, s }: { h?: number; m?: number; s?: number }): QTimetableTime | null {
+    let hour = this.hour + (h ?? 0);
+    let minute = this.minute + (m ?? 0);
+    let second = this.second + (s ?? 0);
+    while (second > 59) {
+      second -= 60;
+      minute++;
+    }
+    while (second < 0) {
+      second += 60;
+      minute--;
+    }
+    while (minute > 59) {
+      minute -= 60;
+      hour++;
+    }
+    while (minute < 0) {
+      minute += 60;
+      hour--;
+    }
+
+    if (hour < 0 || hour > 47) {
+      return null;
+    }
+    return new QTimetableTime(hour, minute, second);
   }
 }
