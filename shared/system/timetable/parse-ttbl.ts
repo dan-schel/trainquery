@@ -1,16 +1,15 @@
-import { parseIntNull } from "@schel-d/js-utils/dist/types";
-import { Timetable, TimetableEntry } from "./timetable";
-import { isLineID, isTimetableID } from "../ids";
-import { getLine } from "../config-utils";
-import { ServerConfig } from "../config";
+import { nonNull, parseIntNull } from "@schel-d/js-utils/dist/types";
+import { Timetable, TimetableEntry, TimetabledStop } from "./timetable";
+import { isDirectionID, isLineID, isRouteVariantID, isStopID, isTimetableID } from "../ids";
 import { QDate } from "../../qtime/qdate";
+import { QWeekdayRange } from "../../qtime/qweekdayrange";
+import { QTimetableTime } from "../../qtime/qtime";
 
 export type ErrorLogger = (error: string) => void;
 
 type ErrorProcedure = (error: string) => null;
 
 export function parseTTBL(
-  config: ServerConfig,
   input: string,
   logError?: ErrorLogger
 ): Timetable | null {
@@ -34,7 +33,7 @@ export function parseTTBL(
   const sections: string[][] = [];
   let section: string[] | null = null;
   for (const line of lines) {
-    if (line.startsWith("[") && line.endsWith("]")) {
+    if (line.startsWith("[")) {
       if (section != null) {
         sections.push(section);
       }
@@ -48,27 +47,31 @@ export function parseTTBL(
   }
 
   // The first section is always the metadata section ("[timetable]").
-  const metadata = parseMetadata(config, sections[0], error);
+  const metadata = parseMetadata(sections[0], error);
   if (metadata == null) {
     return null;
   }
 
-  // TODO: actually parse the entries!
-  const entries: TimetableEntry[] = [];
+  // Every other section must be a grid.
+  const entries = sections
+    .slice(1)
+    .map(g => parseGrid(g, error));
+  if (entries.some(e => e == null)) {
+    return null;
+  }
 
   return new Timetable(
     metadata.id,
-    metadata.line.id,
+    metadata.line,
     metadata.isTemporary,
     metadata.begins,
     metadata.ends,
     metadata.created,
-    entries
+    entries.filter(nonNull).flat()
   );
 }
 
 function parseMetadata(
-  config: ServerConfig,
   metadataInput: string[],
   error: ErrorProcedure
 ) {
@@ -96,10 +99,6 @@ function parseMetadata(
   if (lineID == null || !isLineID(lineID)) {
     return error(`"${lineIDString}" is not a line ID.`);
   }
-  const line = getLine(config, lineID);
-  if (line == null) {
-    return error(`No line exists with ID ${lineID}.`);
-  }
 
   // Parse "type: main" or "type: temporary".
   const typeString = get("type");
@@ -116,7 +115,7 @@ function parseMetadata(
       return null;
     }
     const date = QDate.parse(input);
-    if (date == null || !date.isValid().valid) {
+    if (date == null) {
       return "INVALID!";
     }
     return date;
@@ -128,7 +127,7 @@ function parseMetadata(
   const begins = wildcardDate(beginsString);
   if (begins == "INVALID!") {
     return error(
-      `"${beginsString}" is not a ISO8601 compliant date (or a '*').`
+      `"${beginsString}" is not a ISO8601 compliant date (or a "*").`
     );
   }
   const endsString = get("ends");
@@ -137,7 +136,7 @@ function parseMetadata(
   }
   const ends = wildcardDate(endsString);
   if (ends == "INVALID!") {
-    return error(`"${endsString}" is not a ISO8601 compliant date (or a '*').`);
+    return error(`"${endsString}" is not a ISO8601 compliant date (or a "*").`);
   }
 
   // Parse created date.
@@ -146,16 +145,93 @@ function parseMetadata(
     return error("Metadata is missing 'created'.");
   }
   const created = QDate.parse(createdString);
-  if (created == null || !created.isValid().valid) {
+  if (created == null) {
     return error(`"${createdString}" is not a ISO8601 compliant date.`);
   }
 
   return {
     id: timetableID,
-    line: line,
+    line: lineID,
     isTemporary: typeString == "temporary",
     begins: begins,
     ends: ends,
     created: created,
   };
+}
+
+function parseGrid(
+  gridInput: string[],
+  error: ErrorProcedure
+): TimetableEntry[] | null {
+
+  if (!/^\[[^[\]]+\][^[\]]*$/g.test(gridInput[0])) {
+    return error("Grid header unrecognized. Could not find opening/closing brackets.");
+  }
+
+  // Retrieve and validate the route variant and direction.
+  const args = gridInput[0].replace(/\[|\].+/g, "").split(",").map(s => s.trim());
+  if (args.length != 2) {
+    return error("Expecting two arguments in grid header.");
+  }
+  const routeVariant = args[0];
+  if (!isRouteVariantID(routeVariant)) {
+    return error(`"${routeVariant}" is not a route variant ID.`);
+  }
+  const direction = args[1];
+  if (!isDirectionID(direction)) {
+    return error(`"${direction}" is not a direction ID.`);
+  }
+
+  // Retrieve each weekday range in the header row.
+  const potentialWDRs = gridInput[0]
+    .replace(/\[.+\]\s+/g, "")
+    .split(/\s+/g)
+    .map(s => ({ input: s, wdr: QWeekdayRange.parse(s.trim()) }));
+  const badWDR = potentialWDRs.find(w => w.wdr == null);
+  if (badWDR != null) {
+    return error(`"${badWDR.input}" is not a valid weekday range.`);
+  }
+  const wdrs = potentialWDRs.map(w => w.wdr).filter(nonNull);
+
+  // Treat every other line as a row in the grid.
+  const potentialRows = gridInput.slice(1).map(r => {
+    const terms = r.split(/\s+/g).map(s => s.trim());
+    if (terms.length != wdrs.length + 2) {
+      return error(`Rows in the grid have inconsistent numbers of columns.`);
+    }
+
+    // Ensure the first term is a stop ID.
+    const stopID = parseIntNull(terms[0]);
+    if (stopID == null || !isStopID(stopID)) {
+      return error(`"${terms[0]}" is not a stop ID.`);
+    }
+
+    // Ensure every other term is a timetable time or "-".
+    const potentialTimes = terms.slice(2).map(t => ({ input: t, time: t == "-" ? null : (QTimetableTime.parse(t) ?? "INVALID!" as const) }));
+    const badTime = potentialTimes.find(t => t.time == "INVALID!");
+    if (badTime != null) {
+      return error(`"${badTime.input}" is not a valid timetable time string (or a "-").`);
+    }
+    const times = potentialTimes.map(t => t.time).filter((t): t is (QTimetableTime | null) => t != "INVALID!");
+
+    return {
+      stop: stopID,
+      times: times
+    };
+  });
+  if (potentialRows.some(r => r == null)) {
+    return null;
+  }
+  const rows = potentialRows.filter(nonNull);
+
+  // Convert rows to entries.
+  const entries = wdrs.map((w, i) => new TimetableEntry(
+    routeVariant, direction, w, rows.map(r => {
+      const time = r.times[i];
+      if (time == null) { return null; }
+      return new TimetabledStop(r.stop, time);
+    }).filter(nonNull)
+  ));
+
+  return entries;
 }

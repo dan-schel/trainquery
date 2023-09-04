@@ -1,3 +1,5 @@
+import { parseIntThrow } from "@schel-d/js-utils/dist/types";
+
 const _daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const _monthAcronyms = [
   "Jan",
@@ -70,8 +72,16 @@ export class QDate {
     return `${y}-${m}-${d}`;
   }
 
+  /** Parses "2023-09-04" to a QDate. Does not check for date validity. */
   static parse(input: string): QDate | null {
-    // TODO: parse ISO8601 compliant date string.
+    if (!/^[0-9]{4}-?[0-9]{2}-?[0-9]{2}$/.test(input)) {
+      return null;
+    }
+    input = input.replace(/-/g, "");
+    const year = parseIntThrow(input.slice(0, 4));
+    const month = parseIntThrow(input.slice(4, 6));
+    const day = parseIntThrow(input.slice(6, 8));
+    return new QDate(year, month, day);
   }
 
   /** Returns the date when `x` days have passed. `x` can be negative. */

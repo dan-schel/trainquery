@@ -152,7 +152,7 @@ export const TimetableIDJson = z
 function isPositiveInteger(val: number) {
   return Number.isInteger(val) && val >= 1;
 }
-function isKebabCase(val: string) {
+export function isKebabCase(val: string) {
   return /^[a-z0-9]+(-[a-z0-9]+)*$/.test(val);
 }
 function badID(
