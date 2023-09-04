@@ -1,6 +1,12 @@
 import { nonNull, parseIntNull } from "@schel-d/js-utils/dist/types";
 import { Timetable, TimetableEntry, TimetabledStop } from "./timetable";
-import { isDirectionID, isLineID, isRouteVariantID, isStopID, isTimetableID } from "../ids";
+import {
+  isDirectionID,
+  isLineID,
+  isRouteVariantID,
+  isStopID,
+  isTimetableID,
+} from "../ids";
 import { QDate } from "../../qtime/qdate";
 import { QWeekdayRange } from "../../qtime/qweekdayrange";
 import { QTimetableTime } from "../../qtime/qtime";
@@ -53,10 +59,8 @@ export function parseTTBL(
   }
 
   // Every other section must be a grid.
-  const entries = sections
-    .slice(1)
-    .map(g => parseGrid(g, error));
-  if (entries.some(e => e == null)) {
+  const entries = sections.slice(1).map((g) => parseGrid(g, error));
+  if (entries.some((e) => e == null)) {
     return null;
   }
 
@@ -71,10 +75,7 @@ export function parseTTBL(
   );
 }
 
-function parseMetadata(
-  metadataInput: string[],
-  error: ErrorProcedure
-) {
+function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
   const fields = metadataInput
     .slice(1)
     .map((s) => ({ key: s.split(":")[0], value: s.split(":")[1] }));
@@ -163,13 +164,17 @@ function parseGrid(
   gridInput: string[],
   error: ErrorProcedure
 ): TimetableEntry[] | null {
-
   if (!/^\[[^[\]]+\][^[\]]*$/g.test(gridInput[0])) {
-    return error("Grid header unrecognized. Could not find opening/closing brackets.");
+    return error(
+      "Grid header unrecognized. Could not find opening/closing brackets."
+    );
   }
 
   // Retrieve and validate the route variant and direction.
-  const args = gridInput[0].replace(/\[|\].+/g, "").split(",").map(s => s.trim());
+  const args = gridInput[0]
+    .replace(/\[|\].+/g, "")
+    .split(",")
+    .map((s) => s.trim());
   if (args.length != 2) {
     return error("Expecting two arguments in grid header.");
   }
@@ -186,16 +191,16 @@ function parseGrid(
   const potentialWDRs = gridInput[0]
     .replace(/\[.+\]\s+/g, "")
     .split(/\s+/g)
-    .map(s => ({ input: s, wdr: QWeekdayRange.parse(s.trim()) }));
-  const badWDR = potentialWDRs.find(w => w.wdr == null);
+    .map((s) => ({ input: s, wdr: QWeekdayRange.parse(s.trim()) }));
+  const badWDR = potentialWDRs.find((w) => w.wdr == null);
   if (badWDR != null) {
     return error(`"${badWDR.input}" is not a valid weekday range.`);
   }
-  const wdrs = potentialWDRs.map(w => w.wdr).filter(nonNull);
+  const wdrs = potentialWDRs.map((w) => w.wdr).filter(nonNull);
 
   // Treat every other line as a row in the grid.
-  const potentialRows = gridInput.slice(1).map(r => {
-    const terms = r.split(/\s+/g).map(s => s.trim());
+  const potentialRows = gridInput.slice(1).map((r) => {
+    const terms = r.split(/\s+/g).map((s) => s.trim());
     if (terms.length != wdrs.length + 2) {
       return error(`Rows in the grid have inconsistent numbers of columns.`);
     }
@@ -207,31 +212,51 @@ function parseGrid(
     }
 
     // Ensure every other term is a timetable time or "-".
-    const potentialTimes = terms.slice(2).map(t => ({ input: t, time: t == "-" ? null : (QTimetableTime.parse(t) ?? "INVALID!" as const) }));
-    const badTime = potentialTimes.find(t => t.time == "INVALID!");
+    const potentialTimes = terms
+      .slice(2)
+      .map((t) => ({
+        input: t,
+        time:
+          t == "-" ? null : QTimetableTime.parse(t) ?? ("INVALID!" as const),
+      }));
+    const badTime = potentialTimes.find((t) => t.time == "INVALID!");
     if (badTime != null) {
-      return error(`"${badTime.input}" is not a valid timetable time string (or a "-").`);
+      return error(
+        `"${badTime.input}" is not a valid timetable time string (or a "-").`
+      );
     }
-    const times = potentialTimes.map(t => t.time).filter((t): t is (QTimetableTime | null) => t != "INVALID!");
+    const times = potentialTimes
+      .map((t) => t.time)
+      .filter((t): t is QTimetableTime | null => t != "INVALID!");
 
     return {
       stop: stopID,
-      times: times
+      times: times,
     };
   });
-  if (potentialRows.some(r => r == null)) {
+  if (potentialRows.some((r) => r == null)) {
     return null;
   }
   const rows = potentialRows.filter(nonNull);
 
   // Convert rows to entries.
-  const entries = wdrs.map((w, i) => new TimetableEntry(
-    routeVariant, direction, w, rows.map(r => {
-      const time = r.times[i];
-      if (time == null) { return null; }
-      return new TimetabledStop(r.stop, time);
-    }).filter(nonNull)
-  ));
+  const entries = wdrs.map(
+    (w, i) =>
+      new TimetableEntry(
+        routeVariant,
+        direction,
+        w,
+        rows
+          .map((r) => {
+            const time = r.times[i];
+            if (time == null) {
+              return null;
+            }
+            return new TimetabledStop(r.stop, time);
+          })
+          .filter(nonNull)
+      )
+  );
 
   return entries;
 }

@@ -2,11 +2,11 @@ import { QDate } from "../../qtime/qdate";
 import { QTimetableTime } from "../../qtime/qtime";
 import { QWeekdayRange } from "../../qtime/qweekdayrange";
 import {
-  DirectionID,
-  LineID,
-  RouteVariantID,
-  StopID,
-  TimetableID,
+  type DirectionID,
+  type LineID,
+  type RouteVariantID,
+  type StopID,
+  type TimetableID,
 } from "../ids";
 
 export class Timetable {

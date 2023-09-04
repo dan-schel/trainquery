@@ -5,7 +5,7 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) { }
+  ) {}
 
   protected abstract _getNumOfHours(): number;
 
@@ -108,7 +108,7 @@ export class QTime extends QTimeBase<QTime> {
     if (!/^[0-9]{2}:[0-9]{2}(:[0-9]{2})?$/.test(input)) {
       return null;
     }
-    const numbers = input.split(":").map(x => parseIntThrow(x));
+    const numbers = input.split(":").map((x) => parseIntThrow(x));
     return new QTime(numbers[0], numbers[1], numbers[2] ?? 0);
   }
 }
@@ -162,7 +162,13 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
   static parse(input: string): QTimetableTime | null {
     const timeBit = input.startsWith(">") ? input.slice(1) : input;
     const time = QTime.parse(timeBit);
-    if (time == null) { return null; }
-    return new QTimetableTime(time.hour + (input.startsWith(">") ? 24 : 0), time.minute, time.second);
+    if (time == null) {
+      return null;
+    }
+    return new QTimetableTime(
+      time.hour + (input.startsWith(">") ? 24 : 0),
+      time.minute,
+      time.second
+    );
   }
 }
