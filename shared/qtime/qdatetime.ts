@@ -2,7 +2,7 @@ import { QDate } from "./qdate";
 import { QTime } from "./qtime";
 
 export abstract class QDateTime<T extends QDateTime<T>> {
-  constructor(readonly date: QDate, readonly time: QTime) { }
+  constructor(readonly date: QDate, readonly time: QTime) {}
 
   /** E.g. 145900 for 2:59pm. */
   asDecimal(): number {

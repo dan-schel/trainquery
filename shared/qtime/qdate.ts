@@ -34,7 +34,7 @@ export class QDate {
     readonly year: number,
     readonly month: number,
     readonly day: number
-  ) {}
+  ) { }
   isValid(): { valid: true } | { valid: false; issue: string } {
     const invalid = (issue: string) => ({ valid: false, issue: issue });
 
@@ -51,8 +51,7 @@ export class QDate {
     const daysInMonth = getDaysInMonth(this.year, this.month);
     if (this.day > daysInMonth) {
       return invalid(
-        `${getMonthAcronym(this.month)} ${
-          this.year
+        `${getMonthAcronym(this.month)} ${this.year
         } only has ${daysInMonth} days.`
       );
     }
@@ -70,6 +69,11 @@ export class QDate {
     const d = this.day.toFixed().padStart(2, "0");
     return `${y}-${m}-${d}`;
   }
+
+  static parse(input: string): QDate | null {
+    // TODO: parse ISO8601 compliant date string.
+  }
+
   /** Returns the date when `x` days have passed. `x` can be negative. */
   addDays(x: number): QDate {
     let day = this.day + x;

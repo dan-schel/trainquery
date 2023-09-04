@@ -1,7 +1,13 @@
 import { QDate } from "../../qtime/qdate";
 import { QTimetableTime } from "../../qtime/qtime";
 import { QWeekdayRange } from "../../qtime/qweekdayrange";
-import { DirectionID, LineID, RouteVariantID, StopID, TimetableID } from "../ids";
+import {
+  DirectionID,
+  LineID,
+  RouteVariantID,
+  StopID,
+  TimetableID,
+} from "../ids";
 
 export class Timetable {
   constructor(
@@ -18,8 +24,8 @@ export class Timetable {
     /** The date the timetable was created. */
     readonly created: QDate,
     /** The services in the timetable. */
-    readonly entries: TimetableEntry,
-  ) { }
+    readonly entries: TimetableEntry[]
+  ) {}
 }
 
 export class TimetableEntry {
@@ -32,7 +38,7 @@ export class TimetableEntry {
     readonly weekdayRange: QWeekdayRange,
     /** The times of each stop this service makes. */
     readonly stops: TimetabledStop[]
-  ) { }
+  ) {}
 }
 
 export class TimetabledStop {
@@ -40,6 +46,6 @@ export class TimetabledStop {
     /** The stop in question. */
     readonly stop: StopID,
     /** The time the service stops at the aforementioned stop. */
-    readonly time: QTimetableTime,
-  ) { }
+    readonly time: QTimetableTime
+  ) {}
 }

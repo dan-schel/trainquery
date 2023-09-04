@@ -3,14 +3,18 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) { }
+  ) {}
 
   protected abstract _getNumOfHours(): number;
 
   isValid(): { valid: true } | { valid: false; issue: string } {
     const invalid = (issue: string) => ({ valid: false, issue: issue });
 
-    if (!Number.isInteger(this.hour) || this.hour < 0 || this.hour >= this._getNumOfHours()) {
+    if (
+      !Number.isInteger(this.hour) ||
+      this.hour < 0 ||
+      this.hour >= this._getNumOfHours()
+    ) {
       return invalid(`"${this.hour}" is not a valid hour.`);
     }
     if (!Number.isInteger(this.minute) || this.minute < 0 || this.minute > 59) {
@@ -26,7 +30,6 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
   asDecimal(): number {
     return this.hour * 1000 + this.minute * 100 + this.second;
   }
-
 
   equals(other: T) {
     return this.asDecimal() == other.asDecimal();
@@ -46,11 +49,7 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
 }
 
 export class QTime extends QTimeBase<QTime> {
-  constructor(
-    hour: number,
-    minute: number,
-    second: number
-  ) {
+  constructor(hour: number, minute: number, second: number) {
     super(hour, minute, second);
   }
 
@@ -104,11 +103,7 @@ export class QTime extends QTimeBase<QTime> {
 }
 
 export class QTimetableTime extends QTimeBase<QTimetableTime> {
-  constructor(
-    hour: number,
-    minute: number,
-    second: number
-  ) {
+  constructor(hour: number, minute: number, second: number) {
     super(hour, minute, second);
   }
 
@@ -117,7 +112,15 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
   }
 
   /** Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can be negative. */
-  add({ h, m, s }: { h?: number; m?: number; s?: number }): QTimetableTime | null {
+  add({
+    h,
+    m,
+    s,
+  }: {
+    h?: number;
+    m?: number;
+    s?: number;
+  }): QTimetableTime | null {
     let hour = this.hour + (h ?? 0);
     let minute = this.minute + (m ?? 0);
     let second = this.second + (s ?? 0);

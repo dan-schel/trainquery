@@ -8,8 +8,8 @@ export class QWeekdayRange {
     readonly thu: boolean,
     readonly fri: boolean,
     readonly sat: boolean,
-    readonly sun: boolean,
-  ) { }
+    readonly sun: boolean
+  ) {}
 
   toString() {
     return (
@@ -20,6 +20,22 @@ export class QWeekdayRange {
       (this.fri ? "F" : "_") +
       (this.sat ? "S" : "_") +
       (this.sun ? "S" : "_")
+    );
+  }
+
+  static parse(input: string) {
+    input = input.toUpperCase();
+    if (input.length != 7) {
+      return null;
+    }
+    return new QWeekdayRange(
+      input[0] == "M",
+      input[1] == "T",
+      input[2] == "W",
+      input[3] == "T",
+      input[4] == "F",
+      input[5] == "S",
+      input[6] == "S"
     );
   }
 
