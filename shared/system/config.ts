@@ -4,7 +4,6 @@ import {
   ServerOnlyConfig,
   SharedConfig,
 } from "./config-elements";
-import { type JsonLoader } from "./populate";
 import { hashString } from "./cyrb53";
 
 /** The server's config object, which includes the shared properties. */
@@ -23,43 +22,12 @@ export class ServerConfig {
      */
     readonly frontend: FrontendOnlyConfig
   ) {
-    this.hash = hashString(JSON.stringify(this.toJSON()));
-  }
-
-  static readonly json = z
-    .object({
-      shared: SharedConfig.json,
-      server: ServerOnlyConfig.json,
-      frontend: FrontendOnlyConfig.json,
-    })
-    .transform((x) => new ServerConfig(x.shared, x.server, x.frontend));
-
-  toJSON(): z.input<typeof ServerConfig.json> {
-    return {
-      shared: this.shared.toJSON(),
-      server: this.server.toJSON(),
-      frontend: this.frontend.toJSON(),
-    };
-  }
-
-  /** Parse from file (some props reference other files instead of providing data). */
-  static async fromFile(
-    json: unknown,
-    loader: JsonLoader
-  ): Promise<ServerConfig> {
-    const data = z
-      .object({
-        shared: z.any(),
-        server: z.any(),
-        frontend: z.any(),
+    this.hash = hashString(
+      JSON.stringify({
+        shared: this.shared.toJSON(),
+        frontend: this.frontend.toJSON(),
       })
-      .parse(json);
-
-    const shared = await SharedConfig.fromFile(data.shared, loader);
-    const server = await ServerOnlyConfig.fromFile(data.server, loader);
-    const frontend = await FrontendOnlyConfig.fromFile(data.frontend, loader);
-
-    return new ServerConfig(shared, server, frontend);
+    );
   }
 
   forFrontend(): FrontendConfig {

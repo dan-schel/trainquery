@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { Line } from "./line";
 import { Stop } from "./stop";
-import { type JsonLoader, PopulateBuilder } from "./populate";
 import { UrlNames } from "./url-names";
 import { LinterRules } from "./linter-rules";
 import { ServiceType } from "./service-type";
@@ -81,26 +80,6 @@ export class SharedConfig {
       serviceTypes: this.serviceTypes.map((s) => s.toJSON()),
     };
   }
-
-  /** Parse from file (some props reference other files instead of providing data). */
-  static async fromFile(
-    json: unknown,
-    loader: JsonLoader
-  ): Promise<SharedConfig> {
-    const replacementSchema = z
-      .object({ stops: z.string(), lines: z.string(), urlNames: z.string() })
-      .passthrough();
-    const stopsYml = z.object({ stops: z.any() });
-    const linesYml = z.object({ lines: z.any() });
-
-    const value = await new PopulateBuilder(replacementSchema.parse(json))
-      .populate("stops", async (x) => (await loader(x, stopsYml)).stops)
-      .populate("lines", async (x) => (await loader(x, linesYml)).lines)
-      .populate("urlNames", async (x) => await loader(x, z.any()))
-      .build();
-
-    return SharedConfig.json.parse(value);
-  }
 }
 
 /** The config properties (primarily) used by the frontend. */
@@ -149,22 +128,6 @@ export class FrontendOnlyConfig {
       metaDescription: this.metaDescription,
     };
   }
-
-  /** Parse from file (some props reference other files instead of providing data). */
-  static async fromFile(
-    json: unknown,
-    loader: JsonLoader
-  ): Promise<FrontendOnlyConfig> {
-    const replacementSchema = z
-      .object({ departureFeeds: z.string() })
-      .passthrough();
-
-    const value = await new PopulateBuilder(replacementSchema.parse(json))
-      .populate("departureFeeds", async (x) => await loader(x, z.any()))
-      .build();
-
-    return FrontendOnlyConfig.json.parse(value);
-  }
 }
 
 /** The config properties used by the server and never sent to the frontend. */
@@ -173,33 +136,4 @@ export class ServerOnlyConfig {
     /* todo: continuation */
     readonly linter: LinterRules
   ) {}
-
-  static readonly json = z
-    .object({
-      linter: LinterRules.json,
-    })
-    .transform((x) => new ServerOnlyConfig(x.linter));
-
-  toJSON(): z.input<typeof ServerOnlyConfig.json> {
-    return {
-      linter: this.linter.toJSON(),
-    };
-  }
-
-  /** Parse from file (some props reference other files instead of providing data). */
-  static async fromFile(
-    json: unknown,
-    loader: JsonLoader
-  ): Promise<ServerOnlyConfig> {
-    const replacementSchema = z
-      .object({ continuation: z.string(), linter: z.string() })
-      .passthrough();
-
-    const value = await new PopulateBuilder(replacementSchema.parse(json))
-      .populate("continuation", async (x) => await loader(x, z.any()))
-      .populate("linter", async (x) => await loader(x, z.any()))
-      .build();
-
-    return ServerOnlyConfig.json.parse(value);
-  }
 }
