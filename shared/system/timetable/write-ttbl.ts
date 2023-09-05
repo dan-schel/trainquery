@@ -1,8 +1,9 @@
 import { nonNull, unique } from "@schel-d/js-utils";
 import { HasSharedConfig, requireLine, requireStop } from "../config-utils";
-import { Timetable } from "./timetable";
-import { DirectionID, RouteVariantID } from "../ids";
+import { Timetable, TimetableEntry } from "./timetable";
+import { DirectionID, RouteVariantID, StopID } from "../ids";
 import { QWeekdayRange } from "../../qtime/qweekdayrange";
+import { QTimetableTime } from "../../qtime/qtime";
 
 export function writeTtbl(config: HasSharedConfig, timetable: Timetable) {
   const routeDirectionPairs = unique(
@@ -19,7 +20,7 @@ export function writeTtbl(config: HasSharedConfig, timetable: Timetable) {
   return `${writeMetadata(timetable)}\n${grids.join("\n")}`;
 }
 
-export function writeMetadata(timetable: Timetable): string {
+function writeMetadata(timetable: Timetable): string {
   return (
     `[timetable]\n` +
     `version: 4\n` +
@@ -33,7 +34,7 @@ export function writeMetadata(timetable: Timetable): string {
 }
 
 /** Returns a ttbl grid string for one section, or null if no entries match. */
-export function writeGrid(
+function writeGrid(
   config: HasSharedConfig,
   timetable: Timetable,
   route: RouteVariantID,
@@ -44,6 +45,10 @@ export function writeGrid(
     (e) =>
       e.route == route && e.direction == direction && matchesWdr(e.weekdayRange)
   );
+
+  if (entries.length == 0) {
+    return null;
+  }
 
   const header = `[${route}, ${direction}]`;
   const stops = requireLine(config, timetable.line).route.getStops(
@@ -60,5 +65,37 @@ export function writeGrid(
     return `${idString} ${kebabName}`;
   });
 
-  return null;
+  const headerSize = Math.max(header.length, ...stopHeaders.map(h => h.length));
+
+  const wdrs = entries.map(e => e.weekdayRange.toString()).join(" ");
+  const headerRow = `${header.padEnd(headerSize, " ")} ${wdrs}`;
+
+  const times = entries.map(e => timeStrings(stops, e));
+  const gridRows = stops.map((s, i) => `${stopHeaders[i]} ${times.map(t => t[i].padEnd(8, " ")).join("")}`);
+
+  return `${headerRow}\n${gridRows.join("\n")}\n`;
+}
+
+function timeStrings(stops: StopID[], entry: TimetableEntry): string[] {
+  const result: string[] = [];
+
+  let entryIndex = 0;
+  for (const stop of stops) {
+    let time: QTimetableTime | null = null;
+    for (let i = entryIndex; i < entry.stops.length; i++) {
+      if (entry.stops[i].stop == stop) {
+        time = entry.stops[i].time;
+        entryIndex = i + 1;
+      }
+    }
+
+    if (time == null) {
+      result.push("-");
+    }
+    else {
+      result.push(time.toTtblString());
+    }
+  }
+
+  return result;
 }

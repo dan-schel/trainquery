@@ -1,11 +1,11 @@
-import { parseIntThrow } from "@schel-d/js-utils";
+import { parseIntThrow, posMod } from "@schel-d/js-utils";
 
 export abstract class QTimeBase<T extends QTimeBase<T>> {
   constructor(
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) {}
+  ) { }
 
   protected abstract _getNumOfHours(): number;
 
@@ -170,5 +170,10 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
       time.minute,
       time.second
     );
+  }
+
+  toTtblString() {
+    const time = new QTime(posMod(this.hour, 24), this.minute, this.second).toISO();
+    return this.hour >= 24 ? `>${time}` : time;
   }
 }
