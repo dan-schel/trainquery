@@ -7,7 +7,12 @@ import {
   containsStop,
   nonViaStopIDs,
 } from "./line-route";
-import { toRouteVariantID, type StopID, RouteVariantID, DirectionID } from "../ids";
+import {
+  toRouteVariantID,
+  type StopID,
+  RouteVariantID,
+  DirectionID,
+} from "../ids";
 
 /** Route with a balloon loop section where services terminate inside the loop. */
 export class HookRoute extends Route {

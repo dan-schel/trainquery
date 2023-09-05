@@ -11,10 +11,12 @@ export function writeTtbl(config: HasSharedConfig, timetable: Timetable) {
   );
 
   const grids = routeDirectionPairs
-    .map(p => writeGrid(config, timetable, p.route, p.direction, _wdr => true))
+    .map((p) =>
+      writeGrid(config, timetable, p.route, p.direction, (_wdr) => true)
+    )
     .filter(nonNull);
 
-  return `${writeMetadata(timetable)}\n${grids.join('\n')}`;
+  return `${writeMetadata(timetable)}\n${grids.join("\n")}`;
 }
 
 export function writeMetadata(timetable: Timetable): string {
@@ -44,12 +46,19 @@ export function writeGrid(
   );
 
   const header = `[${route}, ${direction}]`;
-  const stops = requireLine(config, timetable.line).route.getStops(route, direction);
+  const stops = requireLine(config, timetable.line).route.getStops(
+    route,
+    direction
+  );
 
   const maxStopIDDigits = Math.max(...stops).toFixed().length;
-  const stopHeaders = stops.map(s => `${s.toFixed().padStart(maxStopIDDigits, "0")} ${requireStop(config, s).name.toLowerCase().replace(/\s/g, "-")}`);
-
-  console.log(stopHeaders);
+  const stopHeaders = stops.map((s) => {
+    const idString = s.toFixed().padStart(maxStopIDDigits, "0");
+    const kebabName = requireStop(config, s)
+      .name.toLowerCase()
+      .replace(/\s/g, "-");
+    return `${idString} ${kebabName}`;
+  });
 
   return null;
 }

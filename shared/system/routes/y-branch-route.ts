@@ -7,7 +7,12 @@ import {
   containsStop,
   nonViaStopIDs,
 } from "./line-route";
-import { type RouteVariantID, RouteVariantIDJson, type StopID, DirectionID } from "../ids";
+import {
+  type RouteVariantID,
+  RouteVariantIDJson,
+  type StopID,
+  DirectionID,
+} from "../ids";
 
 /** The details of a single branch in a {@link YBranchRoute}. */
 export class Branch {
@@ -19,7 +24,7 @@ export class Branch {
      * section begins.
      */
     readonly stops: RouteStop[]
-  ) { }
+  ) {}
 
   static readonly json = z
     .object({

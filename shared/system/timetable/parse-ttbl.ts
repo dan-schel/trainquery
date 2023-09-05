@@ -76,12 +76,10 @@ export function parseTtbl(
 }
 
 function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
-  const fields = metadataInput
-    .slice(1)
-    .map((s) => ({
-      key: s.split(":")[0].trim(),
-      value: s.split(":")[1].trim(),
-    }));
+  const fields = metadataInput.slice(1).map((s) => ({
+    key: s.split(":")[0].trim(),
+    value: s.split(":")[1].trim(),
+  }));
   const get = (key: string) => fields.find((m) => m.key == key)?.value;
 
   // Parse timetable ID.

@@ -13,7 +13,7 @@ export abstract class Route {
   constructor(
     /** E.g. 'linear', 'y-branch', etc. */
     readonly type: LineRouteType
-  ) { }
+  ) {}
 
   abstract stopsAt(stop: StopID): boolean;
 
@@ -24,7 +24,7 @@ export class DirectionDefinition {
   constructor(
     /** Uniquely identify this direction from others on this line. */
     readonly id: DirectionID
-  ) { }
+  ) {}
 
   static readonly json = z
     .object({
@@ -59,7 +59,7 @@ export class RouteStop {
      * rule (e.g. 'direction-up').
      */
     readonly pickUp?: boolean | string
-  ) { }
+  ) {}
 
   static readonly json = z
     .union([
@@ -107,9 +107,11 @@ export function badVariantOrDirection(
   variant: RouteVariantID,
   direction: DirectionID
 ): Error {
-  return new Error(`Route variant "${variant}" and direction "${direction}" is invalid for this line.`);
+  return new Error(
+    `Route variant "${variant}" and direction "${direction}" is invalid for this line.`
+  );
 }
 
 export function nonViaStopIDs(stops: RouteStop[]) {
-  return stops.filter(s => !s.via).map(s => s.stop);
+  return stops.filter((s) => !s.via).map((s) => s.stop);
 }

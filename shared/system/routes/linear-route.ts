@@ -7,7 +7,12 @@ import {
   containsStop,
   nonViaStopIDs,
 } from "./line-route";
-import { DirectionID, RouteVariantID, toRouteVariantID, type StopID } from "../ids";
+import {
+  DirectionID,
+  RouteVariantID,
+  toRouteVariantID,
+  type StopID,
+} from "../ids";
 
 /** The simplest type of line route. */
 export class LinearRoute extends Route {
