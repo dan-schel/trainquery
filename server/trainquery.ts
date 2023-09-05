@@ -1,7 +1,6 @@
 import { ServerConfig } from "../shared/system/config";
 import { configApi } from "./config-api";
 import { ssrAppPropsApi, ssrRoutePropsApi } from "./ssr-props-api";
-import { writeTtbl } from "../shared/system/timetable/write-ttbl";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = { getConfig: () => ServerConfig; server: Server };
@@ -13,12 +12,6 @@ export async function trainQuery(
 ) {
   let config = await configProvider.fetchConfig(logger);
   logger.logConfigRefresh(config, true);
-
-  // <TEMP>
-
-  console.log(writeTtbl(config, config.server.timetables[0]));
-
-  // </TEMP>
 
   const refreshConfig = async (skipFetch: boolean) => {
     if (!skipFetch) {

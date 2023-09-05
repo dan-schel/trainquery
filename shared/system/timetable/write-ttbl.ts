@@ -11,9 +11,24 @@ export function writeTtbl(config: HasSharedConfig, timetable: Timetable) {
     (a, b) => a.route == b.route && a.direction == b.direction
   );
 
+  const includeSeconds = timetable.entries.some((e) =>
+    e.stops.some((s) => s.time.second != 0)
+  );
+
   const grids = routeDirectionPairs
     .map((p) =>
-      writeGrid(config, timetable, p.route, p.direction, (_wdr) => true)
+      writeGrid(
+        config,
+        timetable,
+        p.route,
+        p.direction,
+
+        // TODO: Use this function to restrict different weekday ranges to
+        // different grids.
+        (_wdr) => true,
+
+        includeSeconds
+      )
     )
     .filter(nonNull);
 
@@ -39,7 +54,8 @@ function writeGrid(
   timetable: Timetable,
   route: RouteVariantID,
   direction: DirectionID,
-  matchesWdr: (wdr: QWeekdayRange) => boolean
+  matchesWdr: (wdr: QWeekdayRange) => boolean,
+  includeSeconds: boolean
 ): string | null {
   const entries = timetable.entries.filter(
     (e) =>
@@ -65,18 +81,33 @@ function writeGrid(
     return `${idString} ${kebabName}`;
   });
 
-  const headerSize = Math.max(header.length, ...stopHeaders.map(h => h.length));
+  const headerSize = Math.max(
+    header.length,
+    ...stopHeaders.map((h) => h.length)
+  );
+  const columnSize = includeSeconds ? 10 : 8;
 
-  const wdrs = entries.map(e => e.weekdayRange.toString()).join(" ");
+  const wdrs = entries
+    .map((e) => e.weekdayRange.toString().padEnd(columnSize, " "))
+    .join("");
   const headerRow = `${header.padEnd(headerSize, " ")} ${wdrs}`;
 
-  const times = entries.map(e => timeStrings(stops, e));
-  const gridRows = stops.map((s, i) => `${stopHeaders[i]} ${times.map(t => t[i].padEnd(8, " ")).join("")}`);
+  const times = entries.map((e) => timeStrings(stops, e, includeSeconds));
+  const gridRows = stops.map(
+    (_s, i) =>
+      `${stopHeaders[i].padEnd(headerSize, " ")} ${times
+        .map((t) => t[i].padEnd(columnSize, " "))
+        .join("")}`
+  );
 
   return `${headerRow}\n${gridRows.join("\n")}\n`;
 }
 
-function timeStrings(stops: StopID[], entry: TimetableEntry): string[] {
+function timeStrings(
+  stops: StopID[],
+  entry: TimetableEntry,
+  includeSeconds: boolean
+): string[] {
   const result: string[] = [];
 
   let entryIndex = 0;
@@ -91,9 +122,8 @@ function timeStrings(stops: StopID[], entry: TimetableEntry): string[] {
 
     if (time == null) {
       result.push("-");
-    }
-    else {
-      result.push(time.toTtblString());
+    } else {
+      result.push(time.toTtblString(includeSeconds));
     }
   }
 

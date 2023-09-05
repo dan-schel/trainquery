@@ -5,7 +5,7 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) { }
+  ) {}
 
   protected abstract _getNumOfHours(): number;
 
@@ -172,8 +172,14 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
     );
   }
 
-  toTtblString() {
-    const time = new QTime(posMod(this.hour, 24), this.minute, this.second).toISO();
-    return this.hour >= 24 ? `>${time}` : time;
+  toTtblString(includeSeconds: boolean) {
+    const h = posMod(this.hour, 24).toFixed().padStart(2, "0");
+    const m = this.minute.toFixed().padStart(2, "0");
+    const timeString = `${this.hour < 24 ? "" : ">"}${h}:${m}`;
+    if (!includeSeconds) {
+      return timeString;
+    }
+    const s = this.second.toFixed().padStart(2, "0");
+    return `${timeString}:${s}`;
   }
 }
