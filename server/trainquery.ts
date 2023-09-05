@@ -10,12 +10,12 @@ export async function trainQuery(
   configProvider: ConfigProvider,
   logger: Logger
 ) {
-  let config = await configProvider.fetchConfig();
+  let config = await configProvider.fetchConfig(logger);
   logger.logConfigRefresh(config, true);
 
   const refreshConfig = async (skipFetch: boolean) => {
     if (!skipFetch) {
-      config = await configProvider.fetchConfig();
+      config = await configProvider.fetchConfig(logger);
       logger.logConfigRefresh(config, false);
     }
 
@@ -62,11 +62,12 @@ export abstract class Server {
 }
 
 export abstract class ConfigProvider {
-  abstract fetchConfig(): Promise<ServerConfig>;
+  abstract fetchConfig(logger: Logger): Promise<ServerConfig>;
   abstract getRefreshMs(): number | null;
 }
 
 export abstract class Logger {
   abstract logListening(server: Server): void;
   abstract logConfigRefresh(config: ServerConfig, initial: boolean): void;
+  abstract logTimetableLoadFail(path: string): void;
 }

@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { ServerConfig } from "../shared/system/config";
-import { ConfigProvider } from "./trainquery";
+import { ConfigProvider, Logger } from "./trainquery";
 import YAML from "yaml";
 import { z } from "zod";
 import fs from "fs";
@@ -19,7 +19,7 @@ export class OnlineConfigProvider extends ConfigProvider {
     super();
   }
 
-  async fetchConfig(): Promise<ServerConfig> {
+  async fetchConfig(logger: Logger): Promise<ServerConfig> {
     const zipUrl = await (async () => {
       // This URL might be the zip file...
       if (this.url.endsWith(".zip")) {
@@ -43,7 +43,7 @@ export class OnlineConfigProvider extends ConfigProvider {
     await fsp.mkdir(dataFolder);
     await download(zipUrl, zipPath);
 
-    const config = await loadConfigFromZip(dataFolder, zipPath);
+    const config = await loadConfigFromZip(dataFolder, zipPath, logger);
 
     await fsp.rm(dataFolder, {
       recursive: true,

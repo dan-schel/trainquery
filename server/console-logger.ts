@@ -20,4 +20,8 @@ export class ConsoleLogger extends Logger {
       `${verb} config "${hash}" (${stopCount} stop(s), ${lineCount} line(s)).`
     );
   }
+
+  logTimetableLoadFail(path: string): void {
+    console.log(`Failed to load timetable "${path}".`);
+  }
 }

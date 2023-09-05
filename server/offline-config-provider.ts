@@ -1,5 +1,5 @@
 import { ServerConfig } from "../shared/system/config";
-import { ConfigProvider } from "./trainquery";
+import { ConfigProvider, Logger } from "./trainquery";
 import fsp from "fs/promises";
 import { generateDataFolderPath, loadConfigFromZip } from "./config-zip";
 
@@ -8,11 +8,11 @@ export class OfflineConfigProvider extends ConfigProvider {
     super();
   }
 
-  async fetchConfig(): Promise<ServerConfig> {
+  async fetchConfig(logger: Logger): Promise<ServerConfig> {
     const dataFolder = generateDataFolderPath();
     await fsp.mkdir(dataFolder);
 
-    const config = await loadConfigFromZip(dataFolder, this.zipPath);
+    const config = await loadConfigFromZip(dataFolder, this.zipPath, logger);
 
     await fsp.rm(dataFolder, {
       recursive: true,

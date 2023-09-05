@@ -11,10 +11,15 @@ import {
   SharedConfig,
 } from "../shared/system/config-elements";
 import { LinterRules } from "../shared/system/linter-rules";
+import { glob } from "glob";
+import { Timetable } from "../shared/system/timetable/timetable";
+import { parseTTBL } from "../shared/system/timetable/parse-ttbl";
+import { Logger } from "./trainquery";
 
 export async function loadConfigFromZip(
   dataFolder: string,
-  zipPath: string
+  zipPath: string,
+  logger: Logger
 ): Promise<ServerConfig> {
   const zip = new AdmZip(zipPath);
   await extractZip(zip, dataFolder);
@@ -27,7 +32,7 @@ export async function loadConfigFromZip(
   const config = await loadYml(dataFolder, "config.yml", configSchema);
 
   const shared = await loadShared(config.shared, dataFolder);
-  const server = await loadServer(config.server, dataFolder);
+  const server = await loadServer(config.server, dataFolder, logger);
   const frontend = await loadFrontend(config.frontend, dataFolder);
 
   return new ServerConfig(shared, server, frontend);
@@ -55,17 +60,20 @@ async function loadShared(
 
 async function loadServer(
   input: unknown,
-  dataFolder: string
+  dataFolder: string,
+  logger: Logger
 ): Promise<ServerOnlyConfig> {
   const schema = z
-    .object({ continuation: z.string(), linter: z.string() })
+    .object({ timetables: z.string(), continuation: z.string(), linter: z.string() })
     .passthrough();
 
   const server = schema.parse(input);
   const linter = LinterRules.json.parse(
     await loadYml(dataFolder, server.linter, z.any())
   );
-  return new ServerOnlyConfig(linter);
+  const timetables = await loadTimetables(dataFolder, server.timetables, (path) => logger.logTimetableLoadFail(path));
+
+  return new ServerOnlyConfig(linter, timetables);
 }
 
 async function loadFrontend(
@@ -90,6 +98,26 @@ async function loadYml<T extends ZodType>(
   const fullPath = path.join(dataFolder, filePath);
   const text = await fsp.readFile(fullPath, { encoding: "utf-8" });
   return schema.parse(YAML.parse(text));
+}
+
+async function loadTimetables(dataFolder: string, globString: string, onFail: (path: string) => void): Promise<Timetable[]> {
+  const files = (await glob(globString, { cwd: dataFolder }));
+
+  const timetables: Timetable[] = [];
+  for (const file of files) {
+    const fullPath = path.join(dataFolder, file);
+    const text = await fsp.readFile(fullPath, { encoding: "utf-8" });
+    const timetable = parseTTBL(text);
+
+    if (timetable == null) {
+      onFail(file);
+    }
+    else {
+      timetables.push(timetable);
+    }
+  }
+
+  return timetables;
 }
 
 async function extractZip(zip: AdmZip, location: string): Promise<void> {

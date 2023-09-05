@@ -1,11 +1,11 @@
-import { parseIntThrow } from "@schel-d/js-utils/dist/types";
+import { parseIntThrow } from "@schel-d/js-utils";
 
 export abstract class QTimeBase<T extends QTimeBase<T>> {
   constructor(
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) {}
+  ) { }
 
   protected abstract _getNumOfHours(): number;
 

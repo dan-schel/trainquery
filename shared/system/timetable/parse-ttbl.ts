@@ -1,4 +1,4 @@
-import { nonNull, parseIntNull } from "@schel-d/js-utils/dist/types";
+import { nonNull, parseIntNull } from "@schel-d/js-utils";
 import { Timetable, TimetableEntry, TimetabledStop } from "./timetable";
 import {
   isDirectionID,
@@ -78,7 +78,7 @@ export function parseTTBL(
 function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
   const fields = metadataInput
     .slice(1)
-    .map((s) => ({ key: s.split(":")[0], value: s.split(":")[1] }));
+    .map((s) => ({ key: s.split(":")[0].trim(), value: s.split(":")[1].trim() }));
   const get = (key: string) => fields.find((m) => m.key == key)?.value;
 
   // Parse timetable ID.
