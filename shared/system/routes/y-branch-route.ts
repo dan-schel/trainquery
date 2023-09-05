@@ -3,9 +3,11 @@ import {
   DirectionDefinition,
   Route,
   RouteStop,
+  badVariantOrDirection,
   containsStop,
+  nonViaStopIDs,
 } from "./line-route";
-import { type RouteVariantID, RouteVariantIDJson, type StopID } from "../ids";
+import { type RouteVariantID, RouteVariantIDJson, type StopID, DirectionID } from "../ids";
 
 /** The details of a single branch in a {@link YBranchRoute}. */
 export class Branch {
@@ -17,7 +19,7 @@ export class Branch {
      * section begins.
      */
     readonly stops: RouteStop[]
-  ) {}
+  ) { }
 
   static readonly json = z
     .object({
@@ -98,5 +100,27 @@ export class YBranchRoute extends Route {
       this.firstBranch.stops,
       this.secondBranch.stops
     );
+  }
+
+  getStops(variant: RouteVariantID, direction: DirectionID): StopID[] {
+    if (variant == this.firstBranch.id) {
+      const stops = nonViaStopIDs([...this.firstBranch.stops, ...this.shared]);
+      if (direction == this.forward.id) {
+        return stops;
+      }
+      if (direction == this.reverse.id) {
+        return stops.reverse();
+      }
+    }
+    if (variant == this.secondBranch.id) {
+      const stops = nonViaStopIDs([...this.secondBranch.stops, ...this.shared]);
+      if (direction == this.forward.id) {
+        return stops;
+      }
+      if (direction == this.reverse.id) {
+        return stops.reverse();
+      }
+    }
+    throw badVariantOrDirection(variant, direction);
   }
 }

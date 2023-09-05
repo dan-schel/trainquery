@@ -15,7 +15,7 @@ export type ErrorLogger = (error: string) => void;
 
 type ErrorProcedure = (error: string) => null;
 
-export function parseTTBL(
+export function parseTtbl(
   input: string,
   logError?: ErrorLogger
 ): Timetable | null {
@@ -78,7 +78,10 @@ export function parseTTBL(
 function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
   const fields = metadataInput
     .slice(1)
-    .map((s) => ({ key: s.split(":")[0].trim(), value: s.split(":")[1].trim() }));
+    .map((s) => ({
+      key: s.split(":")[0].trim(),
+      value: s.split(":")[1].trim(),
+    }));
   const get = (key: string) => fields.find((m) => m.key == key)?.value;
 
   // Parse timetable ID.

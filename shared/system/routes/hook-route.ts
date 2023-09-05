@@ -3,12 +3,17 @@ import {
   DirectionDefinition,
   Route,
   RouteStop,
+  badVariantOrDirection,
   containsStop,
+  nonViaStopIDs,
 } from "./line-route";
-import { type StopID } from "../ids";
+import { toRouteVariantID, type StopID, RouteVariantID, DirectionID } from "../ids";
 
 /** Route with a balloon loop section where services terminate inside the loop. */
 export class HookRoute extends Route {
+  static hookedID = toRouteVariantID("hooked");
+  static directID = toRouteVariantID("direct");
+
   constructor(
     /** Direction details to use for stops in the provided order. */
     readonly forward: DirectionDefinition,
@@ -61,5 +66,27 @@ export class HookRoute extends Route {
 
   stopsAt(stop: StopID): boolean {
     return containsStop(stop, this.stops, this.hooked, this.direct);
+  }
+
+  getStops(variant: RouteVariantID, direction: DirectionID): StopID[] {
+    if (variant == HookRoute.hookedID) {
+      const stops = nonViaStopIDs([...this.stops, ...this.hooked]);
+      if (direction == this.forward.id) {
+        return stops;
+      }
+      if (direction == this.reverse.id) {
+        return stops.reverse();
+      }
+    }
+    if (variant == HookRoute.directID) {
+      const stops = nonViaStopIDs([...this.stops, ...this.direct]);
+      if (direction == this.forward.id) {
+        return stops;
+      }
+      if (direction == this.reverse.id) {
+        return stops.reverse();
+      }
+    }
+    throw badVariantOrDirection(variant, direction);
   }
 }

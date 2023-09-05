@@ -10,7 +10,7 @@ import { parseIntNull } from "@schel-d/js-utils";
 import type { Line } from "./line";
 import { SharedConfig } from "./config-elements";
 
-type HasSharedConfig = { shared: SharedConfig };
+export type HasSharedConfig = { shared: SharedConfig };
 
 export function linesThatStopAt(
   config: HasSharedConfig,

@@ -13,7 +13,7 @@ import {
 import { LinterRules } from "../shared/system/linter-rules";
 import { glob } from "glob";
 import { Timetable } from "../shared/system/timetable/timetable";
-import { parseTTBL } from "../shared/system/timetable/parse-ttbl";
+import { parseTtbl } from "../shared/system/timetable/parse-ttbl";
 import { Logger } from "./trainquery";
 
 export async function loadConfigFromZip(
@@ -64,14 +64,22 @@ async function loadServer(
   logger: Logger
 ): Promise<ServerOnlyConfig> {
   const schema = z
-    .object({ timetables: z.string(), continuation: z.string(), linter: z.string() })
+    .object({
+      timetables: z.string(),
+      continuation: z.string(),
+      linter: z.string(),
+    })
     .passthrough();
 
   const server = schema.parse(input);
   const linter = LinterRules.json.parse(
     await loadYml(dataFolder, server.linter, z.any())
   );
-  const timetables = await loadTimetables(dataFolder, server.timetables, (path) => logger.logTimetableLoadFail(path));
+  const timetables = await loadTimetables(
+    dataFolder,
+    server.timetables,
+    (path) => logger.logTimetableLoadFail(path)
+  );
 
   return new ServerOnlyConfig(linter, timetables);
 }
@@ -100,19 +108,22 @@ async function loadYml<T extends ZodType>(
   return schema.parse(YAML.parse(text));
 }
 
-async function loadTimetables(dataFolder: string, globString: string, onFail: (path: string) => void): Promise<Timetable[]> {
-  const files = (await glob(globString, { cwd: dataFolder }));
+async function loadTimetables(
+  dataFolder: string,
+  globString: string,
+  onFail: (path: string) => void
+): Promise<Timetable[]> {
+  const files = await glob(globString, { cwd: dataFolder });
 
   const timetables: Timetable[] = [];
   for (const file of files) {
     const fullPath = path.join(dataFolder, file);
     const text = await fsp.readFile(fullPath, { encoding: "utf-8" });
-    const timetable = parseTTBL(text);
+    const timetable = parseTtbl(text);
 
     if (timetable == null) {
       onFail(file);
-    }
-    else {
+    } else {
       timetables.push(timetable);
     }
   }

@@ -5,6 +5,7 @@ import {
   DirectionIDJson,
   type StopID,
   StopIDJson,
+  RouteVariantID,
 } from "../ids";
 
 /** Describes the stops and route a line takes. */
@@ -12,16 +13,18 @@ export abstract class Route {
   constructor(
     /** E.g. 'linear', 'y-branch', etc. */
     readonly type: LineRouteType
-  ) {}
+  ) { }
 
   abstract stopsAt(stop: StopID): boolean;
+
+  abstract getStops(variant: RouteVariantID, direction: DirectionID): StopID[];
 }
 
 export class DirectionDefinition {
   constructor(
     /** Uniquely identify this direction from others on this line. */
     readonly id: DirectionID
-  ) {}
+  ) { }
 
   static readonly json = z
     .object({
@@ -56,7 +59,7 @@ export class RouteStop {
      * rule (e.g. 'direction-up').
      */
     readonly pickUp?: boolean | string
-  ) {}
+  ) { }
 
   static readonly json = z
     .union([
@@ -98,4 +101,15 @@ export function containsStop(
   ...stopArrays: RouteStop[][]
 ): boolean {
   return stopArrays.some((a) => a.some((s) => s.stop == stop && !s.via));
+}
+
+export function badVariantOrDirection(
+  variant: RouteVariantID,
+  direction: DirectionID
+): Error {
+  return new Error(`Route variant "${variant}" and direction "${direction}" is invalid for this line.`);
+}
+
+export function nonViaStopIDs(stops: RouteStop[]) {
+  return stops.filter(s => !s.via).map(s => s.stop);
 }
