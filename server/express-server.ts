@@ -1,4 +1,9 @@
-import { Server, ServerParams, TrainQuery } from "./trainquery";
+import {
+  BadApiCallError,
+  Server,
+  ServerParams,
+  TrainQuery,
+} from "./trainquery";
 import express, { Express } from "express";
 
 export class ExpressServer extends Server {
@@ -14,21 +19,20 @@ export class ExpressServer extends Server {
 
   async start(
     ctx: TrainQuery,
-    requestListener: (
-      endpoint: string,
-      params: ServerParams
-    ) => Promise<unknown>
+    requestListener: (endpoint: string, params: ServerParams) => Promise<object>
   ): Promise<void> {
     const app = express();
 
     app.get("/api/*", async (req, res) => {
       const path = req.path.replace(/^\/api\//, "");
-      const data = await requestListener(path, req.query as ServerParams);
 
-      if (data != null) {
+      try {
+        const data = await requestListener(path, req.query as ServerParams);
         res.json(data);
-      } else {
-        res.sendStatus(404);
+      } catch (e) {
+        if (BadApiCallError.detect(e)) {
+          res.status(e.statusCode).send(e.message);
+        }
       }
     });
 

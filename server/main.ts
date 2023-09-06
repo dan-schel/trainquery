@@ -8,7 +8,7 @@ import { ConsoleLogger } from "./console-logger";
 import { parseIntThrow } from "@schel-d/js-utils";
 import "dotenv/config";
 import { OfflineConfigProvider } from "./offline-config-provider";
-import { ssrAppPropsApi } from "./ssr-props-api";
+import { ssrAppPropsApi } from "./api/ssr-props-api";
 
 createServer();
 
