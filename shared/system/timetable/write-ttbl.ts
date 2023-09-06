@@ -4,10 +4,9 @@ import {
   requireLine,
   requireStop,
 } from "../config-utils";
-import { Timetable, TimetableEntry } from "./timetable";
-import { type DirectionID, type RouteVariantID, type StopID } from "../ids";
+import { Timetable } from "./timetable";
+import { type DirectionID, type RouteVariantID } from "../ids";
 import { QWeekdayRange } from "../../qtime/qweekdayrange";
-import { QTimetableTime } from "../../qtime/qtime";
 
 export function writeTtbl(config: HasSharedConfig, timetable: Timetable) {
   const routeDirectionPairs = unique(
@@ -16,7 +15,7 @@ export function writeTtbl(config: HasSharedConfig, timetable: Timetable) {
   );
 
   const includeSeconds = timetable.entries.some((e) =>
-    e.stops.some((s) => s.time.second != 0)
+    e.rows.some((s) => s != null && s.second != 0)
   );
 
   const grids = routeDirectionPairs
@@ -96,7 +95,9 @@ function writeGrid(
     .join("");
   const headerRow = `${header.padEnd(headerSize, " ")} ${wdrs}`;
 
-  const times = entries.map((e) => timeStrings(stops, e, includeSeconds));
+  const times = entries.map((e) =>
+    e.rows.map((r) => (r == null ? "-" : r.toTtblString(includeSeconds)))
+  );
   const gridRows = stops.map(
     (_s, i) =>
       `${stopHeaders[i].padEnd(headerSize, " ")} ${times
@@ -105,31 +106,4 @@ function writeGrid(
   );
 
   return `${headerRow}\n${gridRows.join("\n")}\n`;
-}
-
-function timeStrings(
-  stops: StopID[],
-  entry: TimetableEntry,
-  includeSeconds: boolean
-): string[] {
-  const result: string[] = [];
-
-  let entryIndex = 0;
-  for (const stop of stops) {
-    let time: QTimetableTime | null = null;
-    for (let i = entryIndex; i < entry.stops.length; i++) {
-      if (entry.stops[i].stop == stop) {
-        time = entry.stops[i].time;
-        entryIndex = i + 1;
-      }
-    }
-
-    if (time == null) {
-      result.push("-");
-    } else {
-      result.push(time.toTtblString(includeSeconds));
-    }
-  }
-
-  return result;
 }

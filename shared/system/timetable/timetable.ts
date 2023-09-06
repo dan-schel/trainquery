@@ -5,7 +5,6 @@ import {
   type DirectionID,
   type LineID,
   type RouteVariantID,
-  type StopID,
   type TimetableID,
 } from "../ids";
 
@@ -36,16 +35,7 @@ export class TimetableEntry {
     readonly direction: DirectionID,
     /** Which days of the week this services operates on. */
     readonly weekdayRange: QWeekdayRange,
-    /** The times of each stop this service makes. */
-    readonly stops: TimetabledStop[]
-  ) {}
-}
-
-export class TimetabledStop {
-  constructor(
-    /** The stop in question. */
-    readonly stop: StopID,
-    /** The time the service stops at the aforementioned stop. */
-    readonly time: QTimetableTime
+    /** The value of each row (either the time, or null if it doesn't stop). */
+    readonly rows: (QTimetableTime | null)[]
   ) {}
 }

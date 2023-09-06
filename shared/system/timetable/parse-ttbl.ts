@@ -1,5 +1,5 @@
 import { nonNull, parseIntNull } from "@schel-d/js-utils";
-import { Timetable, TimetableEntry, TimetabledStop } from "./timetable";
+import { Timetable, TimetableEntry } from "./timetable";
 import {
   isDirectionID,
   isLineID,
@@ -223,14 +223,9 @@ function parseGrid(
         `"${badTime.input}" is not a valid timetable time string (or a "-").`
       );
     }
-    const times = potentialTimes
+    return potentialTimes
       .map((t) => t.time)
       .filter((t): t is QTimetableTime | null => t != "INVALID!");
-
-    return {
-      stop: stopID,
-      times: times,
-    };
   });
   if (potentialRows.some((r) => r == null)) {
     return null;
@@ -244,15 +239,7 @@ function parseGrid(
         routeVariant,
         direction,
         w,
-        rows
-          .map((r) => {
-            const time = r.times[i];
-            if (time == null) {
-              return null;
-            }
-            return new TimetabledStop(r.stop, time);
-          })
-          .filter(nonNull)
+        rows.map((r) => r[i])
       )
   );
 
