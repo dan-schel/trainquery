@@ -10,8 +10,8 @@ import {
 import {
   toRouteVariantID,
   type StopID,
-  RouteVariantID,
-  DirectionID,
+  type RouteVariantID,
+  type DirectionID,
 } from "../ids";
 
 /** Route with a balloon loop section where services terminate inside the loop. */

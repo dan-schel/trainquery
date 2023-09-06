@@ -5,7 +5,7 @@ import {
   DirectionIDJson,
   type StopID,
   StopIDJson,
-  RouteVariantID,
+  type RouteVariantID,
 } from "../ids";
 
 /** Describes the stops and route a line takes. */

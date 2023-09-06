@@ -16,13 +16,18 @@ import { Timetable } from "../shared/system/timetable/timetable";
 import { parseTtbl } from "../shared/system/timetable/parse-ttbl";
 import { Logger } from "./trainquery";
 
-export async function loadConfigFromZip(
+export async function loadConfigFromFiles(
   dataFolder: string,
-  zipPath: string,
-  logger: Logger
+  zipOrFolderPath: string,
+  logger?: Logger
 ): Promise<ServerConfig> {
-  const zip = new AdmZip(zipPath);
-  await extractZip(zip, dataFolder);
+  const isDirectory = (await fsp.lstat(zipOrFolderPath)).isDirectory();
+  if (isDirectory) {
+    await fsp.cp(zipOrFolderPath, dataFolder, { recursive: true });
+  } else {
+    const zip = new AdmZip(zipOrFolderPath);
+    await extractZip(zip, dataFolder);
+  }
 
   const configSchema = z.object({
     shared: z.any(),
@@ -61,7 +66,7 @@ async function loadShared(
 async function loadServer(
   input: unknown,
   dataFolder: string,
-  logger: Logger
+  logger?: Logger
 ): Promise<ServerOnlyConfig> {
   const schema = z
     .object({
@@ -78,7 +83,7 @@ async function loadServer(
   const timetables = await loadTimetables(
     dataFolder,
     server.timetables,
-    (path) => logger.logTimetableLoadFail(path)
+    (path) => logger?.logTimetableLoadFail(path)
   );
 
   return new ServerOnlyConfig(linter, timetables);

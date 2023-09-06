@@ -6,7 +6,7 @@ import { z } from "zod";
 import fs from "fs";
 import fsp from "fs/promises";
 import path from "path";
-import { generateDataFolderPath, loadConfigFromZip } from "./config-zip";
+import { generateDataFolderPath, loadConfigFromFiles } from "./config-zip";
 
 const refreshMs = 1000 * 60 * 10;
 const supportedVersion = "v1";
@@ -19,7 +19,7 @@ export class OnlineConfigProvider extends ConfigProvider {
     super();
   }
 
-  async fetchConfig(logger: Logger): Promise<ServerConfig> {
+  async fetchConfig(logger?: Logger): Promise<ServerConfig> {
     const zipUrl = await (async () => {
       // This URL might be the zip file...
       if (this.url.endsWith(".zip")) {
@@ -43,7 +43,7 @@ export class OnlineConfigProvider extends ConfigProvider {
     await fsp.mkdir(dataFolder);
     await download(zipUrl, zipPath);
 
-    const config = await loadConfigFromZip(dataFolder, zipPath, logger);
+    const config = await loadConfigFromFiles(dataFolder, zipPath, logger);
 
     await fsp.rm(dataFolder, {
       recursive: true,

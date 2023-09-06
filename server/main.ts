@@ -34,11 +34,11 @@ async function createServer() {
 
 function getConfigProvider(isOffline: boolean): ConfigProvider {
   if (isOffline) {
-    const zipPath = process.env.CONFIG_OFFLINE;
-    if (zipPath == null) {
+    const zipOrFolderPath = process.env.CONFIG_OFFLINE;
+    if (zipOrFolderPath == null) {
       throw new Error("CONFIG_OFFLINE environment variable not provided.");
     }
-    return new OfflineConfigProvider(zipPath);
+    return new OfflineConfigProvider(zipOrFolderPath);
   } else {
     const configUrl = process.env.CONFIG;
     if (configUrl == null) {

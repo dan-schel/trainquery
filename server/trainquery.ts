@@ -62,7 +62,7 @@ export abstract class Server {
 }
 
 export abstract class ConfigProvider {
-  abstract fetchConfig(logger: Logger): Promise<ServerConfig>;
+  abstract fetchConfig(logger?: Logger): Promise<ServerConfig>;
   abstract getRefreshMs(): number | null;
 }
 

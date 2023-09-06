@@ -11,7 +11,7 @@ import {
   type RouteVariantID,
   RouteVariantIDJson,
   type StopID,
-  DirectionID,
+  type DirectionID,
 } from "../ids";
 
 /** The details of a single branch in a {@link YBranchRoute}. */

@@ -23,12 +23,12 @@ async function main() {
       console.log(`Linting "${configUrl}"...`);
       return new OnlineConfigProvider(configUrl);
     } else if (arg == "offline") {
-      const zipPath = process.env.CONFIG_OFFLINE;
-      if (zipPath == null) {
+      const zipOrFolderPath = process.env.CONFIG_OFFLINE;
+      if (zipOrFolderPath == null) {
         throw new Error("CONFIG_OFFLINE environment variable not set.");
       }
-      console.log(`Linting "${zipPath}"...`);
-      return new OfflineConfigProvider(zipPath);
+      console.log(`Linting "${zipOrFolderPath}"...`);
+      return new OfflineConfigProvider(zipOrFolderPath);
     } else if (arg.startsWith("http://") || arg.startsWith("https://")) {
       return new OnlineConfigProvider(arg);
     }

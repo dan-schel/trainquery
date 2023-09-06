@@ -1,7 +1,11 @@
 import { nonNull, unique } from "@schel-d/js-utils";
-import { HasSharedConfig, requireLine, requireStop } from "../config-utils";
+import {
+  type HasSharedConfig,
+  requireLine,
+  requireStop,
+} from "../config-utils";
 import { Timetable, TimetableEntry } from "./timetable";
-import { DirectionID, RouteVariantID, StopID } from "../ids";
+import { type DirectionID, type RouteVariantID, type StopID } from "../ids";
 import { QWeekdayRange } from "../../qtime/qweekdayrange";
 import { QTimetableTime } from "../../qtime/qtime";
 

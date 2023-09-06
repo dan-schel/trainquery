@@ -8,8 +8,8 @@ import {
   nonViaStopIDs,
 } from "./line-route";
 import {
-  DirectionID,
-  RouteVariantID,
+  type DirectionID,
+  type RouteVariantID,
   toRouteVariantID,
   type StopID,
 } from "../ids";
