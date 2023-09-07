@@ -6,95 +6,60 @@ import {
   type LineID,
   type StaticServiceID,
   type PlatformID,
-  type StopID,
 } from "../ids";
 
-export interface IServiceBase {
-  readonly lines: LineID[];
-  readonly route: RouteVariantID;
-  readonly direction: DirectionID;
-  readonly staticID: StaticServiceID | null;
-  readonly sources: {
-    source: string;
-    id: string;
-  }[];
-}
-export interface IServiceStop {
-  readonly scheduledTime: QUtcDateTime;
-  readonly liveTime: QUtcDateTime | null;
-  readonly platform: {
-    id: PlatformID;
-    confidence: ConfidenceLevel;
-  } | null;
-  readonly setsDown: boolean;
-  readonly picksUp: boolean;
-}
+export type ServiceSource = {
+  /** Unique identifies which source this service came from. */
+  source: string;
+  /** The identifier given to this service by the source. */
+  id: string;
+};
+export type CompleteStoppingPattern = {
+  stop: (ServiceStop | null)[];
+};
+export type PartialStoppingPattern = {
+  /** The index of the terminus within the stop list for this variant/direction. */
+  terminusIndex: number;
+};
 
-export class Service implements IServiceBase {
+export class Service {
   constructor(
-    readonly lines: LineID[],
+    readonly line: LineID,
+    readonly associatedLines: LineID[],
     readonly route: RouteVariantID,
     readonly direction: DirectionID,
-    readonly stops: (IServiceStop | null)[],
-    readonly continuation: Service | null,
+    readonly stops: CompleteStoppingPattern | PartialStoppingPattern,
     readonly staticID: StaticServiceID | null,
-    readonly sources: {
-      source: string;
-      id: string;
-    }[]
-  ) {}
+    readonly sources: ServiceSource[],
+    readonly continuation: Service | null
+  ) { }
 }
 
-export class Departure implements IServiceStop {
+export class Departure extends Service {
+  constructor(
+    line: LineID,
+    associatedLines: LineID[],
+    route: RouteVariantID,
+    direction: DirectionID,
+    stops: CompleteStoppingPattern | PartialStoppingPattern,
+    staticID: StaticServiceID | null,
+    sources: ServiceSource[],
+    continuation: Service | null,
+    readonly perspective: ServiceStop,
+  ) {
+    super(line, associatedLines, route, direction, stops, staticID, sources, continuation);
+  }
+}
+
+export class ServiceStop {
   constructor(
     readonly scheduledTime: QUtcDateTime,
     readonly liveTime: QUtcDateTime | null,
-    readonly platform: {
-      id: PlatformID;
-      confidence: ConfidenceLevel;
-    } | null,
     readonly setsDown: boolean,
     readonly picksUp: boolean,
-
-    readonly terminus: StopID,
-
-    readonly lines: LineID[],
-    readonly route: RouteVariantID,
-    readonly direction: DirectionID,
-    readonly stops: (IServiceStop | null)[] | null,
-    readonly continuation: DepartureContinuation | null,
-    readonly staticID: StaticServiceID | null,
-    readonly sources: {
-      source: string;
-      id: string;
-    }[]
-  ) {}
-}
-
-export class DepartureContinuation implements IServiceBase {
-  constructor(
-    readonly lines: LineID[],
-    readonly route: RouteVariantID,
-    readonly direction: DirectionID,
-    readonly stops: (IServiceStop | null)[] | null,
-    readonly continuation: DepartureContinuation | null,
-    readonly staticID: StaticServiceID | null,
-    readonly sources: {
-      source: string;
-      id: string;
-    }[]
-  ) {}
-}
-
-export class ServiceStop implements IServiceStop {
-  constructor(
-    readonly scheduledTime: QUtcDateTime,
-    readonly liveTime: QUtcDateTime | null,
     readonly platform: {
-      id: PlatformID;
-      confidence: ConfidenceLevel;
-    } | null,
-    readonly setsDown: boolean,
-    readonly picksUp: boolean
-  ) {}
+      id: PlatformID,
+      confidence: ConfidenceLevel
+    } | null
+  ) { }
 }
