@@ -4,11 +4,12 @@ import { QTime } from "../../shared/qtime/qtime";
 import {
   toDirectionID,
   toLineID,
-  toRouteVariantID,
+  toPlatformID,
   toStaticServiceID,
-  toStopID,
 } from "../../shared/system/ids";
-import { Departure } from "../../shared/system/timetable/service";
+import { HookRoute } from "../../shared/system/routes/hook-route";
+import { Departure } from "../../shared/system/timetable/departure";
+import { ServiceStop } from "../../shared/system/timetable/service-stop";
 import { ServerParams, TrainQuery, requireStopParam } from "../trainquery";
 
 export async function departuresApi(
@@ -19,20 +20,25 @@ export async function departuresApi(
 
   const departures: Departure[] = [
     new Departure(
-      new QUtcDateTime(new QDate(2023, 9, 7), new QTime(9, 14, 0)),
-      null,
-      null,
-      true,
-      true,
-      toStopID(104),
-      [toLineID(4)],
-      toRouteVariantID("direct"),
+      toLineID(5),
+      [],
+      HookRoute.directID,
       toDirectionID("up"),
+      { terminusIndex: 8 },
+      toStaticServiceID("18"),
+      [],
       null,
-      null,
-      toStaticServiceID("catdog"),
-      []
-    ),
+      new ServiceStop(
+        new QUtcDateTime(new QDate(2023, 9, 8), new QTime(5, 4, 0)),
+        null,
+        true,
+        true,
+        {
+          id: toPlatformID("1"),
+          confidence: "high"
+        }
+      )
+    )
   ];
 
   return [

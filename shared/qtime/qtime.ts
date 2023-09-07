@@ -5,7 +5,7 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) {}
+  ) { }
 
   protected abstract _getNumOfHours(): number;
 
@@ -111,6 +111,10 @@ export class QTime extends QTimeBase<QTime> {
     const numbers = input.split(":").map((x) => parseIntThrow(x));
     return new QTime(numbers[0], numbers[1], numbers[2] ?? 0);
   }
+
+  toJSON() {
+    return this.toISO();
+  }
 }
 
 export class QTimetableTime extends QTimeBase<QTimetableTime> {
@@ -181,5 +185,9 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
     }
     const s = this.second.toFixed().padStart(2, "0");
     return `${timeString}:${s}`;
+  }
+
+  toJSON() {
+    return this.toTtblString(this.second != 0);
   }
 }
