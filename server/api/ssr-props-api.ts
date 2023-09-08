@@ -1,4 +1,5 @@
-import { ServerParams, TrainQuery, requireParam } from "../trainquery";
+import { requireParam } from "../param-utils";
+import { ServerParams, TrainQuery } from "../trainquery";
 
 export async function ssrAppPropsApi(ctx: TrainQuery): Promise<object> {
   return { configHash: ctx.getConfig().hash };

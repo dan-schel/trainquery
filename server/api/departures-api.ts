@@ -10,7 +10,9 @@ import {
 import { HookRoute } from "../../shared/system/routes/hook-route";
 import { Departure } from "../../shared/system/timetable/departure";
 import { ServiceStop } from "../../shared/system/timetable/service-stop";
-import { ServerParams, TrainQuery, requireStopParam } from "../trainquery";
+import { PartialStoppingPattern } from "../../shared/system/timetable/stopping-pattern";
+import { requireStopParam } from "../param-utils";
+import { ServerParams, TrainQuery } from "../trainquery";
 
 export async function departuresApi(
   ctx: TrainQuery,
@@ -24,7 +26,7 @@ export async function departuresApi(
       [],
       HookRoute.directID,
       toDirectionID("up"),
-      { terminusIndex: 8 },
+      new PartialStoppingPattern(8),
       toStaticServiceID("18"),
       [],
       null,
@@ -35,16 +37,16 @@ export async function departuresApi(
         true,
         {
           id: toPlatformID("1"),
-          confidence: "high"
+          confidence: "high",
         }
       )
-    )
+    ),
   ];
 
   return [
-    // departures.map(d => d.toJSON()),
-    // departures.map(d => d.toJSON()),
-    // departures.map(d => d.toJSON()),
-    // departures.map(d => d.toJSON())
+    departures.map((d) => d.toJSON()),
+    departures.map((d) => d.toJSON()),
+    departures.map((d) => d.toJSON()),
+    departures.map((d) => d.toJSON()),
   ];
 }

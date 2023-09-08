@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { QUtcDateTime } from "../../qtime/qdatetime";
-import { ConfidenceLevel, ConfidenceLevelJson } from "../enums";
-import { PlatformID, PlatformIDJson } from "../ids";
+import { type ConfidenceLevel, ConfidenceLevelJson } from "../enums";
+import { type PlatformID, PlatformIDJson } from "../ids";
 
 export class ServiceStop {
   constructor(
@@ -10,21 +10,34 @@ export class ServiceStop {
     readonly setsDown: boolean,
     readonly picksUp: boolean,
     readonly platform: {
-      id: PlatformID,
-      confidence: ConfidenceLevel
+      id: PlatformID;
+      confidence: ConfidenceLevel;
     } | null
-  ) { }
+  ) {}
 
-  static readonly json = z.object({
-    scheduledTime: QUtcDateTime.json,
-    liveTime: QUtcDateTime.json.nullable(),
-    setsDown: z.boolean(),
-    picksUp: z.boolean(),
-    platform: z.object({
-      id: PlatformIDJson,
-      confidence: ConfidenceLevelJson
-    }).nullable()
-  }).transform(x => new ServiceStop(x.scheduledTime, x.liveTime, x.setsDown, x.picksUp, x.platform));
+  static readonly json = z
+    .object({
+      scheduledTime: QUtcDateTime.json,
+      liveTime: QUtcDateTime.json.nullable(),
+      setsDown: z.boolean(),
+      picksUp: z.boolean(),
+      platform: z
+        .object({
+          id: PlatformIDJson,
+          confidence: ConfidenceLevelJson,
+        })
+        .nullable(),
+    })
+    .transform(
+      (x) =>
+        new ServiceStop(
+          x.scheduledTime,
+          x.liveTime,
+          x.setsDown,
+          x.picksUp,
+          x.platform
+        )
+    );
 
   toJSON(): z.input<typeof ServiceStop.json> {
     return {
@@ -32,10 +45,13 @@ export class ServiceStop {
       liveTime: this.liveTime?.toJSON() ?? null,
       setsDown: this.setsDown,
       picksUp: this.picksUp,
-      platform: this.platform == null ? null : {
-        id: this.platform.id,
-        confidence: this.platform.confidence
-      }
+      platform:
+        this.platform == null
+          ? null
+          : {
+              id: this.platform.id,
+              confidence: this.platform.confidence,
+            },
     };
   }
 }

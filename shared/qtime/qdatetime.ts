@@ -3,7 +3,7 @@ import { QDate } from "./qdate";
 import { QTime } from "./qtime";
 
 export abstract class QDateTime<T extends QDateTime<T>> {
-  constructor(readonly date: QDate, readonly time: QTime) { }
+  constructor(readonly date: QDate, readonly time: QTime) {}
 
   /** E.g. 145900 for 2:59pm. */
   asDecimal(): number {
@@ -60,12 +60,18 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
 
   static parse(input: string): QUtcDateTime | null {
     const components = input.split("T");
-    if (components.length != 2) { return null; }
-    if (!components[1].endsWith("Z")) { return null; }
+    if (components.length != 2) {
+      return null;
+    }
+    if (!components[1].endsWith("Z")) {
+      return null;
+    }
 
     const date = QDate.parse(components[0]);
     const time = QTime.parse(components[1].slice(0, components[1].length - 1));
-    if (date == null || time == null) { return null; }
+    if (date == null || time == null) {
+      return null;
+    }
 
     return new QUtcDateTime(date, time);
   }

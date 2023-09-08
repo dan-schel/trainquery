@@ -1,9 +1,5 @@
-import {
-  BadApiCallError,
-  Server,
-  ServerParams,
-  TrainQuery,
-} from "./trainquery";
+import { BadApiCallError } from "./param-utils";
+import { Server, ServerParams, TrainQuery } from "./trainquery";
 import express, { Express } from "express";
 
 export class ExpressServer extends Server {
@@ -32,6 +28,8 @@ export class ExpressServer extends Server {
       } catch (e) {
         if (BadApiCallError.detect(e)) {
           res.status(e.statusCode).send(e.message);
+        } else {
+          res.status(500).send("Internal server error.");
         }
       }
     });
