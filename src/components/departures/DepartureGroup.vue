@@ -1,20 +1,70 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import DepartureFeed from "./DepartureFeed.vue";
+import { Departure } from "shared/system/timetable/departure";
+import { repeat } from "@schel-d/js-utils";
 
-defineProps<{
+type DepartureFeedData = {
+  index: number;
+  departures: Departure[];
+};
+
+const props = defineProps<{
   allowPinning: boolean;
-  count: number;
+
+  // <TEMP>
+  feedCount: number;
+  // </TEMP>
 }>();
+
+// <TEMP>
+const departureCount = 3;
+// </TEMP>
+
+const loading = ref(true);
+const error = ref<"unknown" | null>(null);
+const departureFeeds = ref<DepartureFeedData[]>(
+  repeat(null, props.feedCount).map((_x, i) => ({
+    index: i,
+    departures: [],
+  }))
+);
+
+async function init() {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const response = await fetch(`/api/departures?count=${departureCount}`);
+    const json = await response.json();
+    const data = Departure.json.array().array().parse(json);
+    departureFeeds.value = data.map((x, i) => ({
+      index: i,
+      departures: x,
+    }));
+    loading.value = false;
+  } catch (err) {
+    console.warn(err);
+    error.value = "unknown";
+  }
+}
+
+if (!import.meta.env.SSR) {
+  init();
+}
 </script>
 
 <template>
   <div class="group">
     <DepartureFeed
-      v-for="num in count"
-      :key="num"
+      v-for="feed of departureFeeds"
+      :key="feed.index"
       class="feed"
-      :count="3"
+      :count="departureCount"
       :allow-pinning="allowPinning"
+      :departures="feed.departures"
+      :loading="loading"
+      :error="error"
     ></DepartureFeed>
   </div>
 </template>

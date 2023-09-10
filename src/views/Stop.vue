@@ -38,7 +38,7 @@ useHead({
     <DepartureGroup
       class="group"
       :allow-pinning="true"
-      :count="4"
+      :feed-count="4"
     ></DepartureGroup>
   </PageContent>
 </template>

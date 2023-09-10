@@ -25,7 +25,7 @@ useHead({
           <Icon id="majesticons:pin-line"></Icon>
           <p>Pinned widgets</p>
         </div>
-        <DepartureGroup :allow-pinning="false" :count="2"></DepartureGroup>
+        <DepartureGroup :allow-pinning="false" :feed-count="2"></DepartureGroup>
       </div>
     </div>
   </main>

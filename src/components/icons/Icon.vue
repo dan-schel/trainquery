@@ -6,6 +6,7 @@ import UilAngleLeft from "./UilAngleLeft.vue";
 import UilAngleRight from "./UilAngleRight.vue";
 import UilAngleUp from "./UilAngleUp.vue";
 import UilBars from "./UilBars.vue";
+import UilCalendarSlash from "./UilCalendarSlash.vue";
 import UilCheck from "./UilCheck.vue";
 import UilClock from "./UilClock.vue";
 import UilCodeBranch from "./UilCodeBranch.vue";
@@ -27,6 +28,7 @@ export type IconID =
   | "uil:angle-right"
   | "uil:angle-up"
   | "uil:bars"
+  | "uil:calendar-slash"
   | "uil:check"
   | "uil:clock"
   | "uil:code-branch"
@@ -59,6 +61,10 @@ defineProps<{
   ></UilAngleRight>
   <UilAngleUp v-else-if="id == 'uil:angle-up'" class="icon"></UilAngleUp>
   <UilBars v-else-if="id == 'uil:bars'" class="icon"></UilBars>
+  <UilCalendarSlash
+    v-else-if="id == 'uil:calendar-slash'"
+    class="icon"
+  ></UilCalendarSlash>
   <UilCheck v-else-if="id == 'uil:check'" class="icon"></UilCheck>
   <UilClock v-else-if="id == 'uil:clock'" class="icon"></UilClock>
   <UilCodeBranch

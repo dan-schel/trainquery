@@ -9,6 +9,7 @@ import {
 import { parseIntNull } from "@schel-d/js-utils";
 import type { Line } from "./line";
 import { SharedConfig } from "./config-elements";
+import { Service } from "./timetable/service";
 
 export type HasSharedConfig = { shared: SharedConfig };
 
@@ -167,6 +168,17 @@ export function getLinePageRoute(
   line: LineID
 ): string {
   return `/lines/${getLineUrlName(config, line) ?? line.toFixed()}`;
+}
+
+/** E.g. "/train/[something]". */
+export function getServicePageRoute(
+  _config: HasSharedConfig,
+  service: Service
+): string {
+  // <TEMP>
+  // Not all services have a static ID, and live data isn't captured here at all.
+  return `/train/${service.staticID}`;
+  // </TEMP>
 }
 
 export function getServiceType(

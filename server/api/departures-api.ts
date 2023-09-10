@@ -1,3 +1,4 @@
+import { parseIntNull } from "@schel-d/js-utils";
 import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { QTime } from "../../shared/qtime/qtime";
@@ -11,42 +12,42 @@ import { HookRoute } from "../../shared/system/routes/hook-route";
 import { Departure } from "../../shared/system/timetable/departure";
 import { ServiceStop } from "../../shared/system/timetable/service-stop";
 import { PartialStoppingPattern } from "../../shared/system/timetable/stopping-pattern";
-import { requireStopParam } from "../param-utils";
+import { requireParamThat } from "../param-utils";
 import { ServerParams, TrainQuery } from "../trainquery";
 
 export async function departuresApi(
-  ctx: TrainQuery,
+  _ctx: TrainQuery,
   params: ServerParams
 ): Promise<object> {
-  const stop = requireStopParam(ctx, params, "stop");
+  const count = requireParamThat(params, "count", (input) =>
+    parseIntNull(input)
+  );
 
-  const departures: Departure[] = [
-    new Departure(
-      toLineID(5),
-      [],
-      HookRoute.directID,
-      toDirectionID("up"),
-      new PartialStoppingPattern(8),
-      toStaticServiceID("18"),
-      [],
-      null,
-      new ServiceStop(
-        new QUtcDateTime(new QDate(2023, 9, 8), new QTime(5, 4, 0)),
+  const departures: Departure[] = [];
+  for (let i = 0; i < count; i++) {
+    departures.push(
+      new Departure(
+        toLineID(5),
+        [],
+        HookRoute.directID,
+        toDirectionID("up"),
+        new PartialStoppingPattern(8),
+        toStaticServiceID("18"),
+        [],
         null,
-        true,
-        true,
-        {
-          id: toPlatformID("1"),
-          confidence: "high",
-        }
+        new ServiceStop(
+          new QUtcDateTime(new QDate(2023, 9, 8), new QTime(5, 4, 0)),
+          null,
+          true,
+          true,
+          {
+            id: toPlatformID("1"),
+            confidence: "high",
+          }
+        )
       )
-    ),
-  ];
+    );
+  }
 
-  return [
-    departures.map((d) => d.toJSON()),
-    departures.map((d) => d.toJSON()),
-    departures.map((d) => d.toJSON()),
-    departures.map((d) => d.toJSON()),
-  ];
+  return [departures.map((d) => d.toJSON()), departures.map((d) => d.toJSON())];
 }

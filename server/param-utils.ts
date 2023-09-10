@@ -27,6 +27,19 @@ export function requireParam(params: ServerParams, name: string): string {
   return value;
 }
 
+export function requireParamThat<T>(
+  params: ServerParams,
+  name: string,
+  validator: (input: string) => T | null
+): T {
+  const value = requireParam(params, name);
+  const result = validator(value);
+  if (result == null) {
+    throw new BadApiCallError(`"${name}" param is invalid.`);
+  }
+  return result;
+}
+
 export function requireStopIDParam(params: ServerParams, name: string): StopID {
   const value = requireParam(params, name);
   const num = parseIntNull(value);

@@ -1,11 +1,19 @@
 <script setup lang="ts">
+import type { Departure } from "shared/system/timetable/departure";
+import LoadingSpinner from "../common/LoadingSpinner.vue";
 import OneLineP from "../common/OneLineP.vue";
 import SimpleButton from "../common/SimpleButton.vue";
-import Departure from "./Departure.vue";
+import DepartureVue from "./Departure.vue";
 import { RouterLink } from "vue-router";
+import { getConfig } from "@/utils/get-config";
+import { getServicePageRoute } from "shared/system/config-utils";
+import Icon from "../icons/Icon.vue";
 
 defineProps<{
+  departures: Departure[];
   count: number;
+  loading: boolean;
+  error: "unknown" | null;
   allowPinning: boolean;
 }>();
 </script>
@@ -29,9 +37,28 @@ defineProps<{
       ></SimpleButton>
     </div>
     <div class="departures">
-      <Departure class="departure"></Departure>
-      <Departure class="departure"></Departure>
-      <Departure class="departure"></Departure>
+      <div class="error" v-if="error != null">
+        <Icon id="uil:exclamation-circle"></Icon>
+        <p>Something went wrong</p>
+      </div>
+      <LoadingSpinner
+        class="spinner"
+        v-if="loading && error == null"
+      ></LoadingSpinner>
+      <template v-if="!loading && error == null">
+        <DepartureVue
+          v-for="departure in departures"
+          :key="getServicePageRoute(getConfig(), departure)"
+          :departure="departure"
+        ></DepartureVue>
+      </template>
+      <div
+        class="empty"
+        v-if="!loading && error == null && departures.length == 0"
+      >
+        <Icon id="uil:calendar-slash"></Icon>
+        <p>No trains scheduled</p>
+      </div>
     </div>
   </div>
 </template>
@@ -80,5 +107,27 @@ defineProps<{
     right: 1rem;
     border-bottom: 1px solid var(--color-ink-20);
   }
+}
+.spinner,
+.error,
+.empty {
+  align-self: center;
+  justify-self: center;
+  grid-row: 1 / span var(--count);
+}
+.error,
+.empty {
+  align-items: center;
+  padding: 1rem;
+  .icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  p {
+    text-align: center;
+  }
+}
+.error * {
+  color: var(--color-error);
 }
 </style>

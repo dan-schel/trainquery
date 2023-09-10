@@ -2,10 +2,20 @@
 import OneLineP from "@/components/common/OneLineP.vue";
 import Icon from "../icons/Icon.vue";
 import { RouterLink } from "vue-router";
+import { Departure } from "shared/system/timetable/departure";
+import { getServicePageRoute } from "shared/system/config-utils";
+import { getConfig } from "@/utils/get-config";
+
+defineProps<{
+  departure: Departure;
+}>();
 </script>
 
 <template>
-  <RouterLink class="departure accent-cyan" to="">
+  <RouterLink
+    class="departure accent-cyan"
+    :to="getServicePageRoute(getConfig(), departure)"
+  >
     <div class="primary">
       <OneLineP class="terminus">Flinders Street</OneLineP>
       <OneLineP class="via">via City Loop</OneLineP>
