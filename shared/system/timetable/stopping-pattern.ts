@@ -2,7 +2,7 @@ import { z } from "zod";
 import { ServiceStop } from "./service-stop";
 
 export class CompleteStoppingPattern {
-  constructor(readonly stops: (ServiceStop | null)[]) {}
+  constructor(readonly stops: (ServiceStop | null)[]) { }
 
   static readonly json = z
     .object({
@@ -19,18 +19,22 @@ export class CompleteStoppingPattern {
 
 export class PartialStoppingPattern {
   constructor(
+    /** The index of the origin (which may be unknown). */
+    readonly originIndex: number | null,
     /** The index of the terminus within the stop list for this variant/direction. */
-    readonly terminusIndex: number
-  ) {}
+    readonly terminusIndex: number,
+  ) { }
 
   static readonly json = z
     .object({
+      originIndex: z.number().nullable(),
       terminusIndex: z.number(),
     })
-    .transform((x) => new PartialStoppingPattern(x.terminusIndex));
+    .transform((x) => new PartialStoppingPattern(x.originIndex, x.terminusIndex));
 
   toJSON(): z.input<typeof PartialStoppingPattern.json> {
     return {
+      originIndex: this.originIndex,
       terminusIndex: this.terminusIndex,
     };
   }

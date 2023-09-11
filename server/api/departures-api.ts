@@ -31,11 +31,11 @@ export async function departuresApi(
         [],
         HookRoute.directID,
         toDirectionID("up"),
-        new PartialStoppingPattern(8),
+        new PartialStoppingPattern(0, 8),
         toStaticServiceID("18"),
         [],
         null,
-        4,
+        0,
         new ServiceStop(
           new QUtcDateTime(new QDate(2023, 9, 8), new QTime(5, 4, 0)),
           null,
