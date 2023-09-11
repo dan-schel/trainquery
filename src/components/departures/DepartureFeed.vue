@@ -48,6 +48,7 @@ defineProps<{
       <template v-if="!loading && error == null">
         <DepartureVue
           v-for="departure in departures"
+          :continuations-enabled="false"
           :key="getServicePageRoute(getConfig(), departure)"
           :departure="departure"
         ></DepartureVue>

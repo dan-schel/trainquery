@@ -35,6 +35,7 @@ export async function departuresApi(
         toStaticServiceID("18"),
         [],
         null,
+        4,
         new ServiceStop(
           new QUtcDateTime(new QDate(2023, 9, 8), new QTime(5, 4, 0)),
           null,

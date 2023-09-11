@@ -5,10 +5,23 @@ import { RouterLink } from "vue-router";
 import { Departure } from "shared/system/timetable/departure";
 import { getServicePageRoute } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
+import { computed } from "vue";
+import { continuify } from "./helpers/continuify";
+import { getTerminus } from "./helpers/utils";
 
-defineProps<{
+const props = defineProps<{
   departure: Departure;
+  continuationsEnabled: boolean;
 }>();
+
+const detail = computed(() => {
+  const detail = continuify(props.departure, props.continuationsEnabled);
+  console.log(detail);
+  return {
+    stoppingPattern: detail,
+    terminus: getTerminus(detail),
+  };
+});
 </script>
 
 <template>
@@ -17,7 +30,7 @@ defineProps<{
     :to="getServicePageRoute(getConfig(), departure)"
   >
     <div class="primary">
-      <OneLineP class="terminus">Flinders Street</OneLineP>
+      <OneLineP class="terminus">{{ detail.terminus.name }}</OneLineP>
       <OneLineP class="via">via City Loop</OneLineP>
       <OneLineP class="time">2 mins</OneLineP>
     </div>
@@ -151,3 +164,4 @@ defineProps<{
   margin-right: -0.5rem;
 }
 </style>
+./helpers/continuify

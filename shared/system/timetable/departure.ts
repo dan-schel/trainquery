@@ -22,6 +22,7 @@ export class Departure extends Service {
     staticID: StaticServiceID | null,
     sources: ServiceSource[],
     continuation: Service | null,
+    readonly perspectiveIndex: number,
     readonly perspective: ServiceStop
   ) {
     super(
@@ -37,8 +38,9 @@ export class Departure extends Service {
   }
 
   static readonly json = BaseServiceJson.extend({
-    perspective: ServiceStop.json,
     continuation: Service.json.nullable(),
+    perspectiveIndex: z.number(),
+    perspective: ServiceStop.json,
   }).transform(
     (y) =>
       new Departure(
@@ -50,7 +52,8 @@ export class Departure extends Service {
         y.staticID,
         y.sources,
         y.continuation == null ? null : Service.transform(y.continuation),
-        y.perspective
+        y.perspectiveIndex,
+        y.perspective,
       )
   );
 
@@ -64,6 +67,7 @@ export class Departure extends Service {
       staticID: this.staticID ?? null,
       sources: this.sources,
       continuation: this.continuation?.toJSON() ?? null,
+      perspectiveIndex: this.perspectiveIndex,
       perspective: this.perspective.toJSON(),
     };
   }
