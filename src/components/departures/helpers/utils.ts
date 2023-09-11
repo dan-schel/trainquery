@@ -6,6 +6,6 @@ export function getTerminus(detail: ContinuifyResult) {
   const stopID = detail[detail.length - 1].stop;
   return {
     id: stopID,
-    name: requireStop(getConfig(), stopID).name
+    name: requireStop(getConfig(), stopID).name,
   };
 }

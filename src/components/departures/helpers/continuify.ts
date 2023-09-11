@@ -6,28 +6,34 @@ import type { Service } from "shared/system/timetable/service";
 import type { ServiceStop } from "shared/system/timetable/service-stop";
 import { CompleteStoppingPattern } from "shared/system/timetable/stopping-pattern";
 
-export type ContinuifyResult = ({
-  type: "express";
-  stop: StopID;
-  stintIndex: number;
-} | {
-  type: "served";
-  stop: StopID;
-  stintIndex: number;
-  detail: ServiceStop | null
-} | {
-  type: "unknown";
-  stop: StopID;
-  stintIndex: number;
-})[];
+export type ContinuifyResult = (
+  | {
+      type: "express";
+      stop: StopID;
+      stintIndex: number;
+    }
+  | {
+      type: "served";
+      stop: StopID;
+      stintIndex: number;
+      detail: ServiceStop | null;
+    }
+  | {
+      type: "unknown";
+      stop: StopID;
+      stintIndex: number;
+    }
+)[];
 
 /** Return the part of the stopping pattern we care about. */
-export function continuify(departure: Departure, continuationsEnabled: boolean): ContinuifyResult {
+export function continuify(
+  departure: Departure,
+  continuationsEnabled: boolean
+): ContinuifyResult {
   const stints: Service[] = [];
   if (!continuationsEnabled || departure.continuation == null) {
     stints.push(departure);
-  }
-  else {
+  } else {
     let service: Service | null = departure;
     while (service != null) {
       stints.push(service);
@@ -46,7 +52,10 @@ function merge(stints: Service[], start: number): ContinuifyResult {
 
   for (let i = 0; i < stints.length; i++) {
     const stint = stints[i];
-    const stopList = requireLine(getConfig(), stint.line).route.getStops(stint.route, stint.direction);
+    const stopList = requireLine(getConfig(), stint.line).route.getStops(
+      stint.route,
+      stint.direction
+    );
 
     // We know the first stint has originated, but for the others we need to
     // wait for the first stop.
@@ -57,8 +66,7 @@ function merge(stints: Service[], start: number): ContinuifyResult {
       if (seen.has(stopList[j]) && i != 0) {
         // Stop here, we've already seen this stop before.
         return result;
-      }
-      else if (totalStopIndex >= start) {
+      } else if (totalStopIndex >= start) {
         const entry = continuifiedStopFor(stint, j, stopList[j], i);
 
         if (hasOriginated || entry.type == "served") {
@@ -82,7 +90,12 @@ function merge(stints: Service[], start: number): ContinuifyResult {
   return result;
 }
 
-function continuifiedStopFor(service: Service, index: number, stop: StopID, stintIndex: number): ContinuifyResult[number] {
+function continuifiedStopFor(
+  service: Service,
+  index: number,
+  stop: StopID,
+  stintIndex: number
+): ContinuifyResult[number] {
   if (stintIndex == 0) {
     if (service instanceof Departure) {
       if (index == service.perspectiveIndex) {
@@ -93,8 +106,7 @@ function continuifiedStopFor(service: Service, index: number, stop: StopID, stin
           stintIndex: stintIndex,
         };
       }
-    }
-    else {
+    } else {
       throw new Error("First stint was not a departure?");
     }
   }
@@ -107,8 +119,7 @@ function continuifiedStopFor(service: Service, index: number, stop: StopID, stin
         stop: stop,
         stintIndex: stintIndex,
       };
-    }
-    else {
+    } else {
       return {
         type: "served",
         stop: stop,
@@ -116,10 +127,9 @@ function continuifiedStopFor(service: Service, index: number, stop: StopID, stin
         stintIndex: stintIndex,
       };
     }
-  }
-  else {
+  } else {
     const terminusIndex = service.stoppingPattern.terminusIndex;
-    const originIndex = (service.stoppingPattern.originIndex ?? 0);
+    const originIndex = service.stoppingPattern.originIndex ?? 0;
     if (index == terminusIndex || index == originIndex) {
       return {
         type: "served",
@@ -127,15 +137,13 @@ function continuifiedStopFor(service: Service, index: number, stop: StopID, stin
         detail: null,
         stintIndex: stintIndex,
       };
-    }
-    else if (index < originIndex || index > terminusIndex) {
+    } else if (index < originIndex || index > terminusIndex) {
       return {
         type: "express",
         stop: stop,
         stintIndex: stintIndex,
       };
-    }
-    else {
+    } else {
       return {
         type: "unknown",
         stop: stop,

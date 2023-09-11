@@ -53,7 +53,7 @@ export class Departure extends Service {
         y.sources,
         y.continuation == null ? null : Service.transform(y.continuation),
         y.perspectiveIndex,
-        y.perspective,
+        y.perspective
       )
   );
 
