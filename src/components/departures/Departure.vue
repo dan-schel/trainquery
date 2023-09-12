@@ -8,6 +8,7 @@ import { getConfig } from "@/utils/get-config";
 import { computed } from "vue";
 import { continuify } from "./helpers/continuify";
 import { getPlatformString, getTerminus, getViaString } from "./helpers/utils";
+import { getStoppingPatternString } from "./helpers/stopping-pattern";
 import type { StopID } from "shared/system/ids";
 
 const props = defineProps<{
@@ -24,6 +25,7 @@ const detail = computed(() => {
     terminus: getTerminus(detail),
     via: getViaString(detail),
     platform: getPlatformString(props.departure, props.perspective),
+    stoppingPatternString: getStoppingPatternString(detail),
   };
 });
 </script>
@@ -39,7 +41,7 @@ const detail = computed(() => {
       <OneLineP class="time">2 mins</OneLineP>
     </div>
     <div class="details">
-      <OneLineP>Express Malvern → South Yarra</OneLineP>
+      <OneLineP>{{ detail.stoppingPatternString }}</OneLineP>
       <div class="disruption">
         <Icon id="uil:exclamation-circle"></Icon>
         <OneLineP class="disruption-text">
