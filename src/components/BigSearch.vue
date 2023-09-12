@@ -64,6 +64,10 @@ const onSearchEnter = (e: Event) => {
 form {
   @include utils.raised-surface;
 
+  &:hover {
+    border-color: var(--color-ink-20);
+  }
+
   // For the search icon.
   position: relative;
 

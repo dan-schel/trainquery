@@ -10,18 +10,18 @@ import { ViaRule } from "./via-rule";
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
   | {
-      /** E.g. '10' for AEST, or '11' for AEDT. */
-      offset: number;
-    }
+    /** E.g. '10' for AEST, or '11' for AEDT. */
+    offset: number;
+  }
   | {
-      /** E.g. 'Australia/Melbourne'. */
-      id: string;
-      /**
-       * Which hour of the day to use when checking the offset, since DST doesn't
-       * start at midnight.
-       */
-      offsetCheckHour: number;
-    };
+    /** E.g. 'Australia/Melbourne'. */
+    id: string;
+    /**
+     * Which hour of the day to use when checking the offset, since DST doesn't
+     * start at midnight.
+     */
+    offsetCheckHour: number;
+  };
 
 /** The config properties required by both the frontend and backend. */
 export class SharedConfig {
@@ -41,7 +41,7 @@ export class SharedConfig {
      * service type filtering.
      */
     readonly serviceTypes: ServiceType[]
-  ) {}
+  ) { }
 
   static readonly json = z
     .object({
@@ -104,7 +104,7 @@ export class FrontendOnlyConfig {
     readonly via: ViaRule[]
   ) // Todo: departure feeds
   // Todo: search tags
-  {}
+  { }
 
   static readonly json = z
     .object({
@@ -113,7 +113,7 @@ export class FrontendOnlyConfig {
       tagline: z.string(),
       footer: z.string(),
       metaDescription: z.string(),
-      via: ViaRule.json.array(),
+      via: ViaRule.json.array().default([]),
     })
     .transform(
       (x) =>
@@ -147,5 +147,5 @@ export class ServerOnlyConfig {
     /** Rules for the linter. */
     readonly linter: LinterRules,
     readonly timetables: Timetable[]
-  ) {}
+  ) { }
 }
