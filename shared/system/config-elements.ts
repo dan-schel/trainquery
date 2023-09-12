@@ -5,6 +5,7 @@ import { UrlNames } from "./url-names";
 import { LinterRules } from "./linter-rules";
 import { ServiceType } from "./service-type";
 import { Timetable } from "./timetable/timetable";
+import { ViaRule } from "./via-rule";
 
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
@@ -98,8 +99,12 @@ export class FrontendOnlyConfig {
      * Used in the SEO description, e.g. 'Navigate Melbourne's train network
      * with TrainQuery'.
      */
-    readonly metaDescription: string // Todo: departure feeds // Todo: search tags
-  ) {}
+    readonly metaDescription: string,
+    /** Rules describing when to show 'via ___' on a departure. */
+    readonly via: ViaRule[]
+  ) // Todo: departure feeds
+  // Todo: search tags
+  {}
 
   static readonly json = z
     .object({
@@ -108,6 +113,7 @@ export class FrontendOnlyConfig {
       tagline: z.string(),
       footer: z.string(),
       metaDescription: z.string(),
+      via: ViaRule.json.array(),
     })
     .transform(
       (x) =>
@@ -116,7 +122,8 @@ export class FrontendOnlyConfig {
           x.beta,
           x.tagline,
           x.footer,
-          x.metaDescription
+          x.metaDescription,
+          x.via
         )
     );
 
@@ -127,6 +134,7 @@ export class FrontendOnlyConfig {
       tagline: this.tagline,
       footer: this.footer,
       metaDescription: this.metaDescription,
+      via: this.via,
     };
   }
 }

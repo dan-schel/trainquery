@@ -7,19 +7,23 @@ import { getServicePageRoute } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
 import { computed } from "vue";
 import { continuify } from "./helpers/continuify";
-import { getTerminus } from "./helpers/utils";
+import { getPlatformString, getTerminus, getViaString } from "./helpers/utils";
+import type { StopID } from "shared/system/ids";
 
 const props = defineProps<{
   departure: Departure;
   continuationsEnabled: boolean;
+  perspective: StopID;
 }>();
 
 const detail = computed(() => {
   const detail = continuify(props.departure, props.continuationsEnabled);
-  console.log(detail);
+  // console.log(detail);
   return {
     stoppingPattern: detail,
     terminus: getTerminus(detail),
+    via: getViaString(detail),
+    platform: getPlatformString(props.departure, props.perspective),
   };
 });
 </script>
@@ -31,7 +35,7 @@ const detail = computed(() => {
   >
     <div class="primary">
       <OneLineP class="terminus">{{ detail.terminus.name }}</OneLineP>
-      <OneLineP class="via">via City Loop</OneLineP>
+      <OneLineP class="via">{{ detail.via ?? "" }}</OneLineP>
       <OneLineP class="time">2 mins</OneLineP>
     </div>
     <div class="details">
@@ -43,9 +47,9 @@ const detail = computed(() => {
         </OneLineP>
       </div>
     </div>
-    <div class="platform">
+    <div class="platform" v-if="detail.platform != null">
       <p>Platform</p>
-      <p class="platform-number">2</p>
+      <p class="platform-number">{{ detail.platform }}</p>
     </div>
     <div class="arrow">
       <Icon id="uil:angle-right"></Icon>

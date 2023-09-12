@@ -3,10 +3,12 @@ import { ref } from "vue";
 import DepartureFeed from "./DepartureFeed.vue";
 import { Departure } from "shared/system/timetable/departure";
 import { repeat } from "@schel-d/js-utils";
+import { toStopID, type StopID } from "shared/system/ids";
 
 type DepartureFeedData = {
   index: number;
   departures: Departure[];
+  perspective: StopID;
 };
 
 const props = defineProps<{
@@ -27,6 +29,7 @@ const departureFeeds = ref<DepartureFeedData[]>(
   repeat(null, props.feedCount).map((_x, i) => ({
     index: i,
     departures: [],
+    perspective: toStopID(212),
   }))
 );
 
@@ -41,6 +44,7 @@ async function init() {
     departureFeeds.value = data.map((x, i) => ({
       index: i,
       departures: x,
+      perspective: toStopID(212),
     }));
     loading.value = false;
   } catch (err) {
@@ -63,6 +67,7 @@ if (!import.meta.env.SSR) {
       :count="departureCount"
       :allow-pinning="allowPinning"
       :departures="feed.departures"
+      :perspective="feed.perspective"
       :loading="loading"
       :error="error"
     ></DepartureFeed>

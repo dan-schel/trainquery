@@ -8,9 +8,11 @@ import { RouterLink } from "vue-router";
 import { getConfig } from "@/utils/get-config";
 import { getServicePageRoute } from "shared/system/config-utils";
 import Icon from "../icons/Icon.vue";
+import type { StopID } from "shared/system/ids";
 
 defineProps<{
   departures: Departure[];
+  perspective: StopID;
   count: number;
   loading: boolean;
   error: "unknown" | null;
@@ -51,6 +53,7 @@ defineProps<{
           :continuations-enabled="false"
           :key="getServicePageRoute(getConfig(), departure)"
           :departure="departure"
+          :perspective="perspective"
         ></DepartureVue>
       </template>
       <div
