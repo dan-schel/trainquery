@@ -8,15 +8,15 @@ import { RouterLink } from "vue-router";
 import { getConfig } from "@/utils/get-config";
 import { getServicePageRoute } from "shared/system/config-utils";
 import Icon from "../icons/Icon.vue";
-import type { StopID } from "shared/system/ids";
+import type { DepartureFeed } from "shared/system/timetable/departure-feed";
 
 defineProps<{
+  feed: DepartureFeed;
   departures: Departure[];
-  perspective: StopID;
-  count: number;
   loading: boolean;
   error: "unknown" | null;
   allowPinning: boolean;
+  statePerspective: boolean;
 }>();
 </script>
 
@@ -24,7 +24,7 @@ defineProps<{
   <div
     class="feed"
     :style="{
-      '--count': count,
+      '--count': feed.count,
     }"
   >
     <div class="header-row">
@@ -53,7 +53,7 @@ defineProps<{
           :continuations-enabled="false"
           :key="getServicePageRoute(getConfig(), departure)"
           :departure="departure"
-          :perspective="perspective"
+          :perspective="feed.stop"
         ></DepartureVue>
       </template>
       <div

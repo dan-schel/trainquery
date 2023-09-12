@@ -1,36 +1,20 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import DepartureFeed from "./DepartureFeed.vue";
+import DepartureFeedVue from "./DepartureFeed.vue";
 import { Departure } from "shared/system/timetable/departure";
 import { repeat } from "@schel-d/js-utils";
-import { toStopID, type StopID } from "shared/system/ids";
-
-type DepartureFeedData = {
-  index: number;
-  departures: Departure[];
-  perspective: StopID;
-};
+import { DepartureFeed } from "shared/system/timetable/departure-feed";
 
 const props = defineProps<{
+  feeds: DepartureFeed[];
   allowPinning: boolean;
-
-  // <TEMP>
-  feedCount: number;
-  // </TEMP>
+  statePerspective: boolean;
 }>();
-
-// <TEMP>
-const departureCount = 3;
-// </TEMP>
 
 const loading = ref(true);
 const error = ref<"unknown" | null>(null);
-const departureFeeds = ref<DepartureFeedData[]>(
-  repeat(null, props.feedCount).map((_x, i) => ({
-    index: i,
-    departures: [],
-    perspective: toStopID(212),
-  }))
+const departureLists = ref<Departure[][]>(
+  repeat(null, props.feeds.length).map((_x) => [])
 );
 
 async function init() {
@@ -38,14 +22,11 @@ async function init() {
   error.value = null;
 
   try {
-    const response = await fetch(`/api/departures?count=${departureCount}`);
+    const response = await fetch(
+      `/api/departures?feeds=${DepartureFeed.encode(props.feeds)}`
+    );
     const json = await response.json();
-    const data = Departure.json.array().array().parse(json);
-    departureFeeds.value = data.map((x, i) => ({
-      index: i,
-      departures: x,
-      perspective: toStopID(212),
-    }));
+    departureLists.value = Departure.json.array().array().parse(json);
     loading.value = false;
   } catch (err) {
     console.warn(err);
@@ -60,17 +41,17 @@ if (!import.meta.env.SSR) {
 
 <template>
   <div class="group">
-    <DepartureFeed
-      v-for="feed of departureFeeds"
-      :key="feed.index"
+    <DepartureFeedVue
+      v-for="(feed, i) of feeds"
       class="feed"
-      :count="departureCount"
-      :allow-pinning="allowPinning"
-      :departures="feed.departures"
-      :perspective="feed.perspective"
+      :key="feed.toString()"
+      :feed="feed"
+      :departures="departureLists[i]"
       :loading="loading"
       :error="error"
-    ></DepartureFeed>
+      :allow-pinning="allowPinning"
+      :state-perspective="statePerspective"
+    ></DepartureFeedVue>
   </div>
 </template>
 

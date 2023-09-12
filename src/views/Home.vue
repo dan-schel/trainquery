@@ -5,9 +5,17 @@ import { useHead } from "@vueuse/head";
 import BigSearch from "@/components/BigSearch.vue";
 import Wordmark from "@/components/Wordmark.vue";
 import { getConfig } from "@/utils/get-config";
+import { computed } from "vue";
+import { DepartureFeed } from "shared/system/timetable/departure-feed";
+import { toStopID } from "shared/system/ids";
 useHead({
   title: "Home",
 });
+
+const feeds = computed(() => [
+  new DepartureFeed(toStopID(212), 3, "direction-up"),
+  new DepartureFeed(toStopID(212), 3, "direction-down"),
+]);
 </script>
 
 <template>
@@ -25,7 +33,11 @@ useHead({
           <Icon id="majesticons:pin-line"></Icon>
           <p>Pinned widgets</p>
         </div>
-        <DepartureGroup :allow-pinning="false" :feed-count="2"></DepartureGroup>
+        <DepartureGroup
+          :feeds="feeds"
+          :allow-pinning="false"
+          :state-perspective="true"
+        ></DepartureGroup>
       </div>
     </div>
   </main>

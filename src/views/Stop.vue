@@ -11,6 +11,8 @@ import DepartureGroup from "@/components/departures/DepartureGroup.vue";
 import DepartureControls from "@/components/departures/DepartureControls.vue";
 import PageContent from "@/components/common/PageContent.vue";
 import LineList from "@/components/LineList.vue";
+import { DepartureFeed } from "shared/system/timetable/departure-feed";
+import { toStopID } from "shared/system/ids";
 
 const route = useRoute();
 const params = computed(() => route.params);
@@ -18,6 +20,11 @@ const params = computed(() => route.params);
 const stop = computed(() =>
   requireStopFromUrlName(getConfig(), params.value.id as string)
 );
+
+const feeds = computed(() => [
+  new DepartureFeed(toStopID(212), 3, "direction-up"),
+  new DepartureFeed(toStopID(212), 3, "direction-down"),
+]);
 
 useHead({
   title: stop.value.name,
@@ -37,8 +44,9 @@ useHead({
     <DepartureControls class="controls"></DepartureControls>
     <DepartureGroup
       class="group"
+      :feeds="feeds"
       :allow-pinning="true"
-      :feed-count="4"
+      :state-perspective="false"
     ></DepartureGroup>
   </PageContent>
 </template>
