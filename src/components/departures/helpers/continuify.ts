@@ -8,21 +8,21 @@ import { CompleteStoppingPattern } from "shared/system/timetable/stopping-patter
 
 export type ContinuifyResult = (
   | {
-      type: "express";
-      stop: StopID;
-      stintIndex: number;
-    }
+    type: "express";
+    stop: StopID;
+    stintIndex: number;
+  }
   | {
-      type: "served";
-      stop: StopID;
-      stintIndex: number;
-      detail: ServiceStop | null;
-    }
+    type: "served";
+    stop: StopID;
+    stintIndex: number;
+    detail: ServiceStop | null;
+  }
   | {
-      type: "unknown";
-      stop: StopID;
-      stintIndex: number;
-    }
+    type: "unknown";
+    stop: StopID;
+    stintIndex: number;
+  }
 )[];
 
 /** Return the part of the stopping pattern we care about. */
@@ -86,6 +86,9 @@ function merge(stints: Service[], start: number): ContinuifyResult {
       totalStopIndex++;
     }
   }
+
+  // TODO: Remove duplicate stops due to the continuation stop being added
+  // twice. The terminus stop for services that continue should be removed.
 
   return result;
 }

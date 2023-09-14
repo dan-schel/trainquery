@@ -4,12 +4,9 @@ import { getConfig } from "@/utils/get-config";
 import type { Departure } from "shared/system/timetable/departure";
 import type { StopID } from "shared/system/ids";
 
-export function getTerminus(detail: ContinuifyResult) {
+export function getTerminusString(detail: ContinuifyResult) {
   const stopID = detail[detail.length - 1].stop;
-  return {
-    id: stopID,
-    name: requireStop(getConfig(), stopID).name,
-  };
+  return requireStop(getConfig(), stopID).name;
 }
 
 export function getViaString(detail: ContinuifyResult) {
