@@ -1,7 +1,7 @@
 import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
-import { QTimetableTime, QTime } from "../../shared/qtime/qtime";
+import { QTimetableTime } from "../../shared/qtime/qtime";
 import { requireLine } from "../../shared/system/config-utils";
 import {
   StopID,
@@ -28,12 +28,12 @@ export function getPossibilities(
   reverse: boolean,
   lines: LineID[]
 ): Possibility[] {
-  const result: (Possibility & { time: QTime })[] = [];
+  const result: (Possibility & { sortTime: number })[] = [];
 
   // Iterate through every range of timetable times that occur at the time we're
   // interested in (we should also consider >03:00 on Monday night for 3:00am
   // Tuesday).
-  const searchTimes = getSearchTimes(time, iteration, reverse);
+  const searchTimes = getSearchTimes(ctx, time, iteration, reverse);
   for (const searchTime of searchTimes) {
     const dow = QDayOfWeek.fromDate(searchTime.date);
 
@@ -72,7 +72,7 @@ export function getPossibilities(
           result.push({
             entry: entry,
             date: searchTime.date,
-            time: searchTime.toTimeInDay(time),
+            sortTime: searchTime.getSortTime(time),
             perspectiveIndex: index,
           });
         }
@@ -81,7 +81,7 @@ export function getPossibilities(
   }
 
   result.sort(
-    (a, b) => (reverse ? -1 : 1) * (a.time.asDecimal() - b.time.asDecimal())
+    (a, b) => (reverse ? -1 : 1) * (a.sortTime - b.sortTime)
   );
   return result;
 }
@@ -109,16 +109,37 @@ type SearchTimeRange = {
   date: QDate;
   min: QTimetableTime | null;
   max: QTimetableTime | null;
-  /** Converts the timetabled time to the time within the day in question. */
-  toTimeInDay: (time: QTimetableTime) => QTime;
+  /**
+   * Converts the timetabled time to a time value that can be used to sorting
+   * (ideally resembles UTC to sort services from days with different offsets
+   * correctly, but only has to worry about sorting within the same iteration).
+   */
+  getSortTime: (time: QTimetableTime) => number;
 };
 
 function getSearchTimes(
+  ctx: TrainQuery,
   time: QUtcDateTime,
   iteration: number,
   reverse: boolean
 ): SearchTimeRange[] {
-  // TODO: Actually do it!
+
+  // === FOR: 2023-09-15 10:04 UTC ===
+  // 2023-09-14: >20:04 - >24:00
+  // 2023-09-15: 20:04 - 24:00
+
+  // === FOR: 2023-09-15 20:04 UTC ===
+  // 2023-09-15: >06:04 - >24:00
+  // 2023-09-16: 06:04 - 24:00
+
+  // === FOR: 2023-10-01 10:04 UTC ===
+  // 2023-09-30: >20:04 - >24:00
+  // 2023-10-01: 21:04 - 24:00
+
+  // === FOR: 2023-09-30 20:04 UTC ===
+  // 2023-09-30: >06:04 - >24:00
+  // 2023-10-01: 07:04 - 24:00
+
   return [];
 }
 

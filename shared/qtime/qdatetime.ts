@@ -3,7 +3,7 @@ import { QDate } from "./qdate";
 import { QTime } from "./qtime";
 
 export abstract class QDateTime<T extends QDateTime<T>> {
-  constructor(readonly date: QDate, readonly time: QTime) {}
+  constructor(readonly date: QDate, readonly time: QTime) { }
 
   /** E.g. 145900 for 2:59pm. */
   asDecimal(): number {
@@ -17,7 +17,7 @@ export abstract class QDateTime<T extends QDateTime<T>> {
   /** E.g. "2023-08-15T10:46:00Z" or "2023-08-15T20:46:00+10:00" */
   abstract toISO(): string;
   /** Adds `d` days, `h` hours, `m` minutes, and `s` seconds. `d`/`h`/`m`/`s` can be negative. */
-  abstract add(units: { d: number; h: number; m: number; s: number }): T;
+  abstract add(units: { d?: number; h?: number; m?: number; s?: number }): T;
 
   toJSON() {
     return this.toISO();
@@ -49,13 +49,13 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
     m,
     s,
   }: {
-    d: number;
-    h: number;
-    m: number;
-    s: number;
+    d?: number;
+    h?: number;
+    m?: number;
+    s?: number;
   }): QUtcDateTime {
     const result = this.time.add({ h, m, s });
-    return new QUtcDateTime(this.date.addDays(result.days + d), result.time);
+    return new QUtcDateTime(this.date.addDays(result.days + (d ?? 0)), result.time);
   }
 
   static parse(input: string): QUtcDateTime | null {
