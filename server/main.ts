@@ -2,12 +2,12 @@ import express, { Express } from "express";
 import path from "path";
 import { createSsrServer } from "vite-ssr/dev";
 import { ConfigProvider, TrainQuery, trainQuery } from "./trainquery";
-import { OnlineConfigProvider } from "./online-config-provider";
+import { OnlineConfigProvider } from "./config/online-config-provider";
 import { ExpressServer } from "./express-server";
 import { ConsoleLogger } from "./console-logger";
 import { parseIntThrow } from "@schel-d/js-utils";
 import "dotenv/config";
-import { OfflineConfigProvider } from "./offline-config-provider";
+import { OfflineConfigProvider } from "./config/offline-config-provider";
 import { ssrAppPropsApi } from "./api/ssr-props-api";
 
 createServer();

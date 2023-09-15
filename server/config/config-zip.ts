@@ -1,5 +1,5 @@
 import AdmZip from "adm-zip";
-import { ServerConfig } from "../shared/system/config";
+import { ServerConfig } from "../../shared/system/config";
 import fsp from "fs/promises";
 import path from "path";
 import YAML from "yaml";
@@ -9,12 +9,12 @@ import {
   FrontendOnlyConfig,
   ServerOnlyConfig,
   SharedConfig,
-} from "../shared/system/config-elements";
-import { LinterRules } from "../shared/system/linter-rules";
+} from "../../shared/system/config-elements";
+import { LinterRules } from "../../shared/system/linter-rules";
 import { glob } from "glob";
-import { Timetable } from "../shared/system/timetable/timetable";
-import { parseTtbl } from "../shared/system/timetable/parse-ttbl";
-import { Logger } from "./trainquery";
+import { Timetable } from "../../shared/system/timetable/timetable";
+import { parseTtbl } from "../../shared/system/timetable/parse-ttbl";
+import { Logger } from "../trainquery";
 
 export async function loadConfigFromFiles(
   dataFolder: string,

@@ -1,5 +1,5 @@
-import { ServerConfig } from "../shared/system/config";
-import { ConfigProvider, Logger } from "./trainquery";
+import { ServerConfig } from "../../shared/system/config";
+import { ConfigProvider, Logger } from "../trainquery";
 import fsp from "fs/promises";
 import { generateDataFolderPath, loadConfigFromFiles } from "./config-zip";
 

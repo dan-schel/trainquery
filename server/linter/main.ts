@@ -1,6 +1,6 @@
 import { ZodError } from "zod";
-import { OfflineConfigProvider } from "../offline-config-provider";
-import { OnlineConfigProvider } from "../online-config-provider";
+import { OfflineConfigProvider } from "../config/offline-config-provider";
+import { OnlineConfigProvider } from "../config/online-config-provider";
 import { lint } from "./lint";
 import chalk from "chalk";
 import "dotenv/config";

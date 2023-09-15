@@ -8,21 +8,21 @@ import { CompleteStoppingPattern } from "shared/system/timetable/stopping-patter
 
 export type ContinuifyResult = (
   | {
-    type: "express";
-    stop: StopID;
-    stintIndex: number;
-  }
+      type: "express";
+      stop: StopID;
+      stintIndex: number;
+    }
   | {
-    type: "served";
-    stop: StopID;
-    stintIndex: number;
-    detail: ServiceStop | null;
-  }
+      type: "served";
+      stop: StopID;
+      stintIndex: number;
+      detail: ServiceStop | null;
+    }
   | {
-    type: "unknown";
-    stop: StopID;
-    stintIndex: number;
-  }
+      type: "unknown";
+      stop: StopID;
+      stintIndex: number;
+    }
 )[];
 
 /** Return the part of the stopping pattern we care about. */

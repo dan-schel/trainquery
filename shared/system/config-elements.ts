@@ -101,9 +101,8 @@ export class FrontendOnlyConfig {
      */
     readonly metaDescription: string,
     /** Rules describing when to show 'via ___' on a departure. */
-    readonly via: ViaRule[] // Todo: departure feeds
-  ) // Todo: search tags
-  {}
+    readonly via: ViaRule[] // Todo: departure feeds // Todo: search tags
+  ) {}
 
   static readonly json = z
     .object({

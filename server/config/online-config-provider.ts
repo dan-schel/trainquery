@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
-import { ServerConfig } from "../shared/system/config";
-import { ConfigProvider, Logger } from "./trainquery";
+import { ServerConfig } from "../../shared/system/config";
+import { ConfigProvider, Logger } from "../trainquery";
 import YAML from "yaml";
 import { z } from "zod";
 import fs from "fs";

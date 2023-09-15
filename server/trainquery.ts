@@ -2,22 +2,23 @@ import { ServerConfig } from "../shared/system/config";
 import { configApi } from "./api/config-api";
 import { departuresApi } from "./api/departures-api";
 import { ssrAppPropsApi, ssrRoutePropsApi } from "./api/ssr-props-api";
+import { FullConfig } from "./config/full-config";
 import { BadApiCallError } from "./param-utils";
 
 export type ServerBuilder = () => Server;
-export type TrainQuery = { getConfig: () => ServerConfig; server: Server };
+export type TrainQuery = { getConfig: () => FullConfig; server: Server };
 
 export async function trainQuery(
   serverBuilder: ServerBuilder,
   configProvider: ConfigProvider,
   logger: Logger
 ) {
-  let config = await configProvider.fetchConfig(logger);
+  let config = new FullConfig(await configProvider.fetchConfig(logger));
   logger.logConfigRefresh(config, true);
 
   const refreshConfig = async (skipFetch: boolean) => {
     if (!skipFetch) {
-      config = await configProvider.fetchConfig(logger);
+      config = new FullConfig(await configProvider.fetchConfig(logger));
       logger.logConfigRefresh(config, false);
     }
 
@@ -70,6 +71,6 @@ export abstract class ConfigProvider {
 
 export abstract class Logger {
   abstract logListening(server: Server): void;
-  abstract logConfigRefresh(config: ServerConfig, initial: boolean): void;
+  abstract logConfigRefresh(config: FullConfig, initial: boolean): void;
   abstract logTimetableLoadFail(path: string): void;
 }

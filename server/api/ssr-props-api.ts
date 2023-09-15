@@ -6,7 +6,7 @@ export async function ssrAppPropsApi(ctx: TrainQuery): Promise<object> {
 }
 
 export async function ssrRoutePropsApi(
-  ctx: TrainQuery,
+  _ctx: TrainQuery,
   params: ServerParams
 ): Promise<object> {
   const page = requireParam(params, "page");

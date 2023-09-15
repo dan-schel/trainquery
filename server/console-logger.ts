@@ -1,4 +1,4 @@
-import { ServerConfig } from "../shared/system/config";
+import { FullConfig } from "./config/full-config";
 import { ExpressServer } from "./express-server";
 import { Logger, Server } from "./trainquery";
 
@@ -11,7 +11,7 @@ export class ConsoleLogger extends Logger {
     }
   }
 
-  logConfigRefresh(config: ServerConfig, initial: boolean): void {
+  logConfigRefresh(config: FullConfig, initial: boolean): void {
     const stopCount = config.shared.stops.length;
     const lineCount = config.shared.lines.length;
     const hash = config.hash;
