@@ -3,16 +3,10 @@ import {
   DirectionDefinition,
   Route,
   RouteStop,
-  badVariantOrDirection,
-  containsStop,
+  type StopList,
   nonViaStopIDs,
 } from "./line-route";
-import {
-  type DirectionID,
-  type RouteVariantID,
-  toRouteVariantID,
-  type StopID,
-} from "../ids";
+import { toRouteVariantID } from "../ids";
 
 /** The simplest type of line route. */
 export class LinearRoute extends Route {
@@ -51,20 +45,19 @@ export class LinearRoute extends Route {
     return route.type == "linear";
   }
 
-  stopsAt(stop: StopID): boolean {
-    return containsStop(stop, this.stops);
-  }
-
-  getStops(variant: RouteVariantID, direction: DirectionID): StopID[] {
-    if (variant == LinearRoute.regularID) {
-      const stops = nonViaStopIDs(this.stops);
-      if (direction == this.forward.id) {
-        return stops;
-      }
-      if (direction == this.reverse.id) {
-        return stops.reverse();
-      }
-    }
-    throw badVariantOrDirection(variant, direction);
+  getStopLists(): StopList[] {
+    const stops = nonViaStopIDs(this.stops);
+    return [
+      {
+        variant: LinearRoute.regularID,
+        direction: this.forward.id,
+        stops: stops,
+      },
+      {
+        variant: LinearRoute.regularID,
+        direction: this.reverse.id,
+        stops: stops.reverse(),
+      },
+    ];
   }
 }

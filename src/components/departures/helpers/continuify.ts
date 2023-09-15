@@ -52,7 +52,7 @@ function merge(stints: Service[], start: number): ContinuifyResult {
 
   for (let i = 0; i < stints.length; i++) {
     const stint = stints[i];
-    const stopList = requireLine(getConfig(), stint.line).route.getStops(
+    const stopList = requireLine(getConfig(), stint.line).route.requireStops(
       stint.route,
       stint.direction
     );

@@ -3,16 +3,10 @@ import {
   DirectionDefinition,
   Route,
   RouteStop,
-  badVariantOrDirection,
-  containsStop,
+  type StopList,
   nonViaStopIDs,
 } from "./line-route";
-import {
-  toRouteVariantID,
-  type StopID,
-  type RouteVariantID,
-  type DirectionID,
-} from "../ids";
+import { toRouteVariantID } from "../ids";
 
 /** Route with a balloon loop section where services terminate inside the loop. */
 export class HookRoute extends Route {
@@ -69,29 +63,30 @@ export class HookRoute extends Route {
     return route.type == "hook";
   }
 
-  stopsAt(stop: StopID): boolean {
-    return containsStop(stop, this.stops, this.hooked, this.direct);
-  }
-
-  getStops(variant: RouteVariantID, direction: DirectionID): StopID[] {
-    if (variant == HookRoute.hookedID) {
-      const stops = nonViaStopIDs([...this.stops, ...this.hooked]);
-      if (direction == this.forward.id) {
-        return stops;
-      }
-      if (direction == this.reverse.id) {
-        return stops.reverse();
-      }
-    }
-    if (variant == HookRoute.directID) {
-      const stops = nonViaStopIDs([...this.stops, ...this.direct]);
-      if (direction == this.forward.id) {
-        return stops;
-      }
-      if (direction == this.reverse.id) {
-        return stops.reverse();
-      }
-    }
-    throw badVariantOrDirection(variant, direction);
+  getStopLists(): StopList[] {
+    const hooked = nonViaStopIDs([...this.stops, ...this.hooked]);
+    const direct = nonViaStopIDs([...this.stops, ...this.direct]);
+    return [
+      {
+        variant: HookRoute.hookedID,
+        direction: this.forward.id,
+        stops: hooked,
+      },
+      {
+        variant: HookRoute.hookedID,
+        direction: this.reverse.id,
+        stops: hooked.reverse(),
+      },
+      {
+        variant: HookRoute.directID,
+        direction: this.forward.id,
+        stops: direct,
+      },
+      {
+        variant: HookRoute.directID,
+        direction: this.reverse.id,
+        stops: direct.reverse(),
+      },
+    ];
   }
 }

@@ -8,16 +8,48 @@ import {
   type RouteVariantID,
 } from "../ids";
 
+export type StopList = {
+  variant: RouteVariantID;
+  direction: DirectionID;
+  stops: StopID[];
+};
+
 /** Describes the stops and route a line takes. */
 export abstract class Route {
+  private _stopLists: StopList[] | null = null;
+
   constructor(
     /** E.g. 'linear', 'y-branch', etc. */
     readonly type: LineRouteType
   ) {}
 
-  abstract stopsAt(stop: StopID): boolean;
+  stopsAt(stop: StopID): boolean {
+    if (this._stopLists == null) {
+      this._stopLists = this.getStopLists();
+    }
+    return this._stopLists.some((l) => l.stops.includes(stop));
+  }
 
-  abstract getStops(variant: RouteVariantID, direction: DirectionID): StopID[];
+  getStops(variant: RouteVariantID, direction: DirectionID): StopID[] | null {
+    if (this._stopLists == null) {
+      this._stopLists = this.getStopLists();
+    }
+    return (
+      this._stopLists.find(
+        (l) => l.variant == variant && l.direction == direction
+      )?.stops ?? null
+    );
+  }
+
+  requireStops(variant: RouteVariantID, direction: DirectionID): StopID[] {
+    const result = this.getStops(variant, direction);
+    if (result == null) {
+      throw badVariantOrDirection(variant, direction);
+    }
+    return result;
+  }
+
+  abstract getStopLists(): StopList[];
 }
 
 export class DirectionDefinition {
@@ -93,14 +125,6 @@ export class RouteStop {
       picksUp: this.pickUp == true ? undefined : this.pickUp,
     };
   }
-}
-
-/** True if one of the passed arrays contains this stop. */
-export function containsStop(
-  stop: StopID,
-  ...stopArrays: RouteStop[][]
-): boolean {
-  return stopArrays.some((a) => a.some((s) => s.stop == stop && !s.via));
 }
 
 export function badVariantOrDirection(

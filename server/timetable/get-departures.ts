@@ -1,21 +1,10 @@
 import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
-import { QTimetableTime } from "../../shared/qtime/qtime";
 import { linesThatStopAt } from "../../shared/system/config-utils";
 import { LineID, StopID } from "../../shared/system/ids";
 import { TimetableEntry } from "../../shared/system/timetable/timetable";
 import { TrainQuery } from "../trainquery";
-
-type SearchTimeRange = {
-  date: QDate;
-  min: QTimetableTime;
-  max: QTimetableTime | null;
-};
-
-type Possibility = {
-  entry: TimetableEntry;
-  date: QDate;
-};
+import { Possibility, getPossibilities as gp } from "./get-possibilities";
 
 export abstract class Bucket<T> {
   abstract willAccept(possibility: Possibility): boolean;
@@ -23,7 +12,11 @@ export abstract class Bucket<T> {
   abstract isFull(): boolean;
 }
 
-export type Specificizer<T> = (entry: TimetableEntry, date: QDate) => T;
+export type Specificizer<T> = (
+  entry: TimetableEntry,
+  date: QDate,
+  perspectiveIndex: number
+) => T;
 
 export function getDeparture<T>(
   ctx: TrainQuery,
@@ -38,13 +31,13 @@ export function getDeparture<T>(
   const maxIteration = options?.maxIteration ?? 14;
 
   const lines = getRelevantLines(ctx, stop, filterLines);
-  const _getPossibilities = (iteration: number) =>
-    getPossibilities(ctx, stop, time, iteration, reverse, lines);
+  const getPossibilities = (iteration: number) =>
+    gp(ctx, stop, time, iteration, reverse, lines);
 
   let iteration = 0;
 
   while (iteration <= maxIteration && !buckets.every((b) => b.isFull())) {
-    const possibilities = _getPossibilities(iteration);
+    const possibilities = getPossibilities(iteration);
 
     for (const possibility of possibilities) {
       // Determine which buckets (if any) want this departure.
@@ -54,7 +47,11 @@ export function getDeparture<T>(
       if (approvingBuckets.length > 1) {
         // This operation is treated as being potentially expensive, which is
         // why buckets are encouraged to filter first on the possibility.
-        const specificized = specificizer(possibility.entry, possibility.date);
+        const specificized = specificizer(
+          possibility.entry,
+          possibility.date,
+          possibility.perspectiveIndex
+        );
         approvingBuckets.forEach((b) => b.push(specificized));
       }
 
@@ -78,27 +75,4 @@ function getRelevantLines(
     return stoppingLines;
   }
   return stoppingLines.filter((f) => filterLines.includes(f));
-}
-
-function getPossibilities(
-  ctx: TrainQuery,
-  stop: StopID,
-  time: QUtcDateTime,
-  iteration: number,
-  reverse: boolean,
-  lines: LineID[]
-): Possibility[] {
-  const searchTimes = getTimetableTimes(time, iteration, reverse);
-
-  // TODO: Actually do it!
-  return [];
-}
-
-function getTimetableTimes(
-  utc: QUtcDateTime,
-  iteration: number,
-  reverse: boolean
-): SearchTimeRange[] {
-  // TODO: Actually do it!
-  return [];
 }

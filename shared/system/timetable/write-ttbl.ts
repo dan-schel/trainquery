@@ -70,7 +70,7 @@ function writeGrid(
   }
 
   const header = `[${route}, ${direction}]`;
-  const stops = requireLine(config, timetable.line).route.getStops(
+  const stops = requireLine(config, timetable.line).route.requireStops(
     route,
     direction
   );

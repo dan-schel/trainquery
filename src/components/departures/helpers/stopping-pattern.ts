@@ -53,7 +53,7 @@ export function getStoppingPatternString(detail: ContinuifyResult): string {
 export function getArrivalDetailString(departure: Departure) {
   // Need to use departure in this function, because detail only includes stops in the future.
 
-  const stopList = requireLine(getConfig(), departure.line).route.getStops(
+  const stopList = requireLine(getConfig(), departure.line).route.requireStops(
     departure.route,
     departure.direction
   );

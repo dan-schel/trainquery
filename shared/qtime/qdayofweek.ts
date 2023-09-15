@@ -34,7 +34,7 @@ export class QDayOfWeek {
     return { valid: true };
   }
 
-  fromDate(date: QDate): QDayOfWeek {
+  static fromDate(date: QDate): QDayOfWeek {
     return _cache.get(date);
   }
 

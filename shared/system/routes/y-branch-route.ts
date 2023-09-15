@@ -3,16 +3,10 @@ import {
   DirectionDefinition,
   Route,
   RouteStop,
-  badVariantOrDirection,
-  containsStop,
+  type StopList,
   nonViaStopIDs,
 } from "./line-route";
-import {
-  type RouteVariantID,
-  RouteVariantIDJson,
-  type StopID,
-  type DirectionID,
-} from "../ids";
+import { type RouteVariantID, RouteVariantIDJson } from "../ids";
 
 /** The details of a single branch in a {@link YBranchRoute}. */
 export class Branch {
@@ -98,34 +92,36 @@ export class YBranchRoute extends Route {
     return route.type == "y-branch";
   }
 
-  stopsAt(stop: StopID): boolean {
-    return containsStop(
-      stop,
-      this.shared,
-      this.firstBranch.stops,
-      this.secondBranch.stops
-    );
-  }
-
-  getStops(variant: RouteVariantID, direction: DirectionID): StopID[] {
-    if (variant == this.firstBranch.id) {
-      const stops = nonViaStopIDs([...this.firstBranch.stops, ...this.shared]);
-      if (direction == this.forward.id) {
-        return stops;
-      }
-      if (direction == this.reverse.id) {
-        return stops.reverse();
-      }
-    }
-    if (variant == this.secondBranch.id) {
-      const stops = nonViaStopIDs([...this.secondBranch.stops, ...this.shared]);
-      if (direction == this.forward.id) {
-        return stops;
-      }
-      if (direction == this.reverse.id) {
-        return stops.reverse();
-      }
-    }
-    throw badVariantOrDirection(variant, direction);
+  getStopLists(): StopList[] {
+    const firstBranch = nonViaStopIDs([
+      ...this.firstBranch.stops,
+      ...this.shared,
+    ]);
+    const secondBranch = nonViaStopIDs([
+      ...this.secondBranch.stops,
+      ...this.shared,
+    ]);
+    return [
+      {
+        variant: this.firstBranch.id,
+        direction: this.forward.id,
+        stops: firstBranch,
+      },
+      {
+        variant: this.firstBranch.id,
+        direction: this.reverse.id,
+        stops: firstBranch.reverse(),
+      },
+      {
+        variant: this.secondBranch.id,
+        direction: this.forward.id,
+        stops: secondBranch,
+      },
+      {
+        variant: this.secondBranch.id,
+        direction: this.reverse.id,
+        stops: secondBranch.reverse(),
+      },
+    ];
   }
 }
