@@ -67,7 +67,10 @@ export class QTime extends QTimeBase<QTime> {
     return `${h}:${m}:${s}`;
   }
 
-  /** Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can be negative. */
+  /**
+   * Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can
+   * be negative.
+   */
   add({ h, m, s }: { h?: number; m?: number; s?: number }): {
     time: QTime;
     days: number;
@@ -123,10 +126,18 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
   }
 
   _getNumOfHours(): number {
+    // NOTE: This limits services to only be able to span over two days.
+    // getDepartures() is written to support services that might span more than
+    // two days, so this could be expanded in future, we'd just need to come up
+    // with some way of representing them as strings (maybe ">>00:45" could mean
+    // 12:45am on the third day?).
     return 48;
   }
 
-  /** Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can be negative. */
+  /**
+   * Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can
+   * be negative.
+   */
   add({
     h,
     m,

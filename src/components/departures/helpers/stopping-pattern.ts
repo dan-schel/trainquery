@@ -20,13 +20,11 @@ export function getStoppingPatternString(detail: ContinuifyResult): string {
 
   // Note that arrivals are processed outside this function, so there should
   // always be at least two served stops in the list.
-  const stops = detail
-    .slice(1)
-    .map((x, i) => ({
-      name: name(x.stop),
-      express: x.type != "served",
-      index: i,
-    }));
+  const stops = detail.slice(1).map((x, i) => ({
+    name: name(x.stop),
+    express: x.type != "served",
+    index: i,
+  }));
   const served = stops.filter((s) => !s.express);
   const express = stops.filter((s) => s.express);
   if (served.length <= 3) {
