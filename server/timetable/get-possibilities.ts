@@ -1,7 +1,7 @@
 import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
-import { QTimetableTime } from "../../shared/qtime/qtime";
+import { QTime, QTimetableTime } from "../../shared/qtime/qtime";
 import { requireLine } from "../../shared/system/config-utils";
 import {
   StopID,
@@ -13,6 +13,8 @@ import { badVariantOrDirection } from "../../shared/system/routes/line-route";
 import { TimetableEntry } from "../../shared/system/timetable/timetable";
 import { TrainQuery } from "../trainquery";
 import { getTimetablesForDay } from "./get-timetables-for-day";
+
+const iterationSizeHours = 24;
 
 export type Possibility = {
   entry: TimetableEntry;
@@ -123,26 +125,52 @@ function getSearchTimes(
   iteration: number,
   reverse: boolean
 ): SearchTimeRange[] {
+  const blockOffset = !reverse ? iteration : -1 - iteration;
+  const start = time.add({ h: iterationSizeHours * blockOffset });
+  const end = time.add({ h: iterationSizeHours * (blockOffset + 1) });
 
-  // === FOR: 2023-09-15 10:04 UTC ===
-  // 2023-09-14: >20:04 - >24:00
-  // 2023-09-15: 20:04 - 24:00
+  // TODO: this could be generic (so it works with all timey-type types), and
+  // available as an exported function in another file.
+  const getOverlap = (start1: QUtcDateTime, end1: QUtcDateTime, start2: QUtcDateTime, end2: QUtcDateTime) => {
+    if (end1.isBefore(start2)) { return null; }
+    if (end2.isBefore(start1)) { return null; }
+    return {
+      start: start1.isAfter(start2) ? start1 : start2,
+      end: end1.isAfter(end2) ? end1 : end2
+    };
+  };
 
-  // === FOR: 2023-09-15 20:04 UTC ===
-  // 2023-09-15: >06:04 - >24:00
-  // 2023-09-16: 06:04 - 24:00
+  // Services can depart up to 48 hours after a day begins, and timezones can
+  // have up to a 24 hour offset (14 in reality, but let's be cautious).
+  const surroundingHours = 48 + 24;
+  const surroundingDays = Math.ceil(surroundingHours / 24);
+  const result: SearchTimeRange[] = [];
 
-  // === FOR: 2023-10-01 10:04 UTC ===
-  // 2023-09-30: >20:04 - >24:00
-  // 2023-10-01: 21:04 - 24:00
+  // TODO: double check we're definitely getting the right range of days.
+  for (let i = -surroundingDays; i <= surroundingDays; i++) {
+    const date = time.date.addDays(i);
+    const offset = ctx.getConfig().computed.offset.get(date);
 
-  // === FOR: 2023-09-30 20:04 UTC ===
-  // 2023-09-30: >06:04 - >24:00
-  // 2023-10-01: 07:04 - 24:00
+    // TODO: add needs to support decimals because the offset might not be an integer
+    const dayStart = new QUtcDateTime(date, new QTime(0, 0, 0)).add({ h: offset });
+    const dayEnd = dayStart.add({ h: QTimetableTime.getNumOfHours() });
+    const overlap = getOverlap(dayStart, dayEnd, start, end);
+    if (overlap != null) {
+      result.push({
+        date: date,
+        min: QTimetableTime.fromDuration(overlap.start.minus(dayStart)),
+        max: QTimetableTime.fromDuration(overlap.end.minus(dayStart)),
+        getSortTime: (time) => toUTCDateTime(date, time, offset).asDecimal()
+      });
+    }
+  }
 
-  return [];
+
+  return result;
 }
 
+// TODO: this could be generic (so it works with all timey-type types), and
+// available as an exported function in another file.
 function isWithin(
   time: QTimetableTime,
   start: QTimetableTime | null,

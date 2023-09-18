@@ -5,7 +5,7 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) {}
+  ) { }
 
   protected abstract _getNumOfHours(): number;
 
@@ -125,13 +125,17 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
     super(hour, minute, second);
   }
 
-  _getNumOfHours(): number {
+  static getNumOfHours(): number {
     // NOTE: This limits services to only be able to span over two days.
     // getDepartures() is written to support services that might span more than
     // two days, so this could be expanded in future, we'd just need to come up
     // with some way of representing them as strings (maybe ">>00:45" could mean
     // 12:45am on the third day?).
     return 48;
+  }
+
+  _getNumOfHours(): number {
+    return QTimetableTime.getNumOfHours();
   }
 
   /**

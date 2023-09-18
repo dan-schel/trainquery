@@ -23,19 +23,19 @@ export abstract class QDateTime<T extends QDateTime<T>> {
     return this.toISO();
   }
 
-  equals(other: QTime) {
+  equals(other: T) {
     return this.asDecimal() == other.asDecimal();
   }
-  isBefore(other: QTime) {
+  isBefore(other: T) {
     return this.asDecimal() < other.asDecimal();
   }
-  isBeforeOrEqual(other: QTime) {
+  isBeforeOrEqual(other: T) {
     return this.asDecimal() <= other.asDecimal();
   }
-  isAfter(other: QTime) {
+  isAfter(other: T) {
     return this.asDecimal() > other.asDecimal();
   }
-  isAfterOrEqual(other: QTime) {
+  isAfterOrEqual(other: T) {
     return this.asDecimal() >= other.asDecimal();
   }
 }
