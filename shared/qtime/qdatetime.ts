@@ -58,6 +58,19 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
     return new QUtcDateTime(this.date.addDays(result.days + (d ?? 0)), result.time);
   }
 
+  diff(other: QUtcDateTime) {
+    const dateDiff = this.date.diff(other.date);
+    const timeDiff = this.time.diffSeconds(other.time);
+    const diff = dateDiff * 24 * 60 * 60 + timeDiff;
+
+    return {
+      d: Math.trunc(diff / 24 / 60 / 60),
+      h: Math.trunc(diff / 60 / 60) % 24,
+      m: Math.trunc(diff / 60) % 60,
+      s: Math.trunc(diff) % 60,
+    };
+  }
+
   static parse(input: string): QUtcDateTime | null {
     const components = input.split("T");
     if (components.length != 2) {

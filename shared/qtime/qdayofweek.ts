@@ -22,7 +22,7 @@ export class QDayOfWeek {
   static sat = new QDayOfWeek(5);
   static sun = new QDayOfWeek(6);
 
-  constructor(readonly index: number) {}
+  constructor(readonly index: number) { }
 
   isValid(): { valid: true } | { valid: false; issue: string } {
     if (!Number.isInteger(this.index) || this.index < 0 || this.index > 6) {
@@ -42,6 +42,9 @@ export class QDayOfWeek {
     return _acronyms[this.index];
   }
   addDays(days: number): QDayOfWeek {
+    if (!Number.isInteger(days)) {
+      throw new Error(`Cannot add "${days}" days to a day of the week.`);
+    }
     return new QDayOfWeek(posMod(this.index + days, 7));
   }
   tomorrow() {

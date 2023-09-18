@@ -27,6 +27,10 @@ function getDaysInMonth(year: number, month: number): number {
   return _daysInMonth[month - 1];
 }
 
+function getDaysInYear(year: number) {
+  return isLeapYear(year) ? 366 : 365;
+}
+
 function getMonthAcronym(month: number) {
   return _monthAcronyms[month - 1];
 }
@@ -36,7 +40,7 @@ export class QDate {
     readonly year: number,
     readonly month: number,
     readonly day: number
-  ) {}
+  ) { }
   isValid(): { valid: true } | { valid: false; issue: string } {
     const invalid = (issue: string) => ({ valid: false, issue: issue });
 
@@ -53,8 +57,7 @@ export class QDate {
     const daysInMonth = getDaysInMonth(this.year, this.month);
     if (this.day > daysInMonth) {
       return invalid(
-        `${getMonthAcronym(this.month)} ${
-          this.year
+        `${getMonthAcronym(this.month)} ${this.year
         } only has ${daysInMonth} days.`
       );
     }
@@ -87,6 +90,10 @@ export class QDate {
 
   /** Returns the date when `x` days have passed. `x` can be negative. */
   addDays(x: number): QDate {
+    if (!Number.isInteger(x)) {
+      throw new Error(`Cannot add "${x}" days to a date.`);
+    }
+
     let day = this.day + x;
     let month = this.month;
     let year = this.year;
@@ -108,6 +115,10 @@ export class QDate {
     }
     return new QDate(year, month, day);
   }
+  diff(other: QDate) {
+    // TODO
+  }
+
   tomorrow() {
     return this.addDays(1);
   }

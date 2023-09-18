@@ -71,39 +71,38 @@ export class QTime extends QTimeBase<QTime> {
    * Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can
    * be negative.
    */
-  add({ h, m, s }: { h?: number; m?: number; s?: number }): {
+  add({ h = 0, m = 0, s = 0 }: { h?: number; m?: number; s?: number }): {
     time: QTime;
     days: number;
   } {
+    const currSeconds = this.hour * 60 * 60 + this.minute * 60 + this.second;
+    const addSeconds = h * 60 * 60 + m * 60 + s;
+    if (!Number.isInteger(addSeconds)) {
+      throw new Error(`Cannot add ${h}h ${m}m ${s}s. It is not an integer number of seconds.`);
+    }
+
     let days = 0;
-    let hour = this.hour + (h ?? 0);
-    let minute = this.minute + (m ?? 0);
-    let second = this.second + (s ?? 0);
-    while (second > 59) {
-      second -= 60;
-      minute++;
+    let newValue = currSeconds - addSeconds;
+    while (newValue >= 24 * 60 * 60) {
+      days += 1;
+      newValue -= 24 * 60 * 60;
     }
-    while (second < 0) {
-      second += 60;
-      minute--;
+    while (newValue < 0) {
+      days -= 1;
+      newValue += 24 * 60 * 60;
     }
-    while (minute > 59) {
-      minute -= 60;
-      hour++;
-    }
-    while (minute < 0) {
-      minute += 60;
-      hour--;
-    }
-    while (hour > 23) {
-      hour -= 24;
-      days++;
-    }
-    while (hour < 0) {
-      hour += 24;
-      days--;
-    }
+
+    const hour = Math.floor(newValue / 60 / 60);
+    const minute = Math.floor(newValue / 60) % 60;
+    const second = newValue % 60;
+
     return { time: new QTime(hour, minute, second), days: days };
+  }
+
+  diffSeconds(other: QTime) {
+    const thisSeconds = this.hour * 60 * 60 + this.minute * 60 + this.second;
+    const otherSeconds = other.hour * 60 * 60 + other.minute * 60 + other.second;
+    return thisSeconds - otherSeconds;
   }
 
   /** Accepts "09:45", "14:55:32", etc. */
@@ -143,37 +142,28 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
    * be negative.
    */
   add({
-    h,
-    m,
-    s,
+    h = 0,
+    m = 0,
+    s = 0,
   }: {
     h?: number;
     m?: number;
     s?: number;
   }): QTimetableTime | null {
-    let hour = this.hour + (h ?? 0);
-    let minute = this.minute + (m ?? 0);
-    let second = this.second + (s ?? 0);
-    while (second > 59) {
-      second -= 60;
-      minute++;
+    const currSeconds = this.hour * 60 * 60 + this.minute * 60 + this.second;
+    const addSeconds = h * 60 * 60 + m * 60 + s;
+    if (!Number.isInteger(addSeconds)) {
+      throw new Error(`Cannot add ${h}h ${m}m ${s}s. It is not an integer number of seconds.`);
     }
-    while (second < 0) {
-      second += 60;
-      minute--;
-    }
-    while (minute > 59) {
-      minute -= 60;
-      hour++;
-    }
-    while (minute < 0) {
-      minute += 60;
-      hour--;
-    }
+    const newValue = currSeconds - addSeconds;
 
-    if (hour < 0 || hour > 47) {
+    if (newValue < 0 || newValue >= 48 * 60 * 60) {
       return null;
     }
+
+    const hour = Math.floor(newValue / 60 / 60);
+    const minute = Math.floor(newValue / 60) % 60;
+    const second = newValue % 60;
     return new QTimetableTime(hour, minute, second);
   }
 
@@ -189,6 +179,19 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
       time.minute,
       time.second
     );
+  }
+
+  static fromDuration({ d = 0, h = 0, m = 0, s = 0 }: {
+    d?: number
+    h?: number;
+    m?: number;
+    s?: number;
+  }): QTimetableTime | null {
+    return new QTimetableTime(0, 0, 0).add({
+      h: d * 24 + h,
+      m: m,
+      s: s
+    });
   }
 
   toTtblString(includeSeconds: boolean) {

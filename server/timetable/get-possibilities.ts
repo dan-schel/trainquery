@@ -132,8 +132,8 @@ function getSearchTimes(
   // TODO: this could be generic (so it works with all timey-type types), and
   // available as an exported function in another file.
   const getOverlap = (start1: QUtcDateTime, end1: QUtcDateTime, start2: QUtcDateTime, end2: QUtcDateTime) => {
-    if (end1.isBefore(start2)) { return null; }
-    if (end2.isBefore(start1)) { return null; }
+    if (end1.isBeforeOrEqual(start2)) { return null; }
+    if (end2.isBeforeOrEqual(start1)) { return null; }
     return {
       start: start1.isAfter(start2) ? start1 : start2,
       end: end1.isAfter(end2) ? end1 : end2
@@ -151,15 +151,14 @@ function getSearchTimes(
     const date = time.date.addDays(i);
     const offset = ctx.getConfig().computed.offset.get(date);
 
-    // TODO: add needs to support decimals because the offset might not be an integer
     const dayStart = new QUtcDateTime(date, new QTime(0, 0, 0)).add({ h: offset });
     const dayEnd = dayStart.add({ h: QTimetableTime.getNumOfHours() });
     const overlap = getOverlap(dayStart, dayEnd, start, end);
     if (overlap != null) {
       result.push({
         date: date,
-        min: QTimetableTime.fromDuration(overlap.start.minus(dayStart)),
-        max: QTimetableTime.fromDuration(overlap.end.minus(dayStart)),
+        min: QTimetableTime.fromDuration(overlap.start.diff(dayStart)),
+        max: QTimetableTime.fromDuration(overlap.end.diff(dayStart)),
         getSortTime: (time) => toUTCDateTime(date, time, offset).asDecimal()
       });
     }
