@@ -5,7 +5,7 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) { }
+  ) {}
 
   protected abstract _getNumOfHours(): number;
 
@@ -78,7 +78,9 @@ export class QTime extends QTimeBase<QTime> {
     const currSeconds = this.hour * 60 * 60 + this.minute * 60 + this.second;
     const addSeconds = h * 60 * 60 + m * 60 + s;
     if (!Number.isInteger(addSeconds)) {
-      throw new Error(`Cannot add ${h}h ${m}m ${s}s. It is not an integer number of seconds.`);
+      throw new Error(
+        `Cannot add ${h}h ${m}m ${s}s. It is not an integer number of seconds.`
+      );
     }
 
     let days = 0;
@@ -101,7 +103,8 @@ export class QTime extends QTimeBase<QTime> {
 
   diffSeconds(other: QTime) {
     const thisSeconds = this.hour * 60 * 60 + this.minute * 60 + this.second;
-    const otherSeconds = other.hour * 60 * 60 + other.minute * 60 + other.second;
+    const otherSeconds =
+      other.hour * 60 * 60 + other.minute * 60 + other.second;
     return thisSeconds - otherSeconds;
   }
 
@@ -153,7 +156,9 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
     const currSeconds = this.hour * 60 * 60 + this.minute * 60 + this.second;
     const addSeconds = h * 60 * 60 + m * 60 + s;
     if (!Number.isInteger(addSeconds)) {
-      throw new Error(`Cannot add ${h}h ${m}m ${s}s. It is not an integer number of seconds.`);
+      throw new Error(
+        `Cannot add ${h}h ${m}m ${s}s. It is not an integer number of seconds.`
+      );
     }
     const newValue = currSeconds - addSeconds;
 
@@ -181,8 +186,13 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
     );
   }
 
-  static fromDuration({ d = 0, h = 0, m = 0, s = 0 }: {
-    d?: number
+  static fromDuration({
+    d = 0,
+    h = 0,
+    m = 0,
+    s = 0,
+  }: {
+    d?: number;
     h?: number;
     m?: number;
     s?: number;
@@ -190,7 +200,7 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
     return new QTimetableTime(0, 0, 0).add({
       h: d * 24 + h,
       m: m,
-      s: s
+      s: s,
     });
   }
 

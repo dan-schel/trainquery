@@ -82,9 +82,7 @@ export function getPossibilities(
     }
   }
 
-  result.sort(
-    (a, b) => (reverse ? -1 : 1) * (a.sortTime - b.sortTime)
-  );
+  result.sort((a, b) => (reverse ? -1 : 1) * (a.sortTime - b.sortTime));
   return result;
 }
 
@@ -131,12 +129,21 @@ function getSearchTimes(
 
   // TODO: this could be generic (so it works with all timey-type types), and
   // available as an exported function in another file.
-  const getOverlap = (start1: QUtcDateTime, end1: QUtcDateTime, start2: QUtcDateTime, end2: QUtcDateTime) => {
-    if (end1.isBeforeOrEqual(start2)) { return null; }
-    if (end2.isBeforeOrEqual(start1)) { return null; }
+  const getOverlap = (
+    start1: QUtcDateTime,
+    end1: QUtcDateTime,
+    start2: QUtcDateTime,
+    end2: QUtcDateTime
+  ) => {
+    if (end1.isBeforeOrEqual(start2)) {
+      return null;
+    }
+    if (end2.isBeforeOrEqual(start1)) {
+      return null;
+    }
     return {
       start: start1.isAfter(start2) ? start1 : start2,
-      end: end1.isAfter(end2) ? end1 : end2
+      end: end1.isAfter(end2) ? end1 : end2,
     };
   };
 
@@ -151,7 +158,9 @@ function getSearchTimes(
     const date = time.date.addDays(i);
     const offset = ctx.getConfig().computed.offset.get(date);
 
-    const dayStart = new QUtcDateTime(date, new QTime(0, 0, 0)).add({ h: offset });
+    const dayStart = new QUtcDateTime(date, new QTime(0, 0, 0)).add({
+      h: offset,
+    });
     const dayEnd = dayStart.add({ h: QTimetableTime.getNumOfHours() });
     const overlap = getOverlap(dayStart, dayEnd, start, end);
     if (overlap != null) {
@@ -159,11 +168,10 @@ function getSearchTimes(
         date: date,
         min: QTimetableTime.fromDuration(overlap.start.diff(dayStart)),
         max: QTimetableTime.fromDuration(overlap.end.diff(dayStart)),
-        getSortTime: (time) => toUTCDateTime(date, time, offset).asDecimal()
+        getSortTime: (time) => toUTCDateTime(date, time, offset).asDecimal(),
       });
     }
   }
-
 
   return result;
 }
