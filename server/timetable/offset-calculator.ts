@@ -1,7 +1,7 @@
 import { QCache } from "../../shared/qtime/qcache";
 import { QDate } from "../../shared/qtime/qdate";
-import { DateTime } from "luxon";
 import { TimezoneConfig } from "../../shared/system/config-elements";
+import { getOffset } from "../../shared/qtime/luxon-conversions";
 
 export class OffsetCalculator {
   private _calculator: { get(key: QDate): number };
@@ -14,18 +14,7 @@ export class OffsetCalculator {
     } else {
       this._calculator = new QCache<QDate, number>(
         (d) => {
-          const localTime = DateTime.local(
-            d.year,
-            d.month,
-            d.day,
-            config.offsetCheckHour,
-            0,
-            0,
-            { zone: config.id }
-          );
-          const utcTime = localTime.toUTC();
-          const offsetUtc = localTime.setZone("utc", { keepLocalTime: true });
-          return offsetUtc.diff(utcTime).as("hours");
+          return getOffset(d, config.id, config.offsetCheckHour);
         },
         (d) => d.toISO(),
         100

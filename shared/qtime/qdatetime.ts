@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { QDate } from "./qdate";
-import { QTime } from "./qtime";
+import { QTime, QTimetableTime } from "./qtime";
 
 export abstract class QDateTime<T extends QDateTime<T>> {
   constructor(readonly date: QDate, readonly time: QTime) { }
@@ -16,8 +16,6 @@ export abstract class QDateTime<T extends QDateTime<T>> {
   }
   /** E.g. "2023-08-15T10:46:00Z" or "2023-08-15T20:46:00+10:00" */
   abstract toISO(): string;
-  /** Adds `d` days, `h` hours, `m` minutes, and `s` seconds. `d`/`h`/`m`/`s` can be negative. */
-  abstract add(units: { d?: number; h?: number; m?: number; s?: number }): T;
 
   toJSON() {
     return this.toISO();
@@ -100,4 +98,58 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
     }
     return result;
   });
+}
+export class QLocalDateTime extends QDateTime<QLocalDateTime> {
+  constructor(date: QDate, time: QTime, readonly offset: number) {
+    super(date, time);
+  }
+
+  toISO(): string {
+    const sign = this.offset >= 0 ? "+" : "-";
+    const hrs = (Math.floor(Math.abs(this.offset))).toFixed().padStart(2, "0");
+    const mins = (Math.floor(Math.abs(this.offset) * 60) % 60).toFixed().padStart(2, "0");
+    return `${this.date.toISO()}T${this.time.toISO()}${sign}${hrs}:${mins}`;
+  }
+
+  toUTC(): QUtcDateTime {
+    const offsetTime = this.time.add({ h: -this.offset });
+    return new QUtcDateTime(this.date.addDays(offsetTime.days), offsetTime.time);
+  }
+
+  static parse(input: string): QLocalDateTime | null {
+    const components = input.split("T").map(x => x.includes(":") ? x.split(/[+-]/g) : x).flat();
+    if (components.length != 3) {
+      return null;
+    }
+
+    const date = QDate.parse(components[0]);
+    const time = QTime.parse(components[1]);
+    const offset = QTime.parse(components[2]);
+    const sign = input.split("T")[1].includes("-") ? -1 : 1;
+
+    if (date == null || time == null || offset == null) {
+      return null;
+    }
+
+    return new QLocalDateTime(date, time, (offset.hour + offset.minute / 60) * sign);
+  }
+
+  static readonly json = z.string().transform((x, ctx) => {
+    const result = QLocalDateTime.parse(x);
+    if (result == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Not a number",
+      });
+      return z.NEVER;
+    }
+    return result;
+  });
+}
+
+export function toUTCDateTime(date: QDate, time: QTimetableTime, offset: number): QUtcDateTime {
+  const dayOffset = Math.floor(time.hour) / 24;
+  const dateComponent = date.addDays(dayOffset);
+  const timeComponent = new QTime(time.hour % 24, time.minute, time.second);
+  return new QUtcDateTime(dateComponent, timeComponent).add({ h: -offset });
 }

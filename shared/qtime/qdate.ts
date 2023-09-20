@@ -115,8 +115,35 @@ export class QDate {
     }
     return new QDate(year, month, day);
   }
-  diff(other: QDate) {
-    // TODO
+  diff(other: QDate): number {
+    if (this.equals(other)) { return 0; }
+    if (this.isBefore(other)) { return -other.diff(this); }
+
+    // By this point we know that "other" occurs before "this" (result will be
+    // positive).
+    if (this.year != other.year) {
+      const endOfOtherYear = new QDate(other.year, 12, 31);
+      const startOfThisYear = new QDate(this.year, 1, 1);
+      let daysBetween = 1;
+      for (let year = other.year + 1; year < this.year; year++) {
+        daysBetween = getDaysInYear(year);
+      }
+      return endOfOtherYear.diff(other) + daysBetween + this.diff(startOfThisYear);
+    }
+
+    // By this point we know the years are the same.
+    if (this.month != other.month) {
+      const endOfOtherMonth = new QDate(other.year, other.month, getDaysInMonth(other.year, other.month));
+      const startOfThisMonth = new QDate(this.year, this.month, 1);
+      let daysBetween = 1;
+      for (let month = other.month + 1; month < this.month; month++) {
+        daysBetween = getDaysInMonth(this.year, month);
+      }
+      return endOfOtherMonth.diff(other) + daysBetween + this.diff(startOfThisMonth);
+    }
+
+    // By this point we know each date refers to the same month.
+    return this.day - other.day;
   }
 
   tomorrow() {

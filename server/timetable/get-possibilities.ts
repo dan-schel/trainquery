@@ -1,5 +1,5 @@
 import { QDate } from "../../shared/qtime/qdate";
-import { QUtcDateTime } from "../../shared/qtime/qdatetime";
+import { QUtcDateTime, toUTCDateTime } from "../../shared/qtime/qdatetime";
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
 import { QTime, QTimetableTime } from "../../shared/qtime/qtime";
 import { requireLine } from "../../shared/system/config-utils";
