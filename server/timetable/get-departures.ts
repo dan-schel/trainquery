@@ -45,7 +45,7 @@ export function getDepartures<T>(
       const approvingBuckets = buckets.filter(
         (b) => !b.isFull() && b.willAccept(possibility)
       );
-      if (approvingBuckets.length > 1) {
+      if (approvingBuckets.length > 0) {
         // This operation is treated as being potentially expensive, which is
         // why buckets are encouraged to filter first on the possibility.
         const specificized = specificizer(

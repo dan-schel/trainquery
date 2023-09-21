@@ -14,8 +14,15 @@ export class FilteredBucket extends Bucket<Departure> {
     super();
   }
 
-  willAccept(_possibility: Possibility): boolean {
-    // TODO: Do filtering.
+  willAccept(possibility: Possibility): boolean {
+    // TODO: Do filtering (properly)!
+    if (this.filter == "direction-up" && possibility.entry.direction != "up") {
+      return false;
+    }
+    if (this.filter == "direction-down" && possibility.entry.direction != "down") {
+      return false;
+    }
+
     return true;
   }
   push(service: Departure): void {
