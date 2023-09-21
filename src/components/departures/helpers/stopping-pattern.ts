@@ -27,10 +27,10 @@ export function getStoppingPatternString(detail: ContinuifyResult): string {
   }));
   const served = stops.filter((s) => !s.express);
   const express = stops.filter((s) => s.express);
-  if (served.length <= 3) {
+  if (served.length > 0 && served.length <= 3) {
     return `Stops at ${listifyAnd(served.map((s) => s.name))} only`;
-  } else if (express.length <= 3) {
-    return `Skips ${listifyAnd(served.map((s) => s.name))}`;
+  } else if (express.length > 0 && express.length <= 3) {
+    return `Skips ${listifyAnd(express.map((s) => s.name))}`;
   } else if (served.length == stops.length) {
     return `Stops all stations to ${stops[stops.length - 1].name}`;
   }
@@ -42,7 +42,10 @@ export function getStoppingPatternString(detail: ContinuifyResult): string {
     lastBeforeExpress,
     firstAfterExpress + 1
   );
-  if (servedInExpressSection.length <= 4) {
+  if (
+    servedInExpressSection.length >= 2 &&
+    servedInExpressSection.length <= 4
+  ) {
     return `Express ${servedInExpressSection.map((x) => x.name).join(" → ")}`;
   }
 

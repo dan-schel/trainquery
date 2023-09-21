@@ -3,7 +3,7 @@ import OneLineP from "@/components/common/OneLineP.vue";
 import Icon from "../icons/Icon.vue";
 import { RouterLink } from "vue-router";
 import { Departure } from "shared/system/timetable/departure";
-import { getServicePageRoute } from "shared/system/config-utils";
+import { getServicePageRoute, requireLine } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
 import { computed } from "vue";
 import { continuify } from "./helpers/continuify";
@@ -26,7 +26,7 @@ const props = defineProps<{
 
 const detail = computed(() => {
   const detail = continuify(props.departure, props.continuationsEnabled);
-  const isArrival = detail.length == 0;
+  const isArrival = detail.length == 1;
 
   return {
     stoppingPattern: detail,
@@ -36,13 +36,15 @@ const detail = computed(() => {
     stoppingPatternString: isArrival
       ? getArrivalDetailString(props.departure) ?? ""
       : getStoppingPatternString(detail),
+    lineColor: requireLine(getConfig(), props.departure.line).color,
   };
 });
 </script>
 
 <template>
   <RouterLink
-    class="departure accent-cyan"
+    class="departure"
+    :class="`accent-${detail.lineColor}`"
     :to="getServicePageRoute(getConfig(), departure)"
   >
     <div class="primary">
