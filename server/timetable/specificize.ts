@@ -11,16 +11,20 @@ export function specificize(
   ctx: TrainQuery,
   entry: FullTimetableEntry,
   date: QDate,
-  perspectiveIndex: number): Departure {
-
+  perspectiveIndex: number
+): Departure {
   const staticID = toStaticServiceID(`TODO-${entry.entryIndex}`);
   const stoppingPattern = new CompleteStoppingPattern(
-    entry.rows.map(r => {
+    entry.rows.map((r) => {
       if (r == null) {
         return null;
       }
 
-      const time = toUTCDateTime(date, r, ctx.getConfig().computed.offset.get(date));
+      const time = toUTCDateTime(
+        date,
+        r,
+        ctx.getConfig().computed.offset.get(date)
+      );
 
       // TODO: These values are temporary!
       const setsDown = true;
@@ -35,5 +39,16 @@ export function specificize(
     throw new Error("Incorrect perspective index.");
   }
 
-  return new Departure(entry.line, [], entry.route, entry.direction, stoppingPattern, staticID, [], null, perspectiveIndex, perspective);
+  return new Departure(
+    entry.line,
+    [],
+    entry.route,
+    entry.direction,
+    stoppingPattern,
+    staticID,
+    [],
+    null,
+    perspectiveIndex,
+    perspective
+  );
 }

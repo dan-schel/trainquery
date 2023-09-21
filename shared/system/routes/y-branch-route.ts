@@ -18,7 +18,7 @@ export class Branch {
      * section begins.
      */
     readonly stops: RouteStop[]
-  ) { }
+  ) {}
 
   static readonly json = z
     .object({

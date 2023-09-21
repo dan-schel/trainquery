@@ -19,7 +19,10 @@ export class FilteredBucket extends Bucket<Departure> {
     if (this.filter == "direction-up" && possibility.entry.direction != "up") {
       return false;
     }
-    if (this.filter == "direction-down" && possibility.entry.direction != "down") {
+    if (
+      this.filter == "direction-down" &&
+      possibility.entry.direction != "down"
+    ) {
       return false;
     }
 
