@@ -2,7 +2,7 @@ import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { linesThatStopAt } from "../../shared/system/config-utils";
 import { LineID, StopID } from "../../shared/system/ids";
-import { TimetableEntry } from "../../shared/system/timetable/timetable";
+import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { TrainQuery } from "../trainquery";
 import { Possibility, getPossibilities as gp } from "./get-possibilities";
 
@@ -13,12 +13,13 @@ export abstract class Bucket<T> {
 }
 
 export type Specificizer<T> = (
-  entry: TimetableEntry,
+  ctx: TrainQuery,
+  entry: FullTimetableEntry,
   date: QDate,
   perspectiveIndex: number
 ) => T;
 
-export function getDeparture<T>(
+export function getDepartures<T>(
   ctx: TrainQuery,
   stop: StopID,
   time: QUtcDateTime,
@@ -48,6 +49,7 @@ export function getDeparture<T>(
         // This operation is treated as being potentially expensive, which is
         // why buckets are encouraged to filter first on the possibility.
         const specificized = specificizer(
+          ctx,
           possibility.entry,
           possibility.date,
           possibility.perspectiveIndex

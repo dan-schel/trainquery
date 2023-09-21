@@ -9,6 +9,8 @@ import {
 } from "../ids";
 
 export class Timetable {
+  readonly entries: FullTimetableEntry[];
+
   constructor(
     /** Uniquely identifies this timetable from others in the system. */
     readonly id: TimetableID,
@@ -23,8 +25,10 @@ export class Timetable {
     /** The date the timetable was created. */
     readonly created: QDate,
     /** The services in the timetable. */
-    readonly entries: TimetableEntry[]
-  ) {}
+    entries: TimetableEntry[]
+  ) {
+    this.entries = entries.map((e, i) => new FullTimetableEntry(id, line, i, e.route, e.direction, e.weekdayRange, e.rows));
+  }
 }
 
 export class TimetableEntry {
@@ -37,5 +41,26 @@ export class TimetableEntry {
     readonly weekdayRange: QWeekdayRange,
     /** The value of each row (either the time, or null if it doesn't stop). */
     readonly rows: (QTimetableTime | null)[]
-  ) {}
+  ) { }
+}
+
+export class FullTimetableEntry extends TimetableEntry {
+  constructor(
+    /** The ID of the timetable which this entry came from. */
+    readonly id: TimetableID,
+    /** The line of the timetable this entry comes from to. */
+    readonly line: LineID,
+    /** The index of the entry within its timetable. */
+    readonly entryIndex: number,
+    /** Which route variant this service takes. */
+    route: RouteVariantID,
+    /** Which direction this service travels in. */
+    direction: DirectionID,
+    /** Which days of the week this services operates on. */
+    weekdayRange: QWeekdayRange,
+    /** The value of each row (either the time, or null if it doesn't stop). */
+    rows: (QTimetableTime | null)[]
+  ) {
+    super(route, direction, weekdayRange, rows);
+  }
 }

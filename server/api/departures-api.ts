@@ -1,23 +1,14 @@
-import { repeat } from "@schel-d/js-utils";
-import { QDate } from "../../shared/qtime/qdate";
-import { QUtcDateTime } from "../../shared/qtime/qdatetime";
-import { QTime } from "../../shared/qtime/qtime";
-import {
-  toDirectionID,
-  toLineID,
-  toPlatformID,
-  toStaticServiceID,
-} from "../../shared/system/ids";
-import { HookRoute } from "../../shared/system/routes/hook-route";
-import { Departure } from "../../shared/system/timetable/departure";
-import { ServiceStop } from "../../shared/system/timetable/service-stop";
-import { PartialStoppingPattern } from "../../shared/system/timetable/stopping-pattern";
 import { BadApiCallError, requireParam } from "../param-utils";
 import { ServerParams, TrainQuery } from "../trainquery";
 import { DepartureFeed } from "../../shared/system/timetable/departure-feed";
+import { getDepartures } from "../timetable/get-departures";
+import { FilteredBucket } from "../timetable/filtering";
+import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
+import { specificize } from "../timetable/specificize";
+import { unique } from "@schel-d/js-utils";
 
 export async function departuresApi(
-  _ctx: TrainQuery,
+  ctx: TrainQuery,
   params: ServerParams
 ): Promise<object> {
   const feedsString = requireParam(params, "feeds");
@@ -26,27 +17,15 @@ export async function departuresApi(
     throw new BadApiCallError(`Provided feeds string is invalid.`);
   }
 
-  const departure = new Departure(
-    toLineID(5),
-    [],
-    HookRoute.directID,
-    toDirectionID("up"),
-    new PartialStoppingPattern(0, 8),
-    toStaticServiceID("18"),
-    [],
-    null,
-    2,
-    new ServiceStop(
-      new QUtcDateTime(new QDate(2023, 9, 8), new QTime(5, 4, 0)),
-      null,
-      true,
-      true,
-      {
-        id: toPlatformID("1"),
-        confidence: "high",
-      }
-    )
-  );
+  const buckets = feeds.map(f => new FilteredBucket(f.stop, f.count, f.filter));
+  const uniqueStops = unique(feeds.map(f => f.stop), (a, b) => a == b);
 
-  return feeds.map((f) => repeat(departure, f.count));
+  // TODO: The time should be a param!
+  const time = nowUTCLuxon();
+
+  uniqueStops.forEach(s => {
+    getDepartures(ctx, s, time, buckets.filter(b => b.stop == s), specificize);
+  });
+
+  return buckets.map(b => b.departures.map(d => d.toJSON()));
 }

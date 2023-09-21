@@ -10,14 +10,14 @@ import {
   DirectionID,
 } from "../../shared/system/ids";
 import { badVariantOrDirection } from "../../shared/system/routes/line-route";
-import { TimetableEntry } from "../../shared/system/timetable/timetable";
+import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { TrainQuery } from "../trainquery";
 import { getTimetablesForDay } from "./get-timetables-for-day";
 
 const iterationSizeHours = 24;
 
 export type Possibility = {
-  entry: TimetableEntry;
+  entry: FullTimetableEntry;
   date: QDate;
   perspectiveIndex: number;
 };
