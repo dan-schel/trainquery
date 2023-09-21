@@ -67,7 +67,7 @@ export function toLocalDateTimeLuxon(
 export function nowUTCLuxon(): QUtcDateTime {
   const now = DateTime.utc();
   return new QUtcDateTime(
-    new QDate(now.year, now.month, now.second),
+    new QDate(now.year, now.month, now.day),
     new QTime(now.hour, now.minute, now.second)
   );
 }

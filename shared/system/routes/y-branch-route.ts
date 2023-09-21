@@ -18,7 +18,7 @@ export class Branch {
      * section begins.
      */
     readonly stops: RouteStop[]
-  ) {}
+  ) { }
 
   static readonly json = z
     .object({
@@ -110,7 +110,7 @@ export class YBranchRoute extends Route {
       {
         variant: this.firstBranch.id,
         direction: this.reverse.id,
-        stops: firstBranch.reverse(),
+        stops: [...firstBranch].reverse(),
       },
       {
         variant: this.secondBranch.id,
@@ -120,7 +120,7 @@ export class YBranchRoute extends Route {
       {
         variant: this.secondBranch.id,
         direction: this.reverse.id,
-        stops: secondBranch.reverse(),
+        stops: [...secondBranch].reverse(),
       },
     ];
   }

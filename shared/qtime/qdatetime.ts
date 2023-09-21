@@ -3,7 +3,7 @@ import { QDate } from "./qdate";
 import { QTime, QTimetableTime } from "./qtime";
 
 export abstract class QDateTime<T extends QDateTime<T>> {
-  constructor(readonly date: QDate, readonly time: QTime) {}
+  constructor(readonly date: QDate, readonly time: QTime) { }
 
   /** E.g. 145900 for 2:59pm. */
   asDecimal(): number {
@@ -167,7 +167,7 @@ export function toUTCDateTime(
   time: QTimetableTime,
   offset: number
 ): QUtcDateTime {
-  const dayOffset = Math.floor(time.hour) / 24;
+  const dayOffset = Math.floor(time.hour / 24);
   const dateComponent = date.addDays(dayOffset);
   const timeComponent = new QTime(time.hour % 24, time.minute, time.second);
   return new QUtcDateTime(dateComponent, timeComponent).add({ h: -offset });

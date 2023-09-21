@@ -143,7 +143,7 @@ function getSearchTimes(
     }
     return {
       start: start1.isAfter(start2) ? start1 : start2,
-      end: end1.isAfter(end2) ? end1 : end2,
+      end: end1.isBefore(end2) ? end1 : end2,
     };
   };
 
@@ -159,10 +159,11 @@ function getSearchTimes(
     const offset = ctx.getConfig().computed.offset.get(date);
 
     const dayStart = new QUtcDateTime(date, new QTime(0, 0, 0)).add({
-      h: offset,
+      h: -offset,
     });
     const dayEnd = dayStart.add({ h: QTimetableTime.getNumOfHours() });
     const overlap = getOverlap(dayStart, dayEnd, start, end);
+
     if (overlap != null) {
       result.push({
         date: date,

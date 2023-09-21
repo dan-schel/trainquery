@@ -22,6 +22,6 @@ export class FilteredBucket extends Bucket<Departure> {
     this.departures.push(service);
   }
   isFull(): boolean {
-    return this.departures.length < this.capacity;
+    return this.departures.length >= this.capacity;
   }
 }

@@ -75,7 +75,7 @@ export class HookRoute extends Route {
       {
         variant: HookRoute.hookedID,
         direction: this.reverse.id,
-        stops: hooked.reverse(),
+        stops: [...hooked].reverse(),
       },
       {
         variant: HookRoute.directID,
@@ -85,7 +85,7 @@ export class HookRoute extends Route {
       {
         variant: HookRoute.directID,
         direction: this.reverse.id,
-        stops: direct.reverse(),
+        stops: [...direct].reverse(),
       },
     ];
   }

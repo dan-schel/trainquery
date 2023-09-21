@@ -56,7 +56,7 @@ export class LinearRoute extends Route {
       {
         variant: LinearRoute.regularID,
         direction: this.reverse.id,
-        stops: stops.reverse(),
+        stops: [...stops].reverse(),
       },
     ];
   }

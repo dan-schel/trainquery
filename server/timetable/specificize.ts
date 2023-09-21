@@ -13,7 +13,7 @@ export function specificize(
   date: QDate,
   perspectiveIndex: number): Departure {
 
-  const staticID = toStaticServiceID("TODO");
+  const staticID = toStaticServiceID(`TODO-${entry.entryIndex}`);
   const stoppingPattern = new CompleteStoppingPattern(
     entry.rows.map(r => {
       if (r == null) {

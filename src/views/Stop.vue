@@ -12,7 +12,6 @@ import DepartureControls from "@/components/departures/DepartureControls.vue";
 import PageContent from "@/components/common/PageContent.vue";
 import LineList from "@/components/LineList.vue";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
-import { toStopID } from "shared/system/ids";
 
 const route = useRoute();
 const params = computed(() => route.params);
@@ -22,8 +21,8 @@ const stop = computed(() =>
 );
 
 const feeds = computed(() => [
-  new DepartureFeed(toStopID(212), 3, "direction-up"),
-  new DepartureFeed(toStopID(212), 3, "direction-down"),
+  new DepartureFeed(stop.value.id, 5, "direction-up"),
+  new DepartureFeed(stop.value.id, 5, "direction-down"),
 ]);
 
 useHead({

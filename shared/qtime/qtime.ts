@@ -5,7 +5,7 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) {}
+  ) { }
 
   protected abstract _getNumOfHours(): number;
 
@@ -30,7 +30,7 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
   }
   /** E.g. 145900 for 2:59pm. */
   asDecimal(): number {
-    return this.hour * 1000 + this.minute * 100 + this.second;
+    return this.hour * 10000 + this.minute * 100 + this.second;
   }
 
   equals(other: T) {
@@ -84,7 +84,7 @@ export class QTime extends QTimeBase<QTime> {
     }
 
     let days = 0;
-    let newValue = currSeconds - addSeconds;
+    let newValue = currSeconds + addSeconds;
     while (newValue >= 24 * 60 * 60) {
       days += 1;
       newValue -= 24 * 60 * 60;
@@ -160,7 +160,7 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
         `Cannot add ${h}h ${m}m ${s}s. It is not an integer number of seconds.`
       );
     }
-    const newValue = currSeconds - addSeconds;
+    const newValue = currSeconds + addSeconds;
 
     if (newValue < 0 || newValue >= 48 * 60 * 60) {
       return null;

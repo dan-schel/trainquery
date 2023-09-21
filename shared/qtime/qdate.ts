@@ -40,7 +40,7 @@ export class QDate {
     readonly year: number,
     readonly month: number,
     readonly day: number
-  ) {}
+  ) { }
   isValid(): { valid: true } | { valid: false; issue: string } {
     const invalid = (issue: string) => ({ valid: false, issue: issue });
 
@@ -57,8 +57,7 @@ export class QDate {
     const daysInMonth = getDaysInMonth(this.year, this.month);
     if (this.day > daysInMonth) {
       return invalid(
-        `${getMonthAcronym(this.month)} ${
-          this.year
+        `${getMonthAcronym(this.month)} ${this.year
         } only has ${daysInMonth} days.`
       );
     }
@@ -67,7 +66,7 @@ export class QDate {
   }
   /** E.g. 20230815 for 15th Aug 2023. */
   asDecimal(): number {
-    return this.year * 1000 + this.month * 100 + this.day;
+    return this.year * 10000 + this.month * 100 + this.day;
   }
   /** E.g. "2023-08-15" for 15th Aug 2023. */
   toISO() {

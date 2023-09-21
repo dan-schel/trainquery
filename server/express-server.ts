@@ -29,6 +29,7 @@ export class ExpressServer extends Server {
         if (BadApiCallError.detect(e)) {
           res.status(e.statusCode).send(e.message);
         } else {
+          console.warn(e);
           res.status(500).send("Internal server error.");
         }
       }
