@@ -3,6 +3,8 @@ import { requireStop } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
 import type { Departure } from "shared/system/timetable/departure";
 import type { StopID } from "shared/system/ids";
+import { formatTime } from "@/utils/format-qtime";
+import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 
 export function getTerminusString(detail: ContinuifyResult) {
   const stopID = detail[detail.length - 1].stop;
@@ -51,4 +53,10 @@ export function getPlatformString(departure: Departure, perspective: StopID) {
     );
   }
   return platform.confidence == "high" ? name : `${name}?`;
+}
+
+export function getTimeString(departure: Departure) {
+  return formatTime(
+    toLocalDateTimeLuxon(getConfig(), departure.perspective.scheduledTime).time
+  );
 }

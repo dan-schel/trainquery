@@ -10,6 +10,7 @@ import { continuify } from "./helpers/continuify";
 import {
   getPlatformString,
   getTerminusString,
+  getTimeString,
   getViaString,
 } from "./helpers/utils";
 import {
@@ -37,6 +38,7 @@ const detail = computed(() => {
       ? getArrivalDetailString(props.departure) ?? ""
       : getStoppingPatternString(detail),
     lineColor: requireLine(getConfig(), props.departure.line).color,
+    timeString: getTimeString(props.departure),
   };
 });
 </script>
@@ -50,7 +52,7 @@ const detail = computed(() => {
     <div class="primary">
       <OneLineP class="terminus">{{ detail.terminus }}</OneLineP>
       <OneLineP class="via">{{ detail.via ?? "" }}</OneLineP>
-      <OneLineP class="time">2 mins</OneLineP>
+      <OneLineP class="time">{{ detail.timeString }}</OneLineP>
     </div>
     <div class="details">
       <OneLineP>{{ detail.stoppingPatternString }}</OneLineP>
