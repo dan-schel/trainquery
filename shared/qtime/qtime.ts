@@ -49,6 +49,10 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
   isAfterOrEqual(other: T) {
     return this.asDecimal() >= other.asDecimal();
   }
+
+  startOfMinute() {
+    return new QTime(this.hour, this.minute, 0);
+  }
 }
 
 export class QTime extends QTimeBase<QTime> {
@@ -107,7 +111,7 @@ export class QTime extends QTimeBase<QTime> {
     return thisSeconds - otherSeconds;
   }
 
-  /** Accepts "09:45", "14:55:32", etc. */
+  /** Accepts "09:45", "14:55:32", etc. Does not check for time validity. */
   static parse(input: string): QTime | null {
     if (!/^[0-9]{2}:[0-9]{2}(:[0-9]{2})?$/.test(input)) {
       return null;

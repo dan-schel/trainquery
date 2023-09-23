@@ -3,6 +3,7 @@ import { getStop } from "../shared/system/config-utils";
 import { StopID, isStopID } from "../shared/system/ids";
 import { Stop } from "../shared/system/stop";
 import { ServerParams, TrainQuery } from "./trainquery";
+import { QUtcDateTime } from "../shared/qtime/qdatetime";
 
 export class BadApiCallError extends Error {
   readonly type = "bad-api-call";
@@ -60,4 +61,18 @@ export function requireStopParam(
     throw new BadApiCallError(`Stop ${id} does not exist.`);
   }
   return stop;
+}
+
+export function requireDateTimeParam(
+  params: ServerParams,
+  name: string
+): QUtcDateTime {
+  const value = requireParam(params, name);
+  const date = QUtcDateTime.parse(value);
+  if (date == null || !date.isValid().valid) {
+    throw new BadApiCallError(
+      `"${name}" param should be a valid ISO8601 UTC date/time.`
+    );
+  }
+  return date;
 }

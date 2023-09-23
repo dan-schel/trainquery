@@ -47,7 +47,7 @@ export async function trainQuery(
       return await configApi(ctx);
     }
     if (endpoint == "departures") {
-      return await departuresApi(ctx, params);
+      return hashify(ctx, await departuresApi(ctx, params));
     }
     throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
   });
@@ -73,4 +73,11 @@ export abstract class Logger {
   abstract logListening(server: Server): void;
   abstract logConfigRefresh(config: FullConfig, initial: boolean): void;
   abstract logTimetableLoadFail(path: string): void;
+}
+
+function hashify(ctx: TrainQuery, result: object) {
+  return {
+    hash: ctx.getConfig().hash,
+    result: result,
+  };
 }

@@ -18,6 +18,8 @@ export abstract class QDateTime<T extends QDateTime<T>> {
   /** E.g. "2023-08-15T10:46:00Z" or "2023-08-15T20:46:00+10:00" */
   abstract toISO(): string;
 
+  abstract isValid(): { valid: true } | { valid: false; issue: string };
+
   toJSON() {
     return this.toISO();
   }
@@ -39,6 +41,18 @@ export abstract class QDateTime<T extends QDateTime<T>> {
   }
 }
 export class QUtcDateTime extends QDateTime<QUtcDateTime> {
+  isValid(): { valid: true } | { valid: false; issue: string } {
+    const time = this.time.isValid();
+    if (!time.valid) {
+      return time;
+    }
+    const date = this.date.isValid();
+    if (!date.valid) {
+      return date;
+    }
+    return { valid: true };
+  }
+
   toISO(): string {
     return `${this.date.toISO()}T${this.time.toISO()}Z`;
   }
@@ -54,6 +68,11 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
     return new QDuration({ s: diff });
   }
 
+  startOfMinute() {
+    return new QUtcDateTime(this.date, this.time.startOfMinute());
+  }
+
+  /** Parses "2023-09-23T20:30:55Z". Does not check for date/time validity. */
   static parse(input: string): QUtcDateTime | null {
     const components = input.split("T");
     if (components.length != 2) {
@@ -87,6 +106,18 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
 export class QLocalDateTime extends QDateTime<QLocalDateTime> {
   constructor(date: QDate, time: QTime, readonly offset: number) {
     super(date, time);
+  }
+
+  isValid(): { valid: true } | { valid: false; issue: string } {
+    const time = this.time.isValid();
+    if (!time.valid) {
+      return time;
+    }
+    const date = this.date.isValid();
+    if (!date.valid) {
+      return date;
+    }
+    return { valid: true };
   }
 
   toISO(): string {

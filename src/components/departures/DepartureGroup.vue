@@ -5,6 +5,7 @@ import { Departure } from "shared/system/timetable/departure";
 import { repeat } from "@schel-d/js-utils";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { nowUTCLuxon } from "shared/qtime/luxon-conversions";
+import { callAPI } from "@/utils/call-api";
 
 const props = defineProps<{
   feeds: DepartureFeed[];
@@ -18,18 +19,18 @@ const departureLists = ref<Departure[][]>(
   repeat(null, props.feeds.length).map((_x) => [])
 );
 
-const now = nowUTCLuxon();
+const now = nowUTCLuxon().startOfMinute();
 
 async function init() {
   loading.value = true;
   error.value = null;
 
   try {
-    const response = await fetch(
-      `/api/departures?feeds=${DepartureFeed.encode(props.feeds)}`
+    departureLists.value = await callAPI(
+      "departures",
+      { feeds: DepartureFeed.encode(props.feeds), time: now.toISO() },
+      Departure.json.array().array()
     );
-    const json = await response.json();
-    departureLists.value = Departure.json.array().array().parse(json);
     loading.value = false;
   } catch (err) {
     console.warn(err);
