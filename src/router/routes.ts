@@ -11,7 +11,7 @@ export default [
   },
   {
     path: "/lines",
-    name: "lines",
+    name: "lines-overview",
     component: () => import("../views/LinesOverview.vue"),
   },
   {

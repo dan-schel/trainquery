@@ -5,7 +5,7 @@ import {
   getStopPageRoute,
   requireStopFromUrlName,
 } from "shared/system/config-utils";
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { getConfig } from "@/utils/get-config";
 import DepartureGroup from "@/components/departures/DepartureGroup.vue";
 import DepartureControls from "@/components/departures/DepartureControls.vue";
@@ -14,7 +14,13 @@ import LineList from "@/components/LineList.vue";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 
 const route = useRoute();
-const params = computed(() => route.params);
+const params = ref(route.params);
+watch(route, () => {
+  // For some reason, this is called even when navigating away from the page!
+  if (route.name == "stop") {
+    params.value = route.params;
+  }
+});
 
 const stop = computed(() =>
   requireStopFromUrlName(getConfig(), params.value.id as string)
@@ -25,7 +31,7 @@ const feeds = computed(() => [
   new DepartureFeed(stop.value.id, 5, "direction-down"),
 ]);
 
-useHead({
+const head = computed(() => ({
   title: stop.value.name,
   link: [
     {
@@ -34,7 +40,8 @@ useHead({
         "https://trainquery.com" + getStopPageRoute(getConfig(), stop.value.id),
     },
   ],
-});
+}));
+useHead(head);
 </script>
 
 <template>

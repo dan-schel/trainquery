@@ -5,7 +5,7 @@ import {
   getLinePageRoute,
   requireLineFromUrlName,
 } from "shared/system/config-utils";
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { getConfig } from "@/utils/get-config";
 import PageContent from "@/components/common/PageContent.vue";
 import LineDiagram from "@/components/line/LineDiagram.vue";
@@ -14,7 +14,13 @@ import LinePageStop from "@/components/line/LinePageStop.vue";
 import { getServiceTypeModeString } from "@/utils/mode-strings";
 
 const route = useRoute();
-const params = computed(() => route.params);
+const params = ref(route.params);
+watch(route, () => {
+  // For some reason, this is called even when navigating away from the page!
+  if (route.name == "line") {
+    params.value = route.params;
+  }
+});
 
 const line = computed(() =>
   requireLineFromUrlName(getConfig(), params.value.id as string)
@@ -24,7 +30,7 @@ const modeString = computed(() =>
   getServiceTypeModeString(line.value.serviceType)
 );
 
-useHead({
+const head = computed(() => ({
   title: `${line.value.name} Line`,
   link: [
     {
@@ -33,7 +39,8 @@ useHead({
         "https://trainquery.com" + getLinePageRoute(getConfig(), line.value.id),
     },
   ],
-});
+}));
+useHead(head);
 </script>
 
 <template>

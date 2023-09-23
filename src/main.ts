@@ -14,7 +14,12 @@ import { initSettings } from "./settings/get-settings";
 
 export default viteSSR(
   App,
-  { routes },
+  {
+    routes,
+    routerOptions: {
+      scrollBehavior: (_to, _from, _savedPosition) => ({ top: 0 })
+    }
+  },
   async ({ app, router, initialState, isClient, url }) => {
     const baseUrl = isClient ? "" : url.origin;
 

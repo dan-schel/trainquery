@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import DepartureFeedVue from "./DepartureFeed.vue";
 import { Departure } from "shared/system/timetable/departure";
 import { repeat } from "@schel-d/js-utils";
@@ -38,9 +38,10 @@ async function init() {
   }
 }
 
-if (!import.meta.env.SSR) {
+onMounted(() => {
   init();
-}
+});
+watch([props], () => init());
 </script>
 
 <template>
