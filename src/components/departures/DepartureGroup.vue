@@ -4,6 +4,7 @@ import DepartureFeedVue from "./DepartureFeed.vue";
 import { Departure } from "shared/system/timetable/departure";
 import { repeat } from "@schel-d/js-utils";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
+import { nowUTCLuxon } from "shared/qtime/luxon-conversions";
 
 const props = defineProps<{
   feeds: DepartureFeed[];
@@ -16,6 +17,8 @@ const error = ref<"unknown" | null>(null);
 const departureLists = ref<Departure[][]>(
   repeat(null, props.feeds.length).map((_x) => [])
 );
+
+const now = nowUTCLuxon();
 
 async function init() {
   loading.value = true;
@@ -51,6 +54,7 @@ if (!import.meta.env.SSR) {
       :error="error"
       :allow-pinning="allowPinning"
       :state-perspective="statePerspective"
+      :now="now"
     ></DepartureFeedVue>
   </div>
 </template>

@@ -9,6 +9,7 @@ import { getConfig } from "@/utils/get-config";
 import { getServicePageRoute } from "shared/system/config-utils";
 import Icon from "../icons/Icon.vue";
 import type { DepartureFeed } from "shared/system/timetable/departure-feed";
+import type { QUtcDateTime } from "shared/qtime/qdatetime";
 
 defineProps<{
   feed: DepartureFeed;
@@ -17,6 +18,7 @@ defineProps<{
   error: "unknown" | null;
   allowPinning: boolean;
   statePerspective: boolean;
+  now: QUtcDateTime;
 }>();
 </script>
 
@@ -54,6 +56,7 @@ defineProps<{
           :key="getServicePageRoute(getConfig(), departure)"
           :departure="departure"
           :perspective="feed.stop"
+          :now="now"
         ></DepartureVue>
       </template>
       <div

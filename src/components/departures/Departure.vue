@@ -8,6 +8,7 @@ import { getConfig } from "@/utils/get-config";
 import { computed } from "vue";
 import { continuify } from "./helpers/continuify";
 import {
+  getLinesString,
   getPlatformString,
   getTerminusString,
   getTimeString,
@@ -18,11 +19,13 @@ import {
   getStoppingPatternString,
 } from "./helpers/stopping-pattern";
 import type { StopID } from "shared/system/ids";
+import type { QUtcDateTime } from "shared/qtime/qdatetime";
 
 const props = defineProps<{
   departure: Departure;
   continuationsEnabled: boolean;
   perspective: StopID;
+  now: QUtcDateTime;
 }>();
 
 const detail = computed(() => {
@@ -38,7 +41,8 @@ const detail = computed(() => {
       ? getArrivalDetailString(props.departure) ?? ""
       : getStoppingPatternString(detail),
     lineColor: requireLine(getConfig(), props.departure.line).color,
-    timeString: getTimeString(props.departure),
+    timeString: getTimeString(props.departure, props.now),
+    linesString: getLinesString(props.departure),
   };
 });
 </script>
@@ -56,12 +60,16 @@ const detail = computed(() => {
     </div>
     <div class="details">
       <OneLineP>{{ detail.stoppingPatternString }}</OneLineP>
-      <div class="disruption">
+
+      <div class="extra">
+        <OneLineP class="extra-text">{{ detail.linesString }}</OneLineP>
+      </div>
+      <!-- <div class="extra disruption">
         <Icon id="uil:exclamation-circle"></Icon>
-        <OneLineP class="disruption-text">
+        <OneLineP class="extra-text">
           Potentially replaced by buses after Westall
         </OneLineP>
-      </div>
+      </div> -->
     </div>
     <div class="platform" v-if="detail.platform != null">
       <p>Platform</p>
@@ -89,7 +97,6 @@ const detail = computed(() => {
 
   padding: 1rem;
   row-gap: 0.5rem;
-  column-gap: 0.5rem;
 }
 
 .primary :deep(p) {
@@ -132,33 +139,41 @@ const detail = computed(() => {
   grid-area: details;
   min-width: 0;
   display: grid;
-  grid-template-columns: auto 1fr 1rem;
-  justify-content: flex-end;
+  grid-template-rows: auto 1fr 1rem;
 
   > * {
     min-width: 0;
   }
-  .disruption {
+  .extra {
     @include template.row;
     grid-row: 3;
     gap: 0.25rem;
 
-    .disruption-text {
+    .extra-text {
       min-width: 0;
       flex-shrink: 1;
     }
-    &:deep(p) {
-      font-weight: bold;
-    }
+
     &:deep(p),
     .icon {
-      color: var(--color-error);
+      color: var(--color-accent);
+    }
+
+    &.disruption {
+      &:deep(p),
+      .icon {
+        color: var(--color-error);
+      }
+      &:deep(p) {
+        font-weight: bold;
+      }
     }
   }
 }
 
 .platform {
   grid-area: platform;
+  margin-left: 0.5rem;
 
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -182,6 +197,7 @@ const detail = computed(() => {
   align-self: center;
   font-size: 1rem;
   margin-right: -0.5rem;
+  margin-left: 0.5rem;
 }
 </style>
 ./helpers/continuify

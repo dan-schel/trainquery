@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { QDate } from "./qdate";
 import { QTime, QTimetableTime } from "./qtime";
+import { type InformalDuration, QDuration } from "./qduration";
 
 export abstract class QDateTime<T extends QDateTime<T>> {
-  constructor(readonly date: QDate, readonly time: QTime) {}
+  constructor(readonly date: QDate, readonly time: QTime) { }
 
   /** E.g. 145900 for 2:59pm. */
   asDecimal(): number {
@@ -41,20 +42,10 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
   toISO(): string {
     return `${this.date.toISO()}T${this.time.toISO()}Z`;
   }
-  add({
-    d,
-    h,
-    m,
-    s,
-  }: {
-    d?: number;
-    h?: number;
-    m?: number;
-    s?: number;
-  }): QUtcDateTime {
-    const result = this.time.add({ h, m, s });
+  add(duration: InformalDuration): QUtcDateTime {
+    const result = this.time.add(duration);
     return new QUtcDateTime(
-      this.date.addDays(result.days + (d ?? 0)),
+      this.date.addDays(result.days),
       result.time
     );
   }
@@ -63,13 +54,7 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
     const dateDiff = this.date.diff(other.date);
     const timeDiff = this.time.diffSeconds(other.time);
     const diff = dateDiff * 24 * 60 * 60 + timeDiff;
-
-    return {
-      d: Math.trunc(diff / 24 / 60 / 60),
-      h: Math.trunc(diff / 60 / 60) % 24,
-      m: Math.trunc(diff / 60) % 60,
-      s: Math.trunc(diff) % 60,
-    };
+    return new QDuration({ s: diff });
   }
 
   static parse(input: string): QUtcDateTime | null {

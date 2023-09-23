@@ -1,10 +1,12 @@
 import type { ContinuifyResult } from "./continuify";
-import { requireStop } from "shared/system/config-utils";
+import { requireLine, requireStop } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
 import type { Departure } from "shared/system/timetable/departure";
 import type { StopID } from "shared/system/ids";
-import { formatTime } from "@/utils/format-qtime";
+import { formatDuration, formatTime } from "@/utils/format-qtime";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
+import type { QUtcDateTime } from "shared/qtime/qdatetime";
+import { listifyAnd } from "@schel-d/js-utils";
 
 export function getTerminusString(detail: ContinuifyResult) {
   const stopID = detail[detail.length - 1].stop;
@@ -55,8 +57,22 @@ export function getPlatformString(departure: Departure, perspective: StopID) {
   return platform.confidence == "high" ? name : `${name}?`;
 }
 
-export function getTimeString(departure: Departure) {
-  return formatTime(
-    toLocalDateTimeLuxon(getConfig(), departure.perspective.scheduledTime).time
-  );
+export function getTimeString(departure: Departure, now: QUtcDateTime) {
+  // TODO: Use live time when available.
+  const time = departure.perspective.scheduledTime;
+  const diff = time.diff(now);
+  if (diff.isNegative) {
+    return formatDuration(diff, { round: true });
+  }
+  if (diff.inHrs <= 2) {
+    return formatDuration(diff);
+  }
+
+  const localTime = toLocalDateTimeLuxon(getConfig(), time);
+  return formatTime(localTime.time);
+}
+
+export function getLinesString(departure: Departure) {
+  const lineNames = [departure.line, ...departure.associatedLines].map(l => requireLine(getConfig(), l).name).sort((a, b) => a.localeCompare(b));
+  return `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "lines"}`;
 }

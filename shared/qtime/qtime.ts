@@ -1,11 +1,12 @@
 import { parseIntThrow, posMod } from "@schel-d/js-utils";
+import { type InformalDuration, QDuration } from "./qduration";
 
 export abstract class QTimeBase<T extends QTimeBase<T>> {
   constructor(
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) {}
+  ) { }
 
   protected abstract _getNumOfHours(): number;
 
@@ -71,15 +72,15 @@ export class QTime extends QTimeBase<QTime> {
    * Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can
    * be negative.
    */
-  add({ h = 0, m = 0, s = 0 }: { h?: number; m?: number; s?: number }): {
+  add(duration: InformalDuration): {
     time: QTime;
     days: number;
   } {
     const currSeconds = this.hour * 60 * 60 + this.minute * 60 + this.second;
-    const addSeconds = h * 60 * 60 + m * 60 + s;
+    const addSeconds = QDuration.formalize(duration).inSecs;
     if (!Number.isInteger(addSeconds)) {
       throw new Error(
-        `Cannot add ${h}h ${m}m ${s}s. It is not an integer number of seconds.`
+        `Must add an integer number of seconds.`
       );
     }
 
@@ -144,20 +145,12 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
    * Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can
    * be negative.
    */
-  add({
-    h = 0,
-    m = 0,
-    s = 0,
-  }: {
-    h?: number;
-    m?: number;
-    s?: number;
-  }): QTimetableTime | null {
+  add(duration: InformalDuration): QTimetableTime | null {
     const currSeconds = this.hour * 60 * 60 + this.minute * 60 + this.second;
-    const addSeconds = h * 60 * 60 + m * 60 + s;
+    const addSeconds = QDuration.formalize(duration).inSecs;
     if (!Number.isInteger(addSeconds)) {
       throw new Error(
-        `Cannot add ${h}h ${m}m ${s}s. It is not an integer number of seconds.`
+        `Must add an integer number of seconds.`
       );
     }
     const newValue = currSeconds + addSeconds;
@@ -186,17 +179,8 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
     );
   }
 
-  static fromDuration({
-    d = 0,
-    h = 0,
-    m = 0,
-    s = 0,
-  }: {
-    d?: number;
-    h?: number;
-    m?: number;
-    s?: number;
-  }): QTimetableTime | null {
+  static fromDuration(duration: QDuration): QTimetableTime | null {
+    const { d, h, m, s } = duration.components;
     return new QTimetableTime(0, 0, 0).add({
       h: d * 24 + h,
       m: m,
