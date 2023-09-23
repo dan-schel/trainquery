@@ -4,7 +4,7 @@ import { QTime, QTimetableTime } from "./qtime";
 import { type InformalDuration, QDuration } from "./qduration";
 
 export abstract class QDateTime<T extends QDateTime<T>> {
-  constructor(readonly date: QDate, readonly time: QTime) { }
+  constructor(readonly date: QDate, readonly time: QTime) {}
 
   /** E.g. 145900 for 2:59pm. */
   asDecimal(): number {
@@ -44,10 +44,7 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
   }
   add(duration: InformalDuration): QUtcDateTime {
     const result = this.time.add(duration);
-    return new QUtcDateTime(
-      this.date.addDays(result.days),
-      result.time
-    );
+    return new QUtcDateTime(this.date.addDays(result.days), result.time);
   }
 
   diff(other: QUtcDateTime) {

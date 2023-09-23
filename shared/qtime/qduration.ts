@@ -10,12 +10,7 @@ export type InformalDuration = QDuration | DurationComponents;
 export class QDuration {
   private _seconds: number;
 
-  constructor({
-    d = 0,
-    h = 0,
-    m = 0,
-    s = 0,
-  }: DurationComponents) {
+  constructor({ d = 0, h = 0, m = 0, s = 0 }: DurationComponents) {
     this._seconds = d * 24 * 60 * 60 + h * 60 * 60 + m * 60 + s;
   }
 

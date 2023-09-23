@@ -6,7 +6,7 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) { }
+  ) {}
 
   protected abstract _getNumOfHours(): number;
 
@@ -79,9 +79,7 @@ export class QTime extends QTimeBase<QTime> {
     const currSeconds = this.hour * 60 * 60 + this.minute * 60 + this.second;
     const addSeconds = QDuration.formalize(duration).inSecs;
     if (!Number.isInteger(addSeconds)) {
-      throw new Error(
-        `Must add an integer number of seconds.`
-      );
+      throw new Error(`Must add an integer number of seconds.`);
     }
 
     let days = 0;
@@ -149,9 +147,7 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
     const currSeconds = this.hour * 60 * 60 + this.minute * 60 + this.second;
     const addSeconds = QDuration.formalize(duration).inSecs;
     if (!Number.isInteger(addSeconds)) {
-      throw new Error(
-        `Must add an integer number of seconds.`
-      );
+      throw new Error(`Must add an integer number of seconds.`);
     }
     const newValue = currSeconds + addSeconds;
 

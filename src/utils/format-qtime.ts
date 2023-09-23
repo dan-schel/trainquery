@@ -17,7 +17,10 @@ export function formatTime(
   return `${hrs}:${mins}${half}`;
 }
 
-export function formatDuration(duration: QDuration, { round = false }: { round?: boolean } = {}) {
+export function formatDuration(
+  duration: QDuration,
+  { round = false }: { round?: boolean } = {}
+) {
   const { d, h, m, s } = duration.positiveComponents;
   const components = [];
   if (d != 0) {

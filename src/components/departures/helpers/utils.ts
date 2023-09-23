@@ -73,6 +73,8 @@ export function getTimeString(departure: Departure, now: QUtcDateTime) {
 }
 
 export function getLinesString(departure: Departure) {
-  const lineNames = [departure.line, ...departure.associatedLines].map(l => requireLine(getConfig(), l).name).sort((a, b) => a.localeCompare(b));
+  const lineNames = [departure.line, ...departure.associatedLines]
+    .map((l) => requireLine(getConfig(), l).name)
+    .sort((a, b) => a.localeCompare(b));
   return `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "lines"}`;
 }
