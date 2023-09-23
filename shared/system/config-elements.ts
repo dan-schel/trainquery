@@ -87,6 +87,9 @@ export class SharedConfig {
 /** The config properties (primarily) used by the frontend. */
 export class FrontendOnlyConfig {
   constructor(
+    // TODO: departure feeds
+    // TODO: search tags
+
     /** E.g. 'TrainQuery'. */
     readonly appName: string,
     /** True to show 'BETA' next to the app name. */
@@ -101,7 +104,7 @@ export class FrontendOnlyConfig {
      */
     readonly metaDescription: string,
     /** Rules describing when to show 'via ___' on a departure. */
-    readonly via: ViaRule[] // Todo: departure feeds // Todo: search tags
+    readonly via: ViaRule[]
   ) {}
 
   static readonly json = z
