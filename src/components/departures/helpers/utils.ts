@@ -64,6 +64,9 @@ export function getTimeString(departure: Departure, now: QUtcDateTime) {
   if (diff.isNegative) {
     return formatDuration(diff, { round: true });
   }
+  if (diff.inMins < 1) {
+    return "Now";
+  }
   if (diff.inHrs <= 2) {
     return formatDuration(diff);
   }

@@ -9,9 +9,9 @@ import Switch from "../common/Switch.vue";
     <div class="scrollable">
       <h6>By line</h6>
       <div class="filter-row">
-        <button class="filter-button"><p>Cranbourne Line</p></button>
-        <button class="filter-button"><p>Gippsland Line</p></button>
-        <button class="filter-button"><p>Pakenham Line</p></button>
+        <button class="filter-button"><p>Cranbourne</p></button>
+        <button class="filter-button"><p>Gippsland</p></button>
+        <button class="filter-button"><p>Pakenham</p></button>
       </div>
       <h6>By direction</h6>
       <div class="filter-row">

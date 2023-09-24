@@ -20,18 +20,18 @@ export function getStoppingPatternString(detail: ContinuifyResult): string {
 
   // Note that arrivals are processed outside this function, so there should
   // always be at least two served stops in the list.
-  const stops = detail.slice(1).map((x, i) => ({
+  const stops = detail.map((x, i) => ({
     name: name(x.stop),
     express: x.type != "served",
     index: i,
   }));
-  const served = stops.filter((s) => !s.express);
-  const express = stops.filter((s) => s.express);
+  const served = stops.slice(1).filter((s) => !s.express);
+  const express = stops.slice(1).filter((s) => s.express);
   if (served.length > 0 && served.length <= 3) {
     return `Stops at ${listifyAnd(served.map((s) => s.name))} only`;
   } else if (express.length > 0 && express.length <= 3) {
     return `Skips ${listifyAnd(express.map((s) => s.name))}`;
-  } else if (served.length == stops.length) {
+  } else if (stops.every(s => !s.express)) {
     return `Stops all stations to ${stops[stops.length - 1].name}`;
   }
 
@@ -41,7 +41,7 @@ export function getStoppingPatternString(detail: ContinuifyResult): string {
   const servedInExpressSection = stops.slice(
     lastBeforeExpress,
     firstAfterExpress + 1
-  );
+  ).filter(x => !x.express);
   if (
     servedInExpressSection.length >= 2 &&
     servedInExpressSection.length <= 4
