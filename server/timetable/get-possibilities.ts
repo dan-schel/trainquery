@@ -155,7 +155,7 @@ function getSearchTimes(
 
   // TODO: double check we're definitely getting the right range of days.
   for (let i = -surroundingDays; i <= surroundingDays; i++) {
-    const date = time.date.addDays(i);
+    const date = start.date.addDays(i);
     const offset = ctx.getConfig().computed.offset.get(date);
 
     const dayStart = new QUtcDateTime(date, new QTime(0, 0, 0)).add({
@@ -173,6 +173,8 @@ function getSearchTimes(
       });
     }
   }
+
+  console.log(iteration, result.map(r => `${r.date.toISO()} ${r.min?.toTtblString(true)} ${r.max?.toTtblString(true)}`));
 
   return result;
 }

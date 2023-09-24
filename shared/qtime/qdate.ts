@@ -31,7 +31,7 @@ function getDaysInYear(year: number) {
   return isLeapYear(year) ? 366 : 365;
 }
 
-function getMonthAcronym(month: number) {
+export function getMonthAcronym(month: number) {
   return _monthAcronyms[month - 1];
 }
 
@@ -40,7 +40,7 @@ export class QDate {
     readonly year: number,
     readonly month: number,
     readonly day: number
-  ) {}
+  ) { }
   isValid(): { valid: true } | { valid: false; issue: string } {
     const invalid = (issue: string) => ({ valid: false, issue: issue });
 
@@ -57,8 +57,7 @@ export class QDate {
     const daysInMonth = getDaysInMonth(this.year, this.month);
     if (this.day > daysInMonth) {
       return invalid(
-        `${getMonthAcronym(this.month)} ${
-          this.year
+        `${getMonthAcronym(this.month)} ${this.year
         } only has ${daysInMonth} days.`
       );
     }

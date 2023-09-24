@@ -3,6 +3,7 @@ import { QCache } from "./qcache";
 import { QDate } from "./qdate";
 
 const _acronyms = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const _names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 const _cache = new QCache<QDate, QDayOfWeek>(
   (d) =>
@@ -22,7 +23,7 @@ export class QDayOfWeek {
   static sat = new QDayOfWeek(5);
   static sun = new QDayOfWeek(6);
 
-  constructor(readonly index: number) {}
+  constructor(readonly index: number) { }
 
   isValid(): { valid: true } | { valid: false; issue: string } {
     if (!Number.isInteger(this.index) || this.index < 0 || this.index > 6) {
@@ -40,6 +41,9 @@ export class QDayOfWeek {
 
   toAcronym(): string {
     return _acronyms[this.index];
+  }
+  toName(): string {
+    return _names[this.index];
   }
   addDays(days: number): QDayOfWeek {
     if (!Number.isInteger(days)) {
