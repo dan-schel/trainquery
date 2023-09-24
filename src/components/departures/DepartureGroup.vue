@@ -11,6 +11,7 @@ const props = defineProps<{
   feeds: DepartureFeed[];
   allowPinning: boolean;
   statePerspective: boolean;
+  isDefaultFeeds: boolean;
 }>();
 
 const loading = ref(true);
@@ -56,6 +57,7 @@ watch([props], () => init());
       :error="error"
       :allow-pinning="allowPinning"
       :state-perspective="statePerspective"
+      :is-default-feeds="isDefaultFeeds"
       :now="now"
     ></DepartureFeedVue>
   </div>

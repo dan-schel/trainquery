@@ -25,7 +25,15 @@ export function getDepartures<T>(
   time: QUtcDateTime,
   buckets: Bucket<T>[],
   specificizer: Specificizer<T>,
-  { reverse = false, filterLines = null, maxIteration = 14 }: { reverse?: boolean; filterLines?: LineID[] | null; maxIteration?: number } = {}
+  {
+    reverse = false,
+    filterLines = null,
+    maxIteration = 14,
+  }: {
+    reverse?: boolean;
+    filterLines?: LineID[] | null;
+    maxIteration?: number;
+  } = {}
 ) {
   const lines = getRelevantLines(ctx, stop, filterLines);
   const getPossibilities = (iteration: number) =>

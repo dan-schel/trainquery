@@ -11,7 +11,7 @@ import PageContent from "@/components/common/PageContent.vue";
 import LineDiagram from "@/components/line/LineDiagram.vue";
 import { getRouteDiagram } from "shared/system/routes/line-routes";
 import LinePageStop from "@/components/line/LinePageStop.vue";
-import { getServiceTypeModeString } from "@/utils/mode-strings";
+import { formatMode } from "@/utils/format-mode";
 
 const route = useRoute();
 const params = ref(route.params);
@@ -27,7 +27,7 @@ const line = computed(() =>
 );
 const diagram = computed(() => getRouteDiagram(line.value));
 const modeString = computed(() =>
-  getServiceTypeModeString(line.value.serviceType)
+  formatMode(line.value.serviceType, { capital: true, line: true })
 );
 
 const head = computed(() => ({
@@ -71,3 +71,4 @@ h2 {
   margin-bottom: 2rem;
 }
 </style>
+@/utils/format-mode

@@ -23,7 +23,7 @@ export async function departuresApi(
   const time = requireDateTimeParam(params, "time");
 
   const buckets = feeds.map(
-    (f) => new FilteredBucket(f.stop, f.count, f.filter)
+    (f) => new FilteredBucket(ctx, f.stop, f.count, f.filter)
   );
   const uniqueStops = unique(
     feeds.map((f) => f.stop),

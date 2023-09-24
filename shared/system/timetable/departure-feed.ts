@@ -7,6 +7,7 @@ import {
   reencode,
   tryReencode,
 } from "@schel-d/js-utils";
+import { DepartureFilter } from "./departure-filter";
 
 const encodedAlpha = alpha + decimal + "- |";
 
@@ -14,11 +15,11 @@ export class DepartureFeed {
   constructor(
     readonly stop: StopID,
     readonly count: number,
-    readonly filter: string
+    readonly filter: DepartureFilter
   ) {}
 
   toString(): string {
-    return `${this.stop.toFixed()}|${this.count.toFixed()}|${this.filter}`;
+    return `${this.stop.toFixed()}|${this.count.toFixed()}|${this.filter.asString()}`;
   }
 
   static parse(input: string): DepartureFeed | null {
@@ -29,13 +30,17 @@ export class DepartureFeed {
 
     const stopNum = parseIntNull(components[0]);
     const count = parseIntNull(components[1]);
+    const filter = DepartureFilter.parse(components[2]);
     if (stopNum == null || !isStopID(stopNum)) {
       return null;
     }
     if (count == null || count < 1) {
       return null;
     }
-    return new DepartureFeed(stopNum, count, components[2]);
+    if (filter == null) {
+      return null;
+    }
+    return new DepartureFeed(stopNum, count, filter);
   }
 
   static encode(feeds: DepartureFeed[]) {

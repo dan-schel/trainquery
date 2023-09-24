@@ -5,6 +5,7 @@ import {
   isLineID,
   isStopID,
   type ServiceTypeID,
+  type PlatformID,
 } from "./ids";
 import { parseIntNull } from "@schel-d/js-utils";
 import type { Line } from "./line";
@@ -56,6 +57,30 @@ export function requireStop(config: HasSharedConfig, stop: StopID) {
     throw new Error(`No stop with ID "${stop}".`);
   }
   return stopData;
+}
+
+export function getPlatform(
+  config: HasSharedConfig,
+  stop: StopID,
+  platform: PlatformID
+) {
+  const stopData = getStop(config, stop);
+  if (stopData == null) {
+    return null;
+  }
+  return stopData.platforms.find((s) => s.id == platform) ?? null;
+}
+
+export function requirePlatform(
+  config: HasSharedConfig,
+  stop: StopID,
+  platform: PlatformID
+) {
+  const platformData = getPlatform(config, stop, platform);
+  if (platformData == null) {
+    throw new Error(`No platform with ID "${platform}" at stop "${stop}".`);
+  }
+  return platformData;
 }
 
 export function parseLineID(value: string): LineID | null {

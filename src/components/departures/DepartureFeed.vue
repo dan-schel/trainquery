@@ -6,20 +6,56 @@ import SimpleButton from "../common/SimpleButton.vue";
 import DepartureVue from "./Departure.vue";
 import { RouterLink } from "vue-router";
 import { getConfig } from "@/utils/get-config";
-import { getServicePageRoute } from "shared/system/config-utils";
+import {
+  getServicePageRoute,
+  getStopPageRoute,
+  requireStop,
+} from "shared/system/config-utils";
 import Icon from "../icons/Icon.vue";
 import type { DepartureFeed } from "shared/system/timetable/departure-feed";
 import type { QUtcDateTime } from "shared/qtime/qdatetime";
+import { computed } from "vue";
+import { formatFilter } from "@/utils/format-filter";
 
-defineProps<{
+const props = defineProps<{
   feed: DepartureFeed;
   departures: Departure[];
   loading: boolean;
   error: "unknown" | null;
   allowPinning: boolean;
   statePerspective: boolean;
+  isDefaultFeeds: boolean;
   now: QUtcDateTime;
 }>();
+
+const title = computed(() => {
+  if (props.statePerspective) {
+    return {
+      text: requireStop(getConfig(), props.feed.stop).name,
+      to: getStopPageRoute(getConfig(), props.feed.stop),
+    };
+  }
+  if (props.isDefaultFeeds) {
+    return {
+      text: formatFilter(props.feed.filter, props.feed.stop),
+      to: "",
+    };
+  }
+  return {
+    text: "Filtered trains",
+    to: "",
+  };
+});
+const subtitle = computed(() => {
+  if (!props.statePerspective && props.isDefaultFeeds) {
+    return null;
+  }
+
+  return {
+    text: formatFilter(props.feed.filter, props.feed.stop),
+    to: "",
+  };
+});
 </script>
 
 <template>
@@ -31,9 +67,16 @@ defineProps<{
   >
     <div class="header-row">
       <OneLineP class="header">
-        <RouterLink class="link title" to="">Officer</RouterLink>
-        <span class="dot">•</span>
-        <RouterLink class="link subtitle" to="">Citybound trains</RouterLink>
+        <RouterLink class="link title" :to="title.to">{{
+          title.text
+        }}</RouterLink>
+        <span class="dot" v-if="subtitle != null">•</span>
+        <RouterLink
+          class="link subtitle"
+          :to="subtitle.to"
+          v-if="subtitle != null"
+          >{{ subtitle.text }}</RouterLink
+        >
       </OneLineP>
       <SimpleButton
         v-if="allowPinning"

@@ -7,7 +7,7 @@ import {
 } from "shared/system/config-utils";
 import type { Stop } from "shared/system/stop";
 import { listifyAnd } from "@schel-d/js-utils";
-import { getServiceTypeModeString } from "@/utils/mode-strings";
+import { formatMode } from "@/utils/format-mode";
 
 /** An entry in a list of searchable pages. */
 export type SearchOption = {
@@ -49,7 +49,7 @@ export function searchOptionsLines(): SearchOption[] {
     ...getConfig().shared.lines.map((l) => {
       return {
         title: `${l.name} Line`,
-        subtitle: getServiceTypeModeString(l.serviceType),
+        subtitle: formatMode(l.serviceType, { capital: true, line: true }),
         icon: "uil:slider-h-range" as IconID,
         url: getLinePageRoute(getConfig(), l.id),
         tags: [],

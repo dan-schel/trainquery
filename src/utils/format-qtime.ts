@@ -46,7 +46,9 @@ export function formatDuration(
 }
 
 export function formatDate(date: QDate) {
-  return `${date.day.toFixed()} ${getMonthAcronym(date.month)} ${date.year.toFixed()}`;
+  return `${date.day.toFixed()} ${getMonthAcronym(
+    date.month
+  )} ${date.year.toFixed()}`;
 }
 
 export function formatRelativeTime(time: QLocalDateTime, now: QLocalDateTime) {
@@ -55,20 +57,17 @@ export function formatRelativeTime(time: QLocalDateTime, now: QLocalDateTime) {
 
   if (dayDiff == 0) {
     return time.isBefore(now) ? `${timeString} earlier today` : timeString;
-  }
-  else if (dayDiff == 1) {
-    return time.time.hour <= 2 ? `${timeString} tonight` : `${timeString} tomorrow`;
-  }
-  else if (dayDiff == -1) {
+  } else if (dayDiff == 1) {
+    return time.time.hour <= 2
+      ? `${timeString} tonight`
+      : `${timeString} tomorrow`;
+  } else if (dayDiff == -1) {
     return `${timeString} yesterday`;
-  }
-  else if (dayDiff < 7) {
+  } else if (dayDiff < 7) {
     return `${timeString} ${QDayOfWeek.fromDate(time.date).toName()}`;
-  }
-  else if (dayDiff > -7) {
+  } else if (dayDiff > -7) {
     return `${timeString} last ${QDayOfWeek.fromDate(time.date).toName()}`;
-  }
-  else {
+  } else {
     return `${timeString} (${formatDate(time.date)})`;
   }
 }

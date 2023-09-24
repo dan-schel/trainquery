@@ -3,9 +3,9 @@ import { useHead } from "@vueuse/head";
 import PageContent from "@/components/common/PageContent.vue";
 import { getConfig } from "@/utils/get-config";
 import { computed } from "vue";
-import { getServiceTypeModeString } from "@/utils/mode-strings";
 import { RouterLink } from "vue-router";
 import { getLinePageRoute } from "shared/system/config-utils";
+import { formatMode } from "@/utils/format-mode";
 
 const modes = computed(() => {
   const c = getConfig().shared;
@@ -29,7 +29,13 @@ useHead({
   <PageContent title="Lines" title-margin="2rem">
     <template v-for="mode in modes" :key="mode">
       <h2>
-        {{ getServiceTypeModeString(mode.serviceType.id, { plural: true }) }}
+        {{
+          formatMode(mode.serviceType.id, {
+            plural: true,
+            capital: true,
+            line: true,
+          })
+        }}
       </h2>
       <ul>
         <li v-for="line in mode.lines" :key="line.id">
@@ -65,3 +71,4 @@ li {
   }
 }
 </style>
+@/utils/format-mode

@@ -1,21 +1,22 @@
 import { type StopID, StopIDJson } from "shared/system/ids";
+import { DepartureFilter } from "shared/system/timetable/departure-filter";
 import { z } from "zod";
 
 export class PinnedWidget {
-  constructor(readonly stop: StopID, readonly filter: string) {}
+  constructor(readonly stop: StopID, readonly filter: DepartureFilter) {}
 
   static readonly json = z
     .object({
       // The "as any" is there to stop a weird error... I tried!
       stop: StopIDJson as any,
-      filter: z.string(),
+      filter: DepartureFilter.json,
     })
     .transform((x) => new PinnedWidget(x.stop, x.filter));
 
   toJSON(): z.input<typeof PinnedWidget.json> {
     return {
       stop: this.stop,
-      filter: this.filter,
+      filter: this.filter.toJSON(),
     };
   }
 }

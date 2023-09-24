@@ -8,13 +8,14 @@ import { getConfig } from "@/utils/get-config";
 import { computed } from "vue";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { toStopID } from "shared/system/ids";
+import { DepartureFilter } from "shared/system/timetable/departure-filter";
 useHead({
   title: "Home",
 });
 
 const feeds = computed(() => [
-  new DepartureFeed(toStopID(212), 3, "direction-up"),
-  new DepartureFeed(toStopID(212), 3, "direction-down"),
+  new DepartureFeed(toStopID(212), 3, DepartureFilter.parse("direction-up")!),
+  new DepartureFeed(toStopID(212), 3, DepartureFilter.parse("direction-down")!),
 ]);
 </script>
 
@@ -37,6 +38,7 @@ const feeds = computed(() => [
           :feeds="feeds"
           :allow-pinning="false"
           :state-perspective="true"
+          :is-default-feeds="false"
         ></DepartureGroup>
       </div>
     </div>

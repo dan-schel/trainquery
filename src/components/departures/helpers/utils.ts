@@ -3,7 +3,7 @@ import { requireLine, requireStop } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
 import type { Departure } from "shared/system/timetable/departure";
 import type { StopID } from "shared/system/ids";
-import { formatDuration, formatRelativeTime, formatTime } from "@/utils/format-qtime";
+import { formatDuration, formatRelativeTime } from "@/utils/format-qtime";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import type { QUtcDateTime } from "shared/qtime/qdatetime";
 import { listifyAnd } from "@schel-d/js-utils";

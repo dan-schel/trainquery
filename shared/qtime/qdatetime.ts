@@ -96,7 +96,7 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
     if (result == null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Not a number",
+        message: "Not a UTC datetime",
       });
       return z.NEVER;
     }
@@ -167,7 +167,7 @@ export class QLocalDateTime extends QDateTime<QLocalDateTime> {
     if (result == null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Not a number",
+        message: "Not a local datetime",
       });
       return z.NEVER;
     }

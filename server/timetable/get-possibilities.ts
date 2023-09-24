@@ -174,8 +174,6 @@ function getSearchTimes(
     }
   }
 
-  console.log(iteration, result.map(r => `${r.date.toISO()} ${r.min?.toTtblString(true)} ${r.max?.toTtblString(true)}`));
-
   return result;
 }
 
