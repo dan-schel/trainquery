@@ -5,9 +5,14 @@ import Icon from "../icons/Icon.vue";
 import FilterControls from "./FilterControls.vue";
 import TimeControls from "./TimeControls.vue";
 import type { AvailableFilters } from "./helpers/available-filters";
+import type { DepartureFilter } from "shared/system/timetable/departure-filter";
 
 defineProps<{
   availableFilters: AvailableFilters;
+  filter: DepartureFilter;
+}>();
+defineEmits<{
+  (e: "update:filter", newValue: DepartureFilter): void;
 }>();
 
 const resetButton = false;
@@ -74,6 +79,8 @@ onUnmounted(() => {
           <FilterControls
             class="content"
             :available-filters="availableFilters"
+            :model-value="filter"
+            @update:model-value="$emit('update:filter', $event)"
           ></FilterControls>
         </div>
       </div>

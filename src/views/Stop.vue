@@ -35,6 +35,12 @@ const feeds = computed(() => [
 
 const availableFilters = computed(() => getAvailableFilters(stop.value.id));
 
+// NOTE: The filter isn't replaced with filterElect (and the feeds aren't
+// updated) until the filter controls are submitted/dismissed.
+const filter = ref(DepartureFilter.default);
+const filterElect = ref(filter.value);
+watch([filterElect], () => console.log(filterElect.value.asString()));
+
 const head = computed(() => ({
   title: stop.value.name,
   link: [
@@ -54,6 +60,7 @@ useHead(head);
     <DepartureControls
       class="controls"
       :available-filters="availableFilters"
+      v-model:filter="filterElect"
     ></DepartureControls>
     <DepartureGroup
       class="group"

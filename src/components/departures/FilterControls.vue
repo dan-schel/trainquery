@@ -1,10 +1,20 @@
 <script setup lang="ts">
+import type { DepartureFilter } from "shared/system/timetable/departure-filter";
 import SimpleButton from "../common/SimpleButton.vue";
 import Switch from "../common/Switch.vue";
-import type { AvailableFilters } from "./helpers/available-filters";
+import {
+  isFilterSelected,
+  type AvailableFilters,
+  toggleFilter,
+} from "./helpers/available-filters";
 
 defineProps<{
   availableFilters: AvailableFilters;
+  modelValue: DepartureFilter;
+}>();
+
+defineEmits<{
+  (e: "update:modelValue", newValue: DepartureFilter): void;
 }>();
 </script>
 
@@ -17,6 +27,8 @@ defineProps<{
         <button
           class="filter-button"
           v-for="filter in availableFilters.lines"
+          :class="{ selected: isFilterSelected(filter, modelValue) }"
+          @click="$emit('update:modelValue', toggleFilter(filter, modelValue))"
           :key="filter.line"
         >
           <p>{{ filter.displayName }}</p>
@@ -27,6 +39,8 @@ defineProps<{
         <button
           class="filter-button"
           v-for="filter in availableFilters.directions"
+          :class="{ selected: isFilterSelected(filter, modelValue) }"
+          @click="$emit('update:modelValue', toggleFilter(filter, modelValue))"
           :key="filter.direction"
         >
           <p>{{ filter.displayName }}</p>
@@ -37,6 +51,8 @@ defineProps<{
         <button
           class="filter-button platform"
           v-for="filter in availableFilters.platforms"
+          :class="{ selected: isFilterSelected(filter, modelValue) }"
+          @click="$emit('update:modelValue', toggleFilter(filter, modelValue))"
           :key="filter.platform"
         >
           <p>{{ filter.displayName }}</p>
@@ -89,7 +105,6 @@ h6 {
   margin-bottom: 1rem;
 }
 .filter-button {
-  @include template.button-filled-neutral;
   @include template.row;
   @include template.content-text;
   height: 1.5rem;
@@ -107,6 +122,13 @@ h6 {
     p {
       font-size: 1rem;
     }
+  }
+
+  &:not(.selected) {
+    @include template.button-filled-neutral;
+  }
+  &.selected {
+    @include template.button-filled;
   }
 }
 .switch p {
