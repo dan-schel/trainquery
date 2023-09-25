@@ -1,28 +1,46 @@
 <script setup lang="ts">
 import SimpleButton from "../common/SimpleButton.vue";
 import Switch from "../common/Switch.vue";
+import type { AvailableFilters } from "./helpers/available-filters";
+
+defineProps<{
+  availableFilters: AvailableFilters;
+}>();
 </script>
 
 <template>
   <div class="filter-controls">
     <h5>Filter trains</h5>
     <div class="scrollable">
-      <h6>By line</h6>
-      <div class="filter-row">
-        <button class="filter-button"><p>Cranbourne</p></button>
-        <button class="filter-button"><p>Gippsland</p></button>
-        <button class="filter-button"><p>Pakenham</p></button>
+      <h6 v-if="availableFilters.lines != null">By line</h6>
+      <div class="filter-row" v-if="availableFilters.lines != null">
+        <button
+          class="filter-button"
+          v-for="filter in availableFilters.lines"
+          :key="filter.line"
+        >
+          <p>{{ filter.displayName }}</p>
+        </button>
       </div>
-      <h6>By direction</h6>
-      <div class="filter-row">
-        <button class="filter-button"><p>Citybound</p></button>
-        <button class="filter-button"><p>Outbound</p></button>
+      <h6 v-if="availableFilters.directions != null">By direction</h6>
+      <div class="filter-row" v-if="availableFilters.directions != null">
+        <button
+          class="filter-button"
+          v-for="filter in availableFilters.directions"
+          :key="filter.direction"
+        >
+          <p>{{ filter.displayName }}</p>
+        </button>
       </div>
-      <h6>By platform</h6>
-      <div class="filter-row">
-        <button class="filter-button platform"><p>1</p></button>
-        <button class="filter-button platform"><p>2</p></button>
-        <button class="filter-button platform"><p>15A</p></button>
+      <h6 v-if="availableFilters.platforms != null">By platform</h6>
+      <div class="filter-row" v-if="availableFilters.platforms != null">
+        <button
+          class="filter-button platform"
+          v-for="filter in availableFilters.platforms"
+          :key="filter.platform"
+        >
+          <p>{{ filter.displayName }}</p>
+        </button>
       </div>
     </div>
     <Switch class="switch"><p>Show arrivals</p></Switch>
@@ -83,7 +101,7 @@ h6 {
 
   &.platform {
     height: 2rem;
-    min-width: 2rem;
+    min-width: 2.25rem;
     padding: 0 0.75rem;
     justify-content: center;
     p {

@@ -4,6 +4,11 @@ import OneLineP from "../common/OneLineP.vue";
 import Icon from "../icons/Icon.vue";
 import FilterControls from "./FilterControls.vue";
 import TimeControls from "./TimeControls.vue";
+import type { AvailableFilters } from "./helpers/available-filters";
+
+defineProps<{
+  availableFilters: AvailableFilters;
+}>();
 
 const resetButton = false;
 
@@ -66,7 +71,10 @@ onUnmounted(() => {
           :class="{ open: openDropdown == 'filter' }"
         >
           <div class="bg"></div>
-          <FilterControls class="content"></FilterControls>
+          <FilterControls
+            class="content"
+            :available-filters="availableFilters"
+          ></FilterControls>
         </div>
       </div>
       <div

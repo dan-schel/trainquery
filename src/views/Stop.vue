@@ -13,6 +13,7 @@ import PageContent from "@/components/common/PageContent.vue";
 import LineList from "@/components/LineList.vue";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { DepartureFilter } from "shared/system/timetable/departure-filter";
+import { getAvailableFilters } from "@/components/departures/helpers/available-filters";
 
 const route = useRoute();
 const params = ref(route.params);
@@ -32,6 +33,8 @@ const feeds = computed(() => [
   new DepartureFeed(stop.value.id, 5, DepartureFilter.parse("direction-down")!),
 ]);
 
+const availableFilters = computed(() => getAvailableFilters(stop.value.id));
+
 const head = computed(() => ({
   title: stop.value.name,
   link: [
@@ -48,7 +51,10 @@ useHead(head);
 <template>
   <PageContent :title="`${stop.name}`" title-margin="0.5rem">
     <LineList :stop="stop.id"></LineList>
-    <DepartureControls class="controls"></DepartureControls>
+    <DepartureControls
+      class="controls"
+      :available-filters="availableFilters"
+    ></DepartureControls>
     <DepartureGroup
       class="group"
       :feeds="feeds"

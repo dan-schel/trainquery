@@ -7,6 +7,7 @@ import {
   StopIDJson,
   type RouteVariantID,
 } from "../ids";
+import { unique } from "@schel-d/js-utils";
 
 export type StopList = {
   variant: RouteVariantID;
@@ -22,6 +23,8 @@ export abstract class Route {
     /** E.g. 'linear', 'y-branch', etc. */
     readonly type: LineRouteType
   ) {}
+
+  abstract getStopLists(): StopList[];
 
   stopsAt(stop: StopID): boolean {
     if (this._stopLists == null) {
@@ -49,7 +52,15 @@ export abstract class Route {
     return result;
   }
 
-  abstract getStopLists(): StopList[];
+  getPossibleDirections(): DirectionID[] {
+    if (this._stopLists == null) {
+      this._stopLists = this.getStopLists();
+    }
+    return unique(
+      this._stopLists.map((l) => l.direction),
+      (a, b) => a == b
+    );
+  }
 }
 
 export class DirectionDefinition {

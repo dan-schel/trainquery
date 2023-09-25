@@ -17,19 +17,22 @@ export type HasSharedConfig = { shared: SharedConfig };
 export function linesThatStopAt(
   config: HasSharedConfig,
   stop: StopID,
-  options?: {
+  {
+    ignoreSpecialEventsOnlyLines = false,
+    sortAlphabetically = false,
+  }: {
     ignoreSpecialEventsOnlyLines?: boolean;
     sortAlphabetically?: boolean;
-  }
+  } = {}
 ) {
   let lines = config.shared.lines.filter((l) => l.route.stopsAt(stop));
   if (
-    (options?.ignoreSpecialEventsOnlyLines ?? false) &&
+    ignoreSpecialEventsOnlyLines &&
     !lines.every((l) => l.specialEventsOnly)
   ) {
     lines = lines.filter((l) => !l.specialEventsOnly);
   }
-  if (options?.sortAlphabetically ?? false) {
+  if (sortAlphabetically) {
     lines.sort((a, b) => a.name.localeCompare(b.name));
   }
   return lines;

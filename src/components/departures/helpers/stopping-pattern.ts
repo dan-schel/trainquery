@@ -31,17 +31,16 @@ export function getStoppingPatternString(detail: ContinuifyResult): string {
     return `Stops at ${listifyAnd(served.map((s) => s.name))} only`;
   } else if (express.length > 0 && express.length <= 3) {
     return `Skips ${listifyAnd(express.map((s) => s.name))}`;
-  } else if (stops.every(s => !s.express)) {
+  } else if (stops.every((s) => !s.express)) {
     return `Stops all stations to ${stops[stops.length - 1].name}`;
   }
 
   // Check for a (semi-)continuous run of express stops.
   const lastBeforeExpress = Math.min(...express.map((x) => x.index)) - 1;
   const firstAfterExpress = Math.max(...express.map((x) => x.index)) + 1;
-  const servedInExpressSection = stops.slice(
-    lastBeforeExpress,
-    firstAfterExpress + 1
-  ).filter(x => !x.express);
+  const servedInExpressSection = stops
+    .slice(lastBeforeExpress, firstAfterExpress + 1)
+    .filter((x) => !x.express);
   if (
     servedInExpressSection.length >= 2 &&
     servedInExpressSection.length <= 4
