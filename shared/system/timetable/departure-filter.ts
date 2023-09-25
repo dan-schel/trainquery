@@ -12,7 +12,14 @@ import {
 import { z } from "zod";
 
 export class DepartureFilter {
-  static readonly default = new DepartureFilter(null, null, null, null, false, false);
+  static readonly default = new DepartureFilter(
+    null,
+    null,
+    null,
+    null,
+    false,
+    false
+  );
 
   constructor(
     readonly lines: LineID[] | null,
@@ -21,16 +28,30 @@ export class DepartureFilter {
     readonly serviceTypes: ServiceTypeID[] | null,
     readonly arrivals: boolean,
     readonly setDownOnly: boolean
-  ) { }
+  ) {}
 
-  with({ lines = undefined, directions = undefined, platforms = undefined, serviceTypes = undefined, arrivals = undefined, setDownOnly = undefined }: { lines?: LineID[] | null, directions?: DirectionID[] | null, platforms?: PlatformID[] | null, serviceTypes?: ServiceTypeID[] | null, arrivals?: boolean, setDownOnly?: boolean }): DepartureFilter {
+  with({
+    lines = undefined,
+    directions = undefined,
+    platforms = undefined,
+    serviceTypes = undefined,
+    arrivals = undefined,
+    setDownOnly = undefined,
+  }: {
+    lines?: LineID[] | null;
+    directions?: DirectionID[] | null;
+    platforms?: PlatformID[] | null;
+    serviceTypes?: ServiceTypeID[] | null;
+    arrivals?: boolean;
+    setDownOnly?: boolean;
+  }): DepartureFilter {
     return new DepartureFilter(
       lines === undefined ? this.lines : lines,
       directions === undefined ? this.directions : directions,
       platforms === undefined ? this.platforms : platforms,
       serviceTypes === undefined ? this.serviceTypes : serviceTypes,
       arrivals === undefined ? this.arrivals : arrivals,
-      setDownOnly === undefined ? this.setDownOnly : setDownOnly,
+      setDownOnly === undefined ? this.setDownOnly : setDownOnly
     );
   }
 

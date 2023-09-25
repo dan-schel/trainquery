@@ -12,25 +12,25 @@ import type { DepartureFilter } from "shared/system/timetable/departure-filter";
 
 export type AvailableFilters = {
   lines:
-  | {
-    displayName: string;
-    line: LineID;
-  }[]
-  | null;
+    | {
+        displayName: string;
+        line: LineID;
+      }[]
+    | null;
 
   directions:
-  | {
-    displayName: string;
-    direction: DirectionID;
-  }[]
-  | null;
+    | {
+        displayName: string;
+        direction: DirectionID;
+      }[]
+    | null;
 
   platforms:
-  | {
-    displayName: string;
-    platform: PlatformID;
-  }[]
-  | null;
+    | {
+        displayName: string;
+        platform: PlatformID;
+      }[]
+    | null;
 };
 
 export function getAvailableFilters(stop: StopID): AvailableFilters {
@@ -42,9 +42,9 @@ export function getAvailableFilters(stop: StopID): AvailableFilters {
     lines.length < 2
       ? null
       : lines.map((l) => ({
-        displayName: l.name,
-        line: l.id,
-      }));
+          displayName: l.name,
+          line: l.id,
+        }));
 
   const directions = unique(
     lines.map((l) => l.route.getPossibleDirections()).flat(),
@@ -54,18 +54,18 @@ export function getAvailableFilters(stop: StopID): AvailableFilters {
     directions.length < 2
       ? null
       : directions.map((d) => ({
-        displayName: formatDirection(d, { capital: true }),
-        direction: d,
-      }));
+          displayName: formatDirection(d, { capital: true }),
+          direction: d,
+        }));
 
   const platforms = requireStop(getConfig(), stop).platforms;
   const platformFilters =
     platforms.length < 2
       ? null
       : platforms.map((p) => ({
-        displayName: p.name,
-        platform: p.id,
-      }));
+          displayName: p.name,
+          platform: p.id,
+        }));
 
   return {
     lines: lineFilters,
@@ -74,45 +74,69 @@ export function getAvailableFilters(stop: StopID): AvailableFilters {
   };
 }
 
-export function isFilterSelected(option: { line: LineID } | { direction: DirectionID } | { platform: PlatformID }, current: DepartureFilter) {
+export function isFilterSelected(
+  option:
+    | { line: LineID }
+    | { direction: DirectionID }
+    | { platform: PlatformID },
+  current: DepartureFilter
+) {
   if ("line" in option) {
     return current.lines != null && current.lines.includes(option.line);
   }
   if ("direction" in option) {
-    return current.directions != null && current.directions.includes(option.direction);
+    return (
+      current.directions != null &&
+      current.directions.includes(option.direction)
+    );
   }
   if ("platform" in option) {
-    return current.platforms != null && current.platforms.includes(option.platform);
+    return (
+      current.platforms != null && current.platforms.includes(option.platform)
+    );
   }
   return false;
 }
 
-export function toggleFilter(option: { line: LineID } | { direction: DirectionID } | { platform: PlatformID }, current: DepartureFilter): DepartureFilter {
+export function toggleFilter(
+  option:
+    | { line: LineID }
+    | { direction: DirectionID }
+    | { platform: PlatformID },
+  current: DepartureFilter
+): DepartureFilter {
   if ("line" in option) {
     if (current.lines != null && current.lines.includes(option.line)) {
-      const removed = current.lines.filter(l => l != option.line);
+      const removed = current.lines.filter((l) => l != option.line);
       return current.with({ lines: removed.length == 0 ? null : removed });
-    }
-    else {
-      return current.with({ lines: [...current.lines ?? [], option.line] });
+    } else {
+      return current.with({ lines: [...(current.lines ?? []), option.line] });
     }
   }
   if ("direction" in option) {
-    if (current.directions != null && current.directions.includes(option.direction)) {
-      const removed = current.directions.filter(l => l != option.direction);
+    if (
+      current.directions != null &&
+      current.directions.includes(option.direction)
+    ) {
+      const removed = current.directions.filter((l) => l != option.direction);
       return current.with({ directions: removed.length == 0 ? null : removed });
-    }
-    else {
-      return current.with({ directions: [...current.directions ?? [], option.direction] });
+    } else {
+      return current.with({
+        directions: [...(current.directions ?? []), option.direction],
+      });
     }
   }
   if ("platform" in option) {
-    if (current.platforms != null && current.platforms.includes(option.platform)) {
-      const removed = current.platforms.filter(l => l != option.platform);
+    if (
+      current.platforms != null &&
+      current.platforms.includes(option.platform)
+    ) {
+      const removed = current.platforms.filter((l) => l != option.platform);
       return current.with({ platforms: removed.length == 0 ? null : removed });
-    }
-    else {
-      return current.with({ platforms: [...current.platforms ?? [], option.platform] });
+    } else {
+      return current.with({
+        platforms: [...(current.platforms ?? []), option.platform],
+      });
     }
   }
   return current;
