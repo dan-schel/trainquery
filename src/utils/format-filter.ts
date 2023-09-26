@@ -10,14 +10,18 @@ export function formatFilter(filter: DepartureFilter, perspective: StopID) {
   let prefix: string | null = null;
   if (filter.directions != null) {
     prefix = listifyAnd(
-      filter.directions.map((d, i) => formatDirection(d, { capital: i == 0 })).sort((a, b) => a.localeCompare(b))
+      filter.directions
+        .map((d, i) => formatDirection(d, { capital: i == 0 }))
+        .sort((a, b) => a.localeCompare(b))
     );
   }
 
   // Add "Gippsland" as a prefix?
   if (filter.lines != null) {
     const linesNames = listifyAnd(
-      filter.lines.map((l) => requireLine(getConfig(), l).name).sort((a, b) => a.localeCompare(b))
+      filter.lines
+        .map((l) => requireLine(getConfig(), l).name)
+        .sort((a, b) => a.localeCompare(b))
     );
     if (prefix != null) {
       prefix += " " + linesNames;
@@ -30,9 +34,11 @@ export function formatFilter(filter: DepartureFilter, perspective: StopID) {
   let noun = prefix == null ? "Trains" : "trains";
   if (filter.serviceTypes != null) {
     noun = listifyAnd(
-      filter.serviceTypes.map((s, i) =>
-        formatMode(s, { capital: i == 0 && prefix == null, plural: true })
-      ).sort((a, b) => a.localeCompare(b))
+      filter.serviceTypes
+        .map((s, i) =>
+          formatMode(s, { capital: i == 0 && prefix == null, plural: true })
+        )
+        .sort((a, b) => a.localeCompare(b))
     );
   }
 
@@ -40,9 +46,9 @@ export function formatFilter(filter: DepartureFilter, perspective: StopID) {
   let suffix = null;
   if (filter.platforms != null) {
     const numbers = listifyAnd(
-      filter.platforms.map(
-        (p) => requirePlatform(getConfig(), perspective, p).name
-      ).sort((a, b) => a.localeCompare(b))
+      filter.platforms
+        .map((p) => requirePlatform(getConfig(), perspective, p).name)
+        .sort((a, b) => a.localeCompare(b))
     );
     suffix =
       filter.platforms.length == 1

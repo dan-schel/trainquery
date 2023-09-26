@@ -12,25 +12,25 @@ import type { DepartureFilter } from "shared/system/timetable/departure-filter";
 
 export type AvailableFilters = {
   lines:
-  | {
-    displayName: string;
-    line: LineID;
-  }[]
-  | null;
+    | {
+        displayName: string;
+        line: LineID;
+      }[]
+    | null;
 
   directions:
-  | {
-    displayName: string;
-    direction: DirectionID;
-  }[]
-  | null;
+    | {
+        displayName: string;
+        direction: DirectionID;
+      }[]
+    | null;
 
   platforms:
-  | {
-    displayName: string;
-    platform: PlatformID;
-  }[]
-  | null;
+    | {
+        displayName: string;
+        platform: PlatformID;
+      }[]
+    | null;
 };
 
 export function getAvailableFilters(stop: StopID): AvailableFilters {
@@ -42,9 +42,9 @@ export function getAvailableFilters(stop: StopID): AvailableFilters {
     lines.length < 2
       ? null
       : lines.map((l) => ({
-        displayName: l.name,
-        line: l.id,
-      }));
+          displayName: l.name,
+          line: l.id,
+        }));
 
   const directions = unique(
     lines.map((l) => l.route.getPossibleDirections()).flat(),
@@ -54,18 +54,18 @@ export function getAvailableFilters(stop: StopID): AvailableFilters {
     directions.length < 2
       ? null
       : directions.map((d) => ({
-        displayName: formatDirection(d, { capital: true }),
-        direction: d,
-      }));
+          displayName: formatDirection(d, { capital: true }),
+          direction: d,
+        }));
 
   const platforms = requireStop(getConfig(), stop).platforms;
   const platformFilters =
     platforms.length < 2
       ? null
       : platforms.map((p) => ({
-        displayName: p.name,
-        platform: p.id,
-      }));
+          displayName: p.name,
+          platform: p.id,
+        }));
 
   return {
     lines: lineFilters,

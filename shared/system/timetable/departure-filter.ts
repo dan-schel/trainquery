@@ -28,7 +28,7 @@ export class DepartureFilter {
     readonly serviceTypes: ServiceTypeID[] | null,
     readonly arrivals: boolean,
     readonly setDownOnly: boolean
-  ) { }
+  ) {}
 
   with({
     lines = undefined,
@@ -71,19 +71,38 @@ export class DepartureFilter {
     return this.asString();
   }
 
-  asString({ ignoreArrivals = false, ignoreSetDownOnly = false }: { ignoreArrivals?: boolean, ignoreSetDownOnly?: boolean } = {}) {
+  asString({
+    ignoreArrivals = false,
+    ignoreSetDownOnly = false,
+  }: { ignoreArrivals?: boolean; ignoreSetDownOnly?: boolean } = {}) {
     const filters: string[] = [];
     if (this.lines != null) {
-      filters.push(...this.lines.map((l) => `line-${l.toFixed()}`).sort((a, b) => a.localeCompare(b)));
+      filters.push(
+        ...this.lines
+          .map((l) => `line-${l.toFixed()}`)
+          .sort((a, b) => a.localeCompare(b))
+      );
     }
     if (this.directions != null) {
-      filters.push(...this.directions.map((d) => `direction-${d}`).sort((a, b) => a.localeCompare(b)));
+      filters.push(
+        ...this.directions
+          .map((d) => `direction-${d}`)
+          .sort((a, b) => a.localeCompare(b))
+      );
     }
     if (this.platforms != null) {
-      filters.push(...this.platforms.map((d) => `platform-${d}`).sort((a, b) => a.localeCompare(b)));
+      filters.push(
+        ...this.platforms
+          .map((d) => `platform-${d}`)
+          .sort((a, b) => a.localeCompare(b))
+      );
     }
     if (this.serviceTypes != null) {
-      filters.push(...this.serviceTypes.map((d) => `service-${d}`).sort((a, b) => a.localeCompare(b)));
+      filters.push(
+        ...this.serviceTypes
+          .map((d) => `service-${d}`)
+          .sort((a, b) => a.localeCompare(b))
+      );
     }
     if (this.arrivals && !ignoreArrivals) {
       filters.push("arr");
@@ -146,7 +165,16 @@ export class DepartureFilter {
     );
   }
 
-  equals(other: DepartureFilter, { ignoreArrivals = false, ignoreSetDownOnly = false }: { ignoreArrivals?: boolean, ignoreSetDownOnly?: boolean } = {}) {
-    return this.asString({ ignoreArrivals, ignoreSetDownOnly }) == other.asString({ ignoreArrivals, ignoreSetDownOnly });
+  equals(
+    other: DepartureFilter,
+    {
+      ignoreArrivals = false,
+      ignoreSetDownOnly = false,
+    }: { ignoreArrivals?: boolean; ignoreSetDownOnly?: boolean } = {}
+  ) {
+    return (
+      this.asString({ ignoreArrivals, ignoreSetDownOnly }) ==
+      other.asString({ ignoreArrivals, ignoreSetDownOnly })
+    );
   }
 }

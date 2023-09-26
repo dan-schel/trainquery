@@ -4,7 +4,7 @@ import OneLineP from "../common/OneLineP.vue";
 import Icon from "../icons/Icon.vue";
 import FilterControls from "./FilterControls.vue";
 import TimeControls from "./TimeControls.vue";
-import type { DepartureFilter } from "shared/system/timetable/departure-filter";
+import { DepartureFilter } from "shared/system/timetable/departure-filter";
 import { formatFilter } from "@/utils/format-filter";
 import type { StopID } from "shared/system/ids";
 
@@ -17,10 +17,10 @@ const emit = defineEmits<{
   (e: "update:filter", newValue: DepartureFilter): void;
 }>();
 
-const resetButton = false;
 const openDropdown = ref<"none" | "time" | "filter">("none");
 
 const filterLabel = computed(() => formatFilter(props.filter, props.stop));
+const showResetButton = computed(() => !props.isDefaultFilter);
 
 // Stores changes to the filter until the dropdown is closed, when the changes
 // are sent back up to the stop page.
@@ -52,6 +52,10 @@ function handleKeyDown(e: KeyboardEvent) {
     // TODO: emit update:time
   }
 }
+function onResetClicked() {
+  emit("update:filter", DepartureFilter.default);
+  // TODO: emit update:time with default value.
+}
 
 onMounted(() => {
   window.addEventListener("keydown", handleKeyDown);
@@ -62,7 +66,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="controls" :class="{ 'can-reset': resetButton }">
+  <div class="controls" :class="{ 'can-reset': showResetButton }">
     <div class="buttons">
       <button class="time-button" @click="handleTimeButtonClick">
         <Icon id="uil:clock" title="Time"></Icon>
@@ -77,7 +81,12 @@ onUnmounted(() => {
         </OneLineP>
         <Icon id="uil:angle-down"></Icon>
       </button>
-      <button class="reset-button" title="Reset" v-if="resetButton">
+      <button
+        class="reset-button"
+        title="Reset"
+        v-if="showResetButton"
+        @click="onResetClicked"
+      >
         <Icon id="uil:redo"></Icon>
       </button>
     </div>
