@@ -73,6 +73,7 @@ watch([props], () => init());
 }
 .feed {
   max-width: 40rem;
+  min-width: 0;
 }
 @media screen and (min-width: 48rem) {
   .group {

@@ -28,7 +28,7 @@ export class DepartureFilter {
     readonly serviceTypes: ServiceTypeID[] | null,
     readonly arrivals: boolean,
     readonly setDownOnly: boolean
-  ) {}
+  ) { }
 
   with({
     lines = undefined,
@@ -71,24 +71,24 @@ export class DepartureFilter {
     return this.asString();
   }
 
-  asString() {
+  asString({ ignoreArrivals = false, ignoreSetDownOnly = false }: { ignoreArrivals?: boolean, ignoreSetDownOnly?: boolean } = {}) {
     const filters: string[] = [];
     if (this.lines != null) {
-      filters.push(...this.lines.map((l) => `line-${l.toFixed()}`));
+      filters.push(...this.lines.map((l) => `line-${l.toFixed()}`).sort((a, b) => a.localeCompare(b)));
     }
     if (this.directions != null) {
-      filters.push(...this.directions.map((d) => `direction-${d}`));
+      filters.push(...this.directions.map((d) => `direction-${d}`).sort((a, b) => a.localeCompare(b)));
     }
     if (this.platforms != null) {
-      filters.push(...this.platforms.map((d) => `platform-${d}`));
+      filters.push(...this.platforms.map((d) => `platform-${d}`).sort((a, b) => a.localeCompare(b)));
     }
     if (this.serviceTypes != null) {
-      filters.push(...this.serviceTypes.map((d) => `service-${d}`));
+      filters.push(...this.serviceTypes.map((d) => `service-${d}`).sort((a, b) => a.localeCompare(b)));
     }
-    if (this.arrivals) {
+    if (this.arrivals && !ignoreArrivals) {
       filters.push("arr");
     }
-    if (this.setDownOnly) {
+    if (this.setDownOnly && !ignoreSetDownOnly) {
       filters.push("sdo");
     }
     return filters.join(" ");
@@ -144,5 +144,9 @@ export class DepartureFilter {
       arrivals,
       setDownOnly
     );
+  }
+
+  equals(other: DepartureFilter, { ignoreArrivals = false, ignoreSetDownOnly = false }: { ignoreArrivals?: boolean, ignoreSetDownOnly?: boolean } = {}) {
+    return this.asString({ ignoreArrivals, ignoreSetDownOnly }) == other.asString({ ignoreArrivals, ignoreSetDownOnly });
   }
 }

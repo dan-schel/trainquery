@@ -119,6 +119,7 @@ const subtitle = computed(() => {
 .header-row {
   @include template.row;
   height: 2rem;
+  gap: 0.5rem;
 }
 .header {
   flex-grow: 1;

@@ -13,7 +13,6 @@ import PageContent from "@/components/common/PageContent.vue";
 import LineList from "@/components/LineList.vue";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { DepartureFilter } from "shared/system/timetable/departure-filter";
-import { getAvailableFilters } from "@/components/departures/helpers/available-filters";
 
 const route = useRoute();
 const params = ref(route.params);
@@ -28,18 +27,35 @@ const stop = computed(() =>
   requireStopFromUrlName(getConfig(), params.value.id as string)
 );
 
-const feeds = computed(() => [
-  new DepartureFeed(stop.value.id, 5, DepartureFilter.parse("direction-up")!),
-  new DepartureFeed(stop.value.id, 5, DepartureFilter.parse("direction-down")!),
-]);
-
-const availableFilters = computed(() => getAvailableFilters(stop.value.id));
-
-// NOTE: The filter isn't replaced with filterElect (and the feeds aren't
-// updated) until the filter controls are submitted/dismissed.
 const filter = ref(DepartureFilter.default);
-const filterElect = ref(filter.value);
-watch([filterElect], () => console.log(filterElect.value.asString()));
+watch([stop], () => {
+  filter.value = DepartureFilter.default;
+});
+
+const isDefaultFilter = computed(() =>
+  filter.value.equals(DepartureFilter.default, {
+    ignoreArrivals: true,
+    ignoreSetDownOnly: true,
+  })
+);
+
+const feeds = computed(() => {
+  if (isDefaultFilter.value) {
+    return [
+      new DepartureFeed(
+        stop.value.id,
+        5,
+        DepartureFilter.parse("direction-up")!
+      ),
+      new DepartureFeed(
+        stop.value.id,
+        5,
+        DepartureFilter.parse("direction-down")!
+      ),
+    ];
+  }
+  return [new DepartureFeed(stop.value.id, 10, filter.value)];
+});
 
 const head = computed(() => ({
   title: stop.value.name,
@@ -59,15 +75,16 @@ useHead(head);
     <LineList :stop="stop.id"></LineList>
     <DepartureControls
       class="controls"
-      :available-filters="availableFilters"
-      v-model:filter="filterElect"
+      :stop="stop.id"
+      v-model:filter="filter"
+      :is-default-filter="isDefaultFilter"
     ></DepartureControls>
     <DepartureGroup
       class="group"
       :feeds="feeds"
       :allow-pinning="true"
       :state-perspective="false"
-      :is-default-feeds="true"
+      :is-default-feeds="isDefaultFilter"
     ></DepartureGroup>
   </PageContent>
 </template>

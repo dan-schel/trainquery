@@ -4,18 +4,25 @@ import SimpleButton from "../common/SimpleButton.vue";
 import Switch from "../common/Switch.vue";
 import {
   isFilterSelected,
-  type AvailableFilters,
   toggleFilter,
+  getAvailableFilters,
 } from "./helpers/available-filters";
+import { computed } from "vue";
+import type { StopID } from "shared/system/ids";
 
-defineProps<{
-  availableFilters: AvailableFilters;
+const props = defineProps<{
+  stop: StopID;
   modelValue: DepartureFilter;
 }>();
 
 defineEmits<{
   (e: "update:modelValue", newValue: DepartureFilter): void;
+  (e: "closeRequested"): void;
 }>();
+
+const availableFilters = computed(() => getAvailableFilters(props.stop));
+const arrivals = computed(() => props.modelValue.arrivals);
+const setDownOnly = computed(() => props.modelValue.setDownOnly);
 </script>
 
 <template>
@@ -27,8 +34,15 @@ defineEmits<{
         <button
           class="filter-button"
           v-for="filter in availableFilters.lines"
-          :class="{ selected: isFilterSelected(filter, modelValue) }"
-          @click="$emit('update:modelValue', toggleFilter(filter, modelValue))"
+          :class="{
+            selected: isFilterSelected(filter, modelValue),
+          }"
+          @click="
+            $emit(
+              'update:modelValue',
+              toggleFilter(filter, modelValue, availableFilters)
+            )
+          "
           :key="filter.line"
         >
           <p>{{ filter.displayName }}</p>
@@ -39,8 +53,15 @@ defineEmits<{
         <button
           class="filter-button"
           v-for="filter in availableFilters.directions"
-          :class="{ selected: isFilterSelected(filter, modelValue) }"
-          @click="$emit('update:modelValue', toggleFilter(filter, modelValue))"
+          :class="{
+            selected: isFilterSelected(filter, modelValue),
+          }"
+          @click="
+            $emit(
+              'update:modelValue',
+              toggleFilter(filter, modelValue, availableFilters)
+            )
+          "
           :key="filter.direction"
         >
           <p>{{ filter.displayName }}</p>
@@ -51,22 +72,43 @@ defineEmits<{
         <button
           class="filter-button platform"
           v-for="filter in availableFilters.platforms"
-          :class="{ selected: isFilterSelected(filter, modelValue) }"
-          @click="$emit('update:modelValue', toggleFilter(filter, modelValue))"
+          :class="{
+            selected: isFilterSelected(filter, modelValue),
+          }"
+          @click="
+            $emit(
+              'update:modelValue',
+              toggleFilter(filter, modelValue, availableFilters)
+            )
+          "
           :key="filter.platform"
         >
           <p>{{ filter.displayName }}</p>
         </button>
       </div>
     </div>
-    <Switch class="switch"><p>Show arrivals</p></Switch>
-    <Switch class="switch"><p>Show set down only trains</p></Switch>
+    <Switch
+      class="switch"
+      :model-value="arrivals"
+      @update:model-value="
+        $emit('update:modelValue', modelValue.with({ arrivals: $event }))
+      "
+      ><p>Show arrivals</p></Switch
+    >
+    <Switch
+      class="switch"
+      :model-value="setDownOnly"
+      @update:model-value="
+        $emit('update:modelValue', modelValue.with({ setDownOnly: $event }))
+      "
+      ><p>Show set down only trains</p></Switch
+    >
     <SimpleButton
       class="submit"
-      to=""
       :content="{ icon: 'uil:check', text: 'Set' }"
       layout="traditional-wide"
       theme="filled"
+      @click="$emit('closeRequested')"
     ></SimpleButton>
   </div>
 </template>

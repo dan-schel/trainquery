@@ -1,45 +1,63 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import OneLineP from "../common/OneLineP.vue";
 import Icon from "../icons/Icon.vue";
 import FilterControls from "./FilterControls.vue";
 import TimeControls from "./TimeControls.vue";
-import type { AvailableFilters } from "./helpers/available-filters";
 import type { DepartureFilter } from "shared/system/timetable/departure-filter";
+import { formatFilter } from "@/utils/format-filter";
+import type { StopID } from "shared/system/ids";
 
-defineProps<{
-  availableFilters: AvailableFilters;
+const props = defineProps<{
+  stop: StopID;
   filter: DepartureFilter;
+  isDefaultFilter: boolean;
 }>();
-defineEmits<{
+const emit = defineEmits<{
   (e: "update:filter", newValue: DepartureFilter): void;
 }>();
 
 const resetButton = false;
-
 const openDropdown = ref<"none" | "time" | "filter">("none");
 
-const handleTimeButtonClick = () => {
-  openDropdown.value = openDropdown.value == "time" ? "none" : "time";
-};
-const handleFilterButtonClick = () => {
-  openDropdown.value = openDropdown.value == "filter" ? "none" : "filter";
-};
+const filterLabel = computed(() => formatFilter(props.filter, props.stop));
 
-const handleOutsideClick = () => {
+// Stores changes to the filter until the dropdown is closed, when the changes
+// are sent back up to the stop page.
+const filterElect = ref(props.filter);
+// TODO: do a similar thing for the time controls.
+watch([props], () => {
+  filterElect.value = props.filter;
+});
+
+function handleTimeButtonClick() {
+  openDropdown.value = openDropdown.value == "time" ? "none" : "time";
+  emit("update:filter", filterElect.value);
+  // TODO: emit update:time
+}
+function handleFilterButtonClick() {
+  openDropdown.value = openDropdown.value == "filter" ? "none" : "filter";
+  emit("update:filter", filterElect.value);
+  // TODO: emit update:time
+}
+function closeDropdown() {
   openDropdown.value = "none";
-};
-const handleEscKey = (e: KeyboardEvent) => {
+  emit("update:filter", filterElect.value);
+  // TODO: emit update:time
+}
+function handleKeyDown(e: KeyboardEvent) {
   if (e.code == "Escape") {
     openDropdown.value = "none";
+    emit("update:filter", filterElect.value);
+    // TODO: emit update:time
   }
-};
+}
 
 onMounted(() => {
-  window.addEventListener("keydown", handleEscKey);
+  window.addEventListener("keydown", handleKeyDown);
 });
 onUnmounted(() => {
-  window.removeEventListener("keydown", handleEscKey);
+  window.removeEventListener("keydown", handleKeyDown);
 });
 </script>
 
@@ -53,7 +71,10 @@ onUnmounted(() => {
       </button>
       <button class="filter-button" @click="handleFilterButtonClick">
         <Icon id="uil:filter"></Icon>
-        <OneLineP class="text"><b>Citybound Gippsland trains</b></OneLineP>
+        <OneLineP class="text">
+          <b v-if="!isDefaultFilter">{{ filterLabel }}</b>
+          <template v-if="isDefaultFilter">{{ filterLabel }}</template>
+        </OneLineP>
         <Icon id="uil:angle-down"></Icon>
       </button>
       <button class="reset-button" title="Reset" v-if="resetButton">
@@ -78,16 +99,16 @@ onUnmounted(() => {
           <div class="bg"></div>
           <FilterControls
             class="content"
-            :available-filters="availableFilters"
-            :model-value="filter"
-            @update:model-value="$emit('update:filter', $event)"
+            :stop="stop"
+            v-model="filterElect"
+            @close-requested="closeDropdown"
           ></FilterControls>
         </div>
       </div>
       <div
         class="dropdown-cover"
         v-if="openDropdown != 'none'"
-        @click="handleOutsideClick"
+        @click="closeDropdown"
       ></div>
     </div>
   </div>
