@@ -79,12 +79,9 @@ export function formatDirection(
   direction: DirectionID,
   { capital = false }: { capital?: boolean } = {}
 ) {
-  // TODO: This shouldn't be hardcoded. Make it part of the config?
-  if (direction == "up") {
-    return capital ? "Citybound" : "citybound";
+  const name = getConfig().frontend.directionNames.getName(direction, capital);
+  if (name == null) {
+    throw new Error(`Unnamed direction "${direction}".`);
   }
-  if (direction == "down") {
-    return capital ? "Outbound" : "outbound";
-  }
-  throw new Error("Unrecognized direction");
+  return name;
 }
