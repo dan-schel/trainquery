@@ -41,18 +41,7 @@ const isDefaultFilter = computed(() =>
 
 const feeds = computed(() => {
   if (isDefaultFilter.value) {
-    return [
-      new DepartureFeed(
-        stop.value.id,
-        5,
-        DepartureFilter.parse("direction-up")!
-      ),
-      new DepartureFeed(
-        stop.value.id,
-        5,
-        DepartureFilter.parse("direction-down")!
-      ),
-    ];
+    return getConfig().frontend.departureFeeds.getFeeds(stop.value.id);
   }
   return [new DepartureFeed(stop.value.id, 10, filter.value)];
 });

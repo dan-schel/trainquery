@@ -100,7 +100,7 @@ export class DepartureFilter {
     if (this.serviceTypes != null) {
       filters.push(
         ...this.serviceTypes
-          .map((d) => `service-${d}`)
+          .map((d) => `service-type-${d}`)
           .sort((a, b) => a.localeCompare(b))
       );
     }
@@ -140,8 +140,8 @@ export class DepartureFilter {
           return null;
         }
         platforms.push(platform);
-      } else if (term.startsWith("service-")) {
-        const service = term.replace("service-", "");
+      } else if (term.startsWith("service-type-")) {
+        const service = term.replace("service-type-", "");
         if (!isServiceTypeID(service)) {
           return null;
         }

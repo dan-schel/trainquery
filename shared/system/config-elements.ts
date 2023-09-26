@@ -6,6 +6,7 @@ import { LinterRules } from "./linter-rules";
 import { ServiceType } from "./service-type";
 import { Timetable } from "./timetable/timetable";
 import { ViaRule } from "./via-rule";
+import { DefaultDepartureFeeds } from "./timetable/default-departure-feeds";
 
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
@@ -87,7 +88,6 @@ export class SharedConfig {
 /** The config properties (primarily) used by the frontend. */
 export class FrontendOnlyConfig {
   constructor(
-    // TODO: departure feeds
     // TODO: search tags
 
     /** E.g. 'TrainQuery'. */
@@ -104,7 +104,9 @@ export class FrontendOnlyConfig {
      */
     readonly metaDescription: string,
     /** Rules describing when to show 'via ___' on a departure. */
-    readonly via: ViaRule[]
+    readonly via: ViaRule[],
+    /** Default departure feeds, e.g. Southern Cross does regional vs suburban. */
+    readonly departureFeeds: DefaultDepartureFeeds
   ) {}
 
   static readonly json = z
@@ -115,6 +117,7 @@ export class FrontendOnlyConfig {
       footer: z.string(),
       metaDescription: z.string(),
       via: ViaRule.json.array().default([]),
+      departureFeeds: DefaultDepartureFeeds.json,
     })
     .transform(
       (x) =>
@@ -124,7 +127,8 @@ export class FrontendOnlyConfig {
           x.tagline,
           x.footer,
           x.metaDescription,
-          x.via
+          x.via,
+          x.departureFeeds
         )
     );
 
@@ -136,6 +140,7 @@ export class FrontendOnlyConfig {
       footer: this.footer,
       metaDescription: this.metaDescription,
       via: this.via,
+      departureFeeds: this.departureFeeds.toJSON(),
     };
   }
 }
