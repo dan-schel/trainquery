@@ -1,4 +1,3 @@
-import { ServerConfig } from "../../shared/system/config";
 import { LintContext, LintMessage, Linter } from "./utils";
 import {
   lintMissingUrlNames,
@@ -13,6 +12,7 @@ import {
   lintOrphanStops,
 } from "./line-stops";
 import { lintPlatforms } from "./platforms";
+import { ServerConfig } from "../config/server-config";
 
 export async function lint(data: ServerConfig): Promise<LintMessage[]> {
   const ctx = new LintContext(data);

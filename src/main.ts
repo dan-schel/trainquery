@@ -5,12 +5,12 @@ import routes from "./router/routes";
 import viteSSR from "vite-ssr/vue";
 import { createHead } from "@vueuse/head";
 import { getConfig, initConfig, provideConfig } from "./utils/get-config";
-import { FrontendConfig } from "shared/system/config";
 import {
   getLineFromUrlName,
   getStopFromUrlName,
 } from "shared/system/config-utils";
 import { initSettings } from "./settings/get-settings";
+import { FrontendConfig } from "shared/system/config/frontend-config";
 
 export default viteSSR(
   App,

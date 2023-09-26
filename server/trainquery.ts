@@ -1,8 +1,8 @@
-import { ServerConfig } from "../shared/system/config";
 import { configApi } from "./api/config-api";
 import { departuresApi } from "./api/departures-api";
 import { ssrAppPropsApi, ssrRoutePropsApi } from "./api/ssr-props-api";
 import { FullConfig } from "./config/full-config";
+import { ServerConfig } from "./config/server-config";
 import { BadApiCallError } from "./param-utils";
 
 export type ServerBuilder = () => Server;

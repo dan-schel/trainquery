@@ -1,7 +1,7 @@
-import { ServerConfig } from "../../shared/system/config";
 import { ConfigProvider, Logger } from "../trainquery";
 import fsp from "fs/promises";
 import { generateDataFolderPath, loadConfigFromFiles } from "./config-zip";
+import { ServerConfig } from "./server-config";
 
 export class OfflineConfigProvider extends ConfigProvider {
   constructor(readonly zipOrFolderPath: string) {

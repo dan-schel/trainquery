@@ -1,5 +1,5 @@
-import { ServerConfig } from "../../shared/system/config";
 import { OffsetCalculator } from "../timetable/offset-calculator";
+import { ServerConfig } from "./server-config";
 
 export type ComputedConfig = {
   offset: OffsetCalculator;

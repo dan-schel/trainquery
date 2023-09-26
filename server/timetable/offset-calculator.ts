@@ -1,7 +1,7 @@
 import { QCache } from "../../shared/qtime/qcache";
 import { QDate } from "../../shared/qtime/qdate";
-import { TimezoneConfig } from "../../shared/system/config-elements";
 import { getOffset } from "../../shared/qtime/luxon-conversions";
+import { TimezoneConfig } from "../../shared/system/config/shared-config";
 
 export class OffsetCalculator {
   private _calculator: { get(key: QDate): number };

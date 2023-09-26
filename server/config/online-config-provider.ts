@@ -1,5 +1,4 @@
 import fetch from "node-fetch";
-import { ServerConfig } from "../../shared/system/config";
 import { ConfigProvider, Logger } from "../trainquery";
 import YAML from "yaml";
 import { z } from "zod";
@@ -7,6 +6,7 @@ import fs from "fs";
 import fsp from "fs/promises";
 import path from "path";
 import { generateDataFolderPath, loadConfigFromFiles } from "./config-zip";
+import { ServerConfig } from "./server-config";
 
 const refreshMs = 1000 * 60 * 10;
 const supportedVersion = "v1";

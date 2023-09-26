@@ -1,20 +1,18 @@
 import AdmZip from "adm-zip";
-import { ServerConfig } from "../../shared/system/config";
 import fsp from "fs/promises";
 import path from "path";
 import YAML from "yaml";
 import { uuid } from "@schel-d/js-utils";
 import { ZodType, z } from "zod";
-import {
-  FrontendOnlyConfig,
-  ServerOnlyConfig,
-  SharedConfig,
-} from "../../shared/system/config-elements";
 import { LinterRules } from "../../shared/system/linter-rules";
 import { glob } from "glob";
 import { Timetable } from "../../shared/system/timetable/timetable";
 import { parseTtbl } from "../../shared/system/timetable/parse-ttbl";
 import { Logger } from "../trainquery";
+import { ServerConfig } from "./server-config";
+import { FrontendOnlyConfig } from "../../shared/system/config/frontend-only-config";
+import { SharedConfig } from "../../shared/system/config/shared-config";
+import { ServerOnlyConfig } from "./server-only-config";
 
 export async function loadConfigFromFiles(
   dataFolder: string,

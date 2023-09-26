@@ -1,5 +1,5 @@
 import { listifyAnd } from "@schel-d/js-utils";
-import { ServerConfig } from "../../shared/system/config";
+import { ServerConfig } from "../config/server-config";
 
 export type LintMessage = {
   severity: LintSeverity;
