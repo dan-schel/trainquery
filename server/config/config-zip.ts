@@ -13,6 +13,7 @@ import { ServerConfig } from "./server-config";
 import { FrontendOnlyConfig } from "../../shared/system/config/frontend-only-config";
 import { SharedConfig } from "../../shared/system/config/shared-config";
 import { ServerOnlyConfig } from "./server-only-config";
+import { PlatformRules } from "./platform-rules";
 
 export async function loadConfigFromFiles(
   dataFolder: string,
@@ -70,6 +71,7 @@ async function loadServer(
     .object({
       timetables: z.string(),
       continuation: z.string(),
+      platformRules: z.string(),
       linter: z.string(),
     })
     .passthrough();
@@ -83,8 +85,11 @@ async function loadServer(
     server.timetables,
     (path) => logger?.logTimetableLoadFail(path)
   );
+  const platformRules = PlatformRules.json.parse(
+    await loadYml(dataFolder, server.platformRules, z.any())
+  );
 
-  return new ServerOnlyConfig(linter, timetables);
+  return new ServerOnlyConfig(timetables, platformRules, linter);
 }
 
 async function loadFrontend(

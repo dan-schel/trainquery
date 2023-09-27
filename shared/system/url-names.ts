@@ -22,15 +22,15 @@ export class UrlNames {
       (x) =>
         new UrlNames(
           new Map(
-            Object.entries(x.stops).map((x) => [
-              StopIDStringJson.parse(x[0]),
-              x[1]!,
+            Object.entries(x.stops).map(([stop, urlName]) => [
+              StopIDStringJson.parse(stop),
+              urlName!,
             ])
           ),
           new Map(
-            Object.entries(x.lines).map((x) => [
-              LineIDStringJson.parse(x[0]),
-              x[1]!,
+            Object.entries(x.lines).map(([line, urlName]) => [
+              LineIDStringJson.parse(line),
+              urlName!,
             ])
           )
         )

@@ -1,17 +1,16 @@
+import { z } from "zod";
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
 import { LineColor } from "../../shared/system/enums";
 import {
   DirectionID,
   LineID,
   PlatformID,
+  PlatformIDJson,
   RouteVariantID,
   StopID,
+  StopIDStringJson,
 } from "../../shared/system/ids";
 import { ServiceType } from "../../shared/system/service-type";
-
-// In order to add this to the server config, the server config should be
-// brought out of the shared folder (use the opportunity to split frontend and
-// shared from the same file too, that file's packed)!
 
 type StopPlatformRule = {
   // TODO: This should probably be an enum?
@@ -21,19 +20,63 @@ type StopPlatformRule = {
 
 export class PlatformRules {
   constructor(readonly rules: Map<StopID, StopPlatformRule>) {}
+
+  static json = z
+    .record(
+      StopIDStringJson,
+      z.object({
+        confidence: z.string(),
+        rules: z
+          .record(
+            PlatformIDJson,
+            z.string().transform((x, ctx) => {
+              const result = PlatformFilter.parseMany(x);
+              if (result == null) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: "Not a valid list of platform filters.",
+                });
+                return z.NEVER;
+              }
+              return result;
+            })
+          )
+          .transform(
+            (x) =>
+              new Map(
+                Object.entries(x).map(([platform, rule]) => [
+                  PlatformIDJson.parse(platform),
+                  rule!,
+                ])
+              )
+          ),
+      })
+    )
+    .transform(
+      (x) =>
+        new PlatformRules(
+          new Map(
+            Object.entries(x).map(([stop, rule]) => [
+              StopIDStringJson.parse(stop),
+              rule!,
+            ])
+          )
+        )
+    );
 }
 
 const clauseMatchers = [
-  /^!?line-[0-9]+$/g,
-  /^!?color-[a-z0-9]+(-[a-z0-9]+)*$/g,
-  /^!?direction-[a-z0-9]+(-[a-z0-9]+)*$/g,
-  /^!?route-variant-[a-z0-9]+(-[a-z0-9]+)*$/g,
-  /^!?service-type-[a-z0-9]+(-[a-z0-9]+)*$/g,
-  /^!?originates-at-[0-9]+$/g,
-  /^!?stops-at-[0-9]+$/g,
-  /^!?terminates-at-[0-9]+$/g,
-  /^!?weekday$/g,
-  /^!?weekend$/g,
+  /^!?line-[0-9]+$/,
+  /^!?color-[a-z0-9]+(-[a-z0-9]+)*$/,
+  /^!?direction-[a-z0-9]+(-[a-z0-9]+)*$/,
+  /^!?route-variant-[a-z0-9]+(-[a-z0-9]+)*$/,
+  /^!?service-type-[a-z0-9]+(-[a-z0-9]+)*$/,
+  /^!?originates-at-[0-9]+$/,
+  /^!?stops-at-[0-9]+$/,
+  /^!?terminates-at-[0-9]+$/,
+  /^!?weekday$/,
+  /^!?weekend$/,
+  /^none$/,
 ];
 
 type RelavantServiceData = {
@@ -62,6 +105,14 @@ export class PlatformFilter {
     }
 
     return new PlatformFilter(clauses);
+  }
+
+  static parseMany(input: string): PlatformFilter[] | null {
+    const filters = input.split(",").map((x) => PlatformFilter.parse(x));
+    if (filters.some((x) => x == null)) {
+      return null;
+    }
+    return filters as PlatformFilter[];
   }
 
   matches(service: RelavantServiceData) {
@@ -109,6 +160,9 @@ function matchesClause(clause: string, service: RelavantServiceData) {
     return negate(service.dayOfWeek.isWeekend(), negated);
   } else if (absClause == `weekday`) {
     return negate(!service.dayOfWeek.isWeekend(), negated);
+  } else if (clause == "none") {
+    // "none" cannot be negated.
+    return false;
   } else {
     throw new Error(`Unrecognised clause "${clause}".`);
   }

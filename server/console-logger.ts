@@ -1,4 +1,4 @@
-import { FullConfig } from "./config/full-config";
+import { FullConfig } from "./config/computed-config";
 import { ExpressServer } from "./express-server";
 import { Logger, Server } from "./trainquery";
 
