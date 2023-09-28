@@ -23,6 +23,10 @@ defineEmits<{
 const availableFilters = computed(() => getAvailableFilters(props.stop));
 const arrivals = computed(() => props.modelValue.arrivals);
 const setDownOnly = computed(() => props.modelValue.setDownOnly);
+const noAvailableFilters =
+  availableFilters.value.lines == null &&
+  availableFilters.value.directions == null &&
+  availableFilters.value.platforms == null;
 </script>
 
 <template>
@@ -86,6 +90,9 @@ const setDownOnly = computed(() => props.modelValue.setDownOnly);
           <p>{{ filter.displayName }}</p>
         </button>
       </div>
+      <p class="empty" v-if="noAvailableFilters">
+        No filtering options available.
+      </p>
     </div>
     <Switch
       class="switch"
@@ -178,5 +185,11 @@ h6 {
 }
 .submit {
   justify-self: flex-end;
+}
+.empty {
+  font-style: italic;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.8rem;
 }
 </style>
