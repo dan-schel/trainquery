@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
-import { LineColor } from "../../shared/system/enums";
+import {
+  ConfidenceLevel,
+  ConfidenceLevelJson,
+  LineColor,
+} from "../../shared/system/enums";
 import {
   DirectionID,
   LineID,
@@ -13,19 +17,18 @@ import {
 } from "../../shared/system/ids";
 
 type StopPlatformRule = {
-  // TODO: This should probably be an enum?
-  confidence: string;
+  confidence: ConfidenceLevel;
   rules: Map<PlatformID, PlatformFilter[]>;
 };
 
 export class PlatformRules {
-  constructor(readonly rules: Map<StopID, StopPlatformRule>) { }
+  constructor(readonly rules: Map<StopID, StopPlatformRule>) {}
 
   static json = z
     .record(
       StopIDStringJson,
       z.object({
-        confidence: z.string(),
+        confidence: ConfidenceLevelJson,
         rules: z
           .record(
             PlatformIDJson,
@@ -96,7 +99,7 @@ export type PlatformFilteringData = {
 };
 
 export class PlatformFilter {
-  constructor(readonly clauses: string[]) { }
+  constructor(readonly clauses: string[]) {}
 
   static parse(input: string): PlatformFilter | null {
     const clauses = input

@@ -16,7 +16,7 @@ export const LineRouteTypes = ["linear", "y-branch", "hook"] as const;
 /** All supported service modes. */
 export const ServiceModes = ["suburban-train", "regional-train"] as const;
 /** All supported confidence levels. */
-export const ConfidenceLevels = ["low", "high"] as const;
+export const ConfidenceLevels = ["low", "medium", "high"] as const;
 
 /** One of a list of pre-defined color options. */
 export type LineColor = (typeof LineColors)[number];

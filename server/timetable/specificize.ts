@@ -6,6 +6,7 @@ import { ServiceStop } from "../../shared/system/timetable/service-stop";
 import { CompleteStoppingPattern } from "../../shared/system/timetable/stopping-pattern";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { TrainQuery } from "../trainquery";
+import { guessPlatformsOfEntry } from "./guess-platform";
 
 export function specificize(
   ctx: TrainQuery,
@@ -14,8 +15,9 @@ export function specificize(
   perspectiveIndex: number
 ): Departure {
   const staticID = toStaticServiceID(`TODO-${entry.entryIndex}`);
+  const platforms = guessPlatformsOfEntry(ctx, entry, date);
   const stoppingPattern = new CompleteStoppingPattern(
-    entry.rows.map((r) => {
+    entry.rows.map((r, i) => {
       if (r == null) {
         return null;
       }
@@ -26,10 +28,11 @@ export function specificize(
         ctx.getConfig().computed.offset.get(date)
       );
 
+      const platform = platforms[i];
+
       // TODO: These values are temporary!
       const setsDown = true;
       const picksUp = true;
-      const platform = null;
 
       return new ServiceStop(time, null, setsDown, picksUp, platform);
     })

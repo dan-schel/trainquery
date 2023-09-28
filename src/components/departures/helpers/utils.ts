@@ -54,7 +54,7 @@ export function getPlatformString(departure: Departure, perspective: StopID) {
       `Platform '${platform.id}' at stop '${perspective}' not found.`
     );
   }
-  return platform.confidence == "high" ? name : `${name}?`;
+  return platform.confidence == "low" ? `${name}?` : name;
 }
 
 export function getTimeString(departure: Departure, now: QUtcDateTime) {

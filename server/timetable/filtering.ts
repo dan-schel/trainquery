@@ -46,7 +46,10 @@ function filterAccepts(
   }
 
   const platform = guessPlatformOfPossibility(ctx, x);
-  if (filter.platforms != null && (platform == null || !filter.platforms.some((p) => p == platform.platform))) {
+  if (
+    filter.platforms != null &&
+    (platform == null || !filter.platforms.some((p) => p == platform.id))
+  ) {
     return false;
   }
 

@@ -1,42 +1,67 @@
 import { nonNull } from "@schel-d/js-utils";
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
 import { requireLine, requireStop } from "../../shared/system/config-utils";
-import { StopID } from "../../shared/system/ids";
+import { PlatformID, StopID } from "../../shared/system/ids";
 import { PlatformFilteringData } from "../config/platform-rules";
 import { TrainQuery } from "../trainquery";
 import { Possibility } from "./get-possibilities";
+import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
+import { QDate } from "../../shared/qtime/qdate";
+import { ConfidenceLevel } from "../../shared/system/enums";
+
+function createPlatformGuesser(ctx: TrainQuery, entry: FullTimetableEntry) {
+  const line = requireLine(ctx.getConfig(), entry.line);
+  const stopList = line.route.requireStops(entry.route, entry.direction);
+  const stops = entry.rows
+    .map((r, i) => (r != null ? stopList[i] : null))
+    .filter(nonNull);
+  const data = {
+    line: entry.line,
+    color: line.color,
+    direction: entry.direction,
+    routeVariant: entry.route,
+    serviceType: line.serviceType,
+    origin: stops[0],
+    stops: stops,
+    terminus: stops[stops.length - 1],
+  };
+  return {
+    guesser: (perspective: StopID, date: QDate) =>
+      guessPlatform(ctx, perspective, {
+        ...data,
+        dayOfWeek: QDayOfWeek.fromDate(date),
+      }),
+    stopList: stopList,
+  };
+}
 
 export function guessPlatformOfPossibility(
   ctx: TrainQuery,
   possibility: Possibility
 ) {
-  const line = requireLine(
-    ctx.getConfig(),
-    possibility.entry.line
+  const { guesser, stopList } = createPlatformGuesser(ctx, possibility.entry);
+  return guesser(stopList[possibility.perspectiveIndex], possibility.date);
+}
+
+export function guessPlatformsOfEntry(
+  ctx: TrainQuery,
+  entry: FullTimetableEntry,
+  date: QDate
+) {
+  const { guesser, stopList } = createPlatformGuesser(ctx, entry);
+  return stopList.map((s, i) =>
+    entry.rows[i] != null ? guesser(s, date) : null
   );
-  const stopList = line.route.requireStops(possibility.entry.route, possibility.entry.direction);
-  const perspective = stopList[possibility.perspectiveIndex];
-
-  const stops = possibility.entry.rows.map((r, i) => r != null ? stopList[i] : null).filter(nonNull);
-
-  return guessPlatform(ctx, perspective, {
-    line: possibility.entry.line,
-    color: line.color,
-    direction: possibility.entry.direction,
-    routeVariant: possibility.entry.route,
-    serviceType: line.serviceType,
-    origin: stops[0],
-    stops: stops,
-    terminus: stops[stops.length - 1],
-    dayOfWeek: QDayOfWeek.fromDate(possibility.date),
-  });
 }
 
 function guessPlatform(
   ctx: TrainQuery,
   stop: StopID,
   service: PlatformFilteringData
-) {
+): {
+  id: PlatformID;
+  confidence: ConfidenceLevel;
+} | null {
   const platforms = requireStop(ctx.getConfig(), stop).platforms;
 
   // This only really gets interesting if there are at least two platforms.
@@ -46,7 +71,7 @@ function guessPlatform(
   if (platforms.length == 1) {
     return {
       confidence: "high",
-      platform: platforms[0].id,
+      id: platforms[0].id,
     };
   }
 
@@ -71,7 +96,7 @@ function guessPlatform(
   if (eligiblePlatforms.length == 1) {
     return {
       confidence: rulesForStop.confidence,
-      platform: eligiblePlatforms[0],
+      id: eligiblePlatforms[0],
     };
   }
 
