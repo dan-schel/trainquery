@@ -5,6 +5,7 @@ import { DepartureFilter } from "../../shared/system/timetable/departure-filter"
 import { TrainQuery } from "../trainquery";
 import { Bucket } from "./get-departures";
 import { Possibility } from "./get-possibilities";
+import { guessPlatformOfPossibility } from "./guess-platform";
 
 export class FilteredBucket extends Bucket<Departure> {
   readonly departures: Departure[] = [];
@@ -44,8 +45,8 @@ function filterAccepts(
     return false;
   }
 
-  // TODO: Do platform filtering properly.
-  if (filter.platforms != null) {
+  const platform = guessPlatformOfPossibility(ctx, x);
+  if (filter.platforms != null && (platform == null || !filter.platforms.some((p) => p == platform.platform))) {
     return false;
   }
 

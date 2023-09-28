@@ -7,10 +7,10 @@ import {
   PlatformID,
   PlatformIDJson,
   RouteVariantID,
+  ServiceTypeID,
   StopID,
   StopIDStringJson,
 } from "../../shared/system/ids";
-import { ServiceType } from "../../shared/system/service-type";
 
 type StopPlatformRule = {
   // TODO: This should probably be an enum?
@@ -19,7 +19,7 @@ type StopPlatformRule = {
 };
 
 export class PlatformRules {
-  constructor(readonly rules: Map<StopID, StopPlatformRule>) {}
+  constructor(readonly rules: Map<StopID, StopPlatformRule>) { }
 
   static json = z
     .record(
@@ -63,6 +63,10 @@ export class PlatformRules {
           )
         )
     );
+
+  get(stop: StopID) {
+    return this.rules.get(stop) ?? null;
+  }
 }
 
 const clauseMatchers = [
@@ -79,12 +83,12 @@ const clauseMatchers = [
   /^none$/,
 ];
 
-type RelavantServiceData = {
+export type PlatformFilteringData = {
   line: LineID;
   color: LineColor;
   direction: DirectionID;
   routeVariant: RouteVariantID;
-  serviceType: ServiceType;
+  serviceType: ServiceTypeID;
   origin: StopID;
   stops: StopID[];
   terminus: StopID;
@@ -92,7 +96,7 @@ type RelavantServiceData = {
 };
 
 export class PlatformFilter {
-  constructor(readonly clauses: string[]) {}
+  constructor(readonly clauses: string[]) { }
 
   static parse(input: string): PlatformFilter | null {
     const clauses = input
@@ -115,7 +119,7 @@ export class PlatformFilter {
     return filters as PlatformFilter[];
   }
 
-  matches(service: RelavantServiceData) {
+  matches(service: PlatformFilteringData) {
     return this.clauses.every((c) => matchesClause(c, service));
   }
 }
@@ -124,7 +128,7 @@ function negate(matches: boolean, negated: boolean) {
   return negated ? !matches : matches;
 }
 
-function matchesClause(clause: string, service: RelavantServiceData) {
+function matchesClause(clause: string, service: PlatformFilteringData) {
   const negated = clause.startsWith("!");
   const absClause = clause.replace("!", "");
 
