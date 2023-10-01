@@ -18,17 +18,33 @@ export class DefaultDepartureFeeds {
     readonly exceptions: FeedException[]
   ) {}
 
-  getFeeds(stop: StopID) {
+  getFeeds(
+    stop: StopID,
+    {
+      arrivals = undefined,
+      setDownOnly = undefined,
+    }: { arrivals?: boolean; setDownOnly?: boolean } = {}
+  ) {
     const exception = this.exceptions.find((e) =>
       e.stops.some((s) => s == stop)
     );
     if (exception != null) {
       return exception.feeds.map(
-        (f) => new DepartureFeed(stop, f.count, f.filter)
+        (f) =>
+          new DepartureFeed(
+            stop,
+            f.count,
+            f.filter.with({ arrivals, setDownOnly })
+          )
       );
     }
     return this.defaultFeeds.map(
-      (f) => new DepartureFeed(stop, f.count, f.filter)
+      (f) =>
+        new DepartureFeed(
+          stop,
+          f.count,
+          f.filter.with({ arrivals, setDownOnly })
+        )
     );
   }
 

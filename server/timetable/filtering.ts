@@ -35,9 +35,12 @@ function filterAccepts(
   filter: DepartureFilter,
   x: Possibility
 ) {
+  // Filter by line.
   if (filter.lines != null && !filter.lines.some((l) => l == x.entry.line)) {
     return false;
   }
+
+  // Filter by direction.
   if (
     filter.directions != null &&
     !filter.directions.some((d) => d == x.entry.direction)
@@ -45,6 +48,7 @@ function filterAccepts(
     return false;
   }
 
+  // Filter by platform.
   const platform = guessPlatformOfPossibility(ctx, x);
   if (
     filter.platforms != null &&
@@ -53,6 +57,7 @@ function filterAccepts(
     return false;
   }
 
+  // Filter by service type.
   const line = requireLine(ctx.getConfig(), x.entry.line);
   if (
     filter.serviceTypes != null &&
@@ -61,9 +66,15 @@ function filterAccepts(
     return false;
   }
 
-  // TODO: Filter set-down-only services.
+  // Filter arrivals.
+  const isArrival = x.entry.rows
+    .slice(x.perspectiveIndex + 1)
+    .every((x) => x == null);
+  if (isArrival) {
+    return filter.arrivals;
+  }
 
-  // TODO: Filter arrivals.
+  // TODO: Filter set-down-only services.
 
   return true;
 }

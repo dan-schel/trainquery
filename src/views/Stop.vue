@@ -41,7 +41,11 @@ const isDefaultFilter = computed(() =>
 
 const feeds = computed(() => {
   if (isDefaultFilter.value) {
-    return getConfig().frontend.departureFeeds.getFeeds(stop.value.id);
+    // Use the default feeds for this stop
+    return getConfig().frontend.departureFeeds.getFeeds(stop.value.id, {
+      arrivals: filter.value.arrivals,
+      setDownOnly: filter.value.setDownOnly,
+    });
   }
   return [new DepartureFeed(stop.value.id, 10, filter.value)];
 });

@@ -8,6 +8,7 @@ import {
   type RouteVariantID,
 } from "../ids";
 import { unique } from "@schel-d/js-utils";
+import { PusdoFilter } from "./pusdo";
 
 export type StopList = {
   variant: RouteVariantID;
@@ -86,22 +87,16 @@ export class DirectionDefinition {
  * Describes stopping rules (e.g. express, set down only, etc.) for a particular
  * stop on a particular line.
  */
-export class RouteStop {
+export class RouteStop<T extends boolean = boolean> {
   constructor(
     /** Which stop occurs now on this route. */
     readonly stop: StopID,
     /** True if the route passes the stop without stopping. */
-    readonly via: boolean,
-    /**
-     * Can passengers alight at this station? Either true, false, or a direction
-     * rule (e.g. 'direction-up').
-     */
-    readonly setDown?: boolean | string,
-    /**
-     * Can passengers board at this station? Either true, false, or a direction
-     * rule (e.g. 'direction-up').
-     */
-    readonly pickUp?: boolean | string
+    readonly via: T,
+    /** Can passengers alight at this station? */
+    readonly setDown: T extends false ? PusdoFilter : undefined,
+    /** Can passengers board at this station? */
+    readonly pickUp: T extends false ? PusdoFilter : undefined
   ) {}
 
   static readonly json = z
@@ -109,8 +104,8 @@ export class RouteStop {
       z.object({
         stops: StopIDJson,
         via: z.undefined(),
-        setsDown: z.union([z.boolean(), z.string()]).default(true),
-        picksUp: z.union([z.boolean(), z.string()]).default(true),
+        setsDown: PusdoFilter.json.default(""),
+        picksUp: PusdoFilter.json.default(""),
       }),
       z.object({
         stops: z.undefined(),
@@ -125,15 +120,16 @@ export class RouteStop {
     );
 
   toJSON(): z.input<typeof RouteStop.json> {
-    if (this.via) {
+    if (this.via == false) {
       return {
-        via: this.stop,
+        stops: this.stop,
+        setsDown: (this as RouteStop<false>).setDown.toJSON(),
+        picksUp: (this as RouteStop<false>).pickUp.toJSON(),
       };
     }
+
     return {
-      stops: this.stop,
-      setsDown: this.setDown == true ? undefined : this.setDown,
-      picksUp: this.pickUp == true ? undefined : this.pickUp,
+      via: this.stop,
     };
   }
 }
