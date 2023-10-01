@@ -70,11 +70,19 @@ function filterAccepts(
   const isArrival = x.entry.rows
     .slice(x.perspectiveIndex + 1)
     .every((x) => x == null);
-  if (isArrival) {
-    return filter.arrivals;
+  if (!filter.arrivals && isArrival) {
+    return false;
   }
 
-  // TODO: Filter set-down-only services.
+  // Filter set-down-only services.
+  const picksUp = line.route.picksUp(
+    x.entry.route,
+    x.entry.direction,
+    x.perspectiveIndex
+  );
+  if (!filter.setDownOnly && !picksUp) {
+    return false;
+  }
 
   return true;
 }

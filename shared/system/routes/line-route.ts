@@ -14,6 +14,8 @@ export type StopList = {
   variant: RouteVariantID;
   direction: DirectionID;
   stops: StopID[];
+  picksUp: PusdoFilter[];
+  setsDown: PusdoFilter[];
 };
 
 /** Describes the stops and route a line takes. */
@@ -34,23 +36,34 @@ export abstract class Route {
     return this._stopLists.some((l) => l.stops.includes(stop));
   }
 
-  getStops(variant: RouteVariantID, direction: DirectionID): StopID[] | null {
+  getStopList(
+    variant: RouteVariantID,
+    direction: DirectionID
+  ): StopList | null {
     if (this._stopLists == null) {
       this._stopLists = this.getStopLists();
     }
     return (
       this._stopLists.find(
         (l) => l.variant == variant && l.direction == direction
-      )?.stops ?? null
+      ) ?? null
     );
   }
 
-  requireStops(variant: RouteVariantID, direction: DirectionID): StopID[] {
-    const result = this.getStops(variant, direction);
+  getStops(variant: RouteVariantID, direction: DirectionID): StopID[] | null {
+    return this.getStopList(variant, direction)?.stops ?? null;
+  }
+
+  requireStopList(variant: RouteVariantID, direction: DirectionID): StopList {
+    const result = this.getStopList(variant, direction);
     if (result == null) {
       throw badVariantOrDirection(variant, direction);
     }
     return result;
+  }
+
+  requireStops(variant: RouteVariantID, direction: DirectionID): StopID[] {
+    return this.requireStopList(variant, direction).stops;
   }
 
   getPossibleDirections(): DirectionID[] {
@@ -60,6 +73,16 @@ export abstract class Route {
     return unique(
       this._stopLists.map((l) => l.direction),
       (a, b) => a == b
+    );
+  }
+
+  picksUp(
+    variant: RouteVariantID,
+    direction: DirectionID,
+    index: number
+  ): boolean {
+    return this.requireStopList(variant, direction).picksUp[index].matches(
+      direction
     );
   }
 }
@@ -94,9 +117,9 @@ export class RouteStop<T extends boolean = boolean> {
     /** True if the route passes the stop without stopping. */
     readonly via: T,
     /** Can passengers alight at this station? */
-    readonly setDown: T extends false ? PusdoFilter : undefined,
+    readonly setsDown: T extends false ? PusdoFilter : undefined,
     /** Can passengers board at this station? */
-    readonly pickUp: T extends false ? PusdoFilter : undefined
+    readonly picksUp: T extends false ? PusdoFilter : undefined
   ) {}
 
   static readonly json = z
@@ -123,8 +146,8 @@ export class RouteStop<T extends boolean = boolean> {
     if (this.via == false) {
       return {
         stops: this.stop,
-        setsDown: (this as RouteStop<false>).setDown.toJSON(),
-        picksUp: (this as RouteStop<false>).pickUp.toJSON(),
+        setsDown: (this as RouteStop<false>).setsDown.toJSON(),
+        picksUp: (this as RouteStop<false>).picksUp.toJSON(),
       };
     }
 
@@ -144,5 +167,7 @@ export function badVariantOrDirection(
 }
 
 export function nonViaStopIDs(stops: RouteStop[]) {
-  return stops.filter((s) => !s.via).map((s) => s.stop);
+  return stops
+    .filter((s): s is RouteStop<false> => !s.via)
+    .map((s) => ({ stop: s.stop, setsDown: s.setsDown, picksUp: s.picksUp }));
 }

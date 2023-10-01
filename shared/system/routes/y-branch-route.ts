@@ -101,26 +101,37 @@ export class YBranchRoute extends Route {
       ...this.secondBranch.stops,
       ...this.shared,
     ]);
+    const firstBranchReversed = [...firstBranch].reverse();
+    const secondBranchReversed = [...secondBranch].reverse();
+
     return [
       {
         variant: this.firstBranch.id,
         direction: this.forward.id,
-        stops: firstBranch,
+        stops: firstBranch.map((h) => h.stop),
+        picksUp: firstBranch.map((h) => h.picksUp),
+        setsDown: firstBranch.map((h) => h.setsDown),
       },
       {
         variant: this.firstBranch.id,
         direction: this.reverse.id,
-        stops: [...firstBranch].reverse(),
+        stops: firstBranchReversed.map((h) => h.stop),
+        picksUp: firstBranchReversed.map((h) => h.picksUp),
+        setsDown: firstBranchReversed.map((h) => h.setsDown),
       },
       {
         variant: this.secondBranch.id,
         direction: this.forward.id,
-        stops: secondBranch,
+        stops: secondBranch.map((h) => h.stop),
+        picksUp: secondBranch.map((h) => h.picksUp),
+        setsDown: secondBranch.map((h) => h.setsDown),
       },
       {
         variant: this.secondBranch.id,
         direction: this.reverse.id,
-        stops: [...secondBranch].reverse(),
+        stops: secondBranchReversed.map((h) => h.stop),
+        picksUp: secondBranchReversed.map((h) => h.picksUp),
+        setsDown: secondBranchReversed.map((h) => h.setsDown),
       },
     ];
   }

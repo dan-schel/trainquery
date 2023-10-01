@@ -66,26 +66,37 @@ export class HookRoute extends Route {
   getStopLists(): StopList[] {
     const hooked = nonViaStopIDs([...this.stops, ...this.hooked]);
     const direct = nonViaStopIDs([...this.stops, ...this.direct]);
+    const hookedReversed = [...hooked].reverse();
+    const directReversed = [...direct].reverse();
+
     return [
       {
         variant: HookRoute.hookedID,
         direction: this.forward.id,
-        stops: hooked,
+        stops: hooked.map((h) => h.stop),
+        picksUp: hooked.map((h) => h.picksUp),
+        setsDown: hooked.map((h) => h.setsDown),
       },
       {
         variant: HookRoute.hookedID,
         direction: this.reverse.id,
-        stops: [...hooked].reverse(),
+        stops: hookedReversed.map((h) => h.stop),
+        picksUp: hookedReversed.map((h) => h.picksUp),
+        setsDown: hookedReversed.map((h) => h.setsDown),
       },
       {
         variant: HookRoute.directID,
         direction: this.forward.id,
-        stops: direct,
+        stops: direct.map((h) => h.stop),
+        picksUp: direct.map((h) => h.picksUp),
+        setsDown: direct.map((h) => h.setsDown),
       },
       {
         variant: HookRoute.directID,
         direction: this.reverse.id,
-        stops: [...direct].reverse(),
+        stops: directReversed.map((h) => h.stop),
+        picksUp: directReversed.map((h) => h.picksUp),
+        setsDown: directReversed.map((h) => h.setsDown),
       },
     ];
   }

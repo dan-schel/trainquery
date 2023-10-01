@@ -66,4 +66,19 @@ export class PusdoFilter {
 
     return new PusdoFilter(directions.length == 0 ? null : directions, false);
   }
+
+  matches(direction: DirectionID) {
+    if (this.none) {
+      return false;
+    }
+
+    if (
+      this.directions != null &&
+      !this.directions.some((d) => d == direction)
+    ) {
+      return false;
+    }
+
+    return true;
+  }
 }

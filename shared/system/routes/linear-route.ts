@@ -47,16 +47,22 @@ export class LinearRoute extends Route {
 
   getStopLists(): StopList[] {
     const stops = nonViaStopIDs(this.stops);
+    const stopsReversed = [...stops].reverse();
+
     return [
       {
         variant: LinearRoute.regularID,
         direction: this.forward.id,
-        stops: stops,
+        stops: stops.map((h) => h.stop),
+        picksUp: stops.map((h) => h.picksUp),
+        setsDown: stops.map((h) => h.setsDown),
       },
       {
         variant: LinearRoute.regularID,
         direction: this.reverse.id,
-        stops: [...stops].reverse(),
+        stops: stopsReversed.map((h) => h.stop),
+        picksUp: stopsReversed.map((h) => h.picksUp),
+        setsDown: stopsReversed.map((h) => h.setsDown),
       },
     ];
   }
