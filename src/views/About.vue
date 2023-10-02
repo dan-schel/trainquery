@@ -3,12 +3,21 @@ import PageContent from "@/components/common/PageContent.vue";
 import Icon from "@/components/icons/Icon.vue";
 import { parseMarkdown } from "@/utils/parse-markdown";
 import { useHead } from "@vueuse/head";
-import { useContext } from "vite-ssr";
 import { computed } from "vue";
+import { useRoute } from "vue-router";
+import { z } from "zod";
 
-const { initialState } = useContext();
+const route = useRoute();
 
-const innerHTML = computed(() => parseMarkdown(initialState.aboutMarkdown));
+const innerHTML = computed(() => {
+  const metaSchema = z.object({
+    state: z.object({
+      aboutMarkdown: z.string(),
+    }),
+  });
+  const meta = metaSchema.parse(route.meta);
+  return parseMarkdown(meta.state.aboutMarkdown);
+});
 
 useHead({
   title: "About",
@@ -23,7 +32,7 @@ useHead({
         <Icon id="uil:github"></Icon>
         <p>Check out TrainQuery on GitHub</p>
       </a>
-      <RouterLink to="about-legal">
+      <RouterLink :to="{ name: 'about-legal' }">
         <Icon id="uil:info-circle"></Icon>
         <p>Licences and attribution</p>
       </RouterLink>

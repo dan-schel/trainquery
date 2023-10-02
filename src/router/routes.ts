@@ -30,6 +30,11 @@ export default [
     component: () => import("../views/About.vue"),
   },
   {
+    path: "/about/legal",
+    name: "about-legal",
+    component: () => import("../views/AboutLegal.vue"),
+  },
+  {
     path: "/settings",
     name: "settings",
     component: () => import("../views/Settings.vue"),
