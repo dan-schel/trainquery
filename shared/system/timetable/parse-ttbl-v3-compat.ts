@@ -188,7 +188,9 @@ function parseGrid(
 
   const route = getRouteVariantAndDirection(args[0]);
   if (route == null) {
-    return error(`"${args[0]}" is cannot be interpreted (in v3.5 compatibility mode).`);
+    return error(
+      `"${args[0]}" is cannot be interpreted (in v3.5 compatibility mode).`
+    );
   }
   const wdr = QWeekdayRange.parse(args[1]);
   if (wdr == null) {
@@ -234,69 +236,61 @@ function parseGrid(
   const entries = [];
 
   for (let i = 0; i < rowCount!; i++) {
-    entries.push(new TimetableEntry(
-      route.variant,
-      route.direction,
-      wdr,
-      rows.map((r) => r[i])
-    ));
+    entries.push(
+      new TimetableEntry(
+        route.variant,
+        route.direction,
+        wdr,
+        rows.map((r) => r[i])
+      )
+    );
   }
-
 
   return entries;
 }
-
 
 function getRouteVariantAndDirection(arg0: string) {
   if (arg0 == "up") {
     return {
       variant: LinearRoute.regularID,
-      direction: toDirectionID("up")
+      direction: toDirectionID("up"),
     };
-  }
-  else if (arg0 == "down") {
+  } else if (arg0 == "down") {
     return {
       variant: LinearRoute.regularID,
-      direction: toDirectionID("down")
+      direction: toDirectionID("down"),
     };
-  }
-  else if (arg0 == "up-direct") {
+  } else if (arg0 == "up-direct") {
     return {
       variant: HookRoute.directID,
-      direction: toDirectionID("up")
+      direction: toDirectionID("up"),
     };
-  }
-  else if (arg0 == "down-direct") {
+  } else if (arg0 == "down-direct") {
     return {
       variant: HookRoute.directID,
-      direction: toDirectionID("down")
+      direction: toDirectionID("down"),
     };
-  }
-  else if (arg0 == "up-via-loop") {
+  } else if (arg0 == "up-via-loop") {
     return {
       variant: HookRoute.hookedID,
-      direction: toDirectionID("up")
+      direction: toDirectionID("up"),
     };
-  }
-  else if (arg0 == "down-via-loop") {
+  } else if (arg0 == "down-via-loop") {
     return {
       variant: HookRoute.hookedID,
-      direction: toDirectionID("down")
+      direction: toDirectionID("down"),
     };
-  }
-  else if (arg0.endsWith("-up")) {
+  } else if (arg0.endsWith("-up")) {
     return {
       variant: toRouteVariantID(arg0.replace("-up", "")),
-      direction: toDirectionID("up")
+      direction: toDirectionID("up"),
     };
-  }
-  else if (arg0.endsWith("-down")) {
+  } else if (arg0.endsWith("-down")) {
     return {
       variant: toRouteVariantID(arg0.replace("-down", "")),
-      direction: toDirectionID("down")
+      direction: toDirectionID("down"),
     };
-  }
-  else {
+  } else {
     return null;
   }
 }

@@ -10,9 +10,11 @@ export type MenuItem = {
   icon: IconID;
   title: string;
   routeName: string;
+  hideOnDesktop?: boolean;
 };
 
 const menuItems = ref<MenuItem[]>([
+  { icon: "uil:home", title: "Home", routeName: "home", hideOnDesktop: true },
   // { icon: "uil:map", title: "Train map", routeName: "map" },
   { icon: "uil:code-branch", title: "Lines", routeName: "lines-overview" },
   { icon: "uil:info-circle", title: "About", routeName: "about" },
