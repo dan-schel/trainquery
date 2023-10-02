@@ -73,6 +73,7 @@ async function loadServer(
       continuation: z.string(),
       platformRules: z.string(),
       linter: z.string(),
+      about: z.string(),
     })
     .passthrough();
 
@@ -88,8 +89,9 @@ async function loadServer(
   const platformRules = PlatformRules.json.parse(
     await loadYml(dataFolder, server.platformRules, z.any())
   );
+  const about = await loadText(dataFolder, server.about);
 
-  return new ServerOnlyConfig(timetables, platformRules, linter);
+  return new ServerOnlyConfig(timetables, platformRules, linter, about);
 }
 
 async function loadFrontend(
@@ -104,6 +106,12 @@ async function loadFrontend(
     ...frontend,
     departureFeeds: await loadYml(dataFolder, frontend.departureFeeds, z.any()),
   });
+}
+
+async function loadText(dataFolder: string, filePath: string) {
+  const fullPath = path.join(dataFolder, filePath);
+  const text = await fsp.readFile(fullPath, { encoding: "utf-8" });
+  return text;
 }
 
 async function loadYml<T extends ZodType>(

@@ -12,6 +12,11 @@ export class ServerOnlyConfig {
     /** Static rules for which trains use which platforms. */
     readonly platformRules: PlatformRules,
     /** Rules for the linter. */
-    readonly linter: LinterRules
+    readonly linter: LinterRules,
+    /**
+     * The markdown code for the about page. Stored in server config so it's
+     * only sent to the client when the about page is requested.
+     */
+    readonly aboutMarkdown: string
   ) {}
 }

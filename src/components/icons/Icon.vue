@@ -12,6 +12,7 @@ import UilClock from "./UilClock.vue";
 import UilCodeBranch from "./UilCodeBranch.vue";
 import UilExclamationCircle from "./UilExclamationCircle.vue";
 import UilFilter from "./UilFilter.vue";
+import UilGithub from "./UilGithub.vue";
 import UilInfoCircle from "./UilInfoCircle.vue";
 import UilMap from "./UilMap.vue";
 import UilMapMarker from "./UilMapMarker.vue";
@@ -34,6 +35,7 @@ export type IconID =
   | "uil:code-branch"
   | "uil:exclamation-circle"
   | "uil:filter"
+  | "uil:github"
   | "uil:info-circle"
   | "uil:map"
   | "uil:map-marker"
@@ -76,6 +78,7 @@ defineProps<{
     class="icon"
   ></UilExclamationCircle>
   <UilFilter v-else-if="id == 'uil:filter'" class="icon"></UilFilter>
+  <UilGithub v-else-if="id == 'uil:github'" class="icon"></UilGithub>
   <UilInfoCircle
     v-else-if="id == 'uil:info-circle'"
     class="icon"

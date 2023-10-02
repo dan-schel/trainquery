@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineProps<{
-  title: string;
+  title: string | null;
   titleMargin?: string;
 }>();
 </script>
@@ -8,7 +8,7 @@ defineProps<{
 <template>
   <main>
     <div class="content">
-      <h1 :style="{ 'margin-bottom': titleMargin }">
+      <h1 v-if="title != null" :style="{ 'margin-bottom': titleMargin }">
         {{ title }}
       </h1>
       <slot></slot>
