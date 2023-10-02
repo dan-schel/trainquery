@@ -4,11 +4,11 @@ export default [
     name: "home",
     component: () => import("../views/Home.vue"),
   },
-  {
-    path: "/map",
-    name: "map",
-    component: () => import("../views/Map.vue"),
-  },
+  // {
+  //   path: "/map",
+  //   name: "map",
+  //   component: () => import("../views/Map.vue"),
+  // },
   {
     path: "/lines",
     name: "lines-overview",

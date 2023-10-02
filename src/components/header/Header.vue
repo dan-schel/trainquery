@@ -13,7 +13,7 @@ export type MenuItem = {
 };
 
 const menuItems = ref<MenuItem[]>([
-  { icon: "uil:map", title: "Train map", routeName: "map" },
+  // { icon: "uil:map", title: "Train map", routeName: "map" },
   { icon: "uil:code-branch", title: "Lines", routeName: "lines-overview" },
   { icon: "uil:info-circle", title: "About", routeName: "about" },
 ]);

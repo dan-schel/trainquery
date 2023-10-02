@@ -65,15 +65,15 @@ export function searchOptionsLines(): SearchOption[] {
 export function searchOptionsWholeSite(): SearchOption[] {
   const options = [...searchOptionsStops(), ...searchOptionsLines()];
 
-  options.push({
-    title: "Train map",
-    subtitle: null,
-    icon: "uil:map",
-    url: "/map",
-    tags: ["diagram", "interactive", "geographic", "location", "live"],
-    data: null,
-    boost: 0.6,
-  });
+  // options.push({
+  //   title: "Train map",
+  //   subtitle: null,
+  //   icon: "uil:map",
+  //   url: "/map",
+  //   tags: ["diagram", "interactive", "geographic", "location", "live"],
+  //   data: null,
+  //   boost: 0.6,
+  // });
 
   options.push({
     title: "Lines",
