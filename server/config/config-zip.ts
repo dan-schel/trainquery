@@ -8,6 +8,7 @@ import { LinterRules } from "../../shared/system/linter-rules";
 import { glob } from "glob";
 import { Timetable } from "../../shared/system/timetable/timetable";
 import { parseTtbl } from "../../shared/system/timetable/parse-ttbl";
+import { parseTtblV3Compat } from "../../shared/system/timetable/parse-ttbl-v3-compat";
 import { Logger } from "../trainquery";
 import { ServerConfig } from "./server-config";
 import { FrontendOnlyConfig } from "../../shared/system/config/frontend-only-config";
@@ -135,7 +136,7 @@ async function loadTimetables(
   for (const file of files) {
     const fullPath = path.join(dataFolder, file);
     const text = await fsp.readFile(fullPath, { encoding: "utf-8" });
-    const timetable = parseTtbl(text);
+    const timetable = parseTtbl(text) ?? parseTtblV3Compat(text);
 
     if (timetable == null) {
       onFail(file);
