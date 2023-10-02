@@ -38,6 +38,24 @@ const packages = computed(() =>
       licenseUrl: "https://github.com/colinhacks/zod/blob/master/LICENSE",
       copyright: "Copyright (c) 2020 Colin McDonnell",
     },
+    {
+      name: "Vue.js",
+      url: "https://vuejs.org/",
+      licenseUrl: "https://github.com/vuejs/core/blob/main/LICENSE",
+      copyright: "Copyright (c) 2018-present, Yuxi (Evan) You",
+    },
+    {
+      name: "Vite SSR",
+      url: "https://github.com/frandiox/vite-ssr",
+      licenseUrl: "https://github.com/frandiox/vite-ssr/blob/master/LICENSE",
+      copyright: "Copyright (c) 2020-present, Fran Dios",
+    },
+    {
+      name: "Vue Router",
+      url: "https://router.vuejs.org/",
+      licenseUrl: "https://github.com/vuejs/router/blob/main/LICENSE",
+      copyright: "Copyright (c) 2019-present Eduardo San Martin Morote",
+    },
   ].sort((a, b) => a.name.localeCompare(b.name))
 );
 
