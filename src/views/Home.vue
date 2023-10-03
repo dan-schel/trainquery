@@ -45,6 +45,7 @@ const feeds = computed(() =>
           :allow-pinning="false"
           :state-perspective="true"
           :is-default-feeds="false"
+          :center-single="true"
         ></DepartureGroup>
         <LoadingSpinner v-if="feeds == null" class="loading"></LoadingSpinner>
         <p class="empty" v-if="feeds != null && feeds.length == 0">

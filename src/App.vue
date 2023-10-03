@@ -24,7 +24,7 @@ provide(settingsInjectionKey, {
 });
 
 onMounted(() => {
-  settings.value = readSettings();
+  settings.value = readSettings().validateAgainstConfig((s) => console.warn(s));
 });
 
 useHead({

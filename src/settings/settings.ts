@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { PinnedWidget } from "./pinned-widgets";
+import {
+  PinnedWidget,
+  validatePinnedWidgetsAgainstConfig,
+} from "./pinned-widgets";
 import { type InjectionKey, inject, type Ref, ref } from "vue";
 import { SignificantStop } from "./significant-stops";
 
@@ -77,6 +80,15 @@ export class Settings {
       enableContinuations ?? this.enableContinuations,
       limitMapFPS ?? this.limitMapFPS
     );
+  }
+
+  validateAgainstConfig(logger: (msg: string) => void) {
+    return this.with({
+      pinnedWidgets: validatePinnedWidgetsAgainstConfig(
+        this.pinnedWidgets,
+        logger
+      ),
+    });
   }
 }
 

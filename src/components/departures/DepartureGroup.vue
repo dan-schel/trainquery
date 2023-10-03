@@ -12,6 +12,7 @@ const props = defineProps<{
   allowPinning: boolean;
   statePerspective: boolean;
   isDefaultFeeds: boolean;
+  centerSingle: boolean;
 }>();
 
 const loading = ref(true);
@@ -25,18 +26,22 @@ const now = nowUTCLuxon().startOfMinute();
 async function init() {
   loading.value = true;
   error.value = null;
+  departureLists.value = repeat(null, props.feeds.length).map((_x) => []);
 
-  try {
-    departureLists.value = await callAPI(
-      "departures",
-      { feeds: DepartureFeed.encode(props.feeds), time: now.toISO() },
-      Departure.json.array().array()
-    );
-    loading.value = false;
-  } catch (err) {
-    console.warn(err);
-    error.value = "unknown";
+  if (props.feeds.length > 0) {
+    try {
+      departureLists.value = await callAPI(
+        "departures",
+        { feeds: DepartureFeed.encode(props.feeds), time: now.toISO() },
+        Departure.json.array().array()
+      );
+    } catch (err) {
+      console.warn(err);
+      error.value = "unknown";
+    }
   }
+
+  loading.value = false;
 }
 
 onMounted(() => {
@@ -46,7 +51,7 @@ watch([props], () => init());
 </script>
 
 <template>
-  <div class="group">
+  <div class="group" :class="{ center: centerSingle }">
     <DepartureFeedVue
       v-for="(feed, i) of feeds"
       class="feed"
@@ -70,9 +75,14 @@ watch([props], () => init());
   grid-template-columns: 1fr;
   row-gap: 1.5rem;
   column-gap: 1.5rem;
+
+  &.center .feed {
+    margin: auto;
+    width: 100%;
+  }
 }
 .feed {
-  max-width: 40rem;
+  max-width: 36rem;
   min-width: 0;
 }
 @media screen and (min-width: 48rem) {

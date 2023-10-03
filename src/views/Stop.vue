@@ -78,6 +78,7 @@ useHead(head);
       :allow-pinning="true"
       :state-perspective="false"
       :is-default-feeds="isDefaultFilter"
+      :center-single="false"
     ></DepartureGroup>
   </PageContent>
 </template>

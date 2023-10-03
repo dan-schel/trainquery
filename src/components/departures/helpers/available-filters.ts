@@ -150,3 +150,34 @@ export function toggleFilter(
   }
   return current;
 }
+
+export function isValidFilter(filter: DepartureFilter, stop: StopID) {
+  const { lines, directions, platforms } = getAvailableFilters(stop);
+  if (filter.lines != null) {
+    if (lines == null) {
+      return false;
+    }
+    if (filter.lines.some((l) => lines.every((a) => a.line != l))) {
+      return false;
+    }
+  }
+  if (filter.directions != null) {
+    if (directions == null) {
+      return false;
+    }
+    if (
+      filter.directions.some((l) => directions.every((a) => a.direction != l))
+    ) {
+      return false;
+    }
+  }
+  if (filter.platforms != null) {
+    if (platforms == null) {
+      return false;
+    }
+    if (filter.platforms.some((l) => platforms.every((a) => a.platform != l))) {
+      return false;
+    }
+  }
+  return true;
+}

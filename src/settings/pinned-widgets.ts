@@ -2,6 +2,9 @@ import { type StopID, StopIDJson } from "shared/system/ids";
 import { DepartureFilter } from "shared/system/timetable/departure-filter";
 import { z } from "zod";
 import type { Settings } from "./settings";
+import { getStop } from "shared/system/config-utils";
+import { isValidFilter } from "@/components/departures/helpers/available-filters";
+import { getConfig } from "@/utils/get-config";
 
 export class PinnedWidget {
   constructor(readonly stop: StopID, readonly filter: DepartureFilter) {}
@@ -51,4 +54,23 @@ export function togglePinnedWidget(
       ],
     });
   }
+}
+
+export function validatePinnedWidgetsAgainstConfig(
+  pinnedWidgets: PinnedWidget[],
+  logger: (msg: string) => void
+) {
+  const okFilters = pinnedWidgets.filter(
+    (w) =>
+      getStop(getConfig(), w.stop) != null && isValidFilter(w.filter, w.stop)
+  );
+  if (okFilters.length < pinnedWidgets.length) {
+    const removed = pinnedWidgets.length - okFilters.length;
+    logger(
+      `${removed} ${
+        removed == 1 ? "pinned widget was" : "pinned widgets were"
+      } removed due to config updates.`
+    );
+  }
+  return okFilters;
 }
