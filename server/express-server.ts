@@ -1,6 +1,11 @@
 import { BadApiCallError } from "./param-utils";
 import { Server, ServerParams, TrainQuery } from "./trainquery";
 import express, { Express } from "express";
+import { rateLimit } from "express-rate-limit";
+
+// Rate limit if a user makes 100 requests in 5 minutes (3 seconds/request).
+const rateLimitWindow = 1000 * 60 * 5;
+const rateLimitRequests = 100;
 
 export class ExpressServer extends Server {
   constructor(
@@ -19,7 +24,12 @@ export class ExpressServer extends Server {
   ): Promise<void> {
     const app = express();
 
-    app.get("/api/*", async (req, res) => {
+    const apiRateLimit = rateLimit({
+      windowMs: rateLimitWindow,
+      limit: rateLimitRequests,
+    });
+
+    app.get("/api/*", apiRateLimit, async (req, res) => {
       const path = req.path.replace(/^\/api\//, "");
 
       try {

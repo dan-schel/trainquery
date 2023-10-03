@@ -10,6 +10,9 @@ import { FilteredBucket } from "../timetable/filtering";
 import { specificize } from "../timetable/specificize";
 import { unique } from "@schel-d/js-utils";
 
+const maxFeeds = 10;
+const maxCount = 20;
+
 export async function departuresApi(
   ctx: TrainQuery,
   params: ServerParams
@@ -18,6 +21,11 @@ export async function departuresApi(
   const feeds = DepartureFeed.decode(feedsString);
   if (feeds == null) {
     throw new BadApiCallError(`Provided feeds string is invalid.`);
+  }
+  if (feeds.length > maxFeeds || feeds.some((f) => f.count > maxCount)) {
+    throw new BadApiCallError(
+      `Too many feeds or too many departures per feed.`
+    );
   }
 
   const time = requireDateTimeParam(params, "time");
