@@ -25,6 +25,11 @@ export default [
     component: () => import("../views/Stop.vue"),
   },
   {
+    path: "/train/:id",
+    name: "train",
+    component: () => import("../views/Train.vue"),
+  },
+  {
     path: "/about",
     name: "about",
     component: () => import("../views/About.vue"),
