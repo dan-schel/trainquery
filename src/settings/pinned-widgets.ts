@@ -6,6 +6,8 @@ import { getStop } from "shared/system/config-utils";
 import { isValidFilter } from "@/components/departures/helpers/available-filters";
 import { getConfig } from "@/utils/get-config";
 
+const maxPinnedWidgets = 6;
+
 export class PinnedWidget {
   constructor(readonly stop: StopID, readonly filter: DepartureFilter) {}
 
@@ -35,6 +37,10 @@ export function isPinned(
   );
 }
 
+export function canPin(settings: Settings) {
+  return settings.pinnedWidgets.length < maxPinnedWidgets;
+}
+
 export function togglePinnedWidget(
   settings: Settings,
   stop: StopID,
@@ -46,13 +52,16 @@ export function togglePinnedWidget(
         (w) => w.stop != stop || !w.filter.equals(filter)
       ),
     });
-  } else {
+  } else if (canPin(settings)) {
     return settings.with({
       pinnedWidgets: [
         ...settings.pinnedWidgets,
         new PinnedWidget(stop, filter),
       ],
     });
+  } else {
+    // Cannot pin, you've already reached the limit.
+    return settings;
   }
 }
 

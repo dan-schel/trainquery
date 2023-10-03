@@ -14,10 +14,12 @@ export interface Props {
   content: ButtonContent;
   layout?: ButtonLayout;
   theme?: ButtonTheme;
+  disabled?: boolean;
 }
 withDefaults(defineProps<Props>(), {
   layout: "traditional",
   theme: "hover",
+  disabled: false,
 });
 
 defineEmits<{ (e: "click", payload: MouseEvent): void }>();
@@ -38,6 +40,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       'theme-filled-neutral': theme == 'filled-neutral',
     }"
     :title="content.altText"
+    :disabled="disabled"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>
@@ -56,6 +59,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       'theme-filled-neutral': theme == 'filled-neutral',
     }"
     :title="content.altText"
+    :disabled="disabled"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>

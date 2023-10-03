@@ -16,7 +16,11 @@ import type { DepartureFeed } from "shared/system/timetable/departure-feed";
 import type { QUtcDateTime } from "shared/qtime/qdatetime";
 import { computed } from "vue";
 import { formatFilter } from "@/utils/format-filter";
-import { togglePinnedWidget, isPinned } from "@/settings/pinned-widgets";
+import {
+  togglePinnedWidget,
+  isPinned,
+  canPin,
+} from "@/settings/pinned-widgets";
 import { useSettings } from "@/settings/settings";
 
 const props = defineProps<{
@@ -70,6 +74,9 @@ const pinned = computed(() =>
     ? false
     : isPinned(settings.value, props.feed.stop, props.feed.filter)
 );
+const pinnable = computed(() =>
+  settings.value == null ? false : canPin(settings.value)
+);
 function handlePin() {
   if (settings.value != null) {
     updateSettings(
@@ -108,6 +115,7 @@ function handlePin() {
           altText: pinned ? 'Unpin widget' : 'Pin widget',
         }"
         @click="handlePin"
+        :disabled="!pinned && !pinnable"
       ></SimpleButton>
     </div>
     <div class="departures">
