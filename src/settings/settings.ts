@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { PinnedWidget, SignificantStop } from "./pinned-widgets";
+import { PinnedWidget } from "./pinned-widgets";
 import { type InjectionKey, inject, type Ref, ref } from "vue";
+import { SignificantStop } from "./significant-stops";
 
 const settingsV1 = z.object({
   // Note that theme is not stored here. It is a separate localStorage entry so

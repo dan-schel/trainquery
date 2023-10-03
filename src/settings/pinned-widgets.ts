@@ -34,45 +34,21 @@ export function isPinned(
 
 export function togglePinnedWidget(
   settings: Settings,
-  updateSettings: (newSettings: Settings) => void,
   stop: StopID,
   filter: DepartureFilter
-) {
+): Settings {
   if (isPinned(settings, stop, filter)) {
-    updateSettings(
-      settings.with({
-        pinnedWidgets: settings.pinnedWidgets.filter(
-          (w) => w.stop != stop || !w.filter.equals(filter)
-        ),
-      })
-    );
+    return settings.with({
+      pinnedWidgets: settings.pinnedWidgets.filter(
+        (w) => w.stop != stop || !w.filter.equals(filter)
+      ),
+    });
   } else {
-    updateSettings(
-      settings.with({
-        pinnedWidgets: [
-          ...settings.pinnedWidgets,
-          new PinnedWidget(stop, filter),
-        ],
-      })
-    );
-  }
-}
-
-export class SignificantStop {
-  constructor(readonly stop: StopID, readonly significance: string) {}
-
-  static readonly json = z
-    .object({
-      // The "as any" is there to stop a weird error... I tried!
-      stop: StopIDJson as any,
-      significance: z.string(),
-    })
-    .transform((x) => new SignificantStop(x.stop, x.significance));
-
-  toJSON(): z.input<typeof SignificantStop.json> {
-    return {
-      stop: this.stop,
-      significance: this.significance,
-    };
+    return settings.with({
+      pinnedWidgets: [
+        ...settings.pinnedWidgets,
+        new PinnedWidget(stop, filter),
+      ],
+    });
   }
 }

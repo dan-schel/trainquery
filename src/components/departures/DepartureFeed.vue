@@ -30,32 +30,37 @@ const props = defineProps<{
   now: QUtcDateTime;
 }>();
 
-const title = computed(() => {
+const header = computed(() => {
   if (props.statePerspective) {
     return {
-      text: requireStop(getConfig(), props.feed.stop).name,
-      to: getStopPageRoute(getConfig(), props.feed.stop),
+      title: {
+        text: requireStop(getConfig(), props.feed.stop).name,
+        to: getStopPageRoute(getConfig(), props.feed.stop),
+      },
+      subtitle: {
+        text: formatFilter(props.feed.filter, props.feed.stop),
+        to: "",
+      },
     };
   }
   if (props.isDefaultFeeds) {
     return {
-      text: formatFilter(props.feed.filter, props.feed.stop),
-      to: "",
+      title: {
+        text: formatFilter(props.feed.filter, props.feed.stop),
+        to: "",
+      },
+      subtitle: null,
     };
   }
   return {
-    text: "Filtered trains",
-    to: "",
-  };
-});
-const subtitle = computed(() => {
-  if (!props.statePerspective && props.isDefaultFeeds) {
-    return null;
-  }
-
-  return {
-    text: formatFilter(props.feed.filter, props.feed.stop),
-    to: "",
+    title: {
+      text: "Filtered trains",
+      to: "",
+    },
+    subtitle: {
+      text: formatFilter(props.feed.filter, props.feed.stop),
+      to: "",
+    },
   };
 });
 
@@ -67,11 +72,8 @@ const pinned = computed(() =>
 );
 function handlePin() {
   if (settings.value != null) {
-    togglePinnedWidget(
-      settings.value,
-      updateSettings,
-      props.feed.stop,
-      props.feed.filter
+    updateSettings(
+      togglePinnedWidget(settings.value, props.feed.stop, props.feed.filter)
     );
   }
 }
@@ -86,19 +88,21 @@ function handlePin() {
   >
     <div class="header-row">
       <OneLineP class="header">
-        <RouterLink class="link title" :to="title.to">{{
-          title.text
+        <RouterLink class="link title" :to="header.title.to">{{
+          header.title.text
         }}</RouterLink>
-        <span class="dot" v-if="subtitle != null">•</span>
+        <span class="dot" v-if="header.subtitle != null">•</span>
         <RouterLink
           class="link subtitle"
-          :to="subtitle.to"
-          v-if="subtitle != null"
-          >{{ subtitle.text }}</RouterLink
+          :to="header.subtitle.to"
+          v-if="header.subtitle != null"
+          >{{ header.subtitle.text }}</RouterLink
         >
       </OneLineP>
       <SimpleButton
         v-if="allowPinning"
+        class="pin-button"
+        :class="{ pinned: pinned }"
         :content="{
           icon: pinned ? 'majesticons:pin' : 'majesticons:pin-line',
           altText: pinned ? 'Unpin widget' : 'Pin widget',
@@ -160,6 +164,11 @@ function handlePin() {
 .subtitle {
   --color-accent: var(--color-ink-80);
   font-size: 1rem;
+}
+.pin-button.pinned {
+  :deep(.icon) {
+    color: var(--color-accent);
+  }
 }
 .departures {
   display: grid;
