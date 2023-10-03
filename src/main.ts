@@ -35,13 +35,20 @@ export default viteSSR(
     // Download route props when navigating pages (the first route's props are
     // downloaded with this code too, but on the server during SSR).
     router.beforeEach(async (to, _from, next) => {
+      // I get several of these calls when loading every page for some reason.
+      if (to.name == "notfound") {
+        return next();
+      }
+
       // Check if route props are already provided.
       if (to.meta.state != null) {
         return next();
       }
 
       const res = await fetch(
-        `${baseUrl}/api/ssrRouteProps?page=${String(to.name)}`
+        `${baseUrl}/api/ssrRouteProps?page=${String(
+          to.name
+        )}&path=${encodeURIComponent(to.fullPath)}`
       );
       to.meta.state = await res.json();
       next();

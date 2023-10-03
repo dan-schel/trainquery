@@ -1,6 +1,17 @@
-import { base48Safe, decimal, parseIntNull, reencode, tryReencode } from "@schel-d/js-utils";
+import {
+  base48Safe,
+  decimal,
+  parseIntNull,
+  reencode,
+  tryReencode,
+} from "@schel-d/js-utils";
 import { QDate } from "../../shared/qtime/qdate";
-import { StaticServiceID, TimetableID, isTimetableID, toStaticServiceID } from "../../shared/system/ids";
+import {
+  StaticServiceID,
+  TimetableID,
+  isTimetableID,
+  toStaticServiceID,
+} from "../../shared/system/ids";
 
 const encodedAlpha = decimal + "-|";
 
@@ -8,8 +19,8 @@ export class StaticServiceIDComponents {
   constructor(
     readonly timetable: TimetableID,
     readonly index: number,
-    readonly date: QDate,
-  ) { }
+    readonly date: QDate
+  ) {}
 
   asString() {
     return `${this.timetable.toFixed()}|${this.index.toFixed()}|${this.date.toISO()}`;
@@ -37,9 +48,13 @@ export class StaticServiceIDComponents {
   }
 
   encode(): StaticServiceID {
-    return toStaticServiceID(reencode(this.asString(), encodedAlpha, base48Safe));
+    return toStaticServiceID(
+      reencode(this.asString(), encodedAlpha, base48Safe)
+    );
   }
-  decode(input: StaticServiceID): StaticServiceIDComponents | null {
+  static decode(
+    input: string | StaticServiceID
+  ): StaticServiceIDComponents | null {
     const decodedString = tryReencode(input, base48Safe, encodedAlpha);
     if (decodedString == null) {
       return null;

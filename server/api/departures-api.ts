@@ -7,7 +7,7 @@ import { ServerParams, TrainQuery } from "../trainquery";
 import { DepartureFeed } from "../../shared/system/timetable/departure-feed";
 import { getDepartures } from "../timetable/get-departures";
 import { FilteredBucket } from "../timetable/filtering";
-import { specificize } from "../timetable/specificize";
+import { specificizeDeparture } from "../timetable/specificize";
 import { unique } from "@schel-d/js-utils";
 
 const maxFeeds = 10;
@@ -44,7 +44,7 @@ export async function departuresApi(
       s,
       time,
       buckets.filter((b) => b.stop == s),
-      specificize
+      specificizeDeparture
     );
   });
 

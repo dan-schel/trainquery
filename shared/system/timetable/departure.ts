@@ -71,4 +71,23 @@ export class Departure extends Service {
       perspective: this.perspective.toJSON(),
     };
   }
+
+  static fromService(
+    service: Service,
+    perspectiveIndex: number,
+    perspective: ServiceStop
+  ) {
+    return new Departure(
+      service.line,
+      service.associatedLines,
+      service.route,
+      service.direction,
+      service.stoppingPattern,
+      service.staticID,
+      service.sources,
+      service.continuation,
+      perspectiveIndex,
+      perspective
+    );
+  }
 }

@@ -1,35 +1,35 @@
+import { nonNull } from "@schel-d/js-utils";
 import { QDate } from "../../shared/qtime/qdate";
 import { LineID } from "../../shared/system/ids";
-import { Timetable } from "../../shared/system/timetable/timetable";
 import { TrainQuery } from "../trainquery";
+
+export function getTimetableForDay(ctx: TrainQuery, day: QDate, line: LineID) {
+  const timetables = ctx
+    .getConfig()
+    .server.timetables.filter(
+      (t) => t.line == line && isWithin(day, t.begins, t.ends)
+    );
+
+  // There should only be (at most) one of each type at a time, so we're fine
+  // to just get the first one of each type.
+  const main = timetables.find((t) => !t.isTemporary);
+  const temporary = timetables.find((t) => t.isTemporary);
+
+  if (temporary != null) {
+    return temporary;
+  }
+  if (main != null) {
+    return main;
+  }
+  return null;
+}
 
 export function getTimetablesForDay(
   ctx: TrainQuery,
   day: QDate,
   lines: LineID[]
 ) {
-  const result: Timetable[] = [];
-
-  for (const l of lines) {
-    const timetables = ctx
-      .getConfig()
-      .server.timetables.filter(
-        (t) => t.line == l && isWithin(day, t.begins, t.ends)
-      );
-
-    // There should only be (at most) one of each type at a time, so we're fine
-    // to just get the first one of each type.
-    const main = timetables.find((t) => !t.isTemporary);
-    const temporary = timetables.find((t) => t.isTemporary);
-
-    if (temporary != null) {
-      result.push(temporary);
-    }
-    if (main != null) {
-      result.push(main);
-    }
-  }
-  return result;
+  return lines.map((l) => getTimetableForDay(ctx, day, l)).filter(nonNull);
 }
 
 function isWithin(day: QDate, begins: QDate | null, ends: QDate | null) {
