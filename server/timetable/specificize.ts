@@ -1,12 +1,12 @@
 import { QDate } from "../../shared/qtime/qdate";
 import { toUTCDateTime } from "../../shared/qtime/qdatetime";
-import { toStaticServiceID } from "../../shared/system/ids";
 import { Departure } from "../../shared/system/timetable/departure";
 import { ServiceStop } from "../../shared/system/timetable/service-stop";
 import { CompleteStoppingPattern } from "../../shared/system/timetable/stopping-pattern";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { TrainQuery } from "../trainquery";
 import { guessPlatformsOfEntry } from "./guess-platform";
+import { StaticServiceIDComponents } from "./static-service-id";
 
 export function specificize(
   ctx: TrainQuery,
@@ -14,7 +14,7 @@ export function specificize(
   date: QDate,
   perspectiveIndex: number
 ): Departure {
-  const staticID = toStaticServiceID(`TODO-${entry.entryIndex}`);
+  const staticID = new StaticServiceIDComponents(entry.id, entry.entryIndex, date).encode();
   const platforms = guessPlatformsOfEntry(ctx, entry, date);
   const stoppingPattern = new CompleteStoppingPattern(
     entry.rows.map((r, i) => {
