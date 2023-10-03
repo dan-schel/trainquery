@@ -1,28 +1,6 @@
 import { z } from "zod";
 import { PinnedWidget, SignificantStop } from "./pinned-widgets";
-import { type InjectionKey, inject } from "vue";
-
-export const settingsInjectionKey = Symbol() as InjectionKey<{
-  settings: Settings | null;
-  updateSettings: (newSettings: Settings) => void;
-}>;
-
-export function tryUseSettings() {
-  return inject(settingsInjectionKey, {
-    settings: null,
-    updateSettings: () => {},
-  });
-}
-export function useSettings() {
-  const result = tryUseSettings();
-  if (result.settings == null) {
-    throw new Error("Settings are null. Are you calling this during SSR?");
-  }
-  return {
-    settings: result.settings,
-    updateSettings: result.updateSettings,
-  };
-}
+import { type InjectionKey, inject, type Ref, ref } from "vue";
 
 const settingsV1 = z.object({
   // Note that theme is not stored here. It is a separate localStorage entry so
@@ -80,4 +58,37 @@ export class Settings {
       limitMapFPS: this.limitMapFPS,
     };
   }
+
+  with({
+    pinnedWidgets = undefined,
+    significantStops = undefined,
+    enableContinuations = undefined,
+    limitMapFPS = undefined,
+  }: {
+    pinnedWidgets?: PinnedWidget[];
+    significantStops?: SignificantStop[];
+    enableContinuations?: boolean;
+    limitMapFPS?: boolean;
+  } = {}) {
+    return new Settings(
+      pinnedWidgets ?? this.pinnedWidgets,
+      significantStops ?? this.significantStops,
+      enableContinuations ?? this.enableContinuations,
+      limitMapFPS ?? this.limitMapFPS
+    );
+  }
+}
+
+export const settingsInjectionKey = Symbol() as InjectionKey<{
+  settings: Ref<Settings | null>;
+  updateSettings: (newSettings: Settings) => void;
+}>;
+
+export function useSettings() {
+  return inject(settingsInjectionKey, {
+    settings: ref(null),
+    updateSettings: () => {
+      throw new Error("Update settings not injected correctly.");
+    },
+  });
 }

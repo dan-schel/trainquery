@@ -16,6 +16,8 @@ import type { DepartureFeed } from "shared/system/timetable/departure-feed";
 import type { QUtcDateTime } from "shared/qtime/qdatetime";
 import { computed } from "vue";
 import { formatFilter } from "@/utils/format-filter";
+import { togglePinnedWidget, isPinned } from "@/settings/pinned-widgets";
+import { useSettings } from "@/settings/settings";
 
 const props = defineProps<{
   feed: DepartureFeed;
@@ -56,6 +58,23 @@ const subtitle = computed(() => {
     to: "",
   };
 });
+
+const { settings, updateSettings } = useSettings();
+const pinned = computed(() =>
+  settings.value == null
+    ? false
+    : isPinned(settings.value, props.feed.stop, props.feed.filter)
+);
+function handlePin() {
+  if (settings.value != null) {
+    togglePinnedWidget(
+      settings.value,
+      updateSettings,
+      props.feed.stop,
+      props.feed.filter
+    );
+  }
+}
 </script>
 
 <template>
@@ -80,7 +99,11 @@ const subtitle = computed(() => {
       </OneLineP>
       <SimpleButton
         v-if="allowPinning"
-        :content="{ icon: 'majesticons:pin-line', altText: 'Pin widget' }"
+        :content="{
+          icon: pinned ? 'majesticons:pin' : 'majesticons:pin-line',
+          altText: pinned ? 'Unpin widget' : 'Pin widget',
+        }"
+        @click="handlePin"
       ></SimpleButton>
     </div>
     <div class="departures">

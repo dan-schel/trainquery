@@ -5,7 +5,7 @@ import { useHead } from "@vueuse/head";
 import BigSearch from "@/components/BigSearch.vue";
 import Wordmark from "@/components/Wordmark.vue";
 import { getConfig } from "@/utils/get-config";
-import { onMounted, ref } from "vue";
+import { computed } from "vue";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { useSettings } from "@/settings/settings";
 import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
@@ -14,13 +14,14 @@ useHead({
   title: "Home",
 });
 
-const feeds = ref<DepartureFeed[] | null>(null);
-onMounted(() => {
-  const { settings } = useSettings();
-  feeds.value = settings.pinnedWidgets.map(
-    (w) => new DepartureFeed(w.stop, 3, w.filter)
-  );
-});
+const { settings } = useSettings();
+const feeds = computed(() =>
+  settings.value == null
+    ? null
+    : settings.value.pinnedWidgets.map(
+        (w) => new DepartureFeed(w.stop, 3, w.filter)
+      )
+);
 </script>
 
 <template>
@@ -46,7 +47,7 @@ onMounted(() => {
           :is-default-feeds="false"
         ></DepartureGroup>
         <LoadingSpinner v-if="feeds == null" class="loading"></LoadingSpinner>
-        <p class="empty">
+        <p class="empty" v-if="feeds != null && feeds.length == 0">
           Click the pin button above a widget on a stop's page to show it here.
         </p>
       </div>

@@ -5,26 +5,27 @@ import Footer from "./components/Footer.vue";
 import { useHead } from "@vueuse/head";
 import { getConfig } from "./utils/get-config";
 import { Settings, settingsInjectionKey } from "./settings/settings";
-import { provide, ref } from "vue";
+import { onMounted, provide, ref } from "vue";
 import { readSettings, writeSettings } from "./settings/persist-settings";
 
-if (import.meta.env.SSR) {
-  provide(settingsInjectionKey, {
-    settings: null,
-    updateSettings: () => {
-      throw new Error("Cannot update settings during SSR.");
-    },
-  });
-} else {
-  const settings = ref<Settings | null>(readSettings());
-  provide(settingsInjectionKey, {
-    settings: settings.value,
-    updateSettings: (newSettings: Settings) => {
-      settings.value = newSettings;
-      writeSettings(newSettings);
-    },
-  });
+const settings = ref<Settings | null>(null);
+
+function updateSettings(newSettings: Settings) {
+  if (settings.value == null) {
+    throw new Error("Cannot update settings during SSR.");
+  }
+  settings.value = newSettings;
+  writeSettings(newSettings);
 }
+
+provide(settingsInjectionKey, {
+  settings: settings,
+  updateSettings: updateSettings,
+});
+
+onMounted(() => {
+  settings.value = readSettings();
+});
 
 useHead({
   titleTemplate: (title?: string) =>
