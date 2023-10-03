@@ -4,6 +4,7 @@ import PageContent from "@/components/common/PageContent.vue";
 import Picker from "@/components/common/Picker.vue";
 import { onMounted, ref } from "vue";
 import { getTheme, setTheme, type Theme } from "@/settings/theme";
+import SimpleButton from "@/components/common/SimpleButton.vue";
 
 useHead({
   title: "Settings",
@@ -14,9 +15,15 @@ onMounted(() => {
   theme.value = getTheme();
 });
 
-const onThemeChanged = (newTheme: Theme) => {
+function handleThemeChange(newTheme: Theme) {
   setTheme(newTheme);
-};
+}
+function handleReset() {
+  if (confirm("This cannot be undone. Reset all settings?")) {
+    localStorage.clear();
+    location.reload();
+  }
+}
 </script>
 
 <template>
@@ -37,13 +44,24 @@ const onThemeChanged = (newTheme: Theme) => {
         ]"
         :keyify="(option) => option.theme"
         :modelValue="theme"
-        @update:modelValue="onThemeChanged"
+        @update:modelValue="handleThemeChange"
         class="theme-picker"
       >
         <template v-slot="slotProps">
           <p>{{ slotProps.data.name }}</p>
         </template>
       </Picker>
+    </div>
+    <div class="section">
+      <h2>Reset</h2>
+      <p>Reset all settings and clear the cached network data.</p>
+      <SimpleButton
+        class="reset-button"
+        :content="{ icon: 'uil:redo', text: 'Reset' }"
+        layout="traditional-wide"
+        theme="filled"
+        @click="handleReset"
+      ></SimpleButton>
     </div>
   </PageContent>
 </template>
@@ -63,6 +81,10 @@ const onThemeChanged = (newTheme: Theme) => {
   > p {
     margin-bottom: 1rem;
   }
+
+  &:last-child {
+    margin-bottom: 2rem;
+  }
 }
 
 .theme-picker {
@@ -72,5 +94,9 @@ const onThemeChanged = (newTheme: Theme) => {
     height: 2rem;
     padding: 0 1.5rem;
   }
+}
+.reset-button {
+  --color-accent: var(--color-error);
+  align-self: flex-start;
 }
 </style>
