@@ -9,7 +9,6 @@ import {
   getLineFromUrlName,
   getStopFromUrlName,
 } from "shared/system/config-utils";
-import { initSettings } from "./settings/get-settings";
 import { FrontendConfig } from "shared/system/config/frontend-config";
 
 export default viteSSR(
@@ -71,7 +70,6 @@ export default viteSSR(
       provideConfig(FrontendConfig.json.parse(json));
     } else {
       await initConfig(initialState.props.configHash);
-      initSettings();
     }
 
     return { head };

@@ -1,5 +1,28 @@
 import { z } from "zod";
 import { PinnedWidget, SignificantStop } from "./pinned-widgets";
+import { type InjectionKey, inject } from "vue";
+
+export const settingsInjectionKey = Symbol() as InjectionKey<{
+  settings: Settings | null;
+  updateSettings: (newSettings: Settings) => void;
+}>;
+
+export function tryUseSettings() {
+  return inject(settingsInjectionKey, {
+    settings: null,
+    updateSettings: () => {},
+  });
+}
+export function useSettings() {
+  const result = tryUseSettings();
+  if (result.settings == null) {
+    throw new Error("Settings are null. Are you calling this during SSR?");
+  }
+  return {
+    settings: result.settings,
+    updateSettings: result.updateSettings,
+  };
+}
 
 const settingsV1 = z.object({
   // Note that theme is not stored here. It is a separate localStorage entry so
