@@ -1,24 +1,25 @@
 import { z } from "zod";
 import {
   ServedStop,
-  SkippedStop,
-  StoppingPatternEntryJson,
-  stoppingPatternEntryToJSON,
+  SkippedStop
 } from "./service-stop";
 import { type StopID, StopIDJson } from "../ids";
 
 export class CompleteStoppingPattern {
-  constructor(readonly stops: (ServedStop | SkippedStop)[]) {}
+  constructor(readonly stops: (ServedStop | SkippedStop)[]) { }
 
   static readonly json = z
     .object({
-      stops: StoppingPatternEntryJson.array(),
+      stops: z.union([
+        SkippedStop.json,
+        ServedStop.json
+      ]).array(),
     })
     .transform((x) => new CompleteStoppingPattern(x.stops));
 
   toJSON(): z.input<typeof CompleteStoppingPattern.json> {
     return {
-      stops: this.stops.map((s) => stoppingPatternEntryToJSON(s)),
+      stops: this.stops.map((s) => s.toJSON()),
     };
   }
 
@@ -54,7 +55,7 @@ export class PartialStoppingPattern {
       index: number;
       stop: StopID;
     }
-  ) {}
+  ) { }
 
   static readonly json = z
     .object({

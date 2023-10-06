@@ -40,7 +40,7 @@ export class Departure extends Service {
   static readonly json = BaseServiceJson.extend({
     continuation: Service.rawJson.nullable(),
     perspectiveIndex: z.number(),
-    perspective: ServedStop.json.transform((s) => ServedStop.transform(s)),
+    perspective: ServedStop.json,
   }).transform(
     (y) =>
       new Departure(
