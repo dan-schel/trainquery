@@ -3,6 +3,7 @@ import { useHead } from "@vueuse/head";
 import { useRoute } from "vue-router";
 import {
   getStopPageRoute,
+  linesThatStopAt,
   requireStopFromUrlName,
 } from "shared/system/config-utils";
 import { computed, ref, watch } from "vue";
@@ -25,6 +26,12 @@ watch(route, () => {
 
 const stop = computed(() =>
   requireStopFromUrlName(getConfig(), params.value.id as string)
+);
+
+const lines = computed(() =>
+  linesThatStopAt(getConfig(), stop.value.id, {
+    ignoreSpecialEventsOnlyLines: true,
+  }).map((l) => l.id)
 );
 
 const filter = ref(DepartureFilter.default);
@@ -65,7 +72,7 @@ useHead(head);
 
 <template>
   <PageContent :title="`${stop.name}`" title-margin="0.5rem">
-    <LineList :stop="stop.id"></LineList>
+    <LineList :lines="lines"></LineList>
     <DepartureControls
       class="controls"
       :stop="stop.id"

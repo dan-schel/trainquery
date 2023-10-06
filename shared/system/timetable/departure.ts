@@ -38,7 +38,7 @@ export class Departure extends Service {
   }
 
   static readonly json = BaseServiceJson.extend({
-    continuation: Service.json.nullable(),
+    continuation: Service.rawJson.nullable(),
     perspectiveIndex: z.number(),
     perspective: ServiceStop.json,
   }).transform(

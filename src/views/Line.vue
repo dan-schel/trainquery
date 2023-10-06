@@ -71,4 +71,3 @@ h2 {
   margin-bottom: 2rem;
 }
 </style>
-@/utils/format-mode

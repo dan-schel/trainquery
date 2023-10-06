@@ -58,10 +58,12 @@ export class Service {
     readonly continuation: Service | null
   ) {}
 
-  static readonly json: z.ZodType<Output, z.ZodTypeDef, Input> =
+  static readonly rawJson: z.ZodType<Output, z.ZodTypeDef, Input> =
     BaseServiceJson.extend({
-      continuation: z.lazy(() => Service.json.nullable()),
-    }).transform((y) => Service.transform(y));
+      continuation: z.lazy(() => Service.rawJson.nullable()),
+    });
+
+  static readonly json = Service.rawJson.transform(Service.transform);
 
   static transform(x: Output): Service {
     return new Service(

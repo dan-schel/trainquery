@@ -71,4 +71,3 @@ li {
   }
 }
 </style>
-@/utils/format-mode

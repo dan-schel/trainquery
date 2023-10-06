@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { getLinePageRoute, linesThatStopAt } from "shared/system/config-utils";
+import { getLinePageRoute, requireLine } from "shared/system/config-utils";
 import { computed } from "vue";
 import { getConfig } from "@/utils/get-config";
-import type { StopID } from "shared/system/ids";
+import type { LineID } from "shared/system/ids";
 
 const props = defineProps<{
-  stop: StopID;
+  lines: LineID[];
 }>();
 
 const lines = computed(() => {
-  const all = linesThatStopAt(getConfig(), props.stop, {
-    ignoreSpecialEventsOnlyLines: true,
-    sortAlphabetically: true,
-  });
+  const all = props.lines
+    .map((l) => requireLine(getConfig(), l))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
   return {
     all,
     last: all[all.length - 1],

@@ -19,7 +19,7 @@ export async function ssrRoutePropsApi(
       aboutMarkdown: ctx.getConfig().server.aboutMarkdown,
     };
   } else if (page == "train") {
-    const idString = path.replace(/^\/train\/([^/?]+)(.+)$/, "$1");
+    const idString = path.replace(/^\/train\/([^/?]+)([/?].*)?$/, "$1");
     const id = StaticServiceIDComponents.decode(idString);
     if (id == null) {
       return {};
