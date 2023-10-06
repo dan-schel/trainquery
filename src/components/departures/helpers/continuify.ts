@@ -3,7 +3,7 @@ import { requireLine } from "shared/system/config-utils";
 import type { StopID } from "shared/system/ids";
 import { Departure } from "shared/system/timetable/departure";
 import type { Service } from "shared/system/timetable/service";
-import type { ServiceStop } from "shared/system/timetable/service-stop";
+import type { ServedStop } from "shared/system/timetable/service-stop";
 import { CompleteStoppingPattern } from "shared/system/timetable/stopping-pattern";
 
 export type ContinuifyResult = (
@@ -16,7 +16,7 @@ export type ContinuifyResult = (
       type: "served";
       stop: StopID;
       stintIndex: number;
-      detail: ServiceStop | null;
+      detail: ServedStop | null;
     }
   | {
       type: "unknown";
@@ -104,7 +104,7 @@ function continuifiedStopFor(
       if (index == service.perspectiveIndex) {
         return {
           type: "served",
-          stop: stop,
+          stop: service.perspective.stop,
           detail: service.perspective,
           stintIndex: stintIndex,
         };
@@ -116,23 +116,23 @@ function continuifiedStopFor(
 
   if (service.stoppingPattern instanceof CompleteStoppingPattern) {
     const detail = service.stoppingPattern.stops[index];
-    if (detail == null) {
+    if (detail.express) {
       return {
         type: "express",
-        stop: stop,
+        stop: detail.stop,
         stintIndex: stintIndex,
       };
     } else {
       return {
         type: "served",
-        stop: stop,
+        stop: detail.stop,
         detail: detail,
         stintIndex: stintIndex,
       };
     }
   } else {
-    const terminusIndex = service.stoppingPattern.terminusIndex;
-    const originIndex = service.stoppingPattern.originIndex ?? 0;
+    const terminusIndex = service.stoppingPattern.terminus.index;
+    const originIndex = service.stoppingPattern.origin?.index ?? 0;
     if (index == terminusIndex || index == originIndex) {
       return {
         type: "served",

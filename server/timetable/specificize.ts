@@ -1,8 +1,12 @@
 import { QDate } from "../../shared/qtime/qdate";
 import { toUTCDateTime } from "../../shared/qtime/qdatetime";
+import { requireLine } from "../../shared/system/config-utils";
 import { Departure } from "../../shared/system/timetable/departure";
 import { Service } from "../../shared/system/timetable/service";
-import { ServiceStop } from "../../shared/system/timetable/service-stop";
+import {
+  ServedStop,
+  SkippedStop,
+} from "../../shared/system/timetable/service-stop";
 import { CompleteStoppingPattern } from "../../shared/system/timetable/stopping-pattern";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { TrainQuery } from "../trainquery";
@@ -20,10 +24,13 @@ export function specificize(
     date
   ).encode();
   const platforms = guessPlatformsOfEntry(ctx, entry, date);
+  const line = requireLine(ctx.getConfig(), entry.line);
+  const stopList = line.route.requireStopList(entry.route, entry.direction);
+
   const stoppingPattern = new CompleteStoppingPattern(
     entry.rows.map((r, i) => {
       if (r == null) {
-        return null;
+        return new SkippedStop(stopList.stops[i]);
       }
 
       const time = toUTCDateTime(
@@ -33,12 +40,17 @@ export function specificize(
       );
 
       const platform = platforms[i];
+      const setsDown = stopList.setsDown[i].matches(entry.direction);
+      const picksUp = stopList.picksUp[i].matches(entry.direction);
 
-      // TODO: These values are temporary!
-      const setsDown = true;
-      const picksUp = true;
-
-      return new ServiceStop(time, null, setsDown, picksUp, platform);
+      return new ServedStop(
+        stopList.stops[i],
+        time,
+        null,
+        setsDown,
+        picksUp,
+        platform
+      );
     })
   );
 
@@ -67,7 +79,7 @@ export function specificizeDeparture(
   const stoppingPattern = service.stoppingPattern as CompleteStoppingPattern;
 
   const perspective = stoppingPattern.stops[perspectiveIndex];
-  if (perspective == null) {
+  if (perspective.express) {
     throw new Error("Incorrect perspective index.");
   }
 

@@ -66,16 +66,16 @@ export class YBranchRoute extends Route {
     secondBranch: Branch.json,
     shared: RouteStop.json.array(),
   });
-  static readonly jsonTransform = (
-    x: z.infer<typeof YBranchRoute.yBranchJson>
-  ) =>
-    new YBranchRoute(
+
+  static transform(x: z.infer<typeof YBranchRoute.yBranchJson>) {
+    return new YBranchRoute(
       x.forward,
       x.reverse,
       x.firstBranch,
       x.secondBranch,
       x.shared
     );
+  }
 
   toJSON(): z.input<typeof YBranchRoute.yBranchJson> {
     return {

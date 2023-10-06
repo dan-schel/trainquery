@@ -60,4 +60,10 @@ useHead(head);
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
+
+.diagram {
+  --stop-gap: 1rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
 </style>

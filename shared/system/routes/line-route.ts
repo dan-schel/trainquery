@@ -85,6 +85,15 @@ export abstract class Route {
       direction
     );
   }
+  setsDown(
+    variant: RouteVariantID,
+    direction: DirectionID,
+    index: number
+  ): boolean {
+    return this.requireStopList(variant, direction).setsDown[index].matches(
+      direction
+    );
+  }
 }
 
 export class DirectionDefinition {

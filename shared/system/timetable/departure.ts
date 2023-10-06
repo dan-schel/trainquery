@@ -6,7 +6,7 @@ import {
   type StaticServiceID,
 } from "../ids";
 import { BaseServiceJson, Service, type ServiceSource } from "./service";
-import { ServiceStop } from "./service-stop";
+import { ServedStop } from "./service-stop";
 import {
   CompleteStoppingPattern,
   PartialStoppingPattern,
@@ -23,7 +23,7 @@ export class Departure extends Service {
     sources: ServiceSource[],
     continuation: Service | null,
     readonly perspectiveIndex: number,
-    readonly perspective: ServiceStop
+    readonly perspective: ServedStop
   ) {
     super(
       line,
@@ -40,7 +40,7 @@ export class Departure extends Service {
   static readonly json = BaseServiceJson.extend({
     continuation: Service.rawJson.nullable(),
     perspectiveIndex: z.number(),
-    perspective: ServiceStop.json,
+    perspective: ServedStop.json.transform((s) => ServedStop.transform(s)),
   }).transform(
     (y) =>
       new Departure(
@@ -75,7 +75,7 @@ export class Departure extends Service {
   static fromService(
     service: Service,
     perspectiveIndex: number,
-    perspective: ServiceStop
+    perspective: ServedStop
   ) {
     return new Departure(
       service.line,

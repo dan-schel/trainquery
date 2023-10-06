@@ -13,13 +13,13 @@ export const RouteJson = z
   ])
   .transform((x): Route => {
     return {
-      linear: LinearRoute.jsonTransform,
-      "y-branch": YBranchRoute.jsonTransform,
-      hook: HookRoute.jsonTransform,
+      linear: LinearRoute.transform,
+      "y-branch": YBranchRoute.transform,
+      hook: HookRoute.transform,
     }[x.type](x as any);
   });
 
-export function routeToJson(route: Route): z.input<typeof RouteJson> {
+export function routeToJSON(route: Route): z.input<typeof RouteJson> {
   return fromRouteType<z.input<typeof RouteJson>>(route, {
     linear: (r) => r.toJSON(),
     "y-branch": (r) => r.toJSON(),

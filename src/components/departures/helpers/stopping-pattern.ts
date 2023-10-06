@@ -1,4 +1,4 @@
-import { requireLine, requireStop } from "shared/system/config-utils";
+import { requireStop } from "shared/system/config-utils";
 import type { ContinuifyResult } from "./continuify";
 import { getConfig } from "@/utils/get-config";
 import type { StopID } from "shared/system/ids";
@@ -53,24 +53,20 @@ export function getStoppingPatternString(detail: ContinuifyResult): string {
 }
 
 export function getArrivalDetailString(departure: Departure) {
-  // Need to use departure in this function, because detail only includes stops in the future.
+  // Need to use departure in this function, because detail only includes stops
+  // in the future.
 
-  const stopList = requireLine(getConfig(), departure.line).route.requireStops(
-    departure.route,
-    departure.direction
-  );
-
-  if (departure.stoppingPattern instanceof CompleteStoppingPattern) {
-    const firstStopIndex = departure.stoppingPattern.stops.findIndex(
-      (s) => s != null
-    );
-    const origin = stopList[firstStopIndex];
-    return `Arrival from ${requireStop(getConfig(), origin).name}`;
-  } else {
-    if (departure.stoppingPattern.originIndex == null) {
-      return null;
+  const origin = (() => {
+    if (departure.stoppingPattern instanceof CompleteStoppingPattern) {
+      return departure.stoppingPattern.trim()[0].stop;
+    } else if (departure.stoppingPattern.origin != null) {
+      return departure.stoppingPattern.origin.stop;
     }
-    const origin = stopList[departure.stoppingPattern.originIndex];
-    return `Arrival from ${requireStop(getConfig(), origin).name}`;
+    return null;
+  })();
+
+  if (origin == null) {
+    return null;
   }
+  return `Arrival from ${requireStop(getConfig(), origin).name}`;
 }

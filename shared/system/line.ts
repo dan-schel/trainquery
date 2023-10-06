@@ -8,7 +8,7 @@ import {
   toServiceTypeID,
 } from "./ids";
 import { Route } from "./routes/line-route";
-import { RouteJson, routeToJson } from "./routes/route-json";
+import { RouteJson, routeToJSON } from "./routes/route-json";
 
 /** Describes the name, route, etc. of a particular transit line. */
 export class Line {
@@ -55,7 +55,7 @@ export class Line {
       color: this.color == "none" ? undefined : this.color,
       specialEventsOnly: this.specialEventsOnly ? true : undefined,
       serviceType: this.serviceType == "normal" ? undefined : this.serviceType,
-      route: routeToJson(this.route),
+      route: routeToJSON(this.route),
     };
   }
 }

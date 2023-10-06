@@ -45,8 +45,10 @@ export class HookRoute extends Route {
     hooked: RouteStop.json.array(),
     direct: RouteStop.json.array(),
   });
-  static readonly jsonTransform = (x: z.infer<typeof HookRoute.hookJson>) =>
-    new HookRoute(x.forward, x.reverse, x.stops, x.hooked, x.direct);
+
+  static transform(x: z.infer<typeof HookRoute.hookJson>) {
+    return new HookRoute(x.forward, x.reverse, x.stops, x.hooked, x.direct);
+  }
 
   toJSON(): z.input<typeof HookRoute.hookJson> {
     return {
