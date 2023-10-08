@@ -30,7 +30,7 @@ export function specificize(
   const stoppingPattern = new CompleteStoppingPattern(
     entry.rows.map((r, i) => {
       if (r == null) {
-        return new SkippedStop(stopList.stops[i]);
+        return new SkippedStop(stopList.stops[i], i);
       }
 
       const time = toUTCDateTime(
@@ -45,6 +45,7 @@ export function specificize(
 
       return new ServedStop(
         stopList.stops[i],
+        i,
         time,
         null,
         setsDown,

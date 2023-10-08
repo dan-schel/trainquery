@@ -90,7 +90,7 @@ export function searchOptionsWholeSite(): SearchOption[] {
     subtitle: null,
     icon: "uil:info-circle",
     url: "/about",
-    tags: ["contact", "legal", "timetables", "github"],
+    tags: ["contact", "legal", "timetables", "github", "trainquery"],
     data: null,
     boost: 0.6,
   });

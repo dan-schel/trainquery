@@ -30,7 +30,7 @@ const props = defineProps<{
 
 const detail = computed(() => {
   const detail = continuify(props.departure, props.continuationsEnabled);
-  const isArrival = detail.length == 1;
+  const isArrival = detail.trimmed.length == 1;
 
   return {
     stoppingPattern: detail,
@@ -39,7 +39,7 @@ const detail = computed(() => {
     platform: getPlatformString(props.departure, props.perspective),
     stoppingPatternString: isArrival
       ? getArrivalDetailString(props.departure) ?? ""
-      : getStoppingPatternString(detail),
+      : getStoppingPatternString(detail.trimmed),
     lineColor: requireLine(getConfig(), props.departure.line).color,
     timeString: getTimeString(props.departure, props.now),
     linesString: getLinesString(props.departure),

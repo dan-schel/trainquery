@@ -8,17 +8,17 @@ import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import type { QUtcDateTime } from "shared/qtime/qdatetime";
 import { listifyAnd } from "@schel-d/js-utils";
 
-export function getTerminusString(detail: ContinuifyResult) {
-  const stopID = detail[detail.length - 1].stop;
+export function getTerminusString({ trimmed }: ContinuifyResult) {
+  const stopID = trimmed[trimmed.length - 1].stop;
   return requireStop(getConfig(), stopID).name;
 }
 
-export function getViaString(detail: ContinuifyResult) {
-  const servedStops = detail.filter((s) => s.type == "served");
-  const doesContinue = detail[detail.length - 1].stintIndex != 0;
+export function getViaString({ all, trimmed }: ContinuifyResult) {
+  const servedStops = trimmed.filter((s) => s.type == "served");
+  const doesContinue = all.some((x) => x.stintIndex != 0);
 
-  const thisStop = detail[0].stop;
-  const lastStop = detail[detail.length - 1].stop;
+  const thisStop = trimmed[0].stop;
+  const lastStop = trimmed[trimmed.length - 1].stop;
 
   for (const rule of getConfig().frontend.via) {
     // Don't use this rule if some stops are not served.

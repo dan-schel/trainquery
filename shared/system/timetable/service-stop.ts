@@ -13,6 +13,7 @@ export class ServedStop {
 
   constructor(
     readonly stop: StopID,
+    readonly stopListIndex: number,
     readonly scheduledTime: QUtcDateTime,
     readonly liveTime: QUtcDateTime | null,
     readonly setsDown: boolean,
@@ -21,36 +22,44 @@ export class ServedStop {
       id: PlatformID;
       confidence: ConfidenceLevel;
     } | null
-  ) { }
+  ) {}
 
-  static readonly json = z.object({
-    stop: StopIDJson,
+  static readonly json = z
+    .object({
+      stop: StopIDJson,
+      stopListIndex: z.number(),
 
-    // Ensures this is never confused for a skipped stop.
-    express: z.literal(false),
+      // Ensures this is never confused for a skipped stop.
+      express: z.literal(false),
 
-    scheduledTime: QUtcDateTime.json,
-    liveTime: QUtcDateTime.json.nullable(),
-    setsDown: z.boolean(),
-    picksUp: z.boolean(),
-    platform: z
-      .object({
-        id: PlatformIDJson,
-        confidence: ConfidenceLevelJson,
-      })
-      .nullable(),
-  }).transform(x => new ServedStop(
-    x.stop,
-    x.scheduledTime,
-    x.liveTime,
-    x.setsDown,
-    x.picksUp,
-    x.platform
-  ));
+      scheduledTime: QUtcDateTime.json,
+      liveTime: QUtcDateTime.json.nullable(),
+      setsDown: z.boolean(),
+      picksUp: z.boolean(),
+      platform: z
+        .object({
+          id: PlatformIDJson,
+          confidence: ConfidenceLevelJson,
+        })
+        .nullable(),
+    })
+    .transform(
+      (x) =>
+        new ServedStop(
+          x.stop,
+          x.stopListIndex,
+          x.scheduledTime,
+          x.liveTime,
+          x.setsDown,
+          x.picksUp,
+          x.platform
+        )
+    );
 
   toJSON(): z.input<typeof ServedStop.json> {
     return {
       stop: this.stop,
+      stopListIndex: this.stopListIndex,
       express: this.express,
       scheduledTime: this.scheduledTime.toJSON(),
       liveTime: this.liveTime?.toJSON() ?? null,
@@ -60,9 +69,9 @@ export class ServedStop {
         this.platform == null
           ? null
           : {
-            id: this.platform.id,
-            confidence: this.platform.confidence,
-          },
+              id: this.platform.id,
+              confidence: this.platform.confidence,
+            },
     };
   }
 }
@@ -70,18 +79,22 @@ export class ServedStop {
 export class SkippedStop {
   readonly express = true;
 
-  constructor(readonly stop: StopID) { }
+  constructor(readonly stop: StopID, readonly stopListIndex: number) {}
 
-  static readonly json = z.object({
-    stop: StopIDJson,
+  static readonly json = z
+    .object({
+      stop: StopIDJson,
+      stopListIndex: z.number(),
 
-    // Ensures this is never confused for a served stop.
-    express: z.literal(true),
-  }).transform(x => new SkippedStop(x.stop));
+      // Ensures this is never confused for a served stop.
+      express: z.literal(true),
+    })
+    .transform((x) => new SkippedStop(x.stop, x.stopListIndex));
 
   toJSON(): z.input<typeof SkippedStop.json> {
     return {
       stop: this.stop,
+      stopListIndex: this.stopListIndex,
       express: this.express,
     };
   }

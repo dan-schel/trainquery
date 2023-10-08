@@ -4,154 +4,211 @@ import type { StopID } from "shared/system/ids";
 import { Departure } from "shared/system/timetable/departure";
 import type { Service } from "shared/system/timetable/service";
 import type { ServedStop } from "shared/system/timetable/service-stop";
-import { CompleteStoppingPattern } from "shared/system/timetable/stopping-pattern";
+import {
+  CompleteStoppingPattern,
+  PartialStoppingPattern,
+} from "shared/system/timetable/stopping-pattern";
 
-export type ContinuifyResult = (
+export type ContinuifyStop =
   | {
       type: "express";
       stop: StopID;
+      stopListIndex: number;
       stintIndex: number;
+      stint: Service;
     }
   | {
       type: "served";
       stop: StopID;
+      stopListIndex: number;
       stintIndex: number;
+      stint: Service;
       detail: ServedStop | null;
     }
   | {
       type: "unknown";
       stop: StopID;
+      stopListIndex: number;
       stintIndex: number;
-    }
-)[];
+      stint: Service;
+    };
+
+export type ContinuifyResult = {
+  all: ContinuifyStop[];
+  trimmed: ContinuifyStop[];
+};
 
 /** Return the part of the stopping pattern we care about. */
 export function continuify(
   departure: Departure,
   continuationsEnabled: boolean
 ): ContinuifyResult {
-  const stints: Service[] = [];
-  if (!continuationsEnabled || departure.continuation == null) {
-    stints.push(departure);
-  } else {
-    let service: Service | null = departure;
-    while (service != null) {
-      stints.push(service);
-      service = service.continuation;
-    }
+  const stints: Service[] = [departure];
+
+  let service: Service | null = departure.continuation;
+  while (continuationsEnabled && service != null) {
+    stints.push(service);
+    service = service.continuation;
   }
 
   return merge(stints, departure.perspectiveIndex);
 }
 
 function merge(stints: Service[], start: number): ContinuifyResult {
-  const result: ContinuifyResult = [];
-
-  let totalStopIndex = 0;
-  const seen = new Set<StopID>();
-
-  for (let i = 0; i < stints.length; i++) {
-    const stint = stints[i];
-    const stopList = requireLine(getConfig(), stint.line).route.requireStops(
-      stint.route,
-      stint.direction
+  const all: ContinuifyStop[] = [];
+  let previousStintTerminus: StopID | null = null;
+  stints.forEach((s, i) => {
+    const stops: ContinuifyStop[] = trimmedStops(s, previousStintTerminus).map(
+      (x) => ({
+        ...x,
+        stintIndex: i,
+        stint: s,
+      })
     );
 
-    // We know the first stint has originated, but for the others we need to
-    // wait for the first stop.
-    let hasOriginated = i == 0;
-    let uncommitted: ContinuifyResult = [];
+    previousStintTerminus = stops[stops.length - 1].stop;
 
-    for (let j = 0; j < stopList.length; j++) {
-      if (seen.has(stopList[j]) && i != 0) {
-        // Stop here, we've already seen this stop before.
-        return result;
-      } else if (totalStopIndex >= start) {
-        const entry = continuifiedStopFor(stint, j, stopList[j], i);
+    // To avoid duplicate terminii, remove the terminus of each service unless
+    // it's the last stint.
+    const stopsToPush = i < stints.length - 1 ? stops.slice(0, -1) : stops;
+    all.push(...stopsToPush);
+  });
 
-        if (hasOriginated || entry.type == "served") {
-          uncommitted.push(entry);
-          hasOriginated = true;
-          if (entry.type == "served" && uncommitted.length != 0) {
-            result.push(...uncommitted);
-            uncommitted = [];
+  const trimmed = [];
+  const seen = new Set<StopID>();
+  let started = false;
+  for (const stop of all) {
+    if (stop.stintIndex != 0 || stop.stopListIndex >= start) {
+      started = true;
+    }
+
+    if (started) {
+      // Consider "unknown" to be the same as "served" for trimming purposes.
+      if (stop.type != "express") {
+        if (seen.has(stop.stop)) {
+          // We've now come to a stop we've been to before, so trim the list
+          // here. There's also no point including any express stops since the
+          // last stop in the list, so let's trim them off now.
+          while (trimmed[trimmed.length - 1].type == "express") {
+            trimmed.splice(trimmed.length - 1, 1);
           }
-        }
-
-        if (entry.type != "express") {
-          seen.add(stopList[j]);
+        } else {
+          seen.add(stop.stop);
         }
       }
 
-      totalStopIndex++;
+      trimmed.push(stop);
     }
   }
 
-  // TODO: Remove duplicate stops due to the continuation stop being added
-  // twice. The terminus stop for services that continue should be removed.
-
-  return result;
+  return {
+    all: all,
+    trimmed: trimmed,
+  };
 }
 
-function continuifiedStopFor(
-  service: Service,
-  index: number,
-  stop: StopID,
-  stintIndex: number
-): ContinuifyResult[number] {
-  if (stintIndex == 0) {
-    if (service instanceof Departure) {
-      if (index == service.perspectiveIndex) {
-        return {
-          type: "served",
-          stop: service.perspective.stop,
-          detail: service.perspective,
-          stintIndex: stintIndex,
-        };
-      }
-    } else {
-      throw new Error("First stint was not a departure?");
-    }
+function trimmedStops(stint: Service, previousStintTerminus: StopID | null) {
+  if (stint.stoppingPattern instanceof CompleteStoppingPattern) {
+    return trimmedStopsComplete(stint.stoppingPattern);
   }
+  return trimmedStopsPartial(
+    stint.stoppingPattern,
+    stint,
+    previousStintTerminus
+  );
+}
 
-  if (service.stoppingPattern instanceof CompleteStoppingPattern) {
-    const detail = service.stoppingPattern.stops[index];
-    if (detail.express) {
+function trimmedStopsComplete(pattern: CompleteStoppingPattern) {
+  return pattern.trim().map((x) =>
+    x.express
+      ? {
+          type: "express" as const,
+          stop: x.stop,
+          stopListIndex: x.stopListIndex,
+        }
+      : {
+          type: "served" as const,
+          stop: x.stop,
+          stopListIndex: x.stopListIndex,
+          detail: x,
+        }
+  );
+}
+
+function trimmedStopsPartial(
+  pattern: PartialStoppingPattern,
+  stint: Service,
+  previousStintTerminus: StopID | null
+) {
+  const stopList = requireLine(getConfig(), stint.line).route.requireStopList(
+    stint.route,
+    stint.direction
+  );
+
+  const terminusIndex = pattern.terminus.index;
+  const originIndex = (() => {
+    // If we know the origin, use it.
+    if (pattern.origin?.index != null) {
+      return pattern.origin.index;
+    }
+
+    // Otherwise find the first known stop (if there are any).
+    let bestGuess = pattern.additional.find((s) => !s.express)?.index ?? null;
+
+    // If we know where the previous stint terminated, find the index of that
+    // stop within the stop list.
+    if (previousStintTerminus != null) {
+      // If this stop list stops here multiple times, use the latest stop (to be
+      // conservative). Don't use any stops before the terminus (which we know
+      // with more certainty).
+      const expectedOriginIndex = Math.max(
+        ...stopList.stops
+          .map((s, i) => ({ stop: s, index: i }))
+          .filter(
+            (s) => s.index < terminusIndex && s.stop == previousStintTerminus
+          )
+          .map((x) => x.index)
+      );
+
+      // Only use this stop if it's earlier that any known stops.
+      if (bestGuess == null || expectedOriginIndex < bestGuess) {
+        bestGuess = expectedOriginIndex;
+      }
+    }
+
+    // If we literally know nothing at all, then just go with the first stop I
+    // guess?
+    return bestGuess ?? 0;
+  })();
+
+  const knownStops = pattern.getKnownStops();
+  const knownExpress = pattern.additional
+    .filter((x) => x.express)
+    .map((x) => x.index);
+
+  return stopList.stops.slice(originIndex, terminusIndex + 1).map((s, i) => {
+    const index = i + originIndex;
+
+    const known = knownStops.find((x) => x.index == index);
+    if (known != null) {
       return {
-        type: "express",
-        stop: detail.stop,
-        stintIndex: stintIndex,
+        type: "served" as const,
+        stop: s,
+        stopListIndex: index,
+        detail: known.detail,
+      };
+    } else if (knownExpress.includes(index)) {
+      return {
+        type: "express" as const,
+        stop: s,
+        stopListIndex: index,
       };
     } else {
       return {
-        type: "served",
-        stop: detail.stop,
-        detail: detail,
-        stintIndex: stintIndex,
+        type: "unknown" as const,
+        stop: s,
+        stopListIndex: index,
       };
     }
-  } else {
-    const terminusIndex = service.stoppingPattern.terminus.index;
-    const originIndex = service.stoppingPattern.origin?.index ?? 0;
-    if (index == terminusIndex || index == originIndex) {
-      return {
-        type: "served",
-        stop: stop,
-        detail: null,
-        stintIndex: stintIndex,
-      };
-    } else if (index < originIndex || index > terminusIndex) {
-      return {
-        type: "express",
-        stop: stop,
-        stintIndex: stintIndex,
-      };
-    } else {
-      return {
-        type: "unknown",
-        stop: stop,
-        stintIndex: stintIndex,
-      };
-    }
-  }
+  });
 }

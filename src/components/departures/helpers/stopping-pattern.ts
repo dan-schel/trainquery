@@ -1,18 +1,20 @@
 import { requireStop } from "shared/system/config-utils";
-import type { ContinuifyResult } from "./continuify";
+import type { ContinuifyStop } from "./continuify";
 import { getConfig } from "@/utils/get-config";
 import type { StopID } from "shared/system/ids";
 import { listifyAnd } from "@schel-d/js-utils";
 import { Departure } from "shared/system/timetable/departure";
 import { CompleteStoppingPattern } from "shared/system/timetable/stopping-pattern";
 
-export function getStoppingPatternString(detail: ContinuifyResult): string {
-  const firstUnknownStint = detail.find((s) => s.type == "unknown")?.stintIndex;
+export function getStoppingPatternString(trimmed: ContinuifyStop[]): string {
+  const firstUnknownStint = trimmed.find(
+    (s) => s.type == "unknown"
+  )?.stintIndex;
   if (firstUnknownStint == 0) {
     return "Unknown stopping pattern";
   } else if (firstUnknownStint != null) {
     return getStoppingPatternString(
-      detail.filter((s) => s.stintIndex < firstUnknownStint)
+      trimmed.filter((s) => s.stintIndex < firstUnknownStint)
     );
   }
 
@@ -20,7 +22,7 @@ export function getStoppingPatternString(detail: ContinuifyResult): string {
 
   // Note that arrivals are processed outside this function, so there should
   // always be at least two served stops in the list.
-  const stops = detail.map((x, i) => ({
+  const stops = trimmed.map((x, i) => ({
     name: name(x.stop),
     express: x.type != "served",
     index: i,
