@@ -1,6 +1,6 @@
 import { requireLine } from "../../shared/system/config-utils";
 import { StopID } from "../../shared/system/ids";
-import { Departure } from "../../shared/system/timetable/departure";
+import { Departure } from "../../shared/system/service/departure";
 import { DepartureFilter } from "../../shared/system/timetable/departure-filter";
 import { TrainQuery } from "../trainquery";
 import { Bucket } from "./get-departures";
