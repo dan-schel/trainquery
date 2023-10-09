@@ -46,7 +46,7 @@ const detail = computed(() => {
   <RouterLink
     class="departure"
     :class="`accent-${detail.lineColor}`"
-    :to="getServicePageRoute(getConfig(), departure)"
+    :to="getServicePageRoute(departure, departure.perspectiveIndex)"
   >
     <div class="primary">
       <OneLineP class="terminus">{{ detail.terminus }}</OneLineP>

@@ -131,7 +131,7 @@ function handlePin() {
         <DepartureVue
           v-for="departure in departures"
           :continuations-enabled="false"
-          :key="getServicePageRoute(getConfig(), departure)"
+          :key="getServicePageRoute(departure)"
           :departure="departure"
           :perspective="feed.stop"
           :now="now"

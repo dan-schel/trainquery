@@ -8,6 +8,7 @@ import SimpleButton from "@/components/common/SimpleButton.vue";
 
 useHead({
   title: "Settings",
+  meta: [{ name: "robots", content: "noindex" }],
 });
 
 const theme = ref<Theme>();

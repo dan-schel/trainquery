@@ -200,12 +200,15 @@ export function getLinePageRoute(
 
 /** E.g. "/train/[something]". */
 export function getServicePageRoute(
-  _config: HasSharedConfig,
-  service: Service
+  service: Service,
+  perspectiveIndex?: number
 ): string {
   // <TEMP>
-  // Not all services have a static ID, and live data isn't captured here at all.
-  return `/train/${service.staticID}`;
+  // Not all services have a static ID, and live data sources aren't used here
+  // at all.
+  const piParam =
+    perspectiveIndex == null ? "" : `?from=${perspectiveIndex.toFixed()}`;
+  return `/train/${service.staticID}` + piParam;
   // </TEMP>
 }
 

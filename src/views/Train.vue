@@ -1,54 +1,101 @@
 <script setup lang="ts">
 import { useHead } from "@vueuse/head";
 import { useRoute } from "vue-router";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import PageContent from "@/components/common/PageContent.vue";
-import { Service } from "shared/system/timetable/service";
 import { z } from "zod";
 import LineList from "@/components/LineList.vue";
 import { getDiagramForService } from "@/components/line/get-diagram-for-service";
 import LineDiagram from "@/components/line/LineDiagram.vue";
 import LinePageStop from "@/components/line/LinePageStop.vue";
+import { Departure } from "shared/system/timetable/departure";
+import { ContinuifiedDeparture } from "@/components/departures/helpers/continuified-departure";
+import NotFoundLayout from "@/components/NotFoundLayout.vue";
+import {
+  nowLocalLuxon,
+  toLocalDateTimeLuxon,
+} from "shared/qtime/luxon-conversions";
+import { getConfig } from "@/utils/get-config";
+import { formatRelativeTime, formatTime } from "@/utils/format-qtime";
+import { requireStop } from "shared/system/config-utils";
+
+const now = ref(nowLocalLuxon(getConfig()));
 
 const route = useRoute();
-const params = ref(route.params);
-watch(route, () => {
-  // For some reason, this is called even when navigating away from the page!
-  if (route.name == "train") {
-    params.value = route.params;
-  }
-});
 
 const train = computed(() => {
   const metaSchema = z.object({
     state: z.object({
-      service: Service.json,
+      departure: Departure.json.optional(),
     }),
   });
   const meta = metaSchema.parse(route.meta);
-  return meta.state.service;
+  const departure = meta.state.departure;
+  return departure == null
+    ? null
+    : ContinuifiedDeparture.build(departure, false);
 });
 
-const diagram = computed(() => getDiagramForService(train.value));
+const diagram = computed(() =>
+  train.value != null ? getDiagramForService(train.value) : null
+);
+
+const title = computed(() => {
+  if (train.value == null) {
+    return {
+      short: "Train not found",
+      long: "Train not found",
+    };
+  }
+
+  const perspective = train.value.perspective;
+  const timeString = formatTime(
+    toLocalDateTimeLuxon(getConfig(), perspective.scheduledTime).time
+  );
+  const terminus = requireStop(
+    getConfig(),
+    train.value.stintTerminus(0).stop
+  ).name;
+  return {
+    short: `${terminus} train`,
+    long: `${timeString} ${terminus} train`,
+  };
+});
+
+const departureText = computed(() => {
+  if (train.value == null) {
+    return "";
+  }
+
+  const name = requireStop(getConfig(), train.value.perspective.stop).name;
+  const time = toLocalDateTimeLuxon(
+    getConfig(),
+    train.value.perspective.scheduledTime
+  );
+  const timeString = formatRelativeTime(time, now.value);
+  const verb = time.isBefore(now.value) ? "Departed" : "Departs";
+  return `${verb} ${name} at ${timeString}`;
+});
 
 const head = computed(() => ({
-  // TODO: Real title.
-  title: "Train",
-  link: [
-    {
-      rel: "canonical",
-      href:
-        // TODO: Real link.
-        "https://trainquery.com/train",
-    },
-  ],
+  title: title.value.long,
+  meta: [{ name: "robots", content: "noindex" }],
 }));
 useHead(head);
 </script>
 
 <template>
-  <PageContent title="Train" title-margin="0.5rem">
-    <LineList :lines="[train.line, ...train.associatedLines]"></LineList>
+  <PageContent
+    :title="title.short"
+    title-margin="0.5rem"
+    v-if="train != null"
+    v-bind="$attrs"
+  >
+    <p class="subtitle">{{ departureText }}</p>
+    <LineList
+      class="line-list"
+      :lines="[train.line, ...train.associatedLines]"
+    ></LineList>
     <LineDiagram v-if="diagram != null" :diagram="diagram" class="diagram">
       <template #stop="slotProps">
         <!-- TODO: this is the wrong component! -->
@@ -56,14 +103,24 @@ useHead(head);
       </template>
     </LineDiagram>
   </PageContent>
+
+  <NotFoundLayout
+    :title="title.short"
+    message="That train can't be found anymore. It might be from an old timetable, no longer running, or not stopping here anymore."
+    v-if="train == null"
+  ></NotFoundLayout>
 </template>
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
-
+.line-list {
+  margin-bottom: 2rem;
+}
+.subtitle {
+  margin-bottom: 1rem;
+}
 .diagram {
   --stop-gap: 1rem;
-  margin-top: 2rem;
   margin-bottom: 2rem;
 }
 </style>

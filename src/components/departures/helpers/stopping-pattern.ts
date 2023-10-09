@@ -10,7 +10,7 @@ export function getStoppingPatternString(
 ): string {
   if (departure.isArrival()) {
     const origin = departure.origin();
-    if (origin.type != "served") {
+    if (origin == null) {
       return "Unknown origin";
     } else {
       return `Arrival from ${requireStop(getConfig(), origin.stop).name}`;

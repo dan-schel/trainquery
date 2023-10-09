@@ -7,13 +7,26 @@ import {
   type ContinuifiedServedStop,
 } from "./continuified-stop";
 
-export class ContinuifiedDeparture {
+export class ContinuifiedDeparture extends Departure {
   constructor(
+    readonly departure: Departure,
     readonly allRaw: ContinuifiedStop[],
     readonly all: ContinuifiedStop[],
-    readonly relevant: ContinuifiedStop[],
-    readonly perspectiveIndex: number
-  ) {}
+    readonly relevant: ContinuifiedStop[]
+  ) {
+    super(
+      departure.line,
+      departure.associatedLines,
+      departure.route,
+      departure.direction,
+      departure.stoppingPattern,
+      departure.staticID,
+      departure.sources,
+      departure.continuation,
+      departure.perspectiveIndex,
+      departure.perspective
+    );
+  }
 
   static build(departure: Departure, continuationsEnabled: boolean) {
     const stints: Service[] = [departure];
@@ -27,12 +40,7 @@ export class ContinuifiedDeparture {
     const allDuped = merge(stints);
     const all = dedupe(allDuped);
     const relevant = trimRelevant(all, departure.perspectiveIndex);
-    return new ContinuifiedDeparture(
-      allDuped,
-      all,
-      relevant,
-      departure.perspectiveIndex
-    );
+    return new ContinuifiedDeparture(departure, allDuped, all, relevant);
   }
 
   forStint(index: number, { relevant = true }: { relevant?: boolean } = {}) {
@@ -50,7 +58,7 @@ export class ContinuifiedDeparture {
   }
 
   origin() {
-    return this.allRaw[0];
+    return this.stintOrigin(0);
   }
 
   perspectiveStop(): ContinuifiedServedStop {
@@ -73,6 +81,24 @@ export class ContinuifiedDeparture {
     return this.relevant.filter(
       (s): s is ContinuifiedServedStop => s.type == "served"
     );
+  }
+
+  stintTerminus(index: number): ContinuifiedServedStop {
+    const stint = this.forStint(index, { relevant: false });
+    const terminus = stint[stint.length - 1];
+    if (terminus.type != "served") {
+      throw new Error("Termini must be known as being served.");
+    }
+    return terminus;
+  }
+  stintOrigin(index: number): ContinuifiedServedStop | null {
+    const stint = this.forStint(index, { relevant: false });
+    const terminus = stint[0];
+    if (terminus.type != "served") {
+      // Origins aren't always known. Don't throw.
+      return null;
+    }
+    return terminus;
   }
 
   hasContinuation() {
