@@ -1,28 +1,46 @@
 import { requireStop } from "shared/system/config-utils";
-import type { ContinuifyStop } from "./continuify";
 import { getConfig } from "@/utils/get-config";
 import type { StopID } from "shared/system/ids";
 import { listifyAnd } from "@schel-d/js-utils";
-import { Departure } from "shared/system/timetable/departure";
-import { CompleteStoppingPattern } from "shared/system/timetable/stopping-pattern";
+import type { ContinuifiedDeparture } from "./continuified-departure";
+import type { ContinuifiedStop } from "./continuified-stop";
 
-export function getStoppingPatternString(trimmed: ContinuifyStop[]): string {
-  const firstUnknownStint = trimmed.find(
-    (s) => s.type == "unknown"
-  )?.stintIndex;
-  if (firstUnknownStint == 0) {
-    return "Unknown stopping pattern";
-  } else if (firstUnknownStint != null) {
-    return getStoppingPatternString(
-      trimmed.filter((s) => s.stintIndex < firstUnknownStint)
-    );
+export function getStoppingPatternString(
+  departure: ContinuifiedDeparture
+): string {
+  if (departure.isArrival()) {
+    const origin = departure.origin();
+    if (origin.type != "served") {
+      return "Unknown origin";
+    } else {
+      return `Arrival from ${requireStop(getConfig(), origin.stop).name}`;
+    }
   }
 
+  const firstUnknownStint = departure.relevant.find(
+    (s) => s.type == "unknown"
+  )?.stintIndex;
+
+  if (firstUnknownStint == null) {
+    // We know everything we need for the whole relevant bit of the service.
+    return stoppingPattern(departure.relevant);
+  } else if (firstUnknownStint > 0) {
+    // Just work out the stopping pattern up to the first unknown bit.
+    return stoppingPattern(
+      departure.relevant.filter((s) => s.stintIndex < firstUnknownStint)
+    );
+  } else {
+    // We don't know much at all.
+    return "Unknown stopping pattern";
+  }
+}
+
+function stoppingPattern(relevant: ContinuifiedStop[]) {
   const name = (stop: StopID) => requireStop(getConfig(), stop).name;
 
   // Note that arrivals are processed outside this function, so there should
   // always be at least two served stops in the list.
-  const stops = trimmed.map((x, i) => ({
+  const stops = relevant.map((x, i) => ({
     name: name(x.stop),
     express: x.type != "served",
     index: i,
@@ -52,23 +70,4 @@ export function getStoppingPatternString(trimmed: ContinuifyStop[]): string {
 
   // Otherwise we give up.
   return "Limited express";
-}
-
-export function getArrivalDetailString(departure: Departure) {
-  // Need to use departure in this function, because detail only includes stops
-  // in the future.
-
-  const origin = (() => {
-    if (departure.stoppingPattern instanceof CompleteStoppingPattern) {
-      return departure.stoppingPattern.trim()[0].stop;
-    } else if (departure.stoppingPattern.origin != null) {
-      return departure.stoppingPattern.origin.stop;
-    }
-    return null;
-  })();
-
-  if (origin == null) {
-    return null;
-  }
-  return `Arrival from ${requireStop(getConfig(), origin).name}`;
 }

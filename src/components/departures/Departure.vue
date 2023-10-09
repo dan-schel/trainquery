@@ -6,7 +6,6 @@ import { Departure } from "shared/system/timetable/departure";
 import { getServicePageRoute, requireLine } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
 import { computed } from "vue";
-import { continuify } from "./helpers/continuify";
 import {
   getLinesString,
   getPlatformString,
@@ -14,12 +13,10 @@ import {
   getTimeString,
   getViaString,
 } from "./helpers/utils";
-import {
-  getArrivalDetailString,
-  getStoppingPatternString,
-} from "./helpers/stopping-pattern";
+import { getStoppingPatternString } from "./helpers/stopping-pattern";
 import type { StopID } from "shared/system/ids";
 import type { QUtcDateTime } from "shared/qtime/qdatetime";
+import { ContinuifiedDeparture } from "./helpers/continuified-departure";
 
 const props = defineProps<{
   departure: Departure;
@@ -29,17 +26,15 @@ const props = defineProps<{
 }>();
 
 const detail = computed(() => {
-  const detail = continuify(props.departure, props.continuationsEnabled);
-  const isArrival = detail.trimmed.length == 1;
-
+  const detail = ContinuifiedDeparture.build(
+    props.departure,
+    props.continuationsEnabled
+  );
   return {
-    stoppingPattern: detail,
-    terminus: isArrival ? "Arrival" : getTerminusString(detail),
+    terminus: getTerminusString(detail),
     via: getViaString(detail),
-    platform: getPlatformString(props.departure, props.perspective),
-    stoppingPatternString: isArrival
-      ? getArrivalDetailString(props.departure) ?? ""
-      : getStoppingPatternString(detail.trimmed),
+    platform: getPlatformString(detail),
+    stoppingPatternString: getStoppingPatternString(detail),
     lineColor: requireLine(getConfig(), props.departure.line).color,
     timeString: getTimeString(props.departure, props.now),
     linesString: getLinesString(props.departure),
@@ -200,4 +195,4 @@ const detail = computed(() => {
   margin-left: 0.5rem;
 }
 </style>
-./helpers/continuify
+./helpers/continuify ./helpers/continuified-departure

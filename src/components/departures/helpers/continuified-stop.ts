@@ -1,7 +1,6 @@
 import { getConfig } from "@/utils/get-config";
 import { requireLine } from "shared/system/config-utils";
 import type { StopID } from "shared/system/ids";
-import { Departure } from "shared/system/timetable/departure";
 import type { Service } from "shared/system/timetable/service";
 import type { ServedStop } from "shared/system/timetable/service-stop";
 import {
@@ -9,116 +8,46 @@ import {
   PartialStoppingPattern,
 } from "shared/system/timetable/stopping-pattern";
 
-export type ContinuifyStop =
-  | {
-      type: "express";
-      stop: StopID;
-      stopListIndex: number;
-      stintIndex: number;
-      stint: Service;
-    }
-  | {
-      type: "served";
-      stop: StopID;
-      stopListIndex: number;
-      stintIndex: number;
-      stint: Service;
-      detail: ServedStop | null;
-    }
-  | {
-      type: "unknown";
-      stop: StopID;
-      stopListIndex: number;
-      stintIndex: number;
-      stint: Service;
-    };
-
-export type ContinuifyResult = {
-  all: ContinuifyStop[];
-  trimmed: ContinuifyStop[];
+export type ContinuifiedServedStop = {
+  type: "served";
+  stop: StopID;
+  stopListIndex: number;
+  stintIndex: number;
+  stint: Service;
+  detail: ServedStop | null;
+};
+export type ContinuifiedExpressStop = {
+  type: "express";
+  stop: StopID;
+  stopListIndex: number;
+  stintIndex: number;
+  stint: Service;
+};
+export type ContinuifiedUnknownStop = {
+  type: "unknown";
+  stop: StopID;
+  stopListIndex: number;
+  stintIndex: number;
+  stint: Service;
 };
 
-/** Return the part of the stopping pattern we care about. */
-export function continuify(
-  departure: Departure,
-  continuationsEnabled: boolean
-): ContinuifyResult {
-  const stints: Service[] = [departure];
+export type ContinuifiedStop =
+  | ContinuifiedServedStop
+  | ContinuifiedExpressStop
+  | ContinuifiedUnknownStop;
 
-  let service: Service | null = departure.continuation;
-  while (continuationsEnabled && service != null) {
-    stints.push(service);
-    service = service.continuation;
-  }
-
-  return merge(stints, departure.perspectiveIndex);
-}
-
-function merge(stints: Service[], start: number): ContinuifyResult {
-  const all: ContinuifyStop[] = [];
-  let previousStintTerminus: StopID | null = null;
-  stints.forEach((s, i) => {
-    const stops: ContinuifyStop[] = trimmedStops(s, previousStintTerminus).map(
-      (x) => ({
-        ...x,
-        stintIndex: i,
-        stint: s,
-      })
-    );
-
-    previousStintTerminus = stops[stops.length - 1].stop;
-
-    // To avoid duplicate terminii, remove the terminus of each service unless
-    // it's the last stint.
-    const stopsToPush = i < stints.length - 1 ? stops.slice(0, -1) : stops;
-    all.push(...stopsToPush);
-  });
-
-  const trimmed = [];
-  const seen = new Set<StopID>();
-  let started = false;
-  for (const stop of all) {
-    if (stop.stintIndex != 0 || stop.stopListIndex >= start) {
-      started = true;
-    }
-
-    if (started) {
-      // Consider "unknown" to be the same as "served" for trimming purposes.
-      if (stop.type != "express") {
-        if (seen.has(stop.stop)) {
-          // We've now come to a stop we've been to before, so trim the list
-          // here. There's also no point including any express stops since the
-          // last stop in the list, so let's trim them off now.
-          while (trimmed[trimmed.length - 1].type == "express") {
-            trimmed.splice(trimmed.length - 1, 1);
-          }
-        } else {
-          seen.add(stop.stop);
-        }
-      }
-
-      trimmed.push(stop);
-    }
-  }
-
-  return {
-    all: all,
-    trimmed: trimmed,
-  };
-}
-
-function trimmedStops(stint: Service, previousStintTerminus: StopID | null) {
+export function getContinuifiedStops(
+  stint: Service,
+  previousStintTerminus: StopID | null
+) {
   if (stint.stoppingPattern instanceof CompleteStoppingPattern) {
-    return trimmedStopsComplete(stint.stoppingPattern);
+    return complete(stint.stoppingPattern);
+  } else {
+    return partial(stint.stoppingPattern, stint, previousStintTerminus);
   }
-  return trimmedStopsPartial(
-    stint.stoppingPattern,
-    stint,
-    previousStintTerminus
-  );
 }
 
-function trimmedStopsComplete(pattern: CompleteStoppingPattern) {
+function complete(pattern: CompleteStoppingPattern) {
   return pattern.trim().map((x) =>
     x.express
       ? {
@@ -135,7 +64,7 @@ function trimmedStopsComplete(pattern: CompleteStoppingPattern) {
   );
 }
 
-function trimmedStopsPartial(
+function partial(
   pattern: PartialStoppingPattern,
   stint: Service,
   previousStintTerminus: StopID | null

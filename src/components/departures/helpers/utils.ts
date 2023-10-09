@@ -1,24 +1,29 @@
-import type { ContinuifyResult } from "./continuify";
-import { requireLine, requireStop } from "shared/system/config-utils";
+import type { ContinuifiedDeparture } from "./continuified-departure";
+import {
+  requireLine,
+  requirePlatform,
+  requireStop,
+} from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
 import type { Departure } from "shared/system/timetable/departure";
-import type { StopID } from "shared/system/ids";
 import { formatDuration, formatRelativeTime } from "@/utils/format-qtime";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import type { QUtcDateTime } from "shared/qtime/qdatetime";
 import { listifyAnd } from "@schel-d/js-utils";
 
-export function getTerminusString({ trimmed }: ContinuifyResult) {
-  const stopID = trimmed[trimmed.length - 1].stop;
-  return requireStop(getConfig(), stopID).name;
+export function getTerminusString(departure: ContinuifiedDeparture) {
+  if (departure.isArrival()) {
+    return "Arrival";
+  }
+  return requireStop(getConfig(), departure.relevantTerminus().stop).name;
 }
 
-export function getViaString({ all, trimmed }: ContinuifyResult) {
-  const servedStops = trimmed.filter((s) => s.type == "served");
-  const doesContinue = all.some((x) => x.stintIndex != 0);
+export function getViaString(departure: ContinuifiedDeparture) {
+  const servedStops = departure.relevantServedStops();
+  const doesContinue = departure.hasContinuation();
 
-  const thisStop = trimmed[0].stop;
-  const lastStop = trimmed[trimmed.length - 1].stop;
+  const thisStop = departure.perspectiveStop().stop;
+  const lastStop = departure.relevantTerminus().stop;
 
   for (const rule of getConfig().frontend.via) {
     // Don't use this rule if some stops are not served.
@@ -41,19 +46,15 @@ export function getViaString({ all, trimmed }: ContinuifyResult) {
   return null;
 }
 
-export function getPlatformString(departure: Departure, perspective: StopID) {
-  const platform = departure.perspective.platform;
+export function getPlatformString(departure: ContinuifiedDeparture) {
+  const thisStop = departure.perspectiveStop();
+
+  const platform = thisStop.detail?.platform;
   if (platform == null) {
     return null;
   }
-  const name = requireStop(getConfig(), perspective).platforms.find(
-    (p) => p.id == platform.id
-  )?.name;
-  if (name == null) {
-    throw new Error(
-      `Platform '${platform.id}' at stop '${perspective}' not found.`
-    );
-  }
+
+  const name = requirePlatform(getConfig(), thisStop.stop, platform.id).name;
   return platform.confidence == "low" ? `${name}?` : name;
 }
 
