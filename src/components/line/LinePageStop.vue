@@ -9,7 +9,7 @@ const props = defineProps<{
   stopData: LineDiagramStop<null, null>;
 }>();
 
-const stopData = computed(() => requireStop(getConfig(), props.stopData.stop));
+const stop = computed(() => requireStop(getConfig(), props.stopData.stop));
 </script>
 
 <template>
@@ -17,8 +17,8 @@ const stopData = computed(() => requireStop(getConfig(), props.stopData.stop));
     <RouterLink
       class="link"
       :class="{ express: stopData.express }"
-      :to="getStopPageRoute(getConfig(), stopData.id)"
-      >{{ stopData.express ? "Skips " : "" }}{{ stopData.name }}</RouterLink
+      :to="getStopPageRoute(getConfig(), stop.id)"
+      >{{ stopData.express ? "Skips " : "" }}{{ stop.name }}</RouterLink
     >
   </p>
 </template>

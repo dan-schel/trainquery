@@ -196,6 +196,11 @@ $branch-end-margin: 0.5rem;
   }
 }
 
+.label,
+.label-extra {
+  min-width: 0;
+}
+
 .visual,
 .visual-extra {
   --indent: 0rem;

@@ -91,7 +91,7 @@ useHead(head);
     ></LineList>
     <LineDiagram v-if="diagram != null" :diagram="diagram" class="diagram">
       <template #stop="slotProps">
-        <TrainPageStop :stop-data="slotProps.stopData" />
+        <TrainPageStop :stop-data="slotProps.stopData" :now="now" />
       </template>
     </LineDiagram>
   </PageContent>
