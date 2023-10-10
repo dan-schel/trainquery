@@ -9,6 +9,7 @@ import { formatRelativeTime } from "@/utils/format-qtime";
 import type { QLocalDateTime } from "shared/qtime/qdatetime";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import OneLineP from "../common/OneLineP.vue";
+import { getPlatformString } from "../departures/helpers/utils";
 
 const props = defineProps<{
   stopData: LineDiagramStop<AdditionalServedData, null>;
@@ -25,6 +26,12 @@ const timeString = computed(() => {
   );
   return formatRelativeTime(local, props.now, { suppressEarlierToday: true });
 });
+const platformString = computed(() => {
+  if (props.stopData.express || props.stopData.data.platform == null) {
+    return null;
+  }
+  return getPlatformString(props.stopData.data.platform, props.stopData.stop);
+});
 </script>
 
 <template>
@@ -39,6 +46,10 @@ const timeString = computed(() => {
     </OneLineP>
     <p v-if="timeString != null" class="dot">•</p>
     <OneLineP v-if="timeString != null" class="time">{{ timeString }}</OneLineP>
+    <p v-if="platformString != null" class="dot">•</p>
+    <OneLineP v-if="platformString != null" class="platform"
+      >Plat. {{ platformString }}</OneLineP
+    >
   </div>
 </template>
 
@@ -56,8 +67,7 @@ const timeString = computed(() => {
   }
 }
 .dot {
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
+  margin: 0 0.4rem;
 }
 .time {
   min-width: 0;
@@ -65,5 +75,8 @@ const timeString = computed(() => {
 }
 .row {
   @include template.row;
+}
+.flex-grow {
+  @include template.flex-grow;
 }
 </style>

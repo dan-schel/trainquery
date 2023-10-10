@@ -10,6 +10,8 @@ import type { QUtcDateTime } from "shared/qtime/qdatetime";
 import { listifyAnd } from "@schel-d/js-utils";
 import type { PatternList } from "shared/system/service/listed-stop";
 import type { Departure } from "shared/system/service/departure";
+import type { PlatformID, StopID } from "shared/system/ids";
+import type { ConfidenceLevel } from "shared/system/enums";
 
 export function getTerminusString(
   departure: Departure,
@@ -49,15 +51,18 @@ export function getViaString(departure: Departure, patternList: PatternList) {
   return null;
 }
 
-export function getPlatformString(departure: Departure) {
-  const platform = departure.perspective.platform;
+export function getDeparturePlatformString(departure: Departure) {
+  return getPlatformString(departure.perspective.platform, departure.perspective.stop);
+}
+
+export function getPlatformString(platform: { id: PlatformID, confidence: ConfidenceLevel } | null, perspectiveStop: StopID) {
   if (platform == null) {
     return null;
   }
 
   const name = requirePlatform(
     getConfig(),
-    departure.perspective.stop,
+    perspectiveStop,
     platform.id
   ).name;
   return platform.confidence == "low" ? `${name}?` : name;

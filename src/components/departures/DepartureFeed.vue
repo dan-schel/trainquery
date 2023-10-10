@@ -167,7 +167,7 @@ function handlePin() {
   font-size: 1rem;
 }
 .dot {
-  margin: 0rem 0.25rem;
+  margin: 0 0.4rem;
 }
 .subtitle {
   --color-accent: var(--color-ink-80);

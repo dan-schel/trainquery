@@ -113,7 +113,6 @@ p {
 }
 .dot {
   @include template.no-select;
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
+  margin: 0 0.4rem;
 }
 </style>

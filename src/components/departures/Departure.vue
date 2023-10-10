@@ -7,8 +7,8 @@ import { getServicePageRoute, requireLine } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
 import { computed } from "vue";
 import {
+  getDeparturePlatformString,
   getLinesString,
-  getPlatformString,
   getTerminusString,
   getTimeString,
   getViaString,
@@ -30,7 +30,7 @@ const detail = computed(() => {
   return {
     terminus: getTerminusString(props.departure, patternList),
     via: getViaString(props.departure, patternList),
-    platform: getPlatformString(props.departure),
+    platform: getDeparturePlatformString(props.departure),
     stoppingPatternString: getStoppingPatternString(
       props.departure,
       patternList

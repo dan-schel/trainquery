@@ -1,13 +1,19 @@
 import { getConfig } from "@/utils/get-config";
 import type { QUtcDateTime } from "shared/qtime/qdatetime";
 import { requireLine } from "shared/system/config-utils";
+import type { ConfidenceLevel } from "shared/system/enums";
+import type { PlatformID } from "shared/system/ids";
 import type { LineDiagramData } from "shared/system/routes/line-routes";
 import type { Departure } from "shared/system/service/departure";
 import { KnownPerspectivePattern } from "shared/system/service/known-perspective-pattern";
 import { getPatternList } from "shared/system/service/listed-stop";
 
 export type AdditionalServedData = {
-  scheduledTime: QUtcDateTime | null
+  scheduledTime: QUtcDateTime | null,
+  platform: {
+    id: PlatformID,
+    confidence: ConfidenceLevel
+  } | null;
 }
 
 export function getDiagramForService(
@@ -32,7 +38,8 @@ export function getDiagramForService(
           stop: x.stop,
           express: false,
           data: {
-            scheduledTime: x.detail?.scheduledTime ?? null
+            scheduledTime: x.detail?.scheduledTime ?? null,
+            platform: x.detail?.platform ?? null
           }
         };
       }
