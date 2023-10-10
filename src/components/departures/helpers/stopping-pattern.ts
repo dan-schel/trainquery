@@ -15,13 +15,12 @@ export function getStoppingPatternString(
   if (departure.isArrival()) {
     if (departure.pattern instanceof CompletePattern) {
       return `Arrival from ${name(departure.pattern.origin.stop)}`;
-    }
-    else {
+    } else {
       return "Unknown origin";
     }
   }
 
-  if (patternList.some(x => x.type == "unknown")) {
+  if (patternList.some((x) => x.type == "unknown")) {
     return "Unknown stopping pattern";
   }
 

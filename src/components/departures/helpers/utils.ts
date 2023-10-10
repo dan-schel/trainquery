@@ -11,15 +11,19 @@ import { listifyAnd } from "@schel-d/js-utils";
 import type { PatternList } from "shared/system/service/listed-stop";
 import type { Departure } from "shared/system/service/departure";
 
-export function getTerminusString(departure: Departure, patternList: PatternList) {
+export function getTerminusString(
+  departure: Departure,
+  patternList: PatternList
+) {
   if (departure.isArrival()) {
     return "Arrival";
   }
-  return requireStop(getConfig(), patternList[patternList.length - 1].stop).name;
+  return requireStop(getConfig(), patternList[patternList.length - 1].stop)
+    .name;
 }
 
 export function getViaString(departure: Departure, patternList: PatternList) {
-  const servedStops = patternList.filter(x => x.type == "served");
+  const servedStops = patternList.filter((x) => x.type == "served");
 
   const thisStop = departure.perspective.stop;
   const lastStop = patternList[patternList.length - 1].stop;
@@ -51,7 +55,11 @@ export function getPlatformString(departure: Departure) {
     return null;
   }
 
-  const name = requirePlatform(getConfig(), departure.perspective.stop, platform.id).name;
+  const name = requirePlatform(
+    getConfig(),
+    departure.perspective.stop,
+    platform.id
+  ).name;
   return platform.confidence == "low" ? `${name}?` : name;
 }
 

@@ -99,9 +99,9 @@ export class Departure extends Service<
   get terminus():
     | ServedStop
     | {
-      stop: StopID;
-      stopListIndex: number;
-    } {
+        stop: StopID;
+        stopListIndex: number;
+      } {
     return this.pattern.terminus;
   }
 
