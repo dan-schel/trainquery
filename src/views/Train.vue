@@ -124,3 +124,4 @@ useHead(head);
   margin-bottom: 2rem;
 }
 </style>
+@/components/departures/helpers/continuify

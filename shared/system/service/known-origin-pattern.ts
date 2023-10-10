@@ -9,7 +9,7 @@ export class KnownOriginPattern {
       stop: StopID;
       stopListIndex: number;
     }
-  ) {}
+  ) { }
 
   static readonly json = z
     .object({

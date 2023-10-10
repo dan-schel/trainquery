@@ -1,7 +1,7 @@
 import { getConfig } from "@/utils/get-config";
 import { requireLine } from "shared/system/config-utils";
 import type { LineDiagramData } from "shared/system/routes/line-routes";
-import type { ContinuifiedDeparture } from "../departures/helpers/continuified-departure";
+import type { ContinuifiedDeparture } from "../departures/helpers/continuify";
 
 export function getDiagramForService(
   departure: ContinuifiedDeparture

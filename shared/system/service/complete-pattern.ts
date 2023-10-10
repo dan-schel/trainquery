@@ -40,15 +40,6 @@ export class CompletePattern {
     };
   }
 
-  /** Return the list of stops between the origin and terminus only. */
-  trim() {
-    return this.stops.filter(
-      (x) =>
-        x.stopListIndex >= this.origin.stopListIndex &&
-        x.stopListIndex <= this.terminus.stopListIndex
-    );
-  }
-
   requireServedStop(stopListIndex: number) {
     const stop = this.stops.find((s) => s.stopListIndex == stopListIndex);
     if (stop == null || stop.express) {

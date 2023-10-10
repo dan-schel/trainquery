@@ -2,45 +2,32 @@ import { requireStop } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
 import type { StopID } from "shared/system/ids";
 import { listifyAnd } from "@schel-d/js-utils";
-import type { ContinuifiedDeparture } from "./continuified-departure";
-import type { ContinuifiedStop } from "./continuified-stop";
+import type { Departure } from "shared/system/service/departure";
+import type { PatternList } from "shared/system/service/listed-stop";
+import { CompletePattern } from "shared/system/service/complete-pattern";
 
 export function getStoppingPatternString(
-  departure: ContinuifiedDeparture
+  departure: Departure,
+  patternList: PatternList
 ): string {
+  const name = (stop: StopID) => requireStop(getConfig(), stop).name;
+
   if (departure.isArrival()) {
-    const origin = departure.origin();
-    if (origin == null) {
+    if (departure.pattern instanceof CompletePattern) {
+      return `Arrival from ${name(departure.pattern.origin.stop)}`;
+    }
+    else {
       return "Unknown origin";
-    } else {
-      return `Arrival from ${requireStop(getConfig(), origin.stop).name}`;
     }
   }
 
-  const firstUnknownStint = departure.relevant.find(
-    (s) => s.type == "unknown"
-  )?.stintIndex;
-
-  if (firstUnknownStint == null) {
-    // We know everything we need for the whole relevant bit of the service.
-    return stoppingPattern(departure.relevant);
-  } else if (firstUnknownStint > 0) {
-    // Just work out the stopping pattern up to the first unknown bit.
-    return stoppingPattern(
-      departure.relevant.filter((s) => s.stintIndex < firstUnknownStint)
-    );
-  } else {
-    // We don't know much at all.
+  if (patternList.some(x => x.type == "unknown")) {
     return "Unknown stopping pattern";
   }
-}
-
-function stoppingPattern(relevant: ContinuifiedStop[]) {
-  const name = (stop: StopID) => requireStop(getConfig(), stop).name;
 
   // Note that arrivals are processed outside this function, so there should
   // always be at least two served stops in the list.
-  const stops = relevant.map((x, i) => ({
+  const stops = patternList.map((x, i) => ({
     name: name(x.stop),
     express: x.type != "served",
     index: i,

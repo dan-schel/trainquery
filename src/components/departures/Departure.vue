@@ -2,7 +2,7 @@
 import OneLineP from "@/components/common/OneLineP.vue";
 import Icon from "../icons/Icon.vue";
 import { RouterLink } from "vue-router";
-import { Departure } from "shared/system/timetable/departure";
+import { Departure } from "shared/system/service/departure";
 import { getServicePageRoute, requireLine } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
 import { computed } from "vue";
@@ -16,7 +16,7 @@ import {
 import { getStoppingPatternString } from "./helpers/stopping-pattern";
 import type { StopID } from "shared/system/ids";
 import type { QUtcDateTime } from "shared/qtime/qdatetime";
-import { ContinuifiedDeparture } from "./helpers/continuified-departure";
+import { continuify } from "./helpers/continuify";
 
 const props = defineProps<{
   departure: Departure;
@@ -26,15 +26,15 @@ const props = defineProps<{
 }>();
 
 const detail = computed(() => {
-  const detail = ContinuifiedDeparture.build(
-    props.departure,
-    props.continuationsEnabled
-  );
+  const patternList = continuify(props.departure);
   return {
-    terminus: getTerminusString(detail),
-    via: getViaString(detail),
-    platform: getPlatformString(detail),
-    stoppingPatternString: getStoppingPatternString(detail),
+    terminus: getTerminusString(props.departure, patternList),
+    via: getViaString(props.departure, patternList),
+    platform: getPlatformString(props.departure),
+    stoppingPatternString: getStoppingPatternString(
+      props.departure,
+      patternList
+    ),
     lineColor: requireLine(getConfig(), props.departure.line).color,
     timeString: getTimeString(props.departure, props.now),
     linesString: getLinesString(props.departure),

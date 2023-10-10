@@ -99,10 +99,26 @@ export class Departure extends Service<
   get terminus():
     | ServedStop
     | {
-        stop: StopID;
-        stopListIndex: number;
-      } {
+      stop: StopID;
+      stopListIndex: number;
+    } {
     return this.pattern.terminus;
+  }
+
+  getServiceString(): Service[] {
+    const result: Service[] = [];
+
+    let current: Service | null = this;
+    while (current != null) {
+      result.push(current);
+      current = current.continuation;
+    }
+
+    return result;
+  }
+
+  isArrival() {
+    return this.perspectiveIndex == this.pattern.terminus.stopListIndex;
   }
 
   static fromService<T extends CompletePattern | KnownPerspectivePattern>(
