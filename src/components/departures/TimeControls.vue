@@ -4,9 +4,13 @@ import NumberWheel from "../common/NumberWheel.vue";
 import { posMod } from "@schel-d/js-utils";
 import Picker from "../common/Picker.vue";
 import SimpleButton from "../common/SimpleButton.vue";
+import { nowLocalLuxon } from "shared/qtime/luxon-conversions";
+import { getConfig } from "@/utils/get-config";
+import { formatDate } from "@/utils/format-qtime";
 
 const hours = ref(7);
 const minutes = ref(10);
+const date = ref(nowLocalLuxon(getConfig()).date);
 const ampm = ref("am");
 </script>
 
@@ -46,6 +50,14 @@ const ampm = ref("am");
         </template>
       </Picker>
     </div>
+    <NumberWheel
+      class="date-wheel"
+      v-model="date"
+      :next="(c) => date.tomorrow()"
+      :prev="(c) => date.yesterday()"
+      :stringify="(c) => formatDate(c)"
+      :horizontal="true"
+    ></NumberWheel>
     <SimpleButton
       :content="{ text: 'Set', icon: 'uil:check' }"
       theme="filled"
@@ -78,7 +90,7 @@ h6 {
   align-items: center;
   border-top: 1px solid var(--color-ink-20);
   border-bottom: 1px solid var(--color-ink-20);
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 .time-colon {
   font-size: 2.5rem;
@@ -100,5 +112,10 @@ h6 {
 }
 .submit {
   align-self: flex-end;
+}
+.date-wheel {
+  --wheel-text-size: 1.5rem;
+  height: 3rem;
+  margin-bottom: 0.5rem;
 }
 </style>

@@ -2,16 +2,20 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import Icon from "../icons/Icon.vue";
 
-const COUNTS_AS_HOME = 0.01;
-const SENSITIVITY_TOUCH = 0.03;
-const SENSITIVITY_MOUSE = 0.06;
-
-const props = defineProps<{
+interface Props<T> {
   modelValue: T;
   next: (current: T) => T | null;
   prev: (current: T) => T | null;
   stringify: (value: T) => string;
-}>();
+  horizontal?: boolean;
+}
+const props = withDefaults(defineProps<Props<T>>(), {
+  horizontal: false,
+});
+
+const COUNTS_AS_HOME = 0.01;
+const SENSITIVITY_TOUCH = props.horizontal ? 0.01 : 0.03;
+const SENSITIVITY_MOUSE = props.horizontal ? 0.02 : 0.06;
 
 const emit = defineEmits<{
   (e: "update:modelValue", newValue: T): void;
@@ -30,7 +34,7 @@ function handlePointerDown(e: PointerEvent) {
   if (dragOffset.value != null) {
     return;
   }
-  dragOffset.value = e.pageY;
+  dragOffset.value = props.horizontal ? -e.pageX : e.pageY;
 }
 function handlePointerMove(e: PointerEvent) {
   if (dragOffset.value == null) {
@@ -40,10 +44,10 @@ function handlePointerMove(e: PointerEvent) {
   // e.movementY is undefined on iPad Safari (otherwise remembering the
   // dragOffset wouldn't be necessary!)
   offset.value +=
-    (e.pageY - dragOffset.value) *
+    ((props.horizontal ? -e.pageX : e.pageY) - dragOffset.value) *
     (e.pointerType == "mouse" ? SENSITIVITY_MOUSE : SENSITIVITY_TOUCH);
 
-  dragOffset.value = e.pageY;
+  dragOffset.value = props.horizontal ? -e.pageX : e.pageY;
 
   while (offset.value > 0.5) {
     const nextValue = props.next(props.modelValue);
@@ -89,22 +93,26 @@ function animateHome() {
   offset.value *= 0.8;
   requestAnimationFrame(animateHome);
 }
-function handleUpButton() {
-  const nextValue = props.next(props.modelValue);
+function handleButtonA() {
+  const nextValue = props.horizontal
+    ? props.prev(props.modelValue)
+    : props.next(props.modelValue);
   if (nextValue == null) {
     return;
   }
   emit("update:modelValue", nextValue);
-  offset.value = -1;
+  offset.value = props.horizontal ? 1 : -1;
   animateHome();
 }
-function handleDownButton() {
-  const prevValue = props.prev(props.modelValue);
+function handleButtonB() {
+  const prevValue = props.horizontal
+    ? props.next(props.modelValue)
+    : props.prev(props.modelValue);
   if (prevValue == null) {
     return;
   }
   emit("update:modelValue", prevValue);
-  offset.value = 1;
+  offset.value = props.horizontal ? -1 : 1;
   animateHome();
 }
 </script>
@@ -112,14 +120,17 @@ function handleDownButton() {
 <template>
   <div
     class="wheel"
+    :class="{
+      horizontal: horizontal,
+    }"
     :style="{
-      '--current-offset': `${offset * 100}%`,
-      '--next-offset': `${(offset + (offset > 0 ? -1 : 1)) * 100}%`,
+      '--current-offset': `${offset}%`,
+      '--next-offset': `${offset + (offset > 0 ? -1 : 1)}%`,
     }"
     @pointerdown="handlePointerDown"
   >
-    <button class="up-button" @click="handleUpButton">
-      <Icon id="uil:angle-up"></Icon>
+    <button class="button-a" @click="handleButtonA">
+      <Icon :id="horizontal ? 'uil:angle-left' : 'uil:angle-up'"></Icon>
     </button>
 
     <p class="current">{{ stringify(modelValue as T) }}</p>
@@ -127,8 +138,8 @@ function handleDownButton() {
       {{ alternate == null ? "" : stringify(alternate as T) }}
     </p>
 
-    <button class="down-button" @click="handleDownButton">
-      <Icon id="uil:angle-down"></Icon>
+    <button class="button-b" @click="handleButtonB">
+      <Icon :id="horizontal ? 'uil:angle-right' : 'uil:angle-down'"></Icon>
     </button>
   </div>
 </template>
@@ -138,20 +149,58 @@ function handleDownButton() {
 
 .wheel {
   display: grid;
-  min-width: 3rem;
-  height: 8rem;
-  grid-template-columns: 1fr;
-  grid-template-rows: 2fr 4fr 2fr;
-  grid-template-areas: "up" "number" "down";
+  --wheel-text-size: 2.5rem;
+  --scroll-offset: 100;
 
   // For ".current" and ".next".
   position: relative;
 
   // Allows this element to take control of it's touch gestures.
   touch-action: none;
+
+  &:not(.horizontal) {
+    min-width: 3rem;
+    height: 8rem;
+    grid-template-columns: 1fr;
+    grid-template-rows: 2rem 1fr 2rem;
+    grid-template-areas: "a" "number" "b";
+
+    .current {
+      transform: translate(
+        -50%,
+        calc(-50% + var(--current-offset) * var(--scroll-offset))
+      );
+    }
+    .next {
+      transform: translate(
+        -50%,
+        calc(-50% + var(--next-offset) * var(--scroll-offset))
+      );
+    }
+  }
+  &.horizontal {
+    min-width: 10rem;
+    min-height: 2rem;
+    grid-template-columns: 2rem 1fr 2rem;
+    grid-template-rows: 1fr;
+    grid-template-areas: "a number b";
+
+    .current {
+      transform: translate(
+        calc(-50% - var(--current-offset) * var(--scroll-offset)),
+        -50%
+      );
+    }
+    .next {
+      transform: translate(
+        calc(-50% - var(--next-offset) * var(--scroll-offset)),
+        -50%
+      );
+    }
+  }
 }
-.up-button,
-.down-button {
+.button-a,
+.button-b {
   @include template.button-hover;
   align-items: center;
   justify-content: center;
@@ -159,11 +208,11 @@ function handleDownButton() {
     font-size: 1.2rem;
   }
 }
-.up-button {
-  grid-area: up;
+.button-a {
+  grid-area: a;
 }
-.down-button {
-  grid-area: down;
+.button-b {
+  grid-area: b;
 }
 .current,
 .next {
@@ -172,15 +221,9 @@ function handleDownButton() {
   top: 50%;
   left: 50%;
 
-  font-size: 2.5rem;
+  font-size: var(--wheel-text-size);
   font-weight: bold;
 
   pointer-events: none;
-}
-.current {
-  transform: translate(-50%, calc(-50% + var(--current-offset)));
-}
-.next {
-  transform: translate(-50%, calc(-50% + var(--next-offset)));
 }
 </style>

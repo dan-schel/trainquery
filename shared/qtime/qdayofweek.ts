@@ -2,7 +2,7 @@ import { posMod } from "@schel-d/js-utils";
 import { QCache } from "./qcache";
 import { QDate } from "./qdate";
 
-const _acronyms = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const _acronyms = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const _names = [
   "Monday",
   "Tuesday",
@@ -31,7 +31,7 @@ export class QDayOfWeek {
   static sat = new QDayOfWeek(5);
   static sun = new QDayOfWeek(6);
 
-  constructor(readonly index: number) {}
+  constructor(readonly index: number) { }
 
   isValid(): { valid: true } | { valid: false; issue: string } {
     if (!Number.isInteger(this.index) || this.index < 0 || this.index > 6) {
@@ -47,9 +47,11 @@ export class QDayOfWeek {
     return _cache.get(date);
   }
 
+  /** E.g. 'Fri' or 'Sun'. */
   toAcronym(): string {
     return _acronyms[this.index];
   }
+  /** E.g. 'Friday' or 'Sunday'. */
   toName(): string {
     return _names[this.index];
   }

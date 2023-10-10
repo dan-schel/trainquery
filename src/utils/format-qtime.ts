@@ -46,9 +46,9 @@ export function formatDuration(
 }
 
 export function formatDate(date: QDate) {
-  return `${date.day.toFixed()} ${getMonthAcronym(
-    date.month
-  )} ${date.year.toFixed()}`;
+  const dow = QDayOfWeek.fromDate(date).toAcronym();
+  const month = getMonthAcronym(date.month);
+  return `${dow}, ${date.day.toFixed()} ${month}`;
 }
 
 export function formatRelativeTime(
