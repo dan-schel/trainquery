@@ -69,9 +69,9 @@ export function formatRelativeTime(
       : `${timeString} tomorrow`;
   } else if (dayDiff == -1) {
     return `${timeString} yesterday`;
-  } else if (dayDiff < 7) {
+  } else if (dayDiff > 1 && dayDiff < 7) {
     return `${timeString} ${QDayOfWeek.fromDate(time.date).toName()}`;
-  } else if (dayDiff > -7) {
+  } else if (dayDiff < -1 && dayDiff > -7) {
     return `${timeString} last ${QDayOfWeek.fromDate(time.date).toName()}`;
   } else {
     return `${timeString} (${formatDate(time.date)})`;

@@ -7,20 +7,28 @@ import TimeControls from "./TimeControls.vue";
 import { DepartureFilter } from "shared/system/timetable/departure-filter";
 import { formatFilter } from "@/utils/format-filter";
 import type { StopID } from "shared/system/ids";
+import type { QLocalDateTime } from "shared/qtime/qdatetime";
+import { formatRelativeTime } from "@/utils/format-qtime";
+import { nowLocalLuxon } from "shared/qtime/luxon-conversions";
+import { getConfig } from "@/utils/get-config";
 
 const props = defineProps<{
   stop: StopID;
   filter: DepartureFilter;
+  time: QLocalDateTime | null;
   isDefaultFilter: boolean;
 }>();
 const emit = defineEmits<{
   (e: "update:filter", newValue: DepartureFilter): void;
+  (e: "update:time", newValue: QLocalDateTime | null): void;
 }>();
 
 const openDropdown = ref<"none" | "time" | "filter">("none");
 
 const filterLabel = computed(() => formatFilter(props.filter, props.stop));
-const showResetButton = computed(() => !props.isDefaultFilter);
+const showResetButton = computed(
+  () => !props.isDefaultFilter || props.time != null
+);
 
 // Stores changes to the filter until the dropdown is closed, when the changes
 // are sent back up to the stop page.
@@ -28,33 +36,38 @@ const filterElect = ref(props.filter);
 // TODO: do a similar thing for the time controls.
 watch([props], () => {
   filterElect.value = props.filter;
+  // timeElect.value = props.time;
 });
 
 function handleTimeButtonClick() {
   openDropdown.value = openDropdown.value == "time" ? "none" : "time";
   emit("update:filter", filterElect.value);
-  // TODO: emit update:time
+  // emit("update:time", timeElect.value);
 }
 function handleFilterButtonClick() {
   openDropdown.value = openDropdown.value == "filter" ? "none" : "filter";
   emit("update:filter", filterElect.value);
-  // TODO: emit update:time
+  // emit("update:time", timeElect.value);
 }
 function closeDropdown() {
   openDropdown.value = "none";
   emit("update:filter", filterElect.value);
-  // TODO: emit update:time
+  // emit("update:time", timeElect.value);
 }
 function handleKeyDown(e: KeyboardEvent) {
   if (e.code == "Escape") {
     openDropdown.value = "none";
     emit("update:filter", filterElect.value);
-    // TODO: emit update:time
+    // emit("update:time", timeElect.value);
   }
 }
-function onResetClicked() {
+function handleResetClicked() {
   emit("update:filter", DepartureFilter.default);
-  // TODO: emit update:time with default value.
+  emit("update:time", null);
+}
+function handleTimeSubmit(newValue: QLocalDateTime | null) {
+  openDropdown.value = "none";
+  emit("update:time", newValue);
 }
 
 onMounted(() => {
@@ -70,7 +83,12 @@ onUnmounted(() => {
     <div class="buttons">
       <button class="time-button" @click="handleTimeButtonClick">
         <Icon id="uil:clock" title="Time"></Icon>
-        <OneLineP class="text">Now</OneLineP>
+        <OneLineP class="text">
+          <b v-if="time != null">{{
+            formatRelativeTime(time, nowLocalLuxon(getConfig()))
+          }}</b>
+          <template v-if="time == null">Now</template>
+        </OneLineP>
         <Icon id="uil:angle-down"></Icon>
       </button>
       <button class="filter-button" @click="handleFilterButtonClick">
@@ -85,7 +103,7 @@ onUnmounted(() => {
         class="reset-button"
         title="Reset"
         v-if="showResetButton"
-        @click="onResetClicked"
+        @click="handleResetClicked"
       >
         <Icon id="uil:redo"></Icon>
       </button>
@@ -97,7 +115,12 @@ onUnmounted(() => {
           :class="{ open: openDropdown == 'time' }"
         >
           <div class="bg"></div>
-          <TimeControls class="content"></TimeControls>
+          <TimeControls
+            class="content"
+            :time="time"
+            :is-open="openDropdown == 'time'"
+            @submit="handleTimeSubmit"
+          ></TimeControls>
         </div>
       </div>
       <div class="filter-dropdown-locator">

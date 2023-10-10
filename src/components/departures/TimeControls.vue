@@ -1,17 +1,68 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import NumberWheel from "../common/NumberWheel.vue";
-import { posMod } from "@schel-d/js-utils";
+import { hour12To24, hour24To12, posMod } from "@schel-d/js-utils";
 import Picker from "../common/Picker.vue";
 import SimpleButton from "../common/SimpleButton.vue";
-import { nowLocalLuxon } from "shared/qtime/luxon-conversions";
+import {
+  buildLocalDateTimeLuxon,
+  nowLocalLuxon,
+} from "shared/qtime/luxon-conversions";
 import { getConfig } from "@/utils/get-config";
 import { formatDate } from "@/utils/format-qtime";
+import { QLocalDateTime } from "shared/qtime/qdatetime";
+import { QTime } from "shared/qtime/qtime";
 
-const hours = ref(7);
-const minutes = ref(10);
-const date = ref(nowLocalLuxon(getConfig()).date);
-const ampm = ref("am");
+const props = defineProps<{
+  time: QLocalDateTime | null;
+  isOpen: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "submit", newValue: QLocalDateTime | null): void;
+}>();
+
+const timeComponents = computed(() => {
+  const time = props.time ?? nowLocalLuxon(getConfig());
+  const hour12 = hour24To12(time.time.hour);
+
+  return {
+    hours: hour12.hour,
+    minutes: time.time.minute,
+    date: time.date,
+    ampm: hour12.half,
+  };
+});
+
+const hours = ref(timeComponents.value.hours);
+const minutes = ref(timeComponents.value.minutes);
+const date = ref(timeComponents.value.date);
+const ampm = ref(timeComponents.value.ampm);
+
+watch([props], () => {
+  hours.value = timeComponents.value.hours;
+  minutes.value = timeComponents.value.minutes;
+  date.value = timeComponents.value.date;
+  ampm.value = timeComponents.value.ampm;
+});
+
+const wasOpen = ref(props.isOpen);
+watch([props], () => {
+  if (props.isOpen && !wasOpen.value) {
+    console.log("Opened!");
+    hours.value = timeComponents.value.hours;
+    minutes.value = timeComponents.value.minutes;
+    date.value = timeComponents.value.date;
+    ampm.value = timeComponents.value.ampm;
+  }
+  wasOpen.value = props.isOpen;
+});
+
+function handleSubmitButton() {
+  const time = new QTime(hour12To24(hours.value, ampm.value), minutes.value, 0);
+  const datetime = buildLocalDateTimeLuxon(getConfig(), date.value, time);
+  emit("submit", datetime);
+}
 </script>
 
 <template>
@@ -22,6 +73,7 @@ const ampm = ref("am");
       theme="filled-neutral"
       class="now"
       layout="traditional-wide"
+      @click="$emit('submit', null)"
     ></SimpleButton>
     <div class="time">
       <NumberWheel
@@ -63,6 +115,7 @@ const ampm = ref("am");
       theme="filled"
       class="submit"
       layout="traditional-wide"
+      @click="handleSubmitButton"
     ></SimpleButton>
   </div>
 </template>

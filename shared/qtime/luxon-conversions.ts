@@ -75,3 +75,26 @@ export function nowUTCLuxon(): QUtcDateTime {
 export function nowLocalLuxon(config: HasSharedConfig): QLocalDateTime {
   return toLocalDateTimeLuxon(config, nowUTCLuxon());
 }
+
+export function buildLocalDateTimeLuxon(
+  config: HasSharedConfig,
+  date: QDate,
+  time: QTime
+): QLocalDateTime {
+  if ("offset" in config.shared.timezone) {
+    const offset = config.shared.timezone.offset;
+    return new QLocalDateTime(date, time, offset);
+  }
+
+  const offset =
+    DateTime.local(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+      time.second,
+      { zone: config.shared.timezone.id }
+    ).offset / 60;
+  return new QLocalDateTime(date, time, offset);
+}

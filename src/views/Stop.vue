@@ -35,8 +35,10 @@ const lines = computed(() =>
 );
 
 const filter = ref(DepartureFilter.default);
+const time = ref(null);
 watch([stop], () => {
   filter.value = DepartureFilter.default;
+  time.value = null;
 });
 
 const isDefaultFilter = computed(() =>
@@ -77,6 +79,7 @@ useHead(head);
       class="controls"
       :stop="stop.id"
       v-model:filter="filter"
+      v-model:time="time"
       :is-default-filter="isDefaultFilter"
     ></DepartureControls>
     <DepartureGroup

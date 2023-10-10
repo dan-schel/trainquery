@@ -31,7 +31,7 @@ export class QDayOfWeek {
   static sat = new QDayOfWeek(5);
   static sun = new QDayOfWeek(6);
 
-  constructor(readonly index: number) { }
+  constructor(readonly index: number) {}
 
   isValid(): { valid: true } | { valid: false; issue: string } {
     if (!Number.isInteger(this.index) || this.index < 0 || this.index > 6) {
