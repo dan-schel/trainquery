@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Departure } from "shared/system/timetable/departure";
+import type { Departure } from "shared/system/service/departure";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import OneLineP from "../common/OneLineP.vue";
 import SimpleButton from "../common/SimpleButton.vue";

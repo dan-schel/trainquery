@@ -1,5 +1,5 @@
-import { HasSharedConfig, requireLine } from "../config-utils";
-import { StopID } from "../ids";
+import { type HasSharedConfig, requireLine } from "../config-utils";
+import { type StopID } from "../ids";
 import { CompletePattern } from "./complete-pattern";
 import { KnownOriginPattern } from "./known-origin-pattern";
 import { ServedStop } from "./served-stop";
