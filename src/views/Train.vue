@@ -112,7 +112,7 @@ useHead(head);
   margin-bottom: 1rem;
 }
 .diagram {
-  --stop-gap: 1rem;
+  --stop-gap: 1.25rem;
   margin-bottom: 2rem;
 }
 </style>

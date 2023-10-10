@@ -46,10 +46,10 @@ const platformString = computed(() => {
     </OneLineP>
     <p v-if="timeString != null" class="dot">•</p>
     <OneLineP v-if="timeString != null" class="time">{{ timeString }}</OneLineP>
-    <p v-if="platformString != null" class="dot">•</p>
-    <OneLineP v-if="platformString != null" class="platform"
-      >Plat. {{ platformString }}</OneLineP
-    >
+    <div class="platform" v-if="platformString != null">
+      <p>Plat.&nbsp;</p>
+      <p class="platform-number">{{ platformString }}</p>
+    </div>
   </div>
 </template>
 
@@ -78,5 +78,29 @@ const platformString = computed(() => {
 }
 .flex-grow {
   @include template.flex-grow;
+}
+.platform {
+  flex-direction: row;
+  align-items: baseline;
+  margin-left: 1rem;
+
+  // Slightly arbitrary, but this is just to stop platform labels impacting the
+  // height of the row.
+  margin-top: -0.5rem;
+  margin-bottom: -0.5rem;
+
+  padding: 0.2rem 0.4rem;
+  justify-items: center;
+
+  border: 2px solid var(--color-ink-20);
+  border-radius: 0.25rem;
+
+  :nth-child(1) {
+    font-size: 0.6rem;
+    font-stretch: semi-condensed;
+  }
+  .platform-number {
+    font-weight: bold;
+  }
 }
 </style>
