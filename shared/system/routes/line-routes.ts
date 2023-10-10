@@ -6,11 +6,21 @@ import { Route, RouteStop } from "./line-route";
 import { LinearRoute } from "./linear-route";
 import { YBranchRoute } from "./y-branch-route";
 
-export type LineDiagramData = {
-  loop: { stop: StopID; express: boolean }[];
-  stops: { stop: StopID; express: boolean }[];
-  firstBranch: { stop: StopID; express: boolean }[];
-  secondBranch: { stop: StopID; express: boolean }[];
+export type LineDiagramStop<ServedData, ExpressData> = {
+  stop: StopID;
+  express: false;
+  data: ServedData;
+} | {
+  stop: StopID;
+  express: true;
+  data: ExpressData;
+}
+
+export type LineDiagramData<ServedData, ExpressData> = {
+  loop: LineDiagramStop<ServedData, ExpressData>[];
+  stops: LineDiagramStop<ServedData, ExpressData>[];
+  firstBranch: LineDiagramStop<ServedData, ExpressData>[];
+  secondBranch: LineDiagramStop<ServedData, ExpressData>[];
   transparentTo: number;
   color: LineColor;
 };
@@ -32,11 +42,11 @@ export function fromRouteType<T>(route: Route, then: Then<T>): T {
   throw new Error(`Unrecognized line route type "${route.type}".`);
 }
 
-export function getRouteDiagram(line: Line): LineDiagramData {
+export function getRouteDiagram(line: Line): LineDiagramData<null, null> {
   const stopIDs = (...a: RouteStop[][]) =>
     a
       .flat()
-      .map((s) => ({ stop: s.stop, express: s.via }))
+      .map((s) => ({ stop: s.stop, express: s.via, data: null }))
       .reverse();
 
   return {

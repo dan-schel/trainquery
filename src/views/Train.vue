@@ -7,7 +7,6 @@ import { z } from "zod";
 import LineList from "@/components/LineList.vue";
 import { getDiagramForService } from "@/components/line/get-diagram-for-service";
 import LineDiagram from "@/components/line/LineDiagram.vue";
-import LinePageStop from "@/components/line/LinePageStop.vue";
 import { Departure } from "shared/system/service/departure";
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
 import {
@@ -17,6 +16,7 @@ import {
 import { getConfig } from "@/utils/get-config";
 import { formatRelativeTime, formatTime } from "@/utils/format-qtime";
 import { requireStop } from "shared/system/config-utils";
+import TrainPageStop from "@/components/line/TrainPageStop.vue";
 
 const now = ref(nowLocalLuxon(getConfig()));
 
@@ -91,8 +91,7 @@ useHead(head);
     ></LineList>
     <LineDiagram v-if="diagram != null" :diagram="diagram" class="diagram">
       <template #stop="slotProps">
-        <!-- TODO: this is the wrong component! -->
-        <LinePageStop :stop="slotProps.stop" :express="slotProps.express" />
+        <TrainPageStop :stop-data="slotProps.stopData" />
       </template>
     </LineDiagram>
   </PageContent>

@@ -1,15 +1,17 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="ServedData, ExpressData">
 import { computed } from "vue";
-import { type LineDiagramData } from "shared/system/routes/line-routes";
-import type { StopID } from "shared/system/ids";
+import {
+  type LineDiagramData,
+  type LineDiagramStop,
+} from "shared/system/routes/line-routes";
 
 const props = defineProps<{
-  diagram: LineDiagramData;
+  diagram: LineDiagramData<ServedData, ExpressData>;
 }>();
 
 const stopList = computed(() => {
   function stopType(
-    stops: { stop: StopID; express: boolean }[],
+    stops: LineDiagramStop<ServedData, ExpressData>[],
     type: string,
     transparentTo: number
   ) {
@@ -17,6 +19,7 @@ const stopList = computed(() => {
       type: type,
       stop: s.stop,
       express: s.express,
+      stopData: s,
       transparent: i < transparentTo,
       transparentThreshold: i == transparentTo,
       firstOfType: i == 0,
@@ -132,7 +135,7 @@ const stopList = computed(() => {
       </div>
 
       <div class="label">
-        <slot name="stop" :stop="entry.stop" :express="entry.express"></slot>
+        <slot name="stop" :stop-data="entry.stopData"></slot>
       </div>
 
       <div class="visual-extra">
@@ -144,11 +147,7 @@ const stopList = computed(() => {
       </div>
 
       <div class="label-extra">
-        <slot
-          name="stop-extra"
-          :stop="entry.stop"
-          :express="entry.express"
-        ></slot>
+        <slot name="stop-extra" :stop-data="entry.stopData"></slot>
       </div>
     </div>
   </div>

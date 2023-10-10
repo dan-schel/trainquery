@@ -49,7 +49,7 @@ useHead(head);
     <h2>Stops</h2>
     <LineDiagram :diagram="diagram" class="diagram">
       <template #stop="slotProps">
-        <LinePageStop :stop="slotProps.stop" :express="slotProps.express" />
+        <LinePageStop :stop-data="slotProps.stopData" />
       </template>
     </LineDiagram>
   </PageContent>

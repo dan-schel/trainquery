@@ -3,12 +3,12 @@ import { getConfig } from "@/utils/get-config";
 import { requireStop } from "shared/system/config-utils";
 import { computed } from "vue";
 import { getStopPageRoute } from "shared/system/config-utils";
-import type { LineDiagramStop } from "shared/system/routes/line-routes";
+import type { AdditionalServedData } from "./get-diagram-for-service";
+import { type LineDiagramStop } from "shared/system/routes/line-routes";
 
 const props = defineProps<{
-  stopData: LineDiagramStop<null, null>;
+  stopData: LineDiagramStop<AdditionalServedData, null>;
 }>();
-
 const stopData = computed(() => requireStop(getConfig(), props.stopData.stop));
 </script>
 
