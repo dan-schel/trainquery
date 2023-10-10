@@ -2,10 +2,10 @@ import { z } from "zod";
 import { QUtcDateTime } from "../../qtime/qdatetime";
 import { type ConfidenceLevel, ConfidenceLevelJson } from "../enums";
 import {
-  type PlatformID,
-  PlatformIDJson,
   type StopID,
+  type PlatformID,
   StopIDJson,
+  PlatformIDJson,
 } from "../ids";
 
 export class ServedStop {
@@ -72,30 +72,6 @@ export class ServedStop {
               id: this.platform.id,
               confidence: this.platform.confidence,
             },
-    };
-  }
-}
-
-export class SkippedStop {
-  readonly express = true;
-
-  constructor(readonly stop: StopID, readonly stopListIndex: number) {}
-
-  static readonly json = z
-    .object({
-      stop: StopIDJson,
-      stopListIndex: z.number(),
-
-      // Ensures this is never confused for a served stop.
-      express: z.literal(true),
-    })
-    .transform((x) => new SkippedStop(x.stop, x.stopListIndex));
-
-  toJSON(): z.input<typeof SkippedStop.json> {
-    return {
-      stop: this.stop,
-      stopListIndex: this.stopListIndex,
-      express: this.express,
     };
   }
 }

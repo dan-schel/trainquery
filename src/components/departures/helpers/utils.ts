@@ -1,29 +1,32 @@
-import type { ContinuifiedDeparture } from "./continuified-departure";
 import {
   requireLine,
   requirePlatform,
   requireStop,
 } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
-import type { Departure } from "shared/system/timetable/departure";
 import { formatDuration, formatRelativeTime } from "@/utils/format-qtime";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import type { QUtcDateTime } from "shared/qtime/qdatetime";
 import { listifyAnd } from "@schel-d/js-utils";
+import type { PatternList } from "shared/system/service/listed-stop";
+import type { Departure } from "shared/system/service/departure";
 
-export function getTerminusString(departure: ContinuifiedDeparture) {
+export function getTerminusString(
+  departure: Departure,
+  patternList: PatternList
+) {
   if (departure.isArrival()) {
     return "Arrival";
   }
-  return requireStop(getConfig(), departure.relevantTerminus().stop).name;
+  return requireStop(getConfig(), patternList[patternList.length - 1].stop)
+    .name;
 }
 
-export function getViaString(departure: ContinuifiedDeparture) {
-  const servedStops = departure.relevantServedStops();
-  const doesContinue = departure.hasContinuation();
+export function getViaString(departure: Departure, patternList: PatternList) {
+  const servedStops = patternList.filter((x) => x.type == "served");
 
-  const thisStop = departure.perspectiveStop().stop;
-  const lastStop = departure.relevantTerminus().stop;
+  const thisStop = departure.perspective.stop;
+  const lastStop = patternList[patternList.length - 1].stop;
 
   for (const rule of getConfig().frontend.via) {
     // Don't use this rule if some stops are not served.
@@ -32,7 +35,7 @@ export function getViaString(departure: ContinuifiedDeparture) {
     }
 
     // Don't use this rule if it's for continuing trains only and this train isn't.
-    if (rule.onlyIfContinuing && !doesContinue) {
+    if (rule.onlyIfContinuing && departure.continuation == null) {
       continue;
     }
 
@@ -46,15 +49,17 @@ export function getViaString(departure: ContinuifiedDeparture) {
   return null;
 }
 
-export function getPlatformString(departure: ContinuifiedDeparture) {
-  const thisStop = departure.perspectiveStop();
-
-  const platform = thisStop.detail?.platform;
+export function getPlatformString(departure: Departure) {
+  const platform = departure.perspective.platform;
   if (platform == null) {
     return null;
   }
 
-  const name = requirePlatform(getConfig(), thisStop.stop, platform.id).name;
+  const name = requirePlatform(
+    getConfig(),
+    departure.perspective.stop,
+    platform.id
+  ).name;
   return platform.confidence == "low" ? `${name}?` : name;
 }
 

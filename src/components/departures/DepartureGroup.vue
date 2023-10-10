@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 import DepartureFeedVue from "./DepartureFeed.vue";
-import { Departure } from "shared/system/timetable/departure";
+import { Departure } from "shared/system/service/departure";
 import { repeat } from "@schel-d/js-utils";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { nowUTCLuxon } from "shared/qtime/luxon-conversions";

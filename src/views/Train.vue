@@ -8,8 +8,7 @@ import LineList from "@/components/LineList.vue";
 import { getDiagramForService } from "@/components/line/get-diagram-for-service";
 import LineDiagram from "@/components/line/LineDiagram.vue";
 import LinePageStop from "@/components/line/LinePageStop.vue";
-import { Departure } from "shared/system/timetable/departure";
-import { ContinuifiedDeparture } from "@/components/departures/helpers/continuified-departure";
+import { Departure } from "shared/system/service/departure";
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
 import {
   nowLocalLuxon,
@@ -30,10 +29,7 @@ const train = computed(() => {
     }),
   });
   const meta = metaSchema.parse(route.meta);
-  const departure = meta.state.departure;
-  return departure == null
-    ? null
-    : ContinuifiedDeparture.build(departure, false);
+  return meta.state.departure;
 });
 
 const diagram = computed(() =>
@@ -52,10 +48,7 @@ const title = computed(() => {
   const timeString = formatTime(
     toLocalDateTimeLuxon(getConfig(), perspective.scheduledTime).time
   );
-  const terminus = requireStop(
-    getConfig(),
-    train.value.stintTerminus(0).stop
-  ).name;
+  const terminus = requireStop(getConfig(), train.value.terminus.stop).name;
   return {
     short: `${terminus} train`,
     long: `${timeString} ${terminus} train`,
@@ -124,3 +117,4 @@ useHead(head);
   margin-bottom: 2rem;
 }
 </style>
+@/components/departures/helpers/continuify

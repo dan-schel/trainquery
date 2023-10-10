@@ -9,7 +9,7 @@ import {
 } from "./ids";
 import { parseIntNull } from "@schel-d/js-utils";
 import type { Line } from "./line";
-import { Service } from "./timetable/service";
+import { Service } from "./service/service";
 import { SharedConfig } from "./config/shared-config";
 
 export type HasSharedConfig = { shared: SharedConfig };

@@ -1,17 +1,15 @@
 import { QDate } from "../../shared/qtime/qdate";
 import { toUTCDateTime } from "../../shared/qtime/qdatetime";
 import { requireLine } from "../../shared/system/config-utils";
-import { Departure } from "../../shared/system/timetable/departure";
-import { Service } from "../../shared/system/timetable/service";
-import {
-  ServedStop,
-  SkippedStop,
-} from "../../shared/system/timetable/service-stop";
-import { CompleteStoppingPattern } from "../../shared/system/timetable/stopping-pattern";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { TrainQuery } from "../trainquery";
 import { guessPlatformsOfEntry } from "./guess-platform";
 import { StaticServiceIDComponents } from "./static-service-id";
+import { CompletePattern } from "../../shared/system/service/complete-pattern";
+import { SkippedStop } from "../../shared/system/service/skipped-stop";
+import { ServedStop } from "../../shared/system/service/served-stop";
+import { Service } from "../../shared/system/service/service";
+import { Departure } from "../../shared/system/service/departure";
 
 export function specificize(
   ctx: TrainQuery,
@@ -23,22 +21,19 @@ export function specificize(
     entry.entryIndex,
     date
   ).encode();
+
   const platforms = guessPlatformsOfEntry(ctx, entry, date);
   const line = requireLine(ctx.getConfig(), entry.line);
   const stopList = line.route.requireStopList(entry.route, entry.direction);
+  const offset = ctx.getConfig().computed.offset.get(date);
 
-  const stoppingPattern = new CompleteStoppingPattern(
+  const stoppingPattern = new CompletePattern(
     entry.rows.map((r, i) => {
       if (r == null) {
         return new SkippedStop(stopList.stops[i], i);
       }
 
-      const time = toUTCDateTime(
-        date,
-        r,
-        ctx.getConfig().computed.offset.get(date)
-      );
-
+      const time = toUTCDateTime(date, r, offset);
       const platform = platforms[i];
       const setsDown = stopList.setsDown[i].matches(entry.direction);
       const picksUp = stopList.picksUp[i].matches(entry.direction);
@@ -74,15 +69,5 @@ export function specificizeDeparture(
   perspectiveIndex: number
 ): Departure {
   const service = specificize(ctx, entry, date);
-
-  // Full timetable entrys will always specificize to a service with a complete
-  // stopping pattern.
-  const stoppingPattern = service.stoppingPattern as CompleteStoppingPattern;
-
-  const perspective = stoppingPattern.stops[perspectiveIndex];
-  if (perspective.express) {
-    throw new Error("Incorrect perspective index.");
-  }
-
-  return Departure.fromService(service, perspectiveIndex, perspective);
+  return Departure.fromService(service, perspectiveIndex);
 }

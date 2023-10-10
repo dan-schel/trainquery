@@ -3,10 +3,7 @@ import { requireParam } from "../param-utils";
 import { getService } from "../timetable/get-service";
 import { StaticServiceIDComponents } from "../timetable/static-service-id";
 import { ServerParams, TrainQuery } from "../trainquery";
-import {
-  departurify,
-  departurifyFromOrigin,
-} from "../../shared/system/timetable/departure";
+import { Departure } from "../../shared/system/service/departure";
 
 export async function ssrAppPropsApi(ctx: TrainQuery): Promise<object> {
   return { configHash: ctx.getConfig().hash };
@@ -35,26 +32,43 @@ function aboutPage(ctx: TrainQuery) {
 }
 
 function trainPage(ctx: TrainQuery, path: string) {
+  // Parse the service ID.
   const idString = path.replace(/^\/train\/([^/?]+)([/?].*)?$/, "$1");
   const id = StaticServiceIDComponents.decode(idString);
   if (id == null) {
     return {};
   }
+
+  // Fetch the service from the timetable.
   const service = getService(ctx, id);
   if (service == null) {
     return {};
   }
 
+  // Parse the perspective index.
   const perspectiveString = /\?from=([0-9]+)?$/.exec(path)?.[1];
   const perspectiveIndex = parseIntNull(perspectiveString ?? "");
-  const departure =
-    perspectiveIndex == null
-      ? departurifyFromOrigin(service)
-      : departurify(service, perspectiveIndex);
+
+  // Convert the service to a departure
+  const departure = (() => {
+    if (perspectiveIndex == null) {
+      return Departure.fromService(
+        service,
+        service.pattern.origin.stopListIndex
+      );
+    }
+
+    const stop = service.pattern.getStop(perspectiveIndex);
+    if (stop != null && !stop.express) {
+      return Departure.fromService(service, stop.stopListIndex);
+    }
+
+    return null;
+  })();
+
   if (departure == null) {
     return {};
   }
-
   return {
     departure: departure.toJSON(),
   };

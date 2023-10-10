@@ -1,14 +1,10 @@
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
-import { Service } from "../../shared/system/timetable/service";
 import { TrainQuery } from "../trainquery";
 import { getTimetableForDay } from "./get-timetables-for-day";
 import { specificize } from "./specificize";
 import { StaticServiceIDComponents } from "./static-service-id";
 
-export function getService(
-  ctx: TrainQuery,
-  id: StaticServiceIDComponents
-): Service | null {
+export function getService(ctx: TrainQuery, id: StaticServiceIDComponents) {
   const timetable = ctx
     .getConfig()
     .server.timetables.find((t) => t.id == id.timetable);
