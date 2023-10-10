@@ -9,12 +9,12 @@ import { KnownPerspectivePattern } from "shared/system/service/known-perspective
 import { getPatternList } from "shared/system/service/listed-stop";
 
 export type AdditionalServedData = {
-  scheduledTime: QUtcDateTime | null,
+  scheduledTime: QUtcDateTime | null;
   platform: {
-    id: PlatformID,
-    confidence: ConfidenceLevel
+    id: PlatformID;
+    confidence: ConfidenceLevel;
   } | null;
-}
+};
 
 export function getDiagramForService(
   departure: Departure
@@ -39,15 +39,14 @@ export function getDiagramForService(
           express: false,
           data: {
             scheduledTime: x.detail?.scheduledTime ?? null,
-            platform: x.detail?.platform ?? null
-          }
+            platform: x.detail?.platform ?? null,
+          },
         };
-      }
-      else {
+      } else {
         return {
           stop: x.stop,
           express: true,
-          data: null
+          data: null,
         };
       }
     }),

@@ -51,12 +51,18 @@ export function formatDate(date: QDate) {
   )} ${date.year.toFixed()}`;
 }
 
-export function formatRelativeTime(time: QLocalDateTime, now: QLocalDateTime, { suppressEarlierToday = false }: { suppressEarlierToday?: boolean } = {}) {
+export function formatRelativeTime(
+  time: QLocalDateTime,
+  now: QLocalDateTime,
+  { suppressEarlierToday = false }: { suppressEarlierToday?: boolean } = {}
+) {
   const timeString = formatTime(time.time);
   const dayDiff = time.date.diff(now.date);
 
   if (dayDiff == 0) {
-    return time.isBefore(now) && !suppressEarlierToday ? `${timeString} earlier today` : timeString;
+    return time.isBefore(now) && !suppressEarlierToday
+      ? `${timeString} earlier today`
+      : timeString;
   } else if (dayDiff == 1) {
     return time.time.hour <= 2
       ? `${timeString} tonight`

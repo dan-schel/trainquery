@@ -52,19 +52,21 @@ export function getViaString(departure: Departure, patternList: PatternList) {
 }
 
 export function getDeparturePlatformString(departure: Departure) {
-  return getPlatformString(departure.perspective.platform, departure.perspective.stop);
+  return getPlatformString(
+    departure.perspective.platform,
+    departure.perspective.stop
+  );
 }
 
-export function getPlatformString(platform: { id: PlatformID, confidence: ConfidenceLevel } | null, perspectiveStop: StopID) {
+export function getPlatformString(
+  platform: { id: PlatformID; confidence: ConfidenceLevel } | null,
+  perspectiveStop: StopID
+) {
   if (platform == null) {
     return null;
   }
 
-  const name = requirePlatform(
-    getConfig(),
-    perspectiveStop,
-    platform.id
-  ).name;
+  const name = requirePlatform(getConfig(), perspectiveStop, platform.id).name;
   return platform.confidence == "low" ? `${name}?` : name;
 }
 

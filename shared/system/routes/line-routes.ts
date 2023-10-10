@@ -6,15 +6,17 @@ import { Route, RouteStop } from "./line-route";
 import { LinearRoute } from "./linear-route";
 import { YBranchRoute } from "./y-branch-route";
 
-export type LineDiagramStop<ServedData, ExpressData> = {
-  stop: StopID;
-  express: false;
-  data: ServedData;
-} | {
-  stop: StopID;
-  express: true;
-  data: ExpressData;
-}
+export type LineDiagramStop<ServedData, ExpressData> =
+  | {
+      stop: StopID;
+      express: false;
+      data: ServedData;
+    }
+  | {
+      stop: StopID;
+      express: true;
+      data: ExpressData;
+    };
 
 export type LineDiagramData<ServedData, ExpressData> = {
   loop: LineDiagramStop<ServedData, ExpressData>[];
