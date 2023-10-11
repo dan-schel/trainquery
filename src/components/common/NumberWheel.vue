@@ -34,7 +34,7 @@ function handlePointerDown(e: PointerEvent) {
   if (dragOffset.value != null) {
     return;
   }
-  dragOffset.value = props.horizontal ? -e.pageX : e.pageY;
+  dragOffset.value = props.horizontal ? -e.pageX : -e.pageY;
 }
 function handlePointerMove(e: PointerEvent) {
   if (dragOffset.value == null) {
@@ -44,10 +44,10 @@ function handlePointerMove(e: PointerEvent) {
   // e.movementY is undefined on iPad Safari (otherwise remembering the
   // dragOffset wouldn't be necessary!)
   offset.value +=
-    ((props.horizontal ? -e.pageX : e.pageY) - dragOffset.value) *
+    ((props.horizontal ? -e.pageX : -e.pageY) - dragOffset.value) *
     (e.pointerType == "mouse" ? SENSITIVITY_MOUSE : SENSITIVITY_TOUCH);
 
-  dragOffset.value = props.horizontal ? -e.pageX : e.pageY;
+  dragOffset.value = props.horizontal ? -e.pageX : -e.pageY;
 
   while (offset.value > 0.5) {
     const nextValue = props.next(props.modelValue);
@@ -167,13 +167,13 @@ function handleButtonB() {
     .current {
       transform: translate(
         -50%,
-        calc(-50% + var(--current-offset) * var(--scroll-offset))
+        calc(-50% - var(--current-offset) * var(--scroll-offset))
       );
     }
     .next {
       transform: translate(
         -50%,
-        calc(-50% + var(--next-offset) * var(--scroll-offset))
+        calc(-50% - var(--next-offset) * var(--scroll-offset))
       );
     }
   }
