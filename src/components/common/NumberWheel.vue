@@ -149,7 +149,6 @@ function handleButtonB() {
 
 .wheel {
   display: grid;
-  --wheel-text-size: 2.5rem;
   --scroll-offset: 100;
 
   // For ".current" and ".next".
@@ -221,7 +220,7 @@ function handleButtonB() {
   top: 50%;
   left: 50%;
 
-  font-size: var(--wheel-text-size);
+  font-size: var(--wheel-text-size, 2.5rem);
   font-weight: bold;
 
   pointer-events: none;

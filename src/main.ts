@@ -24,9 +24,9 @@ export default viteSSR(
 
     // Download app props during SSR. They will be already set if using the
     // prod server, so this is only really for dev mode.
-    if (import.meta.env.SSR && initialState.props == null) {
+    if (import.meta.env.SSR && initialState.app == null) {
       const res = await fetch(`${baseUrl}/api/ssrAppProps`);
-      initialState.props = await res.json();
+      initialState.app = await res.json();
     }
 
     const head = createHead();
@@ -41,7 +41,11 @@ export default viteSSR(
       }
 
       // Check if route props are already provided.
-      if (to.meta.state != null) {
+      if (
+        to.meta.state != null &&
+        typeof to.meta.state == "object" &&
+        "route" in to.meta.state
+      ) {
         return next();
       }
 
@@ -50,7 +54,11 @@ export default viteSSR(
           to.name
         )}&path=${encodeURIComponent(to.fullPath)}`
       );
-      to.meta.state = await res.json();
+
+      to.meta.state = {
+        ...(to.meta.state ?? {}),
+        route: await res.json(),
+      };
       next();
     });
 
@@ -76,7 +84,7 @@ export default viteSSR(
       const json = await res.json();
       provideConfig(FrontendConfig.json.parse(json));
     } else {
-      await initConfig(initialState.props.configHash);
+      await initConfig(initialState.app.configHash);
     }
 
     return { head };

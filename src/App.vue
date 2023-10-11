@@ -48,7 +48,6 @@ onMounted(() => {
 });
 onUnmounted(() => {
   clearInterval(timeout);
-  console.log(timeout);
 });
 
 useHead({

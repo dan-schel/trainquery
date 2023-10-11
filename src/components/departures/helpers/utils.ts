@@ -74,13 +74,10 @@ export function getTimeString(departure: Departure, now: QUtcDateTime) {
   // TODO: Use live time when available.
   const time = departure.perspective.scheduledTime;
   const diff = time.diff(now);
-  if (diff.isNegative) {
-    return formatDuration(diff, { round: true });
-  }
-  if (diff.inMins < 1) {
+  if (diff.inMins < 1 && !diff.isNegative) {
     return "Now";
   }
-  if (diff.inHrs <= 2) {
+  if (Math.abs(diff.inHrs) <= 2) {
     return formatDuration(diff);
   }
 

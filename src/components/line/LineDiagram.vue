@@ -164,10 +164,10 @@ $loop-cap-margin: 0.9rem;
 $loop-join-margin: 0.75rem;
 $branch-split-margin: 0.75rem;
 $branch-end-margin: 0.5rem;
+$default-stop-gap: 1rem;
 
 .diagram {
   @include line-colors.accent-classes;
-  --stop-gap: 0.5rem;
 }
 .stop {
   // For positioning the visual, and not having it interfere with the labels.
@@ -182,7 +182,7 @@ $branch-end-margin: 0.5rem;
     opacity: 0.5;
   }
   &:not(:last-child) {
-    margin-bottom: var(--stop-gap);
+    margin-bottom: var(--stop-gap, $default-stop-gap);
   }
 
   // Indented stops give more space to the "visual" diagram elements.
@@ -273,7 +273,7 @@ $branch-end-margin: 0.5rem;
 // the top of the first row of the next stop.
 .rod-extra,
 .rod-unindented-extra {
-  bottom: calc(var(--stop-gap) * -1);
+  bottom: calc(var(--stop-gap, $default-stop-gap) * -1);
 }
 
 .visual svg {
@@ -298,9 +298,9 @@ $branch-end-margin: 0.5rem;
 // The last loop stop has extra space beneath itself to the next stop, to allow
 // enough space for the loop join SVG.
 .loop.last-of-type {
-  margin-bottom: calc(var(--stop-gap) + $loop-join-margin);
+  margin-bottom: calc(var(--stop-gap, $default-stop-gap) + $loop-join-margin);
   .rod-unindented-extra {
-    bottom: calc(var(--stop-gap) * -1 - $loop-join-margin);
+    bottom: calc(var(--stop-gap, $default-stop-gap) * -1 - $loop-join-margin);
   }
 }
 
@@ -328,9 +328,9 @@ $branch-end-margin: 0.5rem;
 // stop, just because it looks better (provides a bit of visual separation
 // between the two branches).
 .first-branch.last-of-type {
-  margin-bottom: calc(var(--stop-gap) + $branch-end-margin);
+  margin-bottom: calc(var(--stop-gap, $default-stop-gap) + $branch-end-margin);
   .rod-unindented-extra {
-    bottom: calc(var(--stop-gap) * -1 - $branch-end-margin);
+    bottom: calc(var(--stop-gap, $default-stop-gap) * -1 - $branch-end-margin);
   }
 }
 </style>

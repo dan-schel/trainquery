@@ -23,11 +23,13 @@ const route = useRoute();
 const train = computed(() => {
   const metaSchema = z.object({
     state: z.object({
-      departure: Departure.json.optional(),
+      route: z.object({
+        departure: Departure.json.optional(),
+      }),
     }),
   });
   const meta = metaSchema.parse(route.meta);
-  return meta.state.departure;
+  return meta.state.route.departure;
 });
 
 const diagram = computed(() =>
@@ -114,4 +116,3 @@ useHead(head);
   margin-bottom: 2rem;
 }
 </style>
-@/components/departures/helpers/continuify

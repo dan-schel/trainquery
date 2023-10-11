@@ -12,11 +12,14 @@ const route = useRoute();
 const innerHTML = computed(() => {
   const metaSchema = z.object({
     state: z.object({
-      aboutMarkdown: z.string(),
+      route: z.object({
+        aboutMarkdown: z.string(),
+      }),
     }),
   });
+
   const meta = metaSchema.parse(route.meta);
-  return parseMarkdown(meta.state.aboutMarkdown);
+  return parseMarkdown(meta.state.route.aboutMarkdown);
 });
 
 useHead({

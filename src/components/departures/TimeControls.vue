@@ -167,7 +167,7 @@ h6 {
   align-self: flex-end;
 }
 .date-wheel {
-  --wheel-text-size: 1.5rem;
+  --wheel-text-size: 1.25rem;
   height: 3rem;
   margin-bottom: 0.5rem;
 }
