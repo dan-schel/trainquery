@@ -4,8 +4,8 @@ import DepartureFeedVue from "./DepartureFeed.vue";
 import { Departure } from "shared/system/service/departure";
 import { repeat } from "@schel-d/js-utils";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
-import { nowUTCLuxon } from "shared/qtime/luxon-conversions";
 import { callAPI } from "@/utils/call-api";
+import { useNow } from "@/utils/now-provider";
 
 const props = defineProps<{
   feeds: DepartureFeed[];
@@ -21,7 +21,7 @@ const departureLists = ref<Departure[][]>(
   repeat(null, props.feeds.length).map((_x) => [])
 );
 
-const now = nowUTCLuxon().startOfMinute();
+const { utc } = useNow();
 
 async function init() {
   loading.value = true;
@@ -32,7 +32,7 @@ async function init() {
     try {
       departureLists.value = await callAPI(
         "departures",
-        { feeds: DepartureFeed.encode(props.feeds), time: now.toISO() },
+        { feeds: DepartureFeed.encode(props.feeds), time: utc.value.toISO() },
         Departure.json.array().array()
       );
     } catch (err) {
@@ -63,7 +63,6 @@ watch([props], () => init());
       :allow-pinning="allowPinning"
       :state-perspective="statePerspective"
       :is-default-feeds="isDefaultFeeds"
-      :now="now"
     ></DepartureFeedVue>
   </div>
 </template>

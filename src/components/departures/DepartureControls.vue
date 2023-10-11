@@ -9,8 +9,7 @@ import { formatFilter } from "@/utils/format-filter";
 import type { StopID } from "shared/system/ids";
 import type { QLocalDateTime } from "shared/qtime/qdatetime";
 import { formatRelativeTime } from "@/utils/format-qtime";
-import { nowLocalLuxon } from "shared/qtime/luxon-conversions";
-import { getConfig } from "@/utils/get-config";
+import { useNow } from "@/utils/now-provider";
 
 const props = defineProps<{
   stop: StopID;
@@ -70,6 +69,8 @@ function handleTimeSubmit(newValue: QLocalDateTime | null) {
   emit("update:time", newValue);
 }
 
+const { local } = useNow();
+
 onMounted(() => {
   window.addEventListener("keydown", handleKeyDown);
 });
@@ -84,9 +85,7 @@ onUnmounted(() => {
       <button class="time-button" @click="handleTimeButtonClick">
         <Icon id="uil:clock" title="Time"></Icon>
         <OneLineP class="text">
-          <b v-if="time != null">{{
-            formatRelativeTime(time, nowLocalLuxon(getConfig()))
-          }}</b>
+          <b v-if="time != null">{{ formatRelativeTime(time, local) }}</b>
           <template v-if="time == null">Now</template>
         </OneLineP>
         <Icon id="uil:angle-down"></Icon>

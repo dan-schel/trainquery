@@ -5,10 +5,19 @@ import Footer from "./components/Footer.vue";
 import { useHead } from "@vueuse/head";
 import { getConfig } from "./utils/get-config";
 import { Settings, settingsInjectionKey } from "./settings/settings";
-import { onMounted, provide, ref } from "vue";
+import { onMounted, provide, ref, onUnmounted } from "vue";
 import { readSettings, writeSettings } from "./settings/persist-settings";
+import {
+  nowUTCLuxon,
+  toLocalDateTimeLuxon,
+} from "shared/qtime/luxon-conversions";
+import { nowInjectionKey } from "./utils/now-provider";
 
 const settings = ref<Settings | null>(null);
+const nowUtc = ref(nowUTCLuxon().startOfMinute());
+const nowLocal = ref(toLocalDateTimeLuxon(getConfig(), nowUtc.value));
+
+let timeout: NodeJS.Timer;
 
 function updateSettings(newSettings: Settings) {
   if (settings.value == null) {
@@ -22,9 +31,24 @@ provide(settingsInjectionKey, {
   settings: settings,
   updateSettings: updateSettings,
 });
+provide(nowInjectionKey, {
+  local: nowLocal,
+  utc: nowUtc,
+});
 
 onMounted(() => {
   settings.value = readSettings().validateAgainstConfig((s) => console.warn(s));
+  timeout = setInterval(() => {
+    const utc = nowUTCLuxon().startOfMinute();
+    if (!utc.equals(nowUtc.value)) {
+      nowUtc.value = utc;
+      nowLocal.value = toLocalDateTimeLuxon(getConfig(), utc);
+    }
+  }, 1000);
+});
+onUnmounted(() => {
+  clearInterval(timeout);
+  console.log(timeout);
 });
 
 useHead({

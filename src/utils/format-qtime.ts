@@ -14,7 +14,7 @@ export function formatTime(
   const mins = time.minute.toFixed().padStart(2, "0");
   const half = hour12.half;
   if (includeSeconds) {
-    const secs = time.minute.toFixed().padStart(2, "0");
+    const secs = time.second.toFixed().padStart(2, "0");
     return `${hrs}:${mins}:${secs}${half}`;
   }
   return `${hrs}:${mins}${half}`;

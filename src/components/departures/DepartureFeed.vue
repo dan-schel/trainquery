@@ -13,7 +13,6 @@ import {
 } from "shared/system/config-utils";
 import Icon from "../icons/Icon.vue";
 import type { DepartureFeed } from "shared/system/timetable/departure-feed";
-import type { QUtcDateTime } from "shared/qtime/qdatetime";
 import { computed } from "vue";
 import { formatFilter } from "@/utils/format-filter";
 import {
@@ -31,7 +30,6 @@ const props = defineProps<{
   allowPinning: boolean;
   statePerspective: boolean;
   isDefaultFeeds: boolean;
-  now: QUtcDateTime;
 }>();
 
 const header = computed(() => {
@@ -134,7 +132,6 @@ function handlePin() {
           :key="getServicePageRoute(departure)"
           :departure="departure"
           :perspective="feed.stop"
-          :now="now"
         ></DepartureVue>
       </template>
       <div

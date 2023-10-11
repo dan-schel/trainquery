@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useHead } from "@vueuse/head";
 import { useRoute } from "vue-router";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import PageContent from "@/components/common/PageContent.vue";
 import { z } from "zod";
 import LineList from "@/components/LineList.vue";
@@ -9,16 +9,14 @@ import { getDiagramForService } from "@/components/line/get-diagram-for-service"
 import LineDiagram from "@/components/line/LineDiagram.vue";
 import { Departure } from "shared/system/service/departure";
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
-import {
-  nowLocalLuxon,
-  toLocalDateTimeLuxon,
-} from "shared/qtime/luxon-conversions";
+import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import { getConfig } from "@/utils/get-config";
 import { formatRelativeTime, formatTime } from "@/utils/format-qtime";
 import { requireStop } from "shared/system/config-utils";
 import TrainPageStop from "@/components/line/TrainPageStop.vue";
+import { useNow } from "@/utils/now-provider";
 
-const now = ref(nowLocalLuxon(getConfig()));
+const { local } = useNow();
 
 const route = useRoute();
 
@@ -65,8 +63,8 @@ const departureText = computed(() => {
     getConfig(),
     train.value.perspective.scheduledTime
   );
-  const timeString = formatRelativeTime(time, now.value);
-  const verb = time.isBefore(now.value) ? "Departed" : "Departs";
+  const timeString = formatRelativeTime(time, local.value);
+  const verb = time.isBefore(local.value) ? "Departed" : "Departs";
   return `${verb} ${name} at ${timeString}`;
 });
 
@@ -91,7 +89,7 @@ useHead(head);
     ></LineList>
     <LineDiagram v-if="diagram != null" :diagram="diagram" class="diagram">
       <template #stop="slotProps">
-        <TrainPageStop :stop-data="slotProps.stopData" :now="now" />
+        <TrainPageStop :stop-data="slotProps.stopData" />
       </template>
     </LineDiagram>
   </PageContent>

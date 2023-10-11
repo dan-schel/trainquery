@@ -4,14 +4,12 @@ import NumberWheel from "../common/NumberWheel.vue";
 import { hour12To24, hour24To12, posMod } from "@schel-d/js-utils";
 import Picker from "../common/Picker.vue";
 import SimpleButton from "../common/SimpleButton.vue";
-import {
-  buildLocalDateTimeLuxon,
-  nowLocalLuxon,
-} from "shared/qtime/luxon-conversions";
+import { buildLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import { getConfig } from "@/utils/get-config";
 import { formatDate } from "@/utils/format-qtime";
 import { QLocalDateTime } from "shared/qtime/qdatetime";
 import { QTime } from "shared/qtime/qtime";
+import { useNow } from "@/utils/now-provider";
 
 const props = defineProps<{
   time: QLocalDateTime | null;
@@ -22,8 +20,10 @@ const emit = defineEmits<{
   (e: "submit", newValue: QLocalDateTime | null): void;
 }>();
 
+const { local } = useNow();
+
 const timeComponents = computed(() => {
-  const time = props.time ?? nowLocalLuxon(getConfig());
+  const time = props.time ?? local.value;
   const hour12 = hour24To12(time.time.hour);
 
   return {
@@ -46,16 +46,13 @@ watch([props], () => {
   ampm.value = timeComponents.value.ampm;
 });
 
-const wasOpen = ref(props.isOpen);
-watch([props], () => {
-  if (props.isOpen && !wasOpen.value) {
-    console.log("Opened!");
+watch([props], ([newProps], [oldProps]) => {
+  if (newProps.isOpen && !oldProps.isOpen) {
     hours.value = timeComponents.value.hours;
     minutes.value = timeComponents.value.minutes;
     date.value = timeComponents.value.date;
     ampm.value = timeComponents.value.ampm;
   }
-  wasOpen.value = props.isOpen;
 });
 
 function handleSubmitButton() {

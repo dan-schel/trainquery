@@ -6,15 +6,17 @@ import { getStopPageRoute } from "shared/system/config-utils";
 import type { AdditionalServedData } from "./get-diagram-for-service";
 import { type LineDiagramStop } from "shared/system/routes/line-routes";
 import { formatRelativeTime } from "@/utils/format-qtime";
-import type { QLocalDateTime } from "shared/qtime/qdatetime";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import OneLineP from "../common/OneLineP.vue";
 import { getPlatformString } from "../departures/helpers/utils";
+import { useNow } from "@/utils/now-provider";
 
 const props = defineProps<{
   stopData: LineDiagramStop<AdditionalServedData, null>;
-  now: QLocalDateTime;
 }>();
+
+const now = useNow().local;
+
 const stop = computed(() => requireStop(getConfig(), props.stopData.stop));
 const timeString = computed(() => {
   if (props.stopData.express || props.stopData.data.scheduledTime == null) {
@@ -24,7 +26,7 @@ const timeString = computed(() => {
     getConfig(),
     props.stopData.data.scheduledTime
   );
-  return formatRelativeTime(local, props.now, { suppressEarlierToday: true });
+  return formatRelativeTime(local, now.value, { suppressEarlierToday: true });
 });
 const platformString = computed(() => {
   if (props.stopData.express || props.stopData.data.platform == null) {

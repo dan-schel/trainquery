@@ -15,15 +15,16 @@ import {
 } from "./helpers/utils";
 import { getStoppingPatternString } from "./helpers/stopping-pattern";
 import type { StopID } from "shared/system/ids";
-import type { QUtcDateTime } from "shared/qtime/qdatetime";
 import { continuify } from "./helpers/continuify";
+import { useNow } from "@/utils/now-provider";
 
 const props = defineProps<{
   departure: Departure;
   continuationsEnabled: boolean;
   perspective: StopID;
-  now: QUtcDateTime;
 }>();
+
+const { utc } = useNow();
 
 const detail = computed(() => {
   const patternList = continuify(props.departure);
@@ -36,7 +37,7 @@ const detail = computed(() => {
       patternList
     ),
     lineColor: requireLine(getConfig(), props.departure.line).color,
-    timeString: getTimeString(props.departure, props.now),
+    timeString: getTimeString(props.departure, utc.value),
     linesString: getLinesString(props.departure),
   };
 });
