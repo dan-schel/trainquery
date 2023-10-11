@@ -14,6 +14,7 @@ import PageContent from "@/components/common/PageContent.vue";
 import LineList from "@/components/LineList.vue";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { DepartureFilter } from "shared/system/timetable/departure-filter";
+import type { QLocalDateTime } from "shared/qtime/qdatetime";
 
 const route = useRoute();
 const params = ref(route.params);
@@ -35,7 +36,7 @@ const lines = computed(() =>
 );
 
 const filter = ref(DepartureFilter.default);
-const time = ref(null);
+const time = ref<QLocalDateTime | null>(null);
 watch([stop], () => {
   filter.value = DepartureFilter.default;
   time.value = null;
@@ -85,6 +86,7 @@ useHead(head);
     <DepartureGroup
       class="group"
       :feeds="feeds"
+      :time="time"
       :allow-pinning="true"
       :state-perspective="false"
       :is-default-feeds="isDefaultFilter"

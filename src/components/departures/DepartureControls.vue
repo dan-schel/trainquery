@@ -32,32 +32,29 @@ const showResetButton = computed(
 // Stores changes to the filter until the dropdown is closed, when the changes
 // are sent back up to the stop page.
 const filterElect = ref(props.filter);
-// TODO: do a similar thing for the time controls.
-watch([props], () => {
-  filterElect.value = props.filter;
-  // timeElect.value = props.time;
-});
+watch(
+  () => props.filter,
+  () => {
+    filterElect.value = props.filter;
+  }
+);
 
 function handleTimeButtonClick() {
   openDropdown.value = openDropdown.value == "time" ? "none" : "time";
   emit("update:filter", filterElect.value);
-  // emit("update:time", timeElect.value);
 }
 function handleFilterButtonClick() {
   openDropdown.value = openDropdown.value == "filter" ? "none" : "filter";
   emit("update:filter", filterElect.value);
-  // emit("update:time", timeElect.value);
 }
 function closeDropdown() {
   openDropdown.value = "none";
   emit("update:filter", filterElect.value);
-  // emit("update:time", timeElect.value);
 }
 function handleKeyDown(e: KeyboardEvent) {
   if (e.code == "Escape") {
     openDropdown.value = "none";
     emit("update:filter", filterElect.value);
-    // emit("update:time", timeElect.value);
   }
 }
 function handleResetClicked() {

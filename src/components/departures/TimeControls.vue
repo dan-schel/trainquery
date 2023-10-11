@@ -46,14 +46,17 @@ watch([props], () => {
   ampm.value = timeComponents.value.ampm;
 });
 
-watch([props], ([newProps], [oldProps]) => {
-  if (newProps.isOpen && !oldProps.isOpen) {
-    hours.value = timeComponents.value.hours;
-    minutes.value = timeComponents.value.minutes;
-    date.value = timeComponents.value.date;
-    ampm.value = timeComponents.value.ampm;
+watch(
+  () => props.isOpen,
+  (isOpen, wasOpen) => {
+    if (isOpen && !wasOpen) {
+      hours.value = timeComponents.value.hours;
+      minutes.value = timeComponents.value.minutes;
+      date.value = timeComponents.value.date;
+      ampm.value = timeComponents.value.ampm;
+    }
   }
-});
+);
 
 function handleSubmitButton() {
   const time = new QTime(hour12To24(hours.value, ampm.value), minutes.value, 0);

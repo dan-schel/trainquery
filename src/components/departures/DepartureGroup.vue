@@ -6,9 +6,11 @@ import { repeat } from "@schel-d/js-utils";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { callAPI } from "@/utils/call-api";
 import { useNow } from "@/utils/now-provider";
+import type { QLocalDateTime } from "shared/qtime/qdatetime";
 
 const props = defineProps<{
   feeds: DepartureFeed[];
+  time: QLocalDateTime | null;
   allowPinning: boolean;
   statePerspective: boolean;
   isDefaultFeeds: boolean;
@@ -32,7 +34,10 @@ async function init() {
     try {
       departureLists.value = await callAPI(
         "departures",
-        { feeds: DepartureFeed.encode(props.feeds), time: utc.value.toISO() },
+        {
+          feeds: DepartureFeed.encode(props.feeds),
+          time: (props.time?.toUTC() ?? utc.value).toISO(),
+        },
         Departure.json.array().array()
       );
     } catch (err) {
@@ -47,7 +52,12 @@ async function init() {
 onMounted(() => {
   init();
 });
-watch([props], () => init());
+watch(
+  () => ({ feeds: props.feeds, time: props.time }),
+  () => {
+    init();
+  }
+);
 </script>
 
 <template>

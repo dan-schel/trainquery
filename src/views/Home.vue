@@ -42,6 +42,7 @@ const feeds = computed(() =>
         <DepartureGroup
           v-if="feeds != null && feeds.length > 0"
           :feeds="feeds"
+          :time="null"
           :allow-pinning="false"
           :state-perspective="true"
           :is-default-feeds="false"
