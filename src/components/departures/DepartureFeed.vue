@@ -121,19 +121,7 @@ function handlePin() {
         <Icon id="uil:exclamation-circle"></Icon>
         <p>Something went wrong</p>
       </div>
-      <LoadingSpinner
-        class="spinner"
-        v-if="loading && error == null"
-      ></LoadingSpinner>
-      <template v-if="!loading && error == null">
-        <DepartureVue
-          v-for="departure in departures"
-          :continuations-enabled="false"
-          :key="getServicePageRoute(departure)"
-          :departure="departure"
-          :perspective="feed.stop"
-        ></DepartureVue>
-      </template>
+
       <div
         class="empty"
         v-if="!loading && error == null && departures.length == 0"
@@ -141,6 +129,23 @@ function handlePin() {
         <Icon id="uil:calendar-slash"></Icon>
         <p>No trains scheduled</p>
       </div>
+
+      <template v-if="error == null">
+        <DepartureVue
+          :class="{ loading: loading }"
+          v-for="departure in departures"
+          :continuations-enabled="false"
+          :key="getServicePageRoute(departure)"
+          :departure="departure"
+          :perspective="feed.stop"
+        ></DepartureVue>
+      </template>
+
+      <!-- May appear while departures are still shown underneath. -->
+      <LoadingSpinner
+        class="spinner"
+        v-if="loading && error == null"
+      ></LoadingSpinner>
     </div>
   </div>
 </template>
@@ -181,6 +186,9 @@ function handlePin() {
 
   @include utils.raised-surface;
   border-radius: 0.75rem;
+
+  // For the loading spinner (which can appear over departures).
+  position: relative;
 }
 .departure {
   // For the divider.
@@ -195,8 +203,16 @@ function handlePin() {
     right: 1rem;
     border-bottom: 1px solid var(--color-ink-20);
   }
+  &.loading {
+    opacity: 50%;
+    pointer-events: none;
+  }
 }
-.spinner,
+.spinner {
+  position: absolute;
+  left: calc(50% - 0.5em);
+  top: calc(50% - 0.5em);
+}
 .error,
 .empty {
   align-self: center;

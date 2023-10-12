@@ -25,10 +25,13 @@ const departureLists = ref<Departure[][]>(
 
 const { utc } = useNow();
 
-async function init() {
+async function init(reset: boolean) {
   loading.value = true;
   error.value = null;
-  departureLists.value = repeat(null, props.feeds.length).map((_x) => []);
+
+  if (reset) {
+    departureLists.value = repeat(null, props.feeds.length).map((_x) => []);
+  }
 
   if (props.feeds.length > 0) {
     try {
@@ -43,6 +46,7 @@ async function init() {
     } catch (err) {
       console.warn(err);
       error.value = "unknown";
+      departureLists.value = repeat(null, props.feeds.length).map((_x) => []);
     }
   }
 
@@ -50,14 +54,19 @@ async function init() {
 }
 
 onMounted(() => {
-  init();
+  init(true);
 });
 watch(
   () => ({ feeds: props.feeds, time: props.time }),
   () => {
-    init();
+    init(true);
   }
 );
+watch(utc, () => {
+  if (props.time == null) {
+    init(false);
+  }
+});
 </script>
 
 <template>
