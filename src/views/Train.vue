@@ -66,7 +66,13 @@ const departureText = computed(() => {
     train.value.perspective.scheduledTime
   );
   const timeString = formatRelativeTime(time, local.value);
-  const verb = time.isBefore(local.value) ? "Departed" : "Departs";
+  const verb = train.value.isArrival()
+    ? time.isBefore(local.value)
+      ? "Arrived at"
+      : "Arrives at"
+    : time.isBefore(local.value)
+    ? "Departed"
+    : "Departs";
   return `${verb} ${name} at ${timeString}`;
 });
 
