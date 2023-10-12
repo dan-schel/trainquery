@@ -12,6 +12,7 @@ import type { PatternList } from "shared/system/service/listed-stop";
 import type { Departure } from "shared/system/service/departure";
 import type { PlatformID, StopID } from "shared/system/ids";
 import type { ConfidenceLevel } from "shared/system/enums";
+import type { ViaRuleFilteringData } from "shared/system/via-rule";
 
 export function getTerminusString(
   departure: Departure,
@@ -25,29 +26,29 @@ export function getTerminusString(
 }
 
 export function getViaString(departure: Departure, patternList: PatternList) {
-  const servedStops = patternList.filter((x) => x.type == "served");
+  const servedStops = patternList
+    .slice(1, -1)
+    .filter((x) => x.type == "served");
 
-  const thisStop = departure.perspective.stop;
-  const lastStop = patternList[patternList.length - 1].stop;
+  const line = requireLine(getConfig(), departure.line);
+  const data: ViaRuleFilteringData = {
+    line: departure.line,
+    color: line.color,
+    direction: departure.direction,
+    routeVariant: departure.route,
+    serviceType: line.serviceType,
+    futureStops: servedStops.map((s) => s.stop),
+    terminus: departure.terminus.stop,
+    continues: departure.continuation != null,
+  };
 
+  // Return the first matching rule.
   for (const rule of getConfig().frontend.via) {
-    // Don't use this rule if some stops are not served.
-    if (rule.stops.some((x) => servedStops.some((s) => s.stop != x))) {
-      continue;
+    if (rule.rules.some((r) => r.matches(data))) {
+      return rule.text;
     }
-
-    // Don't use this rule if it's for continuing trains only and this train isn't.
-    if (rule.onlyIfContinuing && departure.continuation == null) {
-      continue;
-    }
-
-    // Don't use this rule if it refers to the first or last stop.
-    if (rule.stops.includes(thisStop) || rule.stops.includes(lastStop)) {
-      continue;
-    }
-
-    return rule.text;
   }
+
   return null;
 }
 

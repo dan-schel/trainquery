@@ -61,7 +61,7 @@ export class FrontendOnlyConfig {
       tagline: this.tagline,
       footer: this.footer,
       metaDescription: this.metaDescription,
-      via: this.via,
+      via: this.via.map((v) => v.toJSON()),
       departureFeeds: this.departureFeeds.toJSON(),
       directionNames: this.directionNames.toJSON(),
     };
