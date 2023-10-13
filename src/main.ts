@@ -10,6 +10,11 @@ import {
   getStopFromUrlName,
 } from "shared/system/config-utils";
 import { FrontendConfig } from "shared/system/config/frontend-config";
+import {
+  finishedNavigating,
+  provideNavigating,
+  startedNavigating,
+} from "./utils/navigating-provider";
 
 export default viteSSR(
   App,
@@ -32,9 +37,13 @@ export default viteSSR(
     const head = createHead();
     app.use(head);
 
+    provideNavigating(app);
+
     // Download route props when navigating pages (the first route's props are
     // downloaded with this code too, but on the server during SSR).
     router.beforeEach(async (to, _from, next) => {
+      startedNavigating();
+
       // I get several of these calls when loading every page for some reason.
       if (to.name == "notfound") {
         return next();
@@ -77,6 +86,10 @@ export default viteSSR(
       }
 
       return next();
+    });
+
+    router.afterEach(() => {
+      finishedNavigating();
     });
 
     if (import.meta.env.SSR) {

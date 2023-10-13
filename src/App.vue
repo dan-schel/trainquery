@@ -12,6 +12,10 @@ import {
   toLocalDateTimeLuxon,
 } from "shared/qtime/luxon-conversions";
 import { nowInjectionKey } from "./utils/now-provider";
+import LoadingSpinner from "./components/common/LoadingSpinner.vue";
+import { useNavigating } from "./utils/navigating-provider";
+
+const navigating = useNavigating();
 
 const settings = ref<Settings | null>(null);
 const nowUtc = ref(nowUTCLuxon().startOfMinute());
@@ -64,10 +68,11 @@ useHead({
     <p>Skip to content</p>
   </a>
   <Header></Header>
-  <div class="page" id="content">
+  <div class="page" id="content" :class="{ navigating: navigating }">
     <RouterView />
   </div>
-  <Footer></Footer>
+  <Footer :class="{ navigating: navigating }"></Footer>
+  <LoadingSpinner class="spinner" v-if="navigating"></LoadingSpinner>
 </template>
 
 <style scoped lang="scss">
@@ -100,5 +105,14 @@ useHead({
   &:hover {
     top: 0.5rem;
   }
+}
+.navigating {
+  opacity: 50%;
+  pointer-events: none;
+}
+.spinner {
+  position: fixed;
+  top: calc(50% - 1rem);
+  left: calc(50% - 1rem);
 }
 </style>
