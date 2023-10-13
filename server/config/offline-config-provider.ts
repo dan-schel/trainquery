@@ -4,7 +4,15 @@ import { generateDataFolderPath, loadConfigFromFiles } from "./config-zip";
 import { ServerConfig } from "./server-config";
 
 export class OfflineConfigProvider extends ConfigProvider {
-  constructor(readonly zipOrFolderPath: string) {
+  constructor(
+    readonly zipOrFolderPath: string,
+
+    /**
+     * The value to use for the canonical url in the config. Provided by an
+     * environment variable.
+     */
+    readonly canonicalUrl: string
+  ) {
     super();
   }
 
@@ -15,6 +23,7 @@ export class OfflineConfigProvider extends ConfigProvider {
     const config = await loadConfigFromFiles(
       dataFolder,
       this.zipOrFolderPath,
+      this.canonicalUrl,
       logger
     );
 

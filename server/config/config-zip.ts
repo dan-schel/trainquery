@@ -19,6 +19,7 @@ import { PlatformRules } from "./platform-rules";
 export async function loadConfigFromFiles(
   dataFolder: string,
   zipOrFolderPath: string,
+  canonicalUrl: string,
   logger?: Logger
 ): Promise<ServerConfig> {
   const isDirectory = (await fsp.lstat(zipOrFolderPath)).isDirectory();
@@ -36,7 +37,7 @@ export async function loadConfigFromFiles(
   });
   const config = await loadYml(dataFolder, "config.yml", configSchema);
 
-  const shared = await loadShared(config.shared, dataFolder);
+  const shared = await loadShared(config.shared, dataFolder, canonicalUrl);
   const server = await loadServer(config.server, dataFolder, logger);
   const frontend = await loadFrontend(config.frontend, dataFolder);
 
@@ -45,7 +46,8 @@ export async function loadConfigFromFiles(
 
 async function loadShared(
   input: unknown,
-  dataFolder: string
+  dataFolder: string,
+  canonicalUrl: string
 ): Promise<SharedConfig> {
   const schema = z
     .object({ stops: z.string(), lines: z.string(), urlNames: z.string() })
@@ -60,6 +62,7 @@ async function loadShared(
     stops: (await loadYml(dataFolder, shared.stops, stopsYml)).stops,
     lines: (await loadYml(dataFolder, shared.lines, linesYml)).lines,
     urlNames: await loadYml(dataFolder, shared.urlNames, z.any()),
+    canonicalUrl: canonicalUrl,
   });
 }
 

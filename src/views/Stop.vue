@@ -108,7 +108,7 @@ const head = computed(() => ({
     {
       rel: "canonical",
       href:
-        "https://trainquery.com" +
+        getConfig().shared.canonicalUrl +
         getStopPageRoute(getConfig(), stop.value.id, null, null),
     },
   ],

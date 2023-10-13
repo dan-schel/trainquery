@@ -36,7 +36,8 @@ const head = computed(() => ({
     {
       rel: "canonical",
       href:
-        "https://trainquery.com" + getLinePageRoute(getConfig(), line.value.id),
+        getConfig().shared.canonicalUrl +
+        getLinePageRoute(getConfig(), line.value.id),
     },
   ],
 }));

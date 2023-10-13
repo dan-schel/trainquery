@@ -33,18 +33,23 @@ async function createServer() {
 }
 
 function getConfigProvider(isOffline: boolean): ConfigProvider {
+  const canonicalUrl = process.env.URL;
+  if (canonicalUrl == null) {
+    throw new Error("URL environment variable not set.");
+  }
+
   if (isOffline) {
     const zipOrFolderPath = process.env.CONFIG_OFFLINE;
     if (zipOrFolderPath == null) {
       throw new Error("CONFIG_OFFLINE environment variable not provided.");
     }
-    return new OfflineConfigProvider(zipOrFolderPath);
+    return new OfflineConfigProvider(zipOrFolderPath, canonicalUrl);
   } else {
     const configUrl = process.env.CONFIG;
     if (configUrl == null) {
       throw new Error("CONFIG environment variable not provided.");
     }
-    return new OnlineConfigProvider(configUrl);
+    return new OnlineConfigProvider(configUrl, canonicalUrl);
   }
 }
 

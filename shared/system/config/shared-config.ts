@@ -37,7 +37,9 @@ export class SharedConfig {
      * Array of all possible service types, e.g. [suburban, regional]. Enables
      * service type filtering.
      */
-    readonly serviceTypes: ServiceType[]
+    readonly serviceTypes: ServiceType[],
+    /** E.g. 'https://trainquery.com'. */
+    readonly canonicalUrl: string
   ) {}
 
   static readonly json = z
@@ -56,6 +58,7 @@ export class SharedConfig {
         }),
       ]),
       serviceTypes: ServiceType.json.array(),
+      canonicalUrl: z.string(),
     })
     .transform(
       (x) =>
@@ -65,7 +68,8 @@ export class SharedConfig {
           x.urlNames,
           x.usePlatforms,
           x.timezone,
-          x.serviceTypes
+          x.serviceTypes,
+          x.canonicalUrl
         )
     );
 
@@ -77,6 +81,7 @@ export class SharedConfig {
       usePlatforms: this.usePlatforms,
       timezone: this.timezone,
       serviceTypes: this.serviceTypes.map((s) => s.toJSON()),
+      canonicalUrl: this.canonicalUrl,
     };
   }
 }

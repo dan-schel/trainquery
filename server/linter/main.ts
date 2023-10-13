@@ -15,24 +15,29 @@ async function main() {
 
   const arg = process.argv[2];
   const provider = (() => {
+    const canonicalUrl = process.env.URL;
+    if (canonicalUrl == null) {
+      throw new Error("URL environment variable not set.");
+    }
+
     if (arg == "online") {
       const configUrl = process.env.CONFIG;
       if (configUrl == null) {
         throw new Error("CONFIG environment variable not set.");
       }
       console.log(`Linting "${configUrl}"...`);
-      return new OnlineConfigProvider(configUrl);
+      return new OnlineConfigProvider(configUrl, canonicalUrl);
     } else if (arg == "offline") {
       const zipOrFolderPath = process.env.CONFIG_OFFLINE;
       if (zipOrFolderPath == null) {
         throw new Error("CONFIG_OFFLINE environment variable not set.");
       }
       console.log(`Linting "${zipOrFolderPath}"...`);
-      return new OfflineConfigProvider(zipOrFolderPath);
+      return new OfflineConfigProvider(zipOrFolderPath, canonicalUrl);
     } else if (arg.startsWith("http://") || arg.startsWith("https://")) {
-      return new OnlineConfigProvider(arg);
+      return new OnlineConfigProvider(arg, canonicalUrl);
     }
-    return new OfflineConfigProvider(arg);
+    return new OfflineConfigProvider(arg, canonicalUrl);
   })();
 
   try {

@@ -14,7 +14,12 @@ const supportedVersion = "v1";
 export class OnlineConfigProvider extends ConfigProvider {
   constructor(
     /** Either the url to a manifest file (.yml) or config zip file. */
-    readonly url: string
+    readonly url: string,
+    /**
+     * The value to use for the canonical url in the config. Provided by an
+     * environment variable.
+     */
+    readonly canonicalUrl: string
   ) {
     super();
   }
@@ -43,7 +48,12 @@ export class OnlineConfigProvider extends ConfigProvider {
     await fsp.mkdir(dataFolder);
     await download(zipUrl, zipPath);
 
-    const config = await loadConfigFromFiles(dataFolder, zipPath, logger);
+    const config = await loadConfigFromFiles(
+      dataFolder,
+      zipPath,
+      this.canonicalUrl,
+      logger
+    );
 
     await fsp.rm(dataFolder, {
       recursive: true,
