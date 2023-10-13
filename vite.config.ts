@@ -13,24 +13,39 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       workbox: {
-        globPatterns: ['**/*.{js,css}']
+        globPatterns: ["**/*.{js,css}"]
       },
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
       manifest: {
-        name: 'TrainQuery',
-        short_name: 'TrainQuery',
+        name: "TrainQuery",
+        short_name: "TrainQuery",
         description: "Navigate Melbourne's train network",
-        theme_color: '#000000',
+        theme_color: "#000000",
+        background_color: "#242933",
         icons: [
           {
-            src: 'android-chrome-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
+            src: "favicon-circle-192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any"
           },
           {
-            src: 'android-chrome-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
+            src: "favicon-circle-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any"
+          },
+          {
+            src: "favicon-maskable-192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "maskable"
+          },
+          {
+            src: "favicon-maskable-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable"
           }
         ]
       }
