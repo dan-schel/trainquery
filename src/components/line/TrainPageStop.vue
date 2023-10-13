@@ -18,15 +18,11 @@ const props = defineProps<{
 const now = useNow().local;
 
 const stop = computed(() => requireStop(getConfig(), props.stopData.stop));
-const timeString = computed(() => {
+const time = computed(() => {
   if (props.stopData.express || props.stopData.data.scheduledTime == null) {
     return null;
   }
-  const local = toLocalDateTimeLuxon(
-    getConfig(),
-    props.stopData.data.scheduledTime
-  );
-  return formatRelativeTime(local, now.value, { suppressEarlierToday: true });
+  return toLocalDateTimeLuxon(getConfig(), props.stopData.data.scheduledTime);
 });
 const platformString = computed(() => {
   if (props.stopData.express || props.stopData.data.platform == null) {
@@ -38,16 +34,23 @@ const platformString = computed(() => {
 
 <template>
   <div class="row">
-    <OneLineP>
+    <OneLineP class="stop-name" :class="{ express: stopData.express }">
       <RouterLink
         class="link"
-        :class="{ express: stopData.express }"
         :to="getStopPageRoute(getConfig(), stop.id, null, null)"
         >{{ stopData.express ? "Skips " : "" }}{{ stop.name }}</RouterLink
       >
     </OneLineP>
-    <p v-if="timeString != null" class="dot">•</p>
-    <OneLineP v-if="timeString != null" class="time">{{ timeString }}</OneLineP>
+    <p v-if="time != null" class="dot">•</p>
+    <OneLineP v-if="time != null" class="time">
+      <RouterLink
+        class="link"
+        :to="getStopPageRoute(getConfig(), stop.id, time, null)"
+        >{{
+          formatRelativeTime(time, now, { suppressEarlierToday: true })
+        }}</RouterLink
+      >
+    </OneLineP>
     <div class="platform" v-if="platformString != null">
       <p>Plat.&nbsp;</p>
       <p class="platform-number">{{ platformString }}</p>
@@ -57,7 +60,7 @@ const platformString = computed(() => {
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
-.link {
+.stop-name {
   --color-accent: var(--color-ink-100);
   font-weight: bold;
 
@@ -72,6 +75,7 @@ const platformString = computed(() => {
   margin: 0 0.4rem;
 }
 .time {
+  --color-accent: var(--color-ink-80);
   min-width: 0;
   flex-shrink: 1;
 }
