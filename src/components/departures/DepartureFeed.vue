@@ -41,7 +41,12 @@ const header = computed(() => {
       },
       subtitle: {
         text: formatFilter(props.feed.filter, props.feed.stop),
-        to: "",
+        to: getStopPageRoute(
+          getConfig(),
+          props.feed.stop,
+          null,
+          props.feed.filter
+        ),
       },
     };
   }
@@ -49,7 +54,12 @@ const header = computed(() => {
     return {
       title: {
         text: formatFilter(props.feed.filter, props.feed.stop),
-        to: "",
+        to: getStopPageRoute(
+          getConfig(),
+          props.feed.stop,
+          null,
+          props.feed.filter
+        ),
       },
       subtitle: null,
     };
@@ -57,11 +67,11 @@ const header = computed(() => {
   return {
     title: {
       text: "Filtered trains",
-      to: "",
+      to: null,
     },
     subtitle: {
       text: formatFilter(props.feed.filter, props.feed.stop),
-      to: "",
+      to: null,
     },
   };
 });
@@ -93,16 +103,30 @@ function handlePin() {
   >
     <div class="header-row">
       <OneLineP class="header">
-        <RouterLink class="link title" :to="header.title.to">{{
-          header.title.text
-        }}</RouterLink>
-        <span class="dot" v-if="header.subtitle != null">•</span>
         <RouterLink
+          v-if="header.title.to != null"
+          class="link title"
+          :to="header.title.to"
+          >{{ header.title.text }}</RouterLink
+        >
+        <span v-if="header.title.to == null" class="title">
+          {{ header.title.text }}
+        </span>
+
+        <span class="dot" v-if="header.subtitle != null">•</span>
+
+        <RouterLink
+          v-if="header.subtitle != null && header.subtitle.to != null"
           class="link subtitle"
           :to="header.subtitle.to"
-          v-if="header.subtitle != null"
           >{{ header.subtitle.text }}</RouterLink
         >
+        <span
+          v-if="header.subtitle != null && header.subtitle.to == null"
+          class="subtitle"
+        >
+          {{ header.subtitle.text }}
+        </span>
       </OneLineP>
       <SimpleButton
         v-if="allowPinning"
@@ -167,13 +191,20 @@ function handlePin() {
   --color-accent: var(--color-ink-100);
   font-weight: bold;
   font-size: 1rem;
+
+  // For when it's not a link.
+  color: var(--color-ink-100);
 }
 .dot {
+  @include template.no-select;
   margin: 0 0.4rem;
 }
 .subtitle {
   --color-accent: var(--color-ink-80);
   font-size: 1rem;
+
+  // For when it's not a link.
+  color: var(--color-ink-100);
 }
 .pin-button.pinned {
   :deep(.icon) {
