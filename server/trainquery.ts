@@ -1,21 +1,24 @@
-import { ServerConfig } from "../shared/system/config";
-import { configApi } from "./config-api";
-import { ssrAppPropsApi, ssrRoutePropsApi } from "./ssr-props-api";
+import { configApi } from "./api/config-api";
+import { departuresApi } from "./api/departures-api";
+import { ssrAppPropsApi, ssrRoutePropsApi } from "./api/ssr-props-api";
+import { FullConfig } from "./config/computed-config";
+import { ServerConfig } from "./config/server-config";
+import { BadApiCallError } from "./param-utils";
 
 export type ServerBuilder = () => Server;
-export type TrainQuery = { getConfig: () => ServerConfig; server: Server };
+export type TrainQuery = { getConfig: () => FullConfig; server: Server };
 
 export async function trainQuery(
   serverBuilder: ServerBuilder,
   configProvider: ConfigProvider,
   logger: Logger
 ) {
-  let config = await configProvider.fetchConfig();
+  let config = new FullConfig(await configProvider.fetchConfig(logger));
   logger.logConfigRefresh(config, true);
 
   const refreshConfig = async (skipFetch: boolean) => {
     if (!skipFetch) {
-      config = await configProvider.fetchConfig();
+      config = new FullConfig(await configProvider.fetchConfig(logger));
       logger.logConfigRefresh(config, false);
     }
 
@@ -43,7 +46,10 @@ export async function trainQuery(
     if (endpoint == "config") {
       return await configApi(ctx);
     }
-    return null;
+    if (endpoint == "departures") {
+      return hashify(ctx, await departuresApi(ctx, params));
+    }
+    throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
   });
   logger.logListening(server);
   return ctx;
@@ -54,19 +60,24 @@ export type ServerParams = Record<string, string>;
 export abstract class Server {
   abstract start(
     ctx: TrainQuery,
-    requestListener: (
-      endpoint: string,
-      params: ServerParams
-    ) => Promise<unknown>
+    requestListener: (endpoint: string, params: ServerParams) => Promise<object>
   ): Promise<void>;
 }
 
 export abstract class ConfigProvider {
-  abstract fetchConfig(): Promise<ServerConfig>;
+  abstract fetchConfig(logger?: Logger): Promise<ServerConfig>;
   abstract getRefreshMs(): number | null;
 }
 
 export abstract class Logger {
   abstract logListening(server: Server): void;
-  abstract logConfigRefresh(config: ServerConfig, initial: boolean): void;
+  abstract logConfigRefresh(config: FullConfig, initial: boolean): void;
+  abstract logTimetableLoadFail(path: string): void;
+}
+
+function hashify(ctx: TrainQuery, result: object) {
+  return {
+    hash: ctx.getConfig().hash,
+    result: result,
+  };
 }

@@ -11,11 +11,7 @@ export class Stop {
     readonly name: string,
     /** The platforms this stop has, if this transit system has platforms. */
     readonly platforms: readonly Platform[]
-  ) {
-    this.id = id;
-    this.name = name;
-    this.platforms = platforms;
-  }
+  ) {}
 
   static readonly json = z
     .object({

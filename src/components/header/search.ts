@@ -1,11 +1,13 @@
-import { getConfig } from "@/utils/cached-config";
+import { getConfig } from "@/utils/get-config";
 import type { IconID } from "../icons/Icon.vue";
-import { listifyAnd } from "@schel-d/js-utils";
 import {
   getLinePageRoute,
   getStopPageRoute,
   linesThatStopAt,
-} from "@/utils/config-utils";
+} from "shared/system/config-utils";
+import type { Stop } from "shared/system/stop";
+import { listifyAnd } from "@schel-d/js-utils";
+import { formatMode } from "@/utils/format-mode";
 
 /** An entry in a list of searchable pages. */
 export type SearchOption = {
@@ -24,17 +26,14 @@ export function searchOptionsStops(): SearchOption[] {
 
   options.push(
     ...getConfig().shared.stops.map((s) => {
-      const lineNames = linesThatStopAt(s.id).map((l) => l.name);
       return {
         title: `${s.name} Station`,
-        subtitle: `${listifyAnd(lineNames)} ${
-          lineNames.length == 1 ? "Line" : "Lines"
-        }`,
+        subtitle: stopSubtitle(s),
         icon: "uil:map-marker" as IconID,
-        url: getStopPageRoute(s),
+        url: getStopPageRoute(getConfig(), s.id, null, null),
         tags: [],
         data: { stop: s.id },
-        boost: 2,
+        boost: 1.2,
       };
     })
   );
@@ -50,9 +49,9 @@ export function searchOptionsLines(): SearchOption[] {
     ...getConfig().shared.lines.map((l) => {
       return {
         title: `${l.name} Line`,
-        subtitle: "[todo]",
+        subtitle: formatMode(l.serviceType, { capital: true, line: true }),
         icon: "uil:slider-h-range" as IconID,
-        url: getLinePageRoute(l),
+        url: getLinePageRoute(getConfig(), l.id),
         tags: [],
         data: { line: l.id },
         boost: 1,
@@ -66,15 +65,15 @@ export function searchOptionsLines(): SearchOption[] {
 export function searchOptionsWholeSite(): SearchOption[] {
   const options = [...searchOptionsStops(), ...searchOptionsLines()];
 
-  options.push({
-    title: "Train map",
-    subtitle: null,
-    icon: "uil:map",
-    url: "/map",
-    tags: ["diagram", "interactive", "geographic", "location", "live"],
-    data: null,
-    boost: 1,
-  });
+  // options.push({
+  //   title: "Train map",
+  //   subtitle: null,
+  //   icon: "uil:map",
+  //   url: "/map",
+  //   tags: ["diagram", "interactive", "geographic", "location", "live"],
+  //   data: null,
+  //   boost: 0.6,
+  // });
 
   options.push({
     title: "Lines",
@@ -83,7 +82,7 @@ export function searchOptionsWholeSite(): SearchOption[] {
     url: "/lines",
     tags: ["network", "stops"],
     data: null,
-    boost: 1,
+    boost: 0.6,
   });
 
   options.push({
@@ -91,9 +90,9 @@ export function searchOptionsWholeSite(): SearchOption[] {
     subtitle: null,
     icon: "uil:info-circle",
     url: "/about",
-    tags: ["contact", "legal", "timetables", "github"],
+    tags: ["contact", "legal", "timetables", "github", "trainquery"],
     data: null,
-    boost: 1,
+    boost: 0.6,
   });
 
   options.push({
@@ -112,7 +111,7 @@ export function searchOptionsWholeSite(): SearchOption[] {
       "widgets",
     ],
     data: null,
-    boost: 1,
+    boost: 0.6,
   });
 
   return options;
@@ -206,4 +205,16 @@ function similarity(query: string, tag: string): number {
     mismatch += 1 * Math.pow(0.95, i);
   }
   return 1 * Math.pow(0.75, mismatch);
+}
+
+function stopSubtitle(stop: Stop): string {
+  const lineNames = linesThatStopAt(getConfig(), stop.id, {
+    ignoreSpecialEventsOnlyLines: true,
+    sortAlphabetically: true,
+  }).map((l) => l.name);
+  if (lineNames.length == 0) {
+    return "No lines";
+  }
+
+  return `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "lines"}`;
 }

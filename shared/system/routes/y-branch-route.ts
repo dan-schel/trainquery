@@ -3,9 +3,10 @@ import {
   DirectionDefinition,
   Route,
   RouteStop,
-  containsStop,
+  type StopList,
+  nonViaStopIDs,
 } from "./line-route";
-import { type RouteVariantID, RouteVariantIDJson, type StopID } from "../ids";
+import { type RouteVariantID, RouteVariantIDJson } from "../ids";
 
 /** The details of a single branch in a {@link YBranchRoute}. */
 export class Branch {
@@ -17,10 +18,7 @@ export class Branch {
      * section begins.
      */
     readonly stops: RouteStop[]
-  ) {
-    this.id = id;
-    this.stops = stops;
-  }
+  ) {}
 
   static readonly json = z
     .object({
@@ -58,11 +56,6 @@ export class YBranchRoute extends Route {
     readonly shared: RouteStop[]
   ) {
     super("y-branch");
-    this.forward = forward;
-    this.reverse = reverse;
-    this.firstBranch = firstBranch;
-    this.secondBranch = secondBranch;
-    this.shared = shared;
   }
 
   static readonly yBranchJson = z.object({
@@ -73,16 +66,16 @@ export class YBranchRoute extends Route {
     secondBranch: Branch.json,
     shared: RouteStop.json.array(),
   });
-  static readonly jsonTransform = (
-    x: z.infer<typeof YBranchRoute.yBranchJson>
-  ) =>
-    new YBranchRoute(
+
+  static transform(x: z.infer<typeof YBranchRoute.yBranchJson>) {
+    return new YBranchRoute(
       x.forward,
       x.reverse,
       x.firstBranch,
       x.secondBranch,
       x.shared
     );
+  }
 
   toJSON(): z.input<typeof YBranchRoute.yBranchJson> {
     return {
@@ -99,12 +92,47 @@ export class YBranchRoute extends Route {
     return route.type == "y-branch";
   }
 
-  stopsAt(stop: StopID): boolean {
-    return containsStop(
-      stop,
-      this.shared,
-      this.firstBranch.stops,
-      this.secondBranch.stops
-    );
+  getStopLists(): StopList[] {
+    const firstBranch = nonViaStopIDs([
+      ...this.firstBranch.stops,
+      ...this.shared,
+    ]);
+    const secondBranch = nonViaStopIDs([
+      ...this.secondBranch.stops,
+      ...this.shared,
+    ]);
+    const firstBranchReversed = [...firstBranch].reverse();
+    const secondBranchReversed = [...secondBranch].reverse();
+
+    return [
+      {
+        variant: this.firstBranch.id,
+        direction: this.forward.id,
+        stops: firstBranch.map((h) => h.stop),
+        picksUp: firstBranch.map((h) => h.picksUp),
+        setsDown: firstBranch.map((h) => h.setsDown),
+      },
+      {
+        variant: this.firstBranch.id,
+        direction: this.reverse.id,
+        stops: firstBranchReversed.map((h) => h.stop),
+        picksUp: firstBranchReversed.map((h) => h.picksUp),
+        setsDown: firstBranchReversed.map((h) => h.setsDown),
+      },
+      {
+        variant: this.secondBranch.id,
+        direction: this.forward.id,
+        stops: secondBranch.map((h) => h.stop),
+        picksUp: secondBranch.map((h) => h.picksUp),
+        setsDown: secondBranch.map((h) => h.setsDown),
+      },
+      {
+        variant: this.secondBranch.id,
+        direction: this.reverse.id,
+        stops: secondBranchReversed.map((h) => h.stop),
+        picksUp: secondBranchReversed.map((h) => h.picksUp),
+        setsDown: secondBranchReversed.map((h) => h.setsDown),
+      },
+    ];
   }
 }

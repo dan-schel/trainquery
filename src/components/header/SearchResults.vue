@@ -19,23 +19,25 @@ const results = computed(() => {
 </script>
 
 <template>
-  <p v-if="query.length == 0" class="message">Results will appear here.</p>
-  <p v-else-if="results.length == 0" class="message">No results.</p>
+  <div class="results">
+    <p v-if="query.length == 0" class="message">Results will appear here.</p>
+    <p v-else-if="results.length == 0" class="message">No results.</p>
 
-  <RouterLink
-    v-for="result in results"
-    :key="result.url"
-    :to="result.url"
-    class="result"
-  >
-    <Icon :id="result.icon"></Icon>
-    <div class="column">
-      <p class="title">{{ result.title }}</p>
-      <p class="subtitle" v-if="result.subtitle != null">
-        {{ result.subtitle }}
-      </p>
-    </div>
-  </RouterLink>
+    <RouterLink
+      v-for="result in results"
+      :key="result.url"
+      :to="result.url"
+      class="result"
+    >
+      <Icon :id="result.icon"></Icon>
+      <div class="column">
+        <p class="title">{{ result.title }}</p>
+        <p class="subtitle" v-if="result.subtitle != null">
+          {{ result.subtitle }}
+        </p>
+      </div>
+    </RouterLink>
+  </div>
 </template>
 
 <style scoped lang="scss">

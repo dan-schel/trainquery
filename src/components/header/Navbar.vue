@@ -1,15 +1,20 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import Wordmark from "../Wordmark.vue";
 import SimpleButton from "../common/SimpleButton.vue";
 import type { MenuItem } from "./Header.vue";
 
-defineProps<{
+const props = defineProps<{
   items: MenuItem[];
 }>();
 defineEmits<{
   (e: "menuButtonClicked"): void;
   (e: "searchButtonClicked"): void;
 }>();
+
+const nonHiddenItems = computed(() =>
+  props.items.filter((i) => !(i.hideOnDesktop ?? false))
+);
 </script>
 
 <template>
@@ -27,7 +32,7 @@ defineEmits<{
         </RouterLink>
         <div class="desktop-links">
           <SimpleButton
-            v-for="item in items"
+            v-for="item in nonHiddenItems"
             :key="item.routeName"
             :content="{ icon: item.icon, text: item.title }"
             :to="{ name: item.routeName }"
@@ -55,10 +60,11 @@ defineEmits<{
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
+@use "@/assets/utils" as utils;
 nav {
   // Allow .bg to position itself.
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 .bg {
   position: absolute;
@@ -69,7 +75,7 @@ nav {
   z-index: 0;
 
   background-color: var(--color-paper-30);
-  box-shadow: 0px 2px 4px var(--color-shadow-10);
+  @include utils.shadow;
   opacity: 100%;
   transition: opacity 0.25s;
 

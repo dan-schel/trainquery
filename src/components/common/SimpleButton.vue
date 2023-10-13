@@ -6,7 +6,7 @@ export type ButtonContent =
   | { icon: IconID; text?: never; altText: string }
   | { icon: IconID; text: string; altText?: never }
   | { icon?: never; text: string; altText?: never };
-export type ButtonLayout = "traditional" | "tile";
+export type ButtonLayout = "traditional" | "tile" | "traditional-wide";
 export type ButtonTheme = "hover" | "filled" | "filled-neutral";
 
 export interface Props {
@@ -14,10 +14,12 @@ export interface Props {
   content: ButtonContent;
   layout?: ButtonLayout;
   theme?: ButtonTheme;
+  disabled?: boolean;
 }
 withDefaults(defineProps<Props>(), {
   layout: "traditional",
   theme: "hover",
+  disabled: false,
 });
 
 defineEmits<{ (e: "click", payload: MouseEvent): void }>();
@@ -31,12 +33,14 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       'with-icon': content.icon != null,
       'with-text': content.text != null,
       button: layout == 'traditional',
+      'button-wide': layout == 'traditional-wide',
       tile: layout == 'tile',
       'theme-hover': theme == 'hover',
       'theme-filled': theme == 'filled',
       'theme-filled-neutral': theme == 'filled-neutral',
     }"
     :title="content.altText"
+    :disabled="disabled"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>
@@ -48,12 +52,14 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       'with-icon': content.icon != null,
       'with-text': content.text != null,
       button: layout == 'traditional',
+      'button-wide': layout == 'traditional-wide',
       tile: layout == 'tile',
       'theme-hover': theme == 'hover',
       'theme-filled': theme == 'filled',
       'theme-filled-neutral': theme == 'filled-neutral',
     }"
     :title="content.altText"
+    :disabled="disabled"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>
@@ -62,7 +68,8 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
-.button {
+.button,
+.button-wide {
   @include template.content-text-icon;
   @include template.row;
   justify-content: center;
@@ -82,6 +89,10 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
   &:not(.with-text) {
     width: 2rem;
   }
+}
+.button-wide.with-text {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 .tile {
   @include template.content-text-icon;

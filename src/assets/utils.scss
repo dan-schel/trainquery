@@ -1,0 +1,46 @@
+@mixin h1 {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: var(--color-ink-100);
+}
+
+@mixin h2 {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--color-ink-100);
+}
+
+@mixin h3 {
+  font-weight: bold;
+  font-size: 1rem;
+  color: var(--color-ink-100);
+}
+
+@mixin shadow {
+  box-shadow: 0 0.1rem 0.2rem var(--color-shadow-10);
+}
+
+@mixin raised-surface {
+  @include shadow;
+  overflow: hidden;
+  background-color: var(--color-paper-20);
+  border: 1px solid var(--color-ink-10);
+}
+
+@mixin dropdown-bg {
+  @include shadow;
+  border: 1px solid var(--color-ink-20);
+  background-color: var(--color-paper-30);
+  opacity: 95%;
+}
+
+@mixin dropdown-setup {
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+}
+
+@mixin dropdown-closed {
+  transform: translateY(-1rem);
+  opacity: 0%;
+  visibility: hidden;
+  pointer-events: none;
+}

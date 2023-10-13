@@ -8,7 +8,7 @@ import {
   toServiceTypeID,
 } from "./ids";
 import { Route } from "./routes/line-route";
-import { RouteJson, routeToJson } from "./routes/route-json";
+import { RouteJson, routeToJSON } from "./routes/route-json";
 
 /** Describes the name, route, etc. of a particular transit line. */
 export class Line {
@@ -25,14 +25,7 @@ export class Line {
     readonly serviceType: ServiceTypeID,
     /** Describes the stops and route this line takes. */
     readonly route: Route
-  ) {
-    this.id = id;
-    this.name = name;
-    this.color = color;
-    this.specialEventsOnly = specialEventsOnly;
-    this.serviceType = serviceType;
-    this.route = route;
-  }
+  ) {}
 
   static readonly json = z
     .object({
@@ -60,9 +53,9 @@ export class Line {
       id: this.id,
       name: this.name,
       color: this.color == "none" ? undefined : this.color,
-      specialEventsOnly: !this.specialEventsOnly ? undefined : false,
+      specialEventsOnly: this.specialEventsOnly ? true : undefined,
       serviceType: this.serviceType == "normal" ? undefined : this.serviceType,
-      route: routeToJson(this.route),
+      route: routeToJSON(this.route),
     };
   }
 }

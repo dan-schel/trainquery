@@ -8,10 +8,7 @@ export class Platform {
     readonly id: PlatformID,
     /** The user-facing platform name, e.g. '1' or '15A'. */
     readonly name: string
-  ) {
-    this.id = id;
-    this.name = name;
-  }
+  ) {}
 
   static readonly json = z
     .object({

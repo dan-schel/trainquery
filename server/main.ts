@@ -2,19 +2,19 @@ import express, { Express } from "express";
 import path from "path";
 import { createSsrServer } from "vite-ssr/dev";
 import { ConfigProvider, TrainQuery, trainQuery } from "./trainquery";
-import { OnlineConfigProvider } from "./online-config-provider";
+import { OnlineConfigProvider } from "./config/online-config-provider";
 import { ExpressServer } from "./express-server";
 import { ConsoleLogger } from "./console-logger";
 import { parseIntThrow } from "@schel-d/js-utils";
 import "dotenv/config";
-import { OfflineConfigProvider } from "./offline-config-provider";
-import { ssrAppPropsApi } from "./ssr-props-api";
+import { OfflineConfigProvider } from "./config/offline-config-provider";
+import { ssrAppPropsApi } from "./api/ssr-props-api";
 
 createServer();
 
 async function createServer() {
   const isProd = process.env.NODE_ENV == "production";
-  const isOffline = process.env.OFFLINE == "true";
+  const isOffline = process.argv.includes("offline");
   const port = process.env.PORT ?? "3000";
 
   const serveFrontend = async (ctx: TrainQuery, app: Express) => {
@@ -33,18 +33,23 @@ async function createServer() {
 }
 
 function getConfigProvider(isOffline: boolean): ConfigProvider {
+  const canonicalUrl = process.env.URL;
+  if (canonicalUrl == null) {
+    throw new Error("URL environment variable not set.");
+  }
+
   if (isOffline) {
-    const zipPath = process.env.CONFIG_OFFLINE;
-    if (zipPath == null) {
+    const zipOrFolderPath = process.env.CONFIG_OFFLINE;
+    if (zipOrFolderPath == null) {
       throw new Error("CONFIG_OFFLINE environment variable not provided.");
     }
-    return new OfflineConfigProvider(zipPath);
+    return new OfflineConfigProvider(zipOrFolderPath, canonicalUrl);
   } else {
     const configUrl = process.env.CONFIG;
     if (configUrl == null) {
       throw new Error("CONFIG environment variable not provided.");
     }
-    return new OnlineConfigProvider(configUrl);
+    return new OnlineConfigProvider(configUrl, canonicalUrl);
   }
 }
 

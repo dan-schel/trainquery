@@ -4,14 +4,14 @@ export default [
     name: "home",
     component: () => import("../views/Home.vue"),
   },
-  {
-    path: "/map",
-    name: "map",
-    component: () => import("../views/Map.vue"),
-  },
+  // {
+  //   path: "/map",
+  //   name: "map",
+  //   component: () => import("../views/Map.vue"),
+  // },
   {
     path: "/lines",
-    name: "lines",
+    name: "lines-overview",
     component: () => import("../views/LinesOverview.vue"),
   },
   {
@@ -25,9 +25,19 @@ export default [
     component: () => import("../views/Stop.vue"),
   },
   {
+    path: "/train/:id",
+    name: "train",
+    component: () => import("../views/Train.vue"),
+  },
+  {
     path: "/about",
     name: "about",
     component: () => import("../views/About.vue"),
+  },
+  {
+    path: "/about/legal",
+    name: "about-legal",
+    component: () => import("../views/AboutLegal.vue"),
   },
   {
     path: "/settings",
