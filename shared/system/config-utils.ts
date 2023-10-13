@@ -11,6 +11,8 @@ import { parseIntNull } from "@schel-d/js-utils";
 import type { Line } from "./line";
 import { Service } from "./service/service";
 import { SharedConfig } from "./config/shared-config";
+import { DepartureFilter } from "./timetable/departure-filter";
+import { QLocalDateTime } from "../qtime/qdatetime";
 
 export type HasSharedConfig = { shared: SharedConfig };
 
@@ -185,9 +187,29 @@ export function requireLineFromUrlName(
 /** E.g. "/stops/pakenham" or "/stops/20". */
 export function getStopPageRoute(
   config: HasSharedConfig,
-  stop: StopID
+  stop: StopID,
+  time: QLocalDateTime | null,
+  filter: DepartureFilter | null
 ): string {
-  return `/stops/${getStopUrlName(config, stop) ?? stop.toFixed()}`;
+  const base = `/stops/${getStopUrlName(config, stop) ?? stop.toFixed()}`;
+  const params: { key: string; value: string }[] = [];
+  if (time != null) {
+    params.push({ key: "time", value: time.toISO() });
+  }
+  if (filter != null && !filter.isDefault()) {
+    params.push({
+      key: "filter",
+      value: filter.asString(),
+    });
+  }
+  if (params.length == 0) {
+    return base;
+  }
+  return (
+    base +
+    "?" +
+    params.map((p) => `${p.key}=${encodeURIComponent(p.value)}`).join("&")
+  );
 }
 
 /** E.g. "/lines/pakenham" or "/lines/20". */

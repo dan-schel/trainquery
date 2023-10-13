@@ -30,7 +30,7 @@ export function searchOptionsStops(): SearchOption[] {
         title: `${s.name} Station`,
         subtitle: stopSubtitle(s),
         icon: "uil:map-marker" as IconID,
-        url: getStopPageRoute(getConfig(), s.id),
+        url: getStopPageRoute(getConfig(), s.id, null, null),
         tags: [],
         data: { stop: s.id },
         boost: 1.2,

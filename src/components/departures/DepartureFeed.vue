@@ -37,7 +37,7 @@ const header = computed(() => {
     return {
       title: {
         text: requireStop(getConfig(), props.feed.stop).name,
-        to: getStopPageRoute(getConfig(), props.feed.stop),
+        to: getStopPageRoute(getConfig(), props.feed.stop, null, null),
       },
       subtitle: {
         text: formatFilter(props.feed.filter, props.feed.stop),

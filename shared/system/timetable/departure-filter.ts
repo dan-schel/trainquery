@@ -177,4 +177,11 @@ export class DepartureFilter {
       other.asString({ ignoreArrivals, ignoreSetDownOnly })
     );
   }
+
+  isDefault() {
+    return this.equals(DepartureFilter.default, {
+      ignoreArrivals: true,
+      ignoreSetDownOnly: true,
+    });
+  }
 }

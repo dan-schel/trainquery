@@ -42,7 +42,7 @@ const platformString = computed(() => {
       <RouterLink
         class="link"
         :class="{ express: stopData.express }"
-        :to="getStopPageRoute(getConfig(), stop.id)"
+        :to="getStopPageRoute(getConfig(), stop.id, null, null)"
         >{{ stopData.express ? "Skips " : "" }}{{ stop.name }}</RouterLink
       >
     </OneLineP>

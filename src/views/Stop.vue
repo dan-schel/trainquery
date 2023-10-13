@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHead } from "@vueuse/head";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import {
   getStopPageRoute,
   linesThatStopAt,
@@ -14,40 +14,76 @@ import PageContent from "@/components/common/PageContent.vue";
 import LineList from "@/components/LineList.vue";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { DepartureFilter } from "shared/system/timetable/departure-filter";
-import type { QLocalDateTime } from "shared/qtime/qdatetime";
+import { QLocalDateTime } from "shared/qtime/qdatetime";
+import { nullableEquals, requiredParam, unparam } from "@/utils/param-utils";
+import { isValidFilter } from "@/components/departures/helpers/available-filters";
 
+const router = useRouter();
 const route = useRoute();
-const params = ref(route.params);
+
+function parseParams() {
+  const stop = requireStopFromUrlName(
+    getConfig(),
+    requiredParam(route.params.id)
+  );
+
+  let filter = DepartureFilter.default;
+  const filterString = unparam(route.query.filter);
+  if (filterString != null) {
+    const parsed = DepartureFilter.parse(filterString);
+    if (parsed != null && isValidFilter(parsed, stop.id)) {
+      filter = parsed;
+    }
+  }
+
+  let time: QLocalDateTime | null = null;
+  const timeString = unparam(route.query.time);
+  if (timeString != null) {
+    const parsed = QLocalDateTime.parse(timeString);
+    if (parsed != null) {
+      time = parsed;
+    }
+  }
+
+  return {
+    stop: stop,
+    filter: filter,
+    time: time,
+  };
+}
+
+const parsed = parseParams();
+const stop = ref(parsed.stop);
+const filter = ref(parsed.filter);
+const time = ref(parsed.time);
+
 watch(route, () => {
   // For some reason, this is called even when navigating away from the page!
   if (route.name == "stop") {
-    params.value = route.params;
+    const parsed = parseParams();
+    if (parsed.stop != stop.value) {
+      stop.value = parsed.stop;
+    }
+    if (!parsed.filter.equals(filter.value)) {
+      filter.value = parsed.filter;
+    }
+    if (!nullableEquals(parsed.time, time.value)) {
+      time.value = parsed.time;
+    }
   }
 });
 
-const stop = computed(() =>
-  requireStopFromUrlName(getConfig(), params.value.id as string)
-);
-
-const lines = computed(() =>
-  linesThatStopAt(getConfig(), stop.value.id, {
-    ignoreSpecialEventsOnlyLines: true,
-  }).map((l) => l.id)
-);
-
-const filter = ref(DepartureFilter.default);
-const time = ref<QLocalDateTime | null>(null);
 watch([stop], () => {
   filter.value = DepartureFilter.default;
   time.value = null;
 });
+watch([filter, time], () => {
+  router.replace(
+    getStopPageRoute(getConfig(), stop.value.id, time.value, filter.value)
+  );
+});
 
-const isDefaultFilter = computed(() =>
-  filter.value.equals(DepartureFilter.default, {
-    ignoreArrivals: true,
-    ignoreSetDownOnly: true,
-  })
-);
+const isDefaultFilter = computed(() => filter.value.isDefault());
 
 const feeds = computed(() => {
   if (isDefaultFilter.value) {
@@ -60,13 +96,20 @@ const feeds = computed(() => {
   return [new DepartureFeed(stop.value.id, 10, filter.value)];
 });
 
+const lines = computed(() =>
+  linesThatStopAt(getConfig(), stop.value.id, {
+    ignoreSpecialEventsOnlyLines: true,
+  }).map((l) => l.id)
+);
+
 const head = computed(() => ({
   title: stop.value.name,
   link: [
     {
       rel: "canonical",
       href:
-        "https://trainquery.com" + getStopPageRoute(getConfig(), stop.value.id),
+        "https://trainquery.com" +
+        getStopPageRoute(getConfig(), stop.value.id, null, null),
     },
   ],
 }));
