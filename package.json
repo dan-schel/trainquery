@@ -20,7 +20,8 @@
     "lint-tsc": "tsc --project server/tsconfig.json --noemit && tsc --project shared/tsconfig.json --noemit",
     "format": "prettier --write src --write server --write shared",
     "pretqlint": "esbuild server/linter/main.ts --bundle --platform=node --minify --outfile=dist/lint.js",
-    "tqlint": "node dist/lint.js"
+    "tqlint": "node dist/lint.js",
+    "build:digitalocean": "npm install --only=dev && npm run build && npm prune --production"
   },
   "dependencies": {
     "@schel-d/js-utils": "^1.0.2",
