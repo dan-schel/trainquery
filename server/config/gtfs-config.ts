@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { StopID, StopIDStringJson } from "../../shared/system/ids";
+import { nonNull } from "@schel-d/js-utils";
 
 export const RefreshPolicies = ["always", "when-stale", "production"] as const;
 export type RefreshPolicy = (typeof RefreshPolicies)[number];
@@ -10,7 +11,7 @@ export class GtfsPersistenceConfig {
     readonly mongoUrl: string,
     readonly refresh: RefreshPolicy,
     readonly refreshSeconds: number
-  ) {}
+  ) { }
 
   static readonly json = z
     .object({
@@ -28,8 +29,8 @@ export class GtfsConfig {
     readonly staticUrl: string,
     readonly persist: GtfsPersistenceConfig | null,
     readonly subfeeds: { name: string; path: string }[] | null,
-    readonly stops: Map<[string | null, number], StopID>
-  ) {}
+    readonly stops: { feed: string | null, map: Map<number, StopID> }[]
+  ) { }
 
   static readonly json = z
     .object({
@@ -53,31 +54,48 @@ export class GtfsConfig {
           x.staticUrl,
           x.persist,
           x.subfeeds ?? null,
-          transformStopMap(x.stops)
+          transformStopMap(x.stops, x.subfeeds?.map(x => x.name) ?? null)
         )
     );
 }
 
 function transformStopMap(
-  input: Partial<Record<StopID, number | Record<string, number>>>
-): Map<[string | null, number], StopID> {
-  return new Map(
-    Object.entries(input)
-      .map(([stopIDString, gtfsIDOrMap]) => {
-        const mappings: [[string | null, number], StopID][] = [];
+  input: Partial<Record<StopID, number | Record<string, number>>>,
+  feeds: string[] | null
+): { feed: string | null, map: Map<number, StopID> }[] {
+
+  if (feeds == null) {
+    const pairs = Object.entries(input).map(([stopIDString, gtfsStopID]) => {
+      const stopID = StopIDStringJson.parse(stopIDString);
+      if (gtfsStopID == null || typeof gtfsStopID != "number") {
+        throw new Error(`Stop mapping referenced subfeeds when subfeeds are not in use.`);
+      }
+      return [gtfsStopID, stopID] as [number, StopID];
+    });
+    return [{
+      feed: null,
+      map: new Map(pairs)
+    }];
+  }
+  else {
+    return feeds.map(f => {
+      const pairs = Object.entries(input).map(([stopIDString, gtfsStopIDOrMap]) => {
         const stopID = StopIDStringJson.parse(stopIDString);
-        if (typeof gtfsIDOrMap === "number") {
-          mappings.push([[null, gtfsIDOrMap], stopID]);
-        } else {
-          mappings.push(
-            ...Object.entries(gtfsIDOrMap!).map(
-              ([subfeed, gtfsID]) =>
-                [[subfeed, gtfsID], stopID] as [[string, number], StopID]
-            )
-          );
+        if (typeof gtfsStopIDOrMap == "number") {
+          return [gtfsStopIDOrMap, stopID] as [number, StopID];
         }
-        return mappings;
-      })
-      .flat()
-  );
+        else {
+          const gtfsStopID = (gtfsStopIDOrMap!)[f];
+          if (gtfsStopID == null) {
+            return null;
+          }
+          return [gtfsStopID, stopID] as [number, StopID];
+        }
+      }).filter(nonNull);
+      return {
+        feed: f,
+        map: new Map(pairs)
+      };
+    });
+  }
 }

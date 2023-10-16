@@ -21,7 +21,7 @@ export class GtfsWorker {
   }
 
   init() {
-    downloadGtfs(this._gtfsConfig)
+    downloadGtfs(this._ctx, this._gtfsConfig)
       .then((data) => {
         this._data = data;
         this._ctx.logger.logGtfsReady();
@@ -32,7 +32,10 @@ export class GtfsWorker {
   }
 }
 
-async function downloadGtfs(gtfsConfig: GtfsConfig): Promise<GtfsData> {
+async function downloadGtfs(
+  ctx: TrainQuery,
+  gtfsConfig: GtfsConfig
+): Promise<GtfsData> {
   const dataFolder = "offline/gtfs-temporary"; // generateDataFolderPath();
   // const zipPath = path.join(dataFolder, "gtfs.zip");
   // await fsp.mkdir(dataFolder);
@@ -53,6 +56,7 @@ async function downloadGtfs(gtfsConfig: GtfsConfig): Promise<GtfsData> {
       // await extractZip(subzip, subfeedDirectory);
 
       const data = await parseGtfsFiles(
+        ctx,
         subfeedDirectory,
         createStopIDMap(gtfsConfig, subfeed.name)
       );
@@ -65,6 +69,7 @@ async function downloadGtfs(gtfsConfig: GtfsConfig): Promise<GtfsData> {
     );
   } else {
     const data = await parseGtfsFiles(
+      ctx,
       dataFolder,
       createStopIDMap(gtfsConfig, null)
     );
@@ -77,11 +82,10 @@ function createStopIDMap(
   subfeed: string | null
 ): StopIDMap {
   return (gtfsStopID: number) => {
-    const stopID = gtfsConfig.stops.get([subfeed, gtfsStopID]);
+    const stopID = gtfsConfig.stops.find(f => f.feed == subfeed)?.map.get(gtfsStopID);
     if (stopID == null) {
       throw new Error(
-        `No stop has the GTFS stop ID "${gtfsStopID}" (subfeed=${
-          subfeed ?? "null"
+        `No stop has the GTFS stop ID "${gtfsStopID}" (subfeed=${subfeed ?? "null"
         }).`
       );
     }

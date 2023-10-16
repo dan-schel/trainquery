@@ -12,10 +12,13 @@ import {
 import { QWeekdayRange } from "../../shared/qtime/qweekdayrange";
 import { matchToRoute } from "../../shared/system/routes/find-match";
 import { StopID } from "../../shared/system/ids";
+import { TrainQuery } from "../trainquery";
+import { requireStop } from "../../shared/system/config-utils";
 
 export type StopIDMap = (gtfsStopID: number) => StopID;
 
 export async function parseGtfsFiles(
+  ctx: TrainQuery,
   directory: string,
   stopIDMap: StopIDMap
 ): Promise<GtfsData> {
@@ -34,8 +37,9 @@ export async function parseGtfsFiles(
   const stopTimesPath = path.join(directory, "stop_times.txt");
   const rawTrips = await readCsv(tripsPath, tripsSchema);
   const rawStopTimes = await readCsv(stopTimesPath, stopTimesSchema);
-  const trips = parseTrips(rawTrips, rawStopTimes, stopIDMap);
+  const trips = parseTrips(ctx, rawTrips, rawStopTimes, stopIDMap);
 
+  console.log(`Done!`);
   return new GtfsData(calendars, trips);
 }
 
@@ -79,6 +83,7 @@ export function parseCalendars(
 }
 
 export function parseTrips(
+  ctx: TrainQuery,
   rawTrips: z.infer<typeof tripsSchema>[],
   rawStopTimes: z.infer<typeof stopTimesSchema>[],
   stopIDMap: StopIDMap
@@ -89,15 +94,18 @@ export function parseTrips(
 
     const stopTimes = rawStopTimes
       .filter((s) => s.trip_id == t.trip_id)
-      .sort((a, b) => a.stop_sequence - b.stop_sequence);
-    const match = matchToRoute(
-      stopTimes.map((s) => ({
+      .sort((a, b) => a.stop_sequence - b.stop_sequence)
+      .map((s) => ({
         stop: stopIDMap(s.stop_id),
         value: s.departure_time,
-      }))
+      }));
+    const match = matchToRoute(
+      ctx.getConfig(),
+      stopTimes
     );
 
     if (match == null) {
+      console.log(stopTimes.map(s => requireStop(ctx.getConfig(), s.stop).name));
       throw new Error(
         "GTFS entry has stopping pattern which matches no known routes."
       );
