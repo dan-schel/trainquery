@@ -1,4 +1,4 @@
-import { unique } from "@schel-d/js-utils/dist/types";
+import { unique } from "@schel-d/js-utils";
 import { QDate } from "../../shared/qtime/qdate";
 import { QTimetableTime } from "../../shared/qtime/qtime";
 import { QWeekdayRange } from "../../shared/qtime/qweekdayrange";
