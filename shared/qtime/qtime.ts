@@ -1,12 +1,13 @@
 import { parseIntThrow, posMod } from "@schel-d/js-utils";
 import { type InformalDuration, QDuration } from "./qduration";
+import { z } from "zod";
 
 export abstract class QTimeBase<T extends QTimeBase<T>> {
   constructor(
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) {}
+  ) { }
 
   protected abstract _getNumOfHours(): number;
 
@@ -142,6 +143,18 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
   _getNumOfHours(): number {
     return QTimetableTime.getNumOfHours();
   }
+
+  static readonly json = z.string().transform((x, ctx) => {
+    const result = QTimetableTime.parse(x);
+    if (result == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Not an timetable time.",
+      });
+      return z.NEVER;
+    }
+    return result;
+  });
 
   /**
    * Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can

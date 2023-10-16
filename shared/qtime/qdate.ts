@@ -1,4 +1,5 @@
 import { parseIntThrow } from "@schel-d/js-utils";
+import { z } from "zod";
 
 const _daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const _monthAcronyms = [
@@ -40,7 +41,7 @@ export class QDate {
     readonly year: number,
     readonly month: number,
     readonly day: number
-  ) {}
+  ) { }
   isValid(): { valid: true } | { valid: false; issue: string } {
     const invalid = (issue: string) => ({ valid: false, issue: issue });
 
@@ -57,8 +58,7 @@ export class QDate {
     const daysInMonth = getDaysInMonth(this.year, this.month);
     if (this.day > daysInMonth) {
       return invalid(
-        `${getMonthAcronym(this.month)} ${
-          this.year
+        `${getMonthAcronym(this.month)} ${this.year
         } only has ${daysInMonth} days.`
       );
     }
@@ -77,7 +77,19 @@ export class QDate {
     return `${y}-${m}-${d}`;
   }
 
-  /** Parses "2023-09-04" to a QDate. Does not check for date validity. */
+  static readonly json = z.string().transform((x, ctx) => {
+    const result = QDate.parse(x);
+    if (result == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Not a date.",
+      });
+      return z.NEVER;
+    }
+    return result;
+  });
+
+  /** Parses "2023-09-04" or "20230904" to a QDate. Does not check for date validity. */
   static parse(input: string): QDate | null {
     if (!/^[0-9]{4}-?[0-9]{2}-?[0-9]{2}$/.test(input)) {
       return null;

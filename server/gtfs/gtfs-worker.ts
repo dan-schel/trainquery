@@ -4,6 +4,7 @@ import path from "path";
 import { TrainQuery } from "../trainquery";
 import { GtfsData } from "./gtfs-data";
 import { GtfsConfig } from "../config/gtfs-config";
+import { parseGtfsFiles } from "./parse-gtfs-files";
 // import AdmZip from "adm-zip";
 
 export class GtfsWorker {
@@ -48,19 +49,14 @@ async function downloadGtfs(gtfsConfig: GtfsConfig): Promise<GtfsData> {
       const subfeedDirectory = path.join(dataFolder, path.dirname(subfeed));
       // await extractZip(subzip, subfeedDirectory);
 
-      const data = await parseGtfs(subfeedDirectory);
+      const data = await parseGtfsFiles(subfeedDirectory);
       parsedFeeds.push(data);
     }
 
     return GtfsData.merge(parsedFeeds);
   }
   else {
-    const data = await parseGtfs(dataFolder);
+    const data = await parseGtfsFiles(dataFolder);
     return data;
   }
-}
-
-async function parseGtfs(directory: string): Promise<GtfsData> {
-  console.log(`Parsing GTFS "${directory}"...`);
-  return new GtfsData();
 }
