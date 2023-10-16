@@ -2,7 +2,6 @@ import AdmZip from "adm-zip";
 import fsp from "fs/promises";
 import path from "path";
 import YAML from "yaml";
-import { uuid } from "@schel-d/js-utils";
 import { ZodType, z } from "zod";
 import { LinterRules } from "../../shared/system/linter-rules";
 import { glob } from "glob";
@@ -15,6 +14,8 @@ import { FrontendOnlyConfig } from "../../shared/system/config/frontend-only-con
 import { SharedConfig } from "../../shared/system/config/shared-config";
 import { ServerOnlyConfig } from "./server-only-config";
 import { PlatformRules } from "./platform-rules";
+import { GtfsConfig } from "./gtfs-config";
+import { extractZip } from "./download-utils";
 
 export async function loadConfigFromFiles(
   dataFolder: string,
@@ -76,15 +77,13 @@ async function loadServer(
       timetables: z.string(),
       continuation: z.string(),
       platformRules: z.string(),
+      gtfs: z.string().optional(),
       linter: z.string(),
       about: z.string(),
     })
     .passthrough();
 
   const server = schema.parse(input);
-  const linter = LinterRules.json.parse(
-    await loadYml(dataFolder, server.linter, z.any())
-  );
   const timetables = await loadTimetables(
     dataFolder,
     server.timetables,
@@ -93,9 +92,15 @@ async function loadServer(
   const platformRules = PlatformRules.json.parse(
     await loadYml(dataFolder, server.platformRules, z.any())
   );
+  const gtfs = server.gtfs != null ? GtfsConfig.json.parse(
+    await loadYml(dataFolder, server.gtfs, z.any())
+  ) : null;
+  const linter = LinterRules.json.parse(
+    await loadYml(dataFolder, server.linter, z.any())
+  );
   const about = await loadText(dataFolder, server.about);
 
-  return new ServerOnlyConfig(timetables, platformRules, linter, about);
+  return new ServerOnlyConfig(timetables, platformRules, gtfs, linter, about);
 }
 
 async function loadFrontend(
@@ -149,20 +154,4 @@ async function loadTimetables(
   }
 
   return timetables;
-}
-
-async function extractZip(zip: AdmZip, location: string): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
-    zip.extractAllToAsync(location, true, false, (error) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve();
-      }
-    });
-  });
-}
-
-export function generateDataFolderPath(): string {
-  return `data-${uuid()}`;
 }

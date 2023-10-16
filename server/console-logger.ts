@@ -24,4 +24,12 @@ export class ConsoleLogger extends Logger {
   logTimetableLoadFail(path: string): void {
     console.log(`Failed to load timetable "${path}".`);
   }
+
+  logGtfsDownloadError(err: unknown): void {
+    console.warn("Failed to load GTFS data.", err);
+  }
+
+  logGtfsReady(): void {
+    console.log("Successfully retrieved static GTFS data.");
+  }
 }

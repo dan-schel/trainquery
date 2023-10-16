@@ -1,7 +1,8 @@
 import { ConfigProvider, Logger } from "../trainquery";
 import fsp from "fs/promises";
-import { generateDataFolderPath, loadConfigFromFiles } from "./config-zip";
+import { loadConfigFromFiles } from "./config-zip";
 import { ServerConfig } from "./server-config";
+import { deleteDataFolder, generateDataFolderPath } from "./download-utils";
 
 export class OfflineConfigProvider extends ConfigProvider {
   constructor(
@@ -27,12 +28,7 @@ export class OfflineConfigProvider extends ConfigProvider {
       logger
     );
 
-    await fsp.rm(dataFolder, {
-      recursive: true,
-      force: true,
-      retryDelay: 100,
-      maxRetries: 5,
-    });
+    await deleteDataFolder(dataFolder);
 
     return config;
   }
