@@ -5,18 +5,23 @@ import { QWeekdayRange } from "../../shared/qtime/qweekdayrange";
 import { DirectionID, LineID, RouteVariantID } from "../../shared/system/ids";
 
 export class GtfsData {
-  constructor(
-    readonly calendars: GtfsCalendar[],
-    readonly trips: GtfsTrip[],
-  ) { }
+  constructor(readonly calendars: GtfsCalendar[], readonly trips: GtfsTrip[]) {}
 
   static merge(feeds: GtfsData[], subfeedIDs: string[]): GtfsData {
-    if (feeds.length != subfeedIDs.length || unique(subfeedIDs)) {
+    if (feeds.length != subfeedIDs.length || !unique(subfeedIDs)) {
       throw new Error("Invalid arguments, cannot merge GTFS feeds.");
     }
 
-    const calendars = subfeedIDs.map((subfeedID, i) => feeds[i].calendars.map(c => c.withSubfeedID(subfeedID))).flat();
-    const trips = subfeedIDs.map((subfeedID, i) => feeds[i].trips.map(c => c.withSubfeedID(subfeedID))).flat();
+    const calendars = subfeedIDs
+      .map((subfeedID, i) =>
+        feeds[i].calendars.map((c) => c.withSubfeedID(subfeedID))
+      )
+      .flat();
+    const trips = subfeedIDs
+      .map((subfeedID, i) =>
+        feeds[i].trips.map((c) => c.withSubfeedID(subfeedID))
+      )
+      .flat();
 
     return new GtfsData(calendars, trips);
   }
@@ -31,7 +36,7 @@ export class GtfsCalendar {
     readonly end: QDate,
     readonly additionalDates: QDate[],
     readonly exceptions: QDate[]
-  ) { }
+  ) {}
 
   withSubfeedID(subfeedID: string): GtfsCalendar {
     return new GtfsCalendar(
@@ -56,7 +61,7 @@ export class GtfsTrip {
     readonly route: RouteVariantID,
     readonly direction: DirectionID,
     readonly times: (QTimetableTime | null)[]
-  ) { }
+  ) {}
 
   withSubfeedID(subfeedID: string): GtfsTrip {
     return new GtfsTrip(

@@ -4,7 +4,7 @@ import path from "path";
 import { TrainQuery } from "../trainquery";
 import { GtfsData } from "./gtfs-data";
 import { GtfsConfig } from "../config/gtfs-config";
-import { parseGtfsFiles } from "./parse-gtfs-files";
+import { StopIDMap, parseGtfsFiles } from "./parse-gtfs-files";
 // import AdmZip from "adm-zip";
 
 export class GtfsWorker {
@@ -46,16 +46,45 @@ async function downloadGtfs(gtfsConfig: GtfsConfig): Promise<GtfsData> {
     for (const subfeed of gtfsConfig.subfeeds) {
       // const subzipPath = path.join(dataFolder, subfeed);
       // const subzip = new AdmZip(subzipPath);
-      const subfeedDirectory = path.join(dataFolder, path.dirname(subfeed));
+      const subfeedDirectory = path.join(
+        dataFolder,
+        path.dirname(subfeed.path)
+      );
       // await extractZip(subzip, subfeedDirectory);
 
-      const data = await parseGtfsFiles(subfeedDirectory);
+      const data = await parseGtfsFiles(
+        subfeedDirectory,
+        createStopIDMap(gtfsConfig, subfeed.name)
+      );
       parsedFeeds.push(data);
     }
 
-    return GtfsData.merge(parsedFeeds);
+    return GtfsData.merge(
+      parsedFeeds,
+      gtfsConfig.subfeeds.map((f) => f.name)
+    );
   } else {
-    const data = await parseGtfsFiles(dataFolder);
+    const data = await parseGtfsFiles(
+      dataFolder,
+      createStopIDMap(gtfsConfig, null)
+    );
     return data;
   }
+}
+
+function createStopIDMap(
+  gtfsConfig: GtfsConfig,
+  subfeed: string | null
+): StopIDMap {
+  return (gtfsStopID: number) => {
+    const stopID = gtfsConfig.stops.get([subfeed, gtfsStopID]);
+    if (stopID == null) {
+      throw new Error(
+        `No stop has the GTFS stop ID "${gtfsStopID}" (subfeed=${
+          subfeed ?? "null"
+        }).`
+      );
+    }
+    return stopID;
+  };
 }
