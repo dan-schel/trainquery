@@ -3,7 +3,12 @@ import fs from "fs";
 import { GtfsData } from "./gtfs-data";
 import csvParser from "csv-parser";
 import { z } from "zod";
-import { calendarDatesSchema, calendarSchema, stopTimesSchema, tripsSchema } from "./gtfs-csv-schemas";
+import {
+  calendarDatesSchema,
+  calendarSchema,
+  stopTimesSchema,
+  tripsSchema,
+} from "./gtfs-csv-schemas";
 
 export async function parseGtfsFiles(directory: string): Promise<GtfsData> {
   console.log(`Parsing GTFS "${directory}"...`);
@@ -25,13 +30,18 @@ export async function parseGtfsFiles(directory: string): Promise<GtfsData> {
   return new GtfsData();
 }
 
-async function readCsv<T extends z.ZodType>(path: string, schema: T): Promise<z.infer<T>[]> {
+async function readCsv<T extends z.ZodType>(
+  path: string,
+  schema: T
+): Promise<z.infer<T>[]> {
   return await new Promise((resolve) => {
     const results: z.infer<T>[] = [];
     fs.createReadStream(path)
-      .pipe(csvParser({
-        mapHeaders: ({ header }) => header.trim(),
-      }))
+      .pipe(
+        csvParser({
+          mapHeaders: ({ header }) => header.trim(),
+        })
+      )
       .on("data", (row) => {
         results.push(schema.parse(row));
       })

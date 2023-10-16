@@ -7,7 +7,7 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
     readonly hour: number,
     readonly minute: number,
     readonly second: number
-  ) { }
+  ) {}
 
   protected abstract _getNumOfHours(): number;
 

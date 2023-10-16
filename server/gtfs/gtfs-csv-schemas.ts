@@ -54,10 +54,10 @@ export const stopTimesSchema = z.object({
   trip_id: z.string(),
 
   // "22:37:00"
-  arrival_time: QTimetableTime.json.refine(x => x.isValid().valid),
+  arrival_time: QTimetableTime.json.refine((x) => x.isValid().valid),
 
   // "22:37:00"
-  departure_time: QTimetableTime.json.refine(x => x.isValid().valid),
+  departure_time: QTimetableTime.json.refine((x) => x.isValid().valid),
 
   // "47642"
   stop_id: IntStringJson,
@@ -69,20 +69,26 @@ export const stopTimesSchema = z.object({
   // stop_headsign: z.string(),
 
   // "0"
-  pickup_type: z.enum(["0", "1", "2", "3"]).transform(x => ({
-    "0": "yes" as const,
-    "1": "no" as const,
-    "2": "on-request" as const,
-    "3": "on-request" as const,
-  }[x])),
+  pickup_type: z.enum(["0", "1", "2", "3"]).transform(
+    (x) =>
+      ({
+        "0": "yes" as const,
+        "1": "no" as const,
+        "2": "on-request" as const,
+        "3": "on-request" as const,
+      }[x])
+  ),
 
   // "0"
-  drop_off_type: z.enum(["0", "1", "2", "3"]).transform(x => ({
-    "0": "yes" as const,
-    "1": "no" as const,
-    "2": "on-request" as const,
-    "3": "on-request" as const,
-  }[x])),
+  drop_off_type: z.enum(["0", "1", "2", "3"]).transform(
+    (x) =>
+      ({
+        "0": "yes" as const,
+        "1": "no" as const,
+        "2": "on-request" as const,
+        "3": "on-request" as const,
+      }[x])
+  ),
 
   // "0.00"
   // shape_dist_traveled: z.string(),
@@ -114,10 +120,10 @@ export const calendarSchema = z.object({
   sunday: BooleanStringJson,
 
   // "20231023"
-  start_date: QDate.json.refine(x => x.isValid().valid),
+  start_date: QDate.json.refine((x) => x.isValid().valid),
 
   // "20231026"
-  end_date: QDate.json.refine(x => x.isValid().valid),
+  end_date: QDate.json.refine((x) => x.isValid().valid),
 });
 
 export const calendarDatesSchema = z.object({
@@ -125,11 +131,14 @@ export const calendarDatesSchema = z.object({
   service_id: z.string(),
 
   // "20231107"
-  date: QDate.json.refine(x => x.isValid().valid),
+  date: QDate.json.refine((x) => x.isValid().valid),
 
   // "2"
-  exception_type: z.enum(["1", "2"]).transform(x => ({
-    "1": "added" as const,
-    "2": "removed" as const,
-  }[x]))
+  exception_type: z.enum(["1", "2"]).transform(
+    (x) =>
+      ({
+        "1": "added" as const,
+        "2": "removed" as const,
+      }[x])
+  ),
 });

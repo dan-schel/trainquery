@@ -6,7 +6,11 @@ import fsp from "fs/promises";
 import path from "path";
 import { loadConfigFromFiles } from "./config-zip";
 import { ServerConfig } from "./server-config";
-import { deleteDataFolder, download, generateDataFolderPath } from "./download-utils";
+import {
+  deleteDataFolder,
+  download,
+  generateDataFolderPath,
+} from "./download-utils";
 
 const refreshMs = 1000 * 60 * 10;
 const supportedVersion = "v1";

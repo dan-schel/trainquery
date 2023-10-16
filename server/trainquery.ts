@@ -41,7 +41,7 @@ export async function trainQuery(
     getConfig: () => config,
     server: server,
     logger: logger,
-    gtfs: null
+    gtfs: null,
   };
 
   const gtfs = ctx.getConfig().server.gtfs != null ? new GtfsWorker(ctx) : null;

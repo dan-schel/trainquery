@@ -21,5 +21,5 @@ export class ServerOnlyConfig {
      * only sent to the client when the about page is requested.
      */
     readonly aboutMarkdown: string
-  ) { }
+  ) {}
 }

@@ -11,9 +11,7 @@ export class GtfsWorker {
   private _data: GtfsData | null;
   private _gtfsConfig: GtfsConfig;
 
-  constructor(
-    private readonly _ctx: TrainQuery
-  ) {
+  constructor(private readonly _ctx: TrainQuery) {
     this._data = null;
     const gtfsConfig = this._ctx.getConfig().server.gtfs;
     if (gtfsConfig == null) {
@@ -23,12 +21,14 @@ export class GtfsWorker {
   }
 
   init() {
-    downloadGtfs(this._gtfsConfig).then(data => {
-      this._data = data;
-      this._ctx.logger.logGtfsReady();
-    }).catch(err => {
-      this._ctx.logger.logGtfsDownloadError(err);
-    });
+    downloadGtfs(this._gtfsConfig)
+      .then((data) => {
+        this._data = data;
+        this._ctx.logger.logGtfsReady();
+      })
+      .catch((err) => {
+        this._ctx.logger.logGtfsDownloadError(err);
+      });
   }
 }
 
@@ -54,8 +54,7 @@ async function downloadGtfs(gtfsConfig: GtfsConfig): Promise<GtfsData> {
     }
 
     return GtfsData.merge(parsedFeeds);
-  }
-  else {
+  } else {
     const data = await parseGtfsFiles(dataFolder);
     return data;
   }

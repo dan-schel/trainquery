@@ -92,9 +92,10 @@ async function loadServer(
   const platformRules = PlatformRules.json.parse(
     await loadYml(dataFolder, server.platformRules, z.any())
   );
-  const gtfs = server.gtfs != null ? GtfsConfig.json.parse(
-    await loadYml(dataFolder, server.gtfs, z.any())
-  ) : null;
+  const gtfs =
+    server.gtfs != null
+      ? GtfsConfig.json.parse(await loadYml(dataFolder, server.gtfs, z.any()))
+      : null;
   const linter = LinterRules.json.parse(
     await loadYml(dataFolder, server.linter, z.any())
   );
