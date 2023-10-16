@@ -54,7 +54,7 @@ export const stopTimesSchema = z.object({
   trip_id: z.string(),
 
   // "22:37:00"
-  arrival_time: QTimetableTime.json.refine((x) => x.isValid().valid),
+  // arrival_time: QTimetableTime.json.refine((x) => x.isValid().valid),
 
   // "22:37:00"
   departure_time: QTimetableTime.json.refine((x) => x.isValid().valid),
@@ -69,26 +69,26 @@ export const stopTimesSchema = z.object({
   // stop_headsign: z.string(),
 
   // "0"
-  pickup_type: z.enum(["0", "1", "2", "3"]).transform(
-    (x) =>
-      ({
-        "0": "yes" as const,
-        "1": "no" as const,
-        "2": "on-request" as const,
-        "3": "on-request" as const,
-      }[x])
-  ),
+  // pickup_type: z.enum(["0", "1", "2", "3"]).transform(
+  //   (x) =>
+  //     ({
+  //       "0": "yes" as const,
+  //       "1": "no" as const,
+  //       "2": "on-request" as const,
+  //       "3": "on-request" as const,
+  //     }[x])
+  // ),
 
   // "0"
-  drop_off_type: z.enum(["0", "1", "2", "3"]).transform(
-    (x) =>
-      ({
-        "0": "yes" as const,
-        "1": "no" as const,
-        "2": "on-request" as const,
-        "3": "on-request" as const,
-      }[x])
-  ),
+  // drop_off_type: z.enum(["0", "1", "2", "3"]).transform(
+  //   (x) =>
+  //     ({
+  //       "0": "yes" as const,
+  //       "1": "no" as const,
+  //       "2": "on-request" as const,
+  //       "3": "on-request" as const,
+  //     }[x])
+  // ),
 
   // "0.00"
   // shape_dist_traveled: z.string(),
@@ -136,9 +136,9 @@ export const calendarDatesSchema = z.object({
   // "2"
   exception_type: z.enum(["1", "2"]).transform(
     (x) =>
-      ({
-        "1": "added" as const,
-        "2": "removed" as const,
-      }[x])
+    ({
+      "1": "added" as const,
+      "2": "removed" as const,
+    }[x])
   ),
 });
