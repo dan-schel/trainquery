@@ -5,6 +5,9 @@ import SimpleButton from "../common/SimpleButton.vue";
 defineProps<{
   items: MenuItem[];
 }>();
+defineEmits<{
+  (e: "navigation"): void;
+}>();
 </script>
 
 <template>
@@ -16,6 +19,7 @@ defineProps<{
       :to="{ name: item.routeName }"
       layout="tile"
       theme="filled-neutral"
+      @click="() => $emit('navigation')"
     ></SimpleButton>
   </div>
 </template>

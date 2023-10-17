@@ -29,6 +29,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
   <RouterLink
     v-if="to != null"
     :to="to"
+    @click="(e: MouseEvent) => $emit('click', e)"
     :class="{
       'with-icon': content.icon != null,
       'with-text': content.text != null,

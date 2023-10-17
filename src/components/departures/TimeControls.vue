@@ -168,6 +168,7 @@ h6 {
 }
 .date-wheel {
   --wheel-text-size: 1.25rem;
+  --scroll-offset: 120;
   height: 3rem;
   margin-bottom: 0.5rem;
 }

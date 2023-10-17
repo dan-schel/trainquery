@@ -8,9 +8,9 @@ import {
 import { computed, ref, watch } from "vue";
 import { getConfig } from "@/utils/get-config";
 import PageContent from "@/components/common/PageContent.vue";
-import LineDiagram from "@/components/line/LineDiagram.vue";
+import LineDiagram from "@/components/line-diagram/LineDiagram.vue";
 import { getRouteDiagram } from "shared/system/routes/line-routes";
-import LinePageStop from "@/components/line/LinePageStop.vue";
+import LinePageStop from "@/components/line-diagram/LinePageStop.vue";
 import { formatMode } from "@/utils/format-mode";
 
 const route = useRoute();

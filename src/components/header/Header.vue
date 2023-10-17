@@ -28,13 +28,10 @@ function searchButtonClicked() {
   openExpandable.value = openExpandable.value == "search" ? "none" : "search";
 }
 
-// Close any open expandables when the route changes.
-const route = useRoute();
-watch(route, () => {
-  openExpandable.value = "none";
-});
-
 const handleOutsideClick = () => {
+  openExpandable.value = "none";
+};
+const handleNavigation = () => {
   openExpandable.value = "none";
 };
 function handleEscKey(e: KeyboardEvent) {
@@ -46,6 +43,13 @@ function handleEscKey(e: KeyboardEvent) {
     openExpandable.value = "none";
   }
 }
+
+// Close any open expandables when the route changes (this doesn't occur until
+// after the new page loads and doesn't occur at all if the user attempts to
+// navigate to the page they're already on, hence the custom "navigation" events
+// still being used on the navbar and expandables below).
+const route = useRoute();
+watch(route, handleNavigation);
 
 onMounted(() => {
   window.addEventListener("keydown", handleEscKey);
@@ -61,13 +65,17 @@ onUnmounted(() => {
       :items="menuItems"
       @menu-button-clicked="menuButtonClicked"
       @search-button-clicked="searchButtonClicked"
+      @navigation="handleNavigation"
     ></Navbar>
     <div class="expandables">
       <div
         class="expandable-container"
         :class="{ open: openExpandable == 'menu' }"
       >
-        <ExpandableMenu :items="menuItems"></ExpandableMenu>
+        <ExpandableMenu
+          :items="menuItems"
+          @navigation="handleNavigation"
+        ></ExpandableMenu>
       </div>
       <div
         class="expandable-container"
@@ -76,6 +84,7 @@ onUnmounted(() => {
         <div class="expandable">
           <ExpandableSearch
             :open="openExpandable == 'search'"
+            @navigation="handleNavigation"
           ></ExpandableSearch>
         </div>
       </div>
