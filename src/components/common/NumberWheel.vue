@@ -145,7 +145,7 @@ function handleNextButton() {
 
 .wheel {
   display: grid;
-  --scroll-offset: 100;
+  overflow: hidden;
 
   // For ".current" and ".next".
   position: relative;
@@ -163,13 +163,13 @@ function handleNextButton() {
     .current {
       transform: translate(
         -50%,
-        calc(-50% - var(--current-offset) * var(--scroll-offset))
+        calc(-50% - var(--current-offset) * var(--scroll-offset, 100))
       );
     }
     .next {
       transform: translate(
         -50%,
-        calc(-50% - var(--next-offset) * var(--scroll-offset))
+        calc(-50% - var(--next-offset) * var(--scroll-offset, 100))
       );
     }
   }
@@ -182,13 +182,13 @@ function handleNextButton() {
 
     .current {
       transform: translate(
-        calc(-50% - var(--current-offset) * var(--scroll-offset)),
+        calc(-50% - var(--current-offset) * var(--scroll-offset, 100)),
         -50%
       );
     }
     .next {
       transform: translate(
-        calc(-50% - var(--next-offset) * var(--scroll-offset)),
+        calc(-50% - var(--next-offset) * var(--scroll-offset, 100)),
         -50%
       );
     }
