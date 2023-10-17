@@ -67,8 +67,10 @@ const platformString = computed(() => {
   &.express {
     --color-accent: var(--color-ink-80);
     font-weight: normal;
-    font-size: 0.8rem;
     font-style: italic;
+    :deep(p) {
+      font-size: 0.8rem;
+    }
   }
 }
 .dot {
