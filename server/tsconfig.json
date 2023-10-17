@@ -3,7 +3,7 @@
     "strict": true,
     "esModuleInterop": true,
     "target": "ES2015",
-    "moduleResolution": "Node",
-    "module": "Node16"
+    "moduleResolution": "Bundler",
+    "module": "ESNext"
   }
 }
