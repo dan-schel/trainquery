@@ -39,7 +39,7 @@ export class Settings {
     readonly significantStops: SignificantStop[],
     readonly enableContinuations: boolean,
     readonly limitMapFPS: boolean
-  ) {}
+  ) { }
 
   static json = settingsV1.transform(
     (x) =>
@@ -64,16 +64,16 @@ export class Settings {
   }
 
   with({
-    pinnedWidgets = undefined,
-    significantStops = undefined,
-    enableContinuations = undefined,
-    limitMapFPS = undefined,
+    pinnedWidgets,
+    significantStops,
+    enableContinuations,
+    limitMapFPS,
   }: {
     pinnedWidgets?: PinnedWidget[];
     significantStops?: SignificantStop[];
     enableContinuations?: boolean;
     limitMapFPS?: boolean;
-  } = {}) {
+  }) {
     return new Settings(
       pinnedWidgets ?? this.pinnedWidgets,
       significantStops ?? this.significantStops,

@@ -10,6 +10,8 @@ import { formatDate } from "@/utils/format-qtime";
 import { QLocalDateTime } from "shared/qtime/qdatetime";
 import { QTime } from "shared/qtime/qtime";
 import { useNow } from "@/utils/now-provider";
+import Icon from "../icons/Icon.vue";
+import { TypeableTime } from "./helpers/typeable-time";
 
 const props = defineProps<{
   time: QLocalDateTime | null;
@@ -39,6 +41,10 @@ const minutes = ref(timeComponents.value.minutes);
 const date = ref(timeComponents.value.date);
 const ampm = ref(timeComponents.value.ampm);
 
+const timeEditInput = ref<HTMLInputElement | null>(null);
+const timeEditTime = ref(TypeableTime.blank);
+const timeEditMode = ref(false);
+
 watch([props], () => {
   hours.value = timeComponents.value.hours;
   minutes.value = timeComponents.value.minutes;
@@ -63,6 +69,30 @@ function handleSubmitButton() {
   const datetime = buildLocalDateTimeLuxon(getConfig(), date.value, time);
   emit("submit", datetime);
 }
+function handleTimeClicked() {
+  timeEditMode.value = true;
+  timeEditTime.value = TypeableTime.blank;
+
+  // Doesn't work without the delay for some reason :/
+  setTimeout(() => timeEditInput.value?.focus(), 100);
+}
+function handleSubmitTimeEditor(e: Event) {
+  e.preventDefault();
+  timeEditMode.value = false;
+}
+function handleCloseTimeEditor() {
+  timeEditMode.value = false;
+}
+function handleTimeInput(_e: Event) {
+  const e = _e as InputEvent;
+  if (e.inputType == "insertText") {
+    timeEditTime.value = timeEditTime.value.type(e.data ?? "");
+  } else if (e.inputType == "deleteContentBackward") {
+    timeEditTime.value = timeEditTime.value.backspace();
+  } else if (e.inputType == "deleteContentForward") {
+    timeEditTime.value = timeEditTime.value.delete();
+  }
+}
 </script>
 
 <template>
@@ -75,12 +105,13 @@ function handleSubmitButton() {
       layout="traditional-wide"
       @click="$emit('submit', null)"
     ></SimpleButton>
-    <div class="time">
+    <div v-if="!timeEditMode" class="time-wheels">
       <NumberWheel
         v-model="hours"
         :next="(c) => posMod(c, 12) + 1"
         :prev="(c) => posMod(c - 2, 12) + 1"
         :stringify="(c) => c.toFixed()"
+        @number-clicked="handleTimeClicked"
       ></NumberWheel>
       <p class="time-colon">:</p>
       <NumberWheel
@@ -88,6 +119,7 @@ function handleSubmitButton() {
         :next="(c) => posMod(c + 1, 60)"
         :prev="(c) => posMod(c - 1, 60)"
         :stringify="(c) => c.toFixed().padStart(2, '0')"
+        @number-clicked="handleTimeClicked"
       ></NumberWheel>
       <Picker
         class="ampm-picker"
@@ -102,6 +134,19 @@ function handleSubmitButton() {
         </template>
       </Picker>
     </div>
+    <form
+      v-if="timeEditMode"
+      class="time-editor"
+      @submit="handleSubmitTimeEditor"
+    >
+      <input type="text" ref="timeEditInput" @beforeinput="handleTimeInput" />
+      <button title="Cancel" @click="handleCloseTimeEditor">
+        <Icon id="uil:map-marker"></Icon>
+      </button>
+      <button type="submit" title="Set time">
+        <Icon id="uil:check"></Icon>
+      </button>
+    </form>
     <NumberWheel
       class="date-wheel"
       v-model="date"
@@ -137,25 +182,65 @@ h5 {
 h6 {
   margin-bottom: 0.5rem;
 }
-.time {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr auto;
-  align-items: center;
+.time-wheels,
+.time-editor {
+  height: 8rem;
   border-top: 1px solid var(--color-ink-20);
   border-bottom: 1px solid var(--color-ink-20);
   margin-bottom: 0.5rem;
 }
+.time-wheels {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto;
+}
 .time-colon {
+  align-self: center;
   font-size: 2.5rem;
   font-weight: bold;
+  @include template.no-select;
 }
 .ampm-picker {
+  align-self: center;
   :deep(.content) {
     @include template.content-text;
     padding: 0.5rem 1rem;
     p {
       font-weight: bold;
       font-size: 1rem;
+    }
+  }
+}
+.time-editor {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "input close"
+    "input submit";
+  row-gap: 0.5rem;
+
+  input {
+    grid-area: input;
+  }
+
+  button {
+    @include template.content-text-icon;
+    height: 2.5rem;
+    width: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    .icon {
+      font-size: 1.5rem;
+    }
+
+    &:not([type="submit"]) {
+      @include template.button-hover;
+      grid-area: close;
+      align-self: end;
+    }
+    &[type="submit"] {
+      @include template.button-filled;
+      grid-area: submit;
     }
   }
 }

@@ -28,15 +28,15 @@ export class DepartureFilter {
     readonly serviceTypes: ServiceTypeID[] | null,
     readonly arrivals: boolean,
     readonly setDownOnly: boolean
-  ) {}
+  ) { }
 
   with({
-    lines = undefined,
-    directions = undefined,
-    platforms = undefined,
-    serviceTypes = undefined,
-    arrivals = undefined,
-    setDownOnly = undefined,
+    lines,
+    directions,
+    platforms,
+    serviceTypes,
+    arrivals,
+    setDownOnly,
   }: {
     lines?: LineID[] | null;
     directions?: DirectionID[] | null;
