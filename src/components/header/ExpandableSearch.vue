@@ -7,6 +7,9 @@ import { useRouter } from "vue-router";
 const props = defineProps<{
   open: boolean;
 }>();
+const emit = defineEmits<{
+  (e: "navigation"): void;
+}>();
 
 const query = ref("");
 const input = ref<HTMLInputElement | null>(null);
@@ -30,6 +33,7 @@ const onSearchEnter = (e: Event) => {
   e.preventDefault();
   if (topResultUrl.value != null) {
     router.push(topResultUrl.value);
+    emit("navigation");
   }
 };
 </script>
@@ -50,6 +54,7 @@ const onSearchEnter = (e: Event) => {
     :query="query"
     mode="all"
     @top-result-change="(e) => (topResultUrl = e.url)"
+    @result-click="() => $emit('navigation')"
   ></SearchResults>
 </template>
 

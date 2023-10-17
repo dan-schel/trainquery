@@ -10,6 +10,7 @@ const props = defineProps<{
 defineEmits<{
   (e: "menuButtonClicked"): void;
   (e: "searchButtonClicked"): void;
+  (e: "navigation"): void;
 }>();
 
 const nonHiddenItems = computed(() =>
@@ -36,6 +37,7 @@ const nonHiddenItems = computed(() =>
             :key="item.routeName"
             :content="{ icon: item.icon, text: item.title }"
             :to="{ name: item.routeName }"
+            @click="() => $emit('navigation')"
           ></SimpleButton>
         </div>
         <div class="spacer"></div>
@@ -78,6 +80,7 @@ nav {
   @include utils.shadow;
   opacity: 100%;
   transition: opacity 0.25s;
+  border-top: 1px solid var(--color-ink-10);
 
   &.blend {
     opacity: 0%;

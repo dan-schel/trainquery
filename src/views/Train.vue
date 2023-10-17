@@ -5,15 +5,15 @@ import { computed } from "vue";
 import PageContent from "@/components/common/PageContent.vue";
 import { z } from "zod";
 import LineList from "@/components/LineList.vue";
-import { getDiagramForService } from "@/components/line/get-diagram-for-service";
-import LineDiagram from "@/components/line/LineDiagram.vue";
+import { getDiagramForService } from "@/components/line-diagram/get-diagram-for-service";
+import LineDiagram from "@/components/line-diagram/LineDiagram.vue";
 import { Departure } from "shared/system/service/departure";
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import { getConfig } from "@/utils/get-config";
 import { formatRelativeTime, formatTime } from "@/utils/format-qtime";
 import { requireStop } from "shared/system/config-utils";
-import TrainPageStop from "@/components/line/TrainPageStop.vue";
+import TrainPageStop from "@/components/line-diagram/TrainPageStop.vue";
 import { useNow } from "@/utils/now-provider";
 
 const { local } = useNow();

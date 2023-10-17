@@ -9,6 +9,7 @@ const props = defineProps<{
 }>();
 const emits = defineEmits<{
   (e: "topResultChange", payload: { url: string }): void;
+  (e: "resultClick"): void;
 }>();
 
 const results = computed(() => {
@@ -28,6 +29,7 @@ const results = computed(() => {
       :key="result.url"
       :to="result.url"
       class="result"
+      @click="() => $emit('resultClick')"
     >
       <Icon :id="result.icon"></Icon>
       <div class="column">
