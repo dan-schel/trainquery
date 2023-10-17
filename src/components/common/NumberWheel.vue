@@ -93,26 +93,22 @@ function animateHome() {
   offset.value *= 0.8;
   requestAnimationFrame(animateHome);
 }
-function handleButtonA() {
-  const nextValue = props.horizontal
-    ? props.prev(props.modelValue)
-    : props.next(props.modelValue);
-  if (nextValue == null) {
-    return;
-  }
-  emit("update:modelValue", nextValue);
-  offset.value = props.horizontal ? 1 : -1;
-  animateHome();
-}
-function handleButtonB() {
-  const prevValue = props.horizontal
-    ? props.next(props.modelValue)
-    : props.prev(props.modelValue);
+function handlePrevButton() {
+  const prevValue = props.prev(props.modelValue);
   if (prevValue == null) {
     return;
   }
   emit("update:modelValue", prevValue);
-  offset.value = props.horizontal ? -1 : 1;
+  offset.value = 1;
+  animateHome();
+}
+function handleNextButton() {
+  const nextValue = props.next(props.modelValue);
+  if (nextValue == null) {
+    return;
+  }
+  emit("update:modelValue", nextValue);
+  offset.value = -1;
   animateHome();
 }
 </script>
@@ -129,7 +125,7 @@ function handleButtonB() {
     }"
     @pointerdown="handlePointerDown"
   >
-    <button class="button-a" @click="handleButtonA">
+    <button class="prev-button" @click="handlePrevButton">
       <Icon :id="horizontal ? 'uil:angle-left' : 'uil:angle-up'"></Icon>
     </button>
 
@@ -138,7 +134,7 @@ function handleButtonB() {
       {{ alternate == null ? "" : stringify(alternate as T) }}
     </p>
 
-    <button class="button-b" @click="handleButtonB">
+    <button class="next-button" @click="handleNextButton">
       <Icon :id="horizontal ? 'uil:angle-right' : 'uil:angle-down'"></Icon>
     </button>
   </div>
@@ -198,8 +194,8 @@ function handleButtonB() {
     }
   }
 }
-.button-a,
-.button-b {
+.prev-button,
+.next-button {
   @include template.button-hover;
   align-items: center;
   justify-content: center;
@@ -207,10 +203,10 @@ function handleButtonB() {
     font-size: 1.2rem;
   }
 }
-.button-a {
+.prev-button {
   grid-area: a;
 }
-.button-b {
+.next-button {
   grid-area: b;
 }
 .current,
