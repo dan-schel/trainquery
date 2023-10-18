@@ -20,14 +20,12 @@ export function matchToRoute<T>(
 ): MatchedRoute<T> | null {
   const combinations = config.shared.lines
     .map((l) =>
-      l.route
-        .getStopLists()
-        .map((s) => ({
-          line: l.id,
-          route: s.variant,
-          direction: s.direction,
-          stops: s.stops,
-        }))
+      l.route.getStopLists().map((s) => ({
+        line: l.id,
+        route: s.variant,
+        direction: s.direction,
+        stops: s.stops,
+      }))
     )
     .flat();
 
@@ -45,8 +43,7 @@ export function matchToRoute<T>(
         if (currInOrder == stoppingOrder.length) {
           break;
         }
-      }
-      else {
+      } else {
         stoppingPattern.push(null);
       }
     }
@@ -60,10 +57,9 @@ export function matchToRoute<T>(
           associatedLines: [],
           route: combination.route,
           direction: combination.direction,
-          values: stoppingPattern
+          values: stoppingPattern,
         };
-      }
-      else {
+      } else {
         // And if it's not the only stop list that matched, mark this line down
         // as an associated line.
         if (!successful.associatedLines.includes(combination.line)) {

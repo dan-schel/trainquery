@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { type DirectionID, DirectionIDJson } from "./ids";
+import { mapJson } from "../utils";
 
 /** Provides the strings used for the stop and line page URLs. */
 export class DirectionNames {
@@ -15,22 +16,13 @@ export class DirectionNames {
     return capital ? names.capital : names.regular;
   }
 
-  static readonly json = z
-    .record(
-      DirectionIDJson,
-      z.object({
-        regular: z.string(),
-        capital: z.string(),
-      })
-    )
-    .transform(
-      (x) =>
-        new DirectionNames(
-          new Map(
-            Object.entries(x).map((y) => [DirectionIDJson.parse(y[0]), y[1]!])
-          )
-        )
-    );
+  static readonly json = mapJson(
+    DirectionIDJson,
+    z.object({
+      regular: z.string(),
+      capital: z.string(),
+    })
+  ).transform((x) => new DirectionNames(x));
 
   toJSON(): z.input<typeof DirectionNames.json> {
     return Object.fromEntries(this.names);

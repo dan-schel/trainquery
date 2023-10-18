@@ -99,13 +99,12 @@ export function parseTrips(
         stop: stopIDMap(s.stop_id),
         value: s.departure_time,
       }));
-    const match = matchToRoute(
-      ctx.getConfig(),
-      stopTimes
-    );
+    const match = matchToRoute(ctx.getConfig(), stopTimes);
 
     if (match == null) {
-      console.log(stopTimes.map(s => requireStop(ctx.getConfig(), s.stop).name));
+      console.log(
+        stopTimes.map((s) => requireStop(ctx.getConfig(), s.stop).name)
+      );
       throw new Error(
         "GTFS entry has stopping pattern which matches no known routes."
       );

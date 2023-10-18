@@ -82,10 +82,13 @@ function createStopIDMap(
   subfeed: string | null
 ): StopIDMap {
   return (gtfsStopID: number) => {
-    const stopID = gtfsConfig.stops.find(f => f.feed == subfeed)?.map.get(gtfsStopID);
+    const stopID = gtfsConfig.stops
+      .find((f) => f.feed == subfeed)
+      ?.map.get(gtfsStopID);
     if (stopID == null) {
       throw new Error(
-        `No stop has the GTFS stop ID "${gtfsStopID}" (subfeed=${subfeed ?? "null"
+        `No stop has the GTFS stop ID "${gtfsStopID}" (subfeed=${
+          subfeed ?? "null"
         }).`
       );
     }

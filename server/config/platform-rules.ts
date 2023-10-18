@@ -15,6 +15,7 @@ import {
   StopID,
   StopIDStringJson,
 } from "../../shared/system/ids";
+import { mapJson } from "../../shared/utils";
 
 type StopPlatformRule = {
   confidence: ConfidenceLevel;
@@ -24,48 +25,26 @@ type StopPlatformRule = {
 export class PlatformRules {
   constructor(readonly rules: Map<StopID, StopPlatformRule>) {}
 
-  static json = z
-    .record(
-      StopIDStringJson,
-      z.object({
-        confidence: ConfidenceLevelJson,
-        rules: z
-          .record(
-            PlatformIDJson,
-            z.string().transform((x, ctx) => {
-              const result = PlatformFilter.parseMany(x);
-              if (result == null) {
-                ctx.addIssue({
-                  code: z.ZodIssueCode.custom,
-                  message: "Not a valid list of platform filters.",
-                });
-                return z.NEVER;
-              }
-              return result;
-            })
-          )
-          .transform(
-            (x) =>
-              new Map(
-                Object.entries(x).map(([platform, rule]) => [
-                  PlatformIDJson.parse(platform),
-                  rule!,
-                ])
-              )
-          ),
-      })
-    )
-    .transform(
-      (x) =>
-        new PlatformRules(
-          new Map(
-            Object.entries(x).map(([stop, rule]) => [
-              StopIDStringJson.parse(stop),
-              rule!,
-            ])
-          )
-        )
-    );
+  static json = mapJson(
+    StopIDStringJson,
+    z.object({
+      confidence: ConfidenceLevelJson,
+      rules: mapJson(
+        PlatformIDJson,
+        z.string().transform((x, ctx) => {
+          const result = PlatformFilter.parseMany(x);
+          if (result == null) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Not a valid list of platform filters.",
+            });
+            return z.NEVER;
+          }
+          return result;
+        })
+      ),
+    })
+  ).transform((x) => new PlatformRules(x));
 
   get(stop: StopID) {
     return this.rules.get(stop) ?? null;
