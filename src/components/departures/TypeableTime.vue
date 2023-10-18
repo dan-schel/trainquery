@@ -13,7 +13,9 @@ const inputRef = ref<HTMLInputElement | null>(null);
 
 function handleTimeInput(_e: Event) {
   const e = _e as InputEvent;
-  e.preventDefault();
+
+  // Don't run e.preventDefault(); since it breaks backspacing on Android
+  // Chrome :/
 
   if (e.inputType == "insertText") {
     emit("update:modelValue", props.modelValue.type(e.data ?? ""));
@@ -73,9 +75,27 @@ p {
   font-weight: bold;
   color: var(--color-ink-20);
   font-size: 2.5rem;
+  border-right: 2px solid var(--color-ink-80);
+  animation-name: cursor-blink;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
 
   strong {
     color: var(--color-ink-80);
+  }
+}
+@keyframes cursor-blink {
+  0% {
+    border-right-color: var(--color-ink-80);
+  }
+  1% {
+    border-right-color: transparent;
+  }
+  50% {
+    border-right-color: transparent;
+  }
+  51% {
+    border-right-color: var(--color-ink-80);
   }
 }
 </style>

@@ -28,7 +28,7 @@ export class DepartureFilter {
     readonly serviceTypes: ServiceTypeID[] | null,
     readonly arrivals: boolean,
     readonly setDownOnly: boolean
-  ) { }
+  ) {}
 
   with({
     lines,

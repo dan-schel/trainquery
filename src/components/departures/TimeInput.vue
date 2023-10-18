@@ -19,8 +19,11 @@ const emit = defineEmits<{
   (e: "update:modelValue", newValue: QTime): void;
 }>();
 
-const editMode = ref(false);
+const typeable = ref(false);
 const typeableTime = ref(TypeableTime.blank);
+const typeableSubmitEnabled = computed(
+  () => typeableTime.value.extractTime() != null
+);
 
 const timeComponents = computed(() => {
   const hour12 = hour24To12(props.modelValue.hour);
@@ -42,7 +45,7 @@ watch(
       hours.value = timeComponents.value.hours;
       minutes.value = timeComponents.value.minutes;
       ampm.value = timeComponents.value.ampm;
-      editMode.value = false;
+      typeable.value = false;
     }
   }
 );
@@ -56,7 +59,7 @@ watch([hours, minutes, ampm], ([newHour, newMinute, newAmpm]) => {
 });
 
 function handleTimeClicked() {
-  editMode.value = true;
+  typeable.value = true;
   typeableTime.value = TypeableTime.blank;
 }
 function handleSubmitTimeEditor(e: Event) {
@@ -64,18 +67,17 @@ function handleSubmitTimeEditor(e: Event) {
   const newTime = typeableTime.value.extractTime();
   if (newTime != null) {
     emit("update:modelValue", newTime);
-    editMode.value = false;
+    typeable.value = false;
   }
 }
 function handleCloseTimeEditor() {
-  console.log("close");
-  editMode.value = false;
+  typeable.value = false;
 }
 </script>
 
 <template>
   <div>
-    <div v-if="!editMode" class="time-wheels">
+    <div v-if="!typeable" class="time-wheels">
       <NumberWheel
         class="time-wheel"
         v-model="hours"
@@ -106,15 +108,16 @@ function handleCloseTimeEditor() {
         </template>
       </Picker>
     </div>
-    <form v-if="editMode" class="time-editor" @submit="handleSubmitTimeEditor">
+    <form v-if="typeable" class="time-editor" @submit="handleSubmitTimeEditor">
       <TypeableTimeVue
         class="typeable-time"
         v-model="typeableTime"
+        :display-error="false"
       ></TypeableTimeVue>
       <button type="button" title="Cancel" @click="handleCloseTimeEditor">
         <Icon id="uil:times"></Icon>
       </button>
-      <button type="submit" title="Set time">
+      <button type="submit" title="Set time" :disabled="!typeableSubmitEnabled">
         <Icon id="uil:check"></Icon>
       </button>
     </form>

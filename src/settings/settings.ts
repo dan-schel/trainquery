@@ -39,7 +39,7 @@ export class Settings {
     readonly significantStops: SignificantStop[],
     readonly enableContinuations: boolean,
     readonly limitMapFPS: boolean
-  ) { }
+  ) {}
 
   static json = settingsV1.transform(
     (x) =>
