@@ -63,10 +63,12 @@ function handleSubmitTimeEditor(e: Event) {
   e.preventDefault();
   const newTime = typeableTime.value.extractTime();
   if (newTime != null) {
+    emit("update:modelValue", newTime);
     editMode.value = false;
   }
 }
 function handleCloseTimeEditor() {
+  console.log("close");
   editMode.value = false;
 }
 </script>
@@ -109,7 +111,7 @@ function handleCloseTimeEditor() {
         class="typeable-time"
         v-model="typeableTime"
       ></TypeableTimeVue>
-      <button title="Cancel" @click="handleCloseTimeEditor">
+      <button type="button" title="Cancel" @click="handleCloseTimeEditor">
         <Icon id="uil:times"></Icon>
       </button>
       <button type="submit" title="Set time">
@@ -160,7 +162,6 @@ function handleCloseTimeEditor() {
     "input close"
     "input submit";
   row-gap: 0.5rem;
-  position: relative;
 
   .typeable-time {
     grid-area: input;
