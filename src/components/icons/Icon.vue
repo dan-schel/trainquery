@@ -21,6 +21,7 @@ import UilRedo from "./UilRedo.vue";
 import UilSearch from "./UilSearch.vue";
 import UilSetting from "./UilSetting.vue";
 import UilSliderHRange from "./UilSliderHRange.vue";
+import UilTimes from "./UilTimes.vue";
 
 export type IconID =
   | "majesticons:pin"
@@ -44,7 +45,8 @@ export type IconID =
   | "uil:redo"
   | "uil:search"
   | "uil:setting"
-  | "uil:slider-h-range";
+  | "uil:slider-h-range"
+  | "uil:times";
 
 defineProps<{
   id: IconID;
@@ -95,4 +97,5 @@ defineProps<{
     v-else-if="id == 'uil:slider-h-range'"
     class="icon"
   ></UilSliderHRange>
+  <UilTimes v-else-if="id == 'uil:times'" class="icon"></UilTimes>
 </template>

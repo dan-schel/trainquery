@@ -107,6 +107,7 @@ function handleTimeInput(_e: Event) {
     ></SimpleButton>
     <div v-if="!timeEditMode" class="time-wheels">
       <NumberWheel
+        class="time-wheel"
         v-model="hours"
         :next="(c) => posMod(c, 12) + 1"
         :prev="(c) => posMod(c - 2, 12) + 1"
@@ -115,6 +116,7 @@ function handleTimeInput(_e: Event) {
       ></NumberWheel>
       <p class="time-colon">:</p>
       <NumberWheel
+        class="time-wheel"
         v-model="minutes"
         :next="(c) => posMod(c + 1, 60)"
         :prev="(c) => posMod(c - 1, 60)"
@@ -140,8 +142,9 @@ function handleTimeInput(_e: Event) {
       @submit="handleSubmitTimeEditor"
     >
       <input type="text" ref="timeEditInput" @beforeinput="handleTimeInput" />
+      <p>00:00</p>
       <button title="Cancel" @click="handleCloseTimeEditor">
-        <Icon id="uil:map-marker"></Icon>
+        <Icon id="uil:times"></Icon>
       </button>
       <button type="submit" title="Set time">
         <Icon id="uil:check"></Icon>
@@ -193,6 +196,9 @@ h6 {
   display: grid;
   grid-template-columns: 1fr auto 1fr auto;
 }
+.time-wheel {
+  cursor: text;
+}
 .time-colon {
   align-self: center;
   font-size: 2.5rem;
@@ -218,9 +224,23 @@ h6 {
     "input close"
     "input submit";
   row-gap: 0.5rem;
+  position: relative;
 
   input {
     grid-area: input;
+    z-index: 5;
+    opacity: 0;
+  }
+
+  > p {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: calc(50% - 1.25rem);
+    transform: translate(-50%, -50%);
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--color-ink-20);
   }
 
   button {

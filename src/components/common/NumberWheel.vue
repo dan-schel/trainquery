@@ -138,7 +138,11 @@ function handleNextButton() {
     }"
     @pointerdown="handlePointerDown"
   >
-    <button class="prev-button" @click="handlePrevButton">
+    <button
+      class="prev-button"
+      @click="handlePrevButton"
+      title="Previous value"
+    >
       <Icon :id="horizontal ? 'uil:angle-left' : 'uil:angle-up'"></Icon>
     </button>
 
@@ -147,7 +151,7 @@ function handleNextButton() {
       {{ alternate == null ? "" : stringify(alternate as T) }}
     </p>
 
-    <button class="next-button" @click="handleNextButton">
+    <button class="next-button" @click="handleNextButton" title="Next value">
       <Icon :id="horizontal ? 'uil:angle-right' : 'uil:angle-down'"></Icon>
     </button>
   </div>
