@@ -64,16 +64,16 @@ export class Settings {
   }
 
   with({
-    pinnedWidgets = undefined,
-    significantStops = undefined,
-    enableContinuations = undefined,
-    limitMapFPS = undefined,
+    pinnedWidgets,
+    significantStops,
+    enableContinuations,
+    limitMapFPS,
   }: {
     pinnedWidgets?: PinnedWidget[];
     significantStops?: SignificantStop[];
     enableContinuations?: boolean;
     limitMapFPS?: boolean;
-  } = {}) {
+  }) {
     return new Settings(
       pinnedWidgets ?? this.pinnedWidgets,
       significantStops ?? this.significantStops,
