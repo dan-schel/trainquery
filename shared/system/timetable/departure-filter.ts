@@ -31,12 +31,12 @@ export class DepartureFilter {
   ) {}
 
   with({
-    lines = undefined,
-    directions = undefined,
-    platforms = undefined,
-    serviceTypes = undefined,
-    arrivals = undefined,
-    setDownOnly = undefined,
+    lines,
+    directions,
+    platforms,
+    serviceTypes,
+    arrivals,
+    setDownOnly,
   }: {
     lines?: LineID[] | null;
     directions?: DirectionID[] | null;

@@ -13,12 +13,14 @@ const props = withDefaults(defineProps<Props<T>>(), {
   horizontal: false,
 });
 
+const CLICK_THRESHOLD = 5;
 const COUNTS_AS_HOME = 0.01;
 const SENSITIVITY_TOUCH = props.horizontal ? 0.01 : 0.03;
 const SENSITIVITY_MOUSE = props.horizontal ? 0.02 : 0.06;
 
 const emit = defineEmits<{
   (e: "update:modelValue", newValue: T): void;
+  (e: "numberClicked"): void;
 }>();
 
 const offset = ref(0);
@@ -28,12 +30,17 @@ const alternate = computed(() =>
     : props.prev(props.modelValue)
 );
 const dragOffset = ref<number | null>(null);
+const dragLength = ref<number | null>(null);
 
 function handlePointerDown(e: PointerEvent) {
   e.preventDefault();
   if (dragOffset.value != null) {
     return;
   }
+  const hitButton =
+    !(e.target instanceof HTMLDivElement) ||
+    !e.target.classList.contains("wheel");
+  dragLength.value = hitButton ? null : 0;
   dragOffset.value = props.horizontal ? -e.pageX : -e.pageY;
 }
 function handlePointerMove(e: PointerEvent) {
@@ -43,10 +50,12 @@ function handlePointerMove(e: PointerEvent) {
 
   // e.movementY is undefined on iPad Safari (otherwise remembering the
   // dragOffset wouldn't be necessary!)
+  const delta = (props.horizontal ? -e.pageX : -e.pageY) - dragOffset.value;
   offset.value +=
-    ((props.horizontal ? -e.pageX : -e.pageY) - dragOffset.value) *
-    (e.pointerType == "mouse" ? SENSITIVITY_MOUSE : SENSITIVITY_TOUCH);
-
+    delta * (e.pointerType == "mouse" ? SENSITIVITY_MOUSE : SENSITIVITY_TOUCH);
+  if (dragLength.value != null) {
+    dragLength.value += Math.abs(delta);
+  }
   dragOffset.value = props.horizontal ? -e.pageX : -e.pageY;
 
   while (offset.value > 0.5) {
@@ -72,6 +81,10 @@ function handlePointerUp() {
   if (dragOffset.value == null) {
     return;
   }
+  if (dragLength.value != null && dragLength.value < CLICK_THRESHOLD) {
+    emit("numberClicked");
+  }
+  dragLength.value = null;
   dragOffset.value = null;
   animateHome();
 }
@@ -125,7 +138,11 @@ function handleNextButton() {
     }"
     @pointerdown="handlePointerDown"
   >
-    <button class="prev-button" @click="handlePrevButton">
+    <button
+      class="prev-button"
+      @click="handlePrevButton"
+      title="Previous value"
+    >
       <Icon :id="horizontal ? 'uil:angle-left' : 'uil:angle-up'"></Icon>
     </button>
 
@@ -134,7 +151,7 @@ function handleNextButton() {
       {{ alternate == null ? "" : stringify(alternate as T) }}
     </p>
 
-    <button class="next-button" @click="handleNextButton">
+    <button class="next-button" @click="handleNextButton" title="Next value">
       <Icon :id="horizontal ? 'uil:angle-right' : 'uil:angle-down'"></Icon>
     </button>
   </div>
@@ -155,7 +172,7 @@ function handleNextButton() {
 
   &:not(.horizontal) {
     min-width: 3rem;
-    height: 8rem;
+    min-height: 6rem;
     grid-template-columns: 1fr;
     grid-template-rows: 2rem 1fr 2rem;
     grid-template-areas: "a" "number" "b";

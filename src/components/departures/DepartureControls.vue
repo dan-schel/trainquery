@@ -114,7 +114,7 @@ onUnmounted(() => {
           <TimeControls
             class="content"
             :time="time"
-            :is-open="openDropdown == 'time'"
+            :is-shown="openDropdown == 'time'"
             @submit="handleTimeSubmit"
           ></TimeControls>
         </div>
