@@ -44,9 +44,9 @@ export async function trainQuery(
     gtfs: null,
   };
 
-  // const gtfs = ctx.getConfig().server.gtfs != null ? new GtfsWorker(ctx) : null;
-  // ctx.gtfs = gtfs;
-  // gtfs?.init();
+  const gtfs = ctx.getConfig().server.gtfs != null ? new GtfsWorker(ctx) : null;
+  ctx.gtfs = gtfs;
+  gtfs?.init();
 
   await server.start(ctx, async (endpoint: string, params: ServerParams) => {
     if (endpoint == "ssrAppProps") {

@@ -15,6 +15,18 @@ const IntStringJson = z.string().transform((x, ctx) => {
   return result;
 });
 
+const NumberStringJson = z.string().transform((x, ctx) => {
+  const result = parseFloat(x);
+  if (isNaN(result)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Not a number.",
+    });
+    return z.NEVER;
+  }
+  return result;
+});
+
 const BooleanStringJson = z.string().transform((x, ctx) => {
   if (x == "1") {
     return true;
@@ -136,9 +148,23 @@ export const calendarDatesSchema = z.object({
   // "2"
   exception_type: z.enum(["1", "2"]).transform(
     (x) =>
-      ({
-        "1": "added" as const,
-        "2": "removed" as const,
-      }[x])
+    ({
+      "1": "added" as const,
+      "2": "removed" as const,
+    }[x])
   ),
+});
+
+export const stopsSchema = z.object({
+  // "19837",
+  stop_id: IntStringJson,
+
+  // "Darling Railway Station (Malvern East)",
+  stop_name: z.string(),
+
+  // "-37.8689568446144",
+  stop_lat: NumberStringJson,
+
+  // "145.062950826245"
+  stop_lon: NumberStringJson
 });

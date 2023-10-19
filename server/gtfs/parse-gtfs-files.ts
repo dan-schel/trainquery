@@ -19,8 +19,7 @@ export type StopIDMap = (gtfsStopID: number) => StopID;
 
 export async function parseGtfsFiles(
   ctx: TrainQuery,
-  directory: string,
-  stopIDMap: StopIDMap
+  directory: string
 ): Promise<GtfsData> {
   console.log(`Parsing GTFS "${directory}"...`);
 
@@ -37,13 +36,13 @@ export async function parseGtfsFiles(
   const stopTimesPath = path.join(directory, "stop_times.txt");
   const rawTrips = await readCsv(tripsPath, tripsSchema);
   const rawStopTimes = await readCsv(stopTimesPath, stopTimesSchema);
-  const trips = parseTrips(ctx, rawTrips, rawStopTimes, stopIDMap);
+  const trips = parseTrips(ctx, rawTrips, rawStopTimes);
 
   console.log(`Done!`);
   return new GtfsData(calendars, trips);
 }
 
-export function parseCalendars(
+function parseCalendars(
   rawCalendars: z.infer<typeof calendarSchema>[],
   rawCalendarDates: z.infer<typeof calendarDatesSchema>[]
 ): GtfsCalendar[] {
@@ -82,11 +81,10 @@ export function parseCalendars(
   });
 }
 
-export function parseTrips(
+function parseTrips(
   ctx: TrainQuery,
   rawTrips: z.infer<typeof tripsSchema>[],
-  rawStopTimes: z.infer<typeof stopTimesSchema>[],
-  stopIDMap: StopIDMap
+  rawStopTimes: z.infer<typeof stopTimesSchema>[]
 ): GtfsTrip[] {
   return rawTrips.map((t) => {
     const gtfsTripID = t.trip_id;
