@@ -13,7 +13,7 @@ export class ServerOnlyConfig {
     /** Static rules for which trains use which platforms. */
     readonly platformRules: PlatformRules,
     /** Configuration for a GTFS data source, if applicable. */
-    readonly gtfs: GtfsConfig | null,
+    readonly gtfs: GtfsConfig<true> | GtfsConfig<false> | null,
     /** Rules for the linter. */
     readonly linter: LinterRules,
     /**
@@ -21,5 +21,5 @@ export class ServerOnlyConfig {
      * only sent to the client when the about page is requested.
      */
     readonly aboutMarkdown: string
-  ) {}
+  ) { }
 }

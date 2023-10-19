@@ -1,31 +1,7 @@
 import { z } from "zod";
-import { parseIntNull } from "@schel-d/js-utils";
 import { QTimetableTime } from "../../shared/qtime/qtime";
 import { QDate } from "../../shared/qtime/qdate";
-
-const IntStringJson = z.string().transform((x, ctx) => {
-  const result = parseIntNull(x);
-  if (result == null) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Not an integer.",
-    });
-    return z.NEVER;
-  }
-  return result;
-});
-
-const NumberStringJson = z.string().transform((x, ctx) => {
-  const result = parseFloat(x);
-  if (isNaN(result)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Not a number.",
-    });
-    return z.NEVER;
-  }
-  return result;
-});
+import { IntStringJson, NumberStringJson } from "../../shared/utils";
 
 const BooleanStringJson = z.string().transform((x, ctx) => {
   if (x == "1") {

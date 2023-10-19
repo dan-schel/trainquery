@@ -4,12 +4,12 @@ import path from "path";
 import { TrainQuery } from "../trainquery";
 import { GtfsData } from "./gtfs-data";
 import { GtfsConfig } from "../config/gtfs-config";
-import { StopIDMap, parseGtfsFiles } from "./parse-gtfs-files";
+import { parseGtfsFiles } from "./parse-gtfs-files";
 // import AdmZip from "adm-zip";
 
 export class GtfsWorker {
   private _data: GtfsData | null;
-  private _gtfsConfig: GtfsConfig;
+  private _gtfsConfig: GtfsConfig<true> | GtfsConfig<false>;
 
   constructor(private readonly _ctx: TrainQuery) {
     this._data = null;
@@ -34,7 +34,7 @@ export class GtfsWorker {
 
 async function downloadGtfs(
   ctx: TrainQuery,
-  gtfsConfig: GtfsConfig
+  gtfsConfig: GtfsConfig<true> | GtfsConfig<false>
 ): Promise<GtfsData> {
   const dataFolder = "offline/gtfs-temporary"; // generateDataFolderPath();
   // const zipPath = path.join(dataFolder, "gtfs.zip");
@@ -44,7 +44,7 @@ async function downloadGtfs(
   // const zip = new AdmZip(zipPath);
   // await extractZip(zip, dataFolder);
 
-  if (gtfsConfig.subfeeds != null) {
+  if (gtfsConfig.usesSubfeeds) {
     const parsedFeeds: GtfsData[] = [];
     for (const subfeed of gtfsConfig.subfeeds) {
       // const subzipPath = path.join(dataFolder, subfeed);
@@ -58,7 +58,7 @@ async function downloadGtfs(
       const data = await parseGtfsFiles(
         ctx,
         subfeedDirectory,
-        createStopIDMap(gtfsConfig, subfeed.name)
+        subfeed.stops
       );
       parsedFeeds.push(data);
     }
@@ -71,27 +71,8 @@ async function downloadGtfs(
     const data = await parseGtfsFiles(
       ctx,
       dataFolder,
-      createStopIDMap(gtfsConfig, null)
+      gtfsConfig.feed.stops
     );
     return data;
   }
-}
-
-function createStopIDMap(
-  gtfsConfig: GtfsConfig,
-  subfeed: string | null
-): StopIDMap {
-  return (gtfsStopID: number) => {
-    const stopID = gtfsConfig.stops
-      .find((f) => f.feed == subfeed)
-      ?.map.get(gtfsStopID);
-    if (stopID == null) {
-      throw new Error(
-        `No stop has the GTFS stop ID "${gtfsStopID}" (subfeed=${
-          subfeed ?? "null"
-        }).`
-      );
-    }
-    return stopID;
-  };
 }

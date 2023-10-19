@@ -13,13 +13,13 @@ import { QWeekdayRange } from "../../shared/qtime/qweekdayrange";
 import { matchToRoute } from "../../shared/system/routes/find-match";
 import { StopID } from "../../shared/system/ids";
 import { TrainQuery } from "../trainquery";
+import { nonNull } from "@schel-d/js-utils";
 import { requireStop } from "../../shared/system/config-utils";
-
-export type StopIDMap = (gtfsStopID: number) => StopID;
 
 export async function parseGtfsFiles(
   ctx: TrainQuery,
-  directory: string
+  directory: string,
+  stopMap: Map<number, StopID>,
 ): Promise<GtfsData> {
   console.log(`Parsing GTFS "${directory}"...`);
 
@@ -36,9 +36,9 @@ export async function parseGtfsFiles(
   const stopTimesPath = path.join(directory, "stop_times.txt");
   const rawTrips = await readCsv(tripsPath, tripsSchema);
   const rawStopTimes = await readCsv(stopTimesPath, stopTimesSchema);
-  const trips = parseTrips(ctx, rawTrips, rawStopTimes);
+  const trips = parseTrips(ctx, rawTrips, rawStopTimes, stopMap);
 
-  console.log(`Done!`);
+  console.log(`Done! (Got ${trips.length} trips from a possible ${rawTrips.length})`);
   return new GtfsData(calendars, trips);
 }
 
@@ -84,8 +84,13 @@ function parseCalendars(
 function parseTrips(
   ctx: TrainQuery,
   rawTrips: z.infer<typeof tripsSchema>[],
-  rawStopTimes: z.infer<typeof stopTimesSchema>[]
+  rawStopTimes: z.infer<typeof stopTimesSchema>[],
+  stopMap: Map<number, StopID>,
 ): GtfsTrip[] {
+
+  // TODO: Sort rawTrips and rawTripTimes by trip_id to (hopefully) dramatically
+  // feed up the filtering process below.
+
   return rawTrips.map((t) => {
     const gtfsTripID = t.trip_id;
     const gtfsCalendarID = t.service_id;
@@ -94,18 +99,30 @@ function parseTrips(
       .filter((s) => s.trip_id == t.trip_id)
       .sort((a, b) => a.stop_sequence - b.stop_sequence)
       .map((s) => ({
-        stop: stopIDMap(s.stop_id),
+        stop: stopMap.get(s.stop_id) ?? null,
+        gtfsStop: s.stop_id,
         value: s.departure_time,
       }));
-    const match = matchToRoute(ctx.getConfig(), stopTimes);
+
+    const unknownStops = stopTimes.filter(e => e.stop == null);
+    if (unknownStops.length != 0) {
+      // TODO: Report unknown stops properly!
+      for (const unknownStop of unknownStops) {
+        console.warn(`[GTFS REPORT]: Unknown stop "${unknownStop.gtfsStop}".`);
+      }
+      return null;
+    }
+
+    type AllGood = (typeof stopTimes[number] & { stop: StopID })[];
+    const match = matchToRoute(ctx.getConfig(), stopTimes as AllGood);
 
     if (match == null) {
-      console.log(
-        stopTimes.map((s) => requireStop(ctx.getConfig(), s.stop).name)
-      );
-      throw new Error(
-        "GTFS entry has stopping pattern which matches no known routes."
-      );
+      // TODO: Report unknown route properly!
+      // TODO: Don't report duplicates (probably good to check for duplicates in
+      // reverse order since they tend to duplicate the previous entry).
+      const stopNames = (stopTimes as AllGood).map((s) => requireStop(ctx.getConfig(), s.stop).name);
+      console.warn(`[GTFS REPORT]: Unknown route ${stopNames.join(" → ")}.`);
+      return null;
     }
     const { line, associatedLines, route, direction } = match;
     const times = match.values;
@@ -120,7 +137,7 @@ function parseTrips(
       direction,
       times
     );
-  });
+  }).filter(nonNull);
 }
 
 async function readCsv<T extends z.ZodType>(

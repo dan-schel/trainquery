@@ -1,3 +1,4 @@
+import { parseIntNull } from "@schel-d/js-utils";
 import { z } from "zod";
 
 export function mapJson<A extends string | number, B>(
@@ -21,3 +22,27 @@ export function mapJson<A extends string | number, B>(
     return result;
   });
 }
+
+export const IntStringJson = z.string().transform((x, ctx) => {
+  const result = parseIntNull(x);
+  if (result == null) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Not an integer.",
+    });
+    return z.NEVER;
+  }
+  return result;
+});
+
+export const NumberStringJson = z.string().transform((x, ctx) => {
+  const result = parseFloat(x);
+  if (isNaN(result)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Not a number.",
+    });
+    return z.NEVER;
+  }
+  return result;
+});
