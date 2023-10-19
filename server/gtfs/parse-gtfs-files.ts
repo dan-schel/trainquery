@@ -13,8 +13,8 @@ import { QWeekdayRange } from "../../shared/qtime/qweekdayrange";
 import { matchToRoute } from "../../shared/system/routes/find-match";
 import { StopID } from "../../shared/system/ids";
 import { TrainQuery } from "../trainquery";
-import { nonNull } from "@schel-d/js-utils";
 import { requireStop } from "../../shared/system/config-utils";
+import { QTimetableTime } from "../../shared/qtime/qtime";
 
 export async function parseGtfsFiles(
   ctx: TrainQuery,
@@ -87,22 +87,19 @@ function parseTrips(
   rawStopTimes: z.infer<typeof stopTimesSchema>[],
   stopMap: Map<number, StopID>,
 ): GtfsTrip[] {
+  rawTrips.sort((a, b) => a.trip_id.localeCompare(b.trip_id));
+  rawStopTimes.sort((a, b) => a.trip_id.localeCompare(b.trip_id));
 
-  // TODO: Sort rawTrips and rawTripTimes by trip_id to (hopefully) dramatically
-  // feed up the filtering process below.
+  const result: GtfsTrip[] = [];
 
-  return rawTrips.map((t) => {
-    const gtfsTripID = t.trip_id;
-    const gtfsCalendarID = t.service_id;
+  let thisTrip: { stop: number | null, gtfsStop: number, value: QTimetableTime }[] = [];
+  let tripIndex = 0;
+  let trip = rawTrips[tripIndex];
 
-    const stopTimes = rawStopTimes
-      .filter((s) => s.trip_id == t.trip_id)
-      .sort((a, b) => a.stop_sequence - b.stop_sequence)
-      .map((s) => ({
-        stop: stopMap.get(s.stop_id) ?? null,
-        gtfsStop: s.stop_id,
-        value: s.departure_time,
-      }));
+  function addResult() {
+    const gtfsTripID = trip.trip_id;
+    const gtfsCalendarID = trip.service_id;
+    const stopTimes = thisTrip;
 
     const unknownStops = stopTimes.filter(e => e.stop == null);
     if (unknownStops.length != 0) {
@@ -127,7 +124,7 @@ function parseTrips(
     const { line, associatedLines, route, direction } = match;
     const times = match.values;
 
-    return new GtfsTrip(
+    result.push(new GtfsTrip(
       gtfsTripID,
       null,
       gtfsCalendarID,
@@ -136,8 +133,32 @@ function parseTrips(
       route,
       direction,
       times
-    );
-  }).filter(nonNull);
+    ));
+  }
+
+  for (let i = 0; i < rawStopTimes.length; i++) {
+    const thisStopTime = rawStopTimes[i];
+    if (thisStopTime.trip_id != trip.trip_id) {
+      tripIndex++;
+      while (rawTrips[tripIndex].trip_id != thisStopTime.trip_id) {
+        tripIndex++;
+        if (tripIndex >= rawTrips.length) {
+          throw new Error("Trips mentioned in stop_times.txt are not present in trips.txt.");
+        }
+      }
+      addResult();
+      trip = rawTrips[tripIndex];
+      thisTrip = [];
+    }
+    thisTrip.push({
+      stop: stopMap.get(thisStopTime.stop_id) ?? null,
+      gtfsStop: thisStopTime.stop_id,
+      value: thisStopTime.departure_time,
+    });
+  }
+  addResult();
+
+  return result;
 }
 
 async function readCsv<T extends z.ZodType>(
