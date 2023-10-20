@@ -15,6 +15,7 @@ import { StopID } from "../../shared/system/ids";
 import { TrainQuery } from "../trainquery";
 import { QTimetableTime } from "../../shared/qtime/qtime";
 import { GtfsParsingReport } from "./gtfs-parsing-report";
+import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 
 export async function parseGtfsFiles(
   ctx: TrainQuery,
@@ -42,7 +43,7 @@ export async function parseGtfsFiles(
   );
   const trips = parseTrips(ctx, rawTrips, rawStopTimes, stopMap, parsingReport);
 
-  return new GtfsData(calendars, trips, parsingReport);
+  return new GtfsData(calendars, trips, parsingReport, nowUTCLuxon());
 }
 
 function parseCalendars(

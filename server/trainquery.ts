@@ -5,6 +5,7 @@ import { FullConfig } from "./config/computed-config";
 import { ServerConfig } from "./config/server-config";
 import { GtfsWorker } from "./gtfs/gtfs-worker";
 import { BadApiCallError } from "./param-utils";
+import { TrainQueryDB } from "./trainquery-db";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -12,11 +13,13 @@ export type TrainQuery = {
   readonly server: Server;
   readonly logger: Logger;
   gtfs: GtfsWorker | null;
+  database: TrainQueryDB | null;
 };
 
 export async function trainQuery(
   serverBuilder: ServerBuilder,
   configProvider: ConfigProvider,
+  database: TrainQueryDB | null,
   logger: Logger
 ) {
   let config = new FullConfig(await configProvider.fetchConfig(logger));
@@ -40,9 +43,12 @@ export async function trainQuery(
   const ctx: TrainQuery = {
     getConfig: () => config,
     server: server,
+    database: database,
     logger: logger,
     gtfs: null,
   };
+
+  await database?.init();
 
   const gtfs = ctx.getConfig().server.gtfs != null ? new GtfsWorker(ctx) : null;
   ctx.gtfs = gtfs;

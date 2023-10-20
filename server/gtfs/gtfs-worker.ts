@@ -22,10 +22,13 @@ export class GtfsWorker {
   }
 
   init() {
-    downloadGtfs(this._ctx, this._gtfsConfig)
-      .then((data) => {
+    (async () => {
+      try {
+        const data = await downloadGtfs(this._ctx, this._gtfsConfig);
         this._data = data;
         this._ctx.logger.logGtfsReady();
+
+        // TODO: Persist the data to mongoDB.
 
         // <TEMP>
         const acc = data.parsingReport.acceptedTrips;
@@ -56,10 +59,11 @@ export class GtfsWorker {
           console.log(`    None!`);
         }
         // </TEMP>
-      })
-      .catch((err) => {
+      }
+      catch (err) {
         this._ctx.logger.logGtfsDownloadError(err);
-      });
+      }
+    })();
   }
 }
 

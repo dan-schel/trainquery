@@ -4,13 +4,15 @@ import { QTimetableTime } from "../../shared/qtime/qtime";
 import { QWeekdayRange } from "../../shared/qtime/qweekdayrange";
 import { DirectionID, LineID, RouteVariantID } from "../../shared/system/ids";
 import { GtfsParsingReport } from "./gtfs-parsing-report";
+import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 
 export class GtfsData {
   constructor(
     readonly calendars: GtfsCalendar[],
     readonly trips: GtfsTrip[],
-    readonly parsingReport: GtfsParsingReport
-  ) {}
+    readonly parsingReport: GtfsParsingReport,
+    readonly age: QUtcDateTime
+  ) { }
 
   static merge(feeds: GtfsData[], subfeedIDs: string[]): GtfsData {
     if (feeds.length != subfeedIDs.length || !unique(subfeedIDs)) {
@@ -32,7 +34,10 @@ export class GtfsData {
       feeds.map((f) => f.parsingReport)
     );
 
-    return new GtfsData(calendars, trips, reporting);
+    // As they say, "a feed is only as old as it's oldest subfeed".
+    const age = feeds.map(f => f.age).sort((a, b) => a.asDecimal() - b.asDecimal())[0];
+
+    return new GtfsData(calendars, trips, reporting, age);
   }
 }
 
@@ -45,7 +50,7 @@ export class GtfsCalendar {
     readonly end: QDate,
     readonly additionalDates: QDate[],
     readonly exceptions: QDate[]
-  ) {}
+  ) { }
 
   withSubfeedID(subfeedID: string): GtfsCalendar {
     return new GtfsCalendar(
@@ -70,7 +75,7 @@ export class GtfsTrip {
     readonly route: RouteVariantID,
     readonly direction: DirectionID,
     readonly times: (QTimetableTime | null)[]
-  ) {}
+  ) { }
 
   withSubfeedID(subfeedID: string): GtfsTrip {
     return new GtfsTrip(
