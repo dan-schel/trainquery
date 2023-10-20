@@ -124,10 +124,10 @@ export const calendarDatesSchema = z.object({
   // "2"
   exception_type: z.enum(["1", "2"]).transform(
     (x) =>
-    ({
-      "1": "added" as const,
-      "2": "removed" as const,
-    }[x])
+      ({
+        "1": "added" as const,
+        "2": "removed" as const,
+      }[x])
   ),
 });
 
@@ -142,5 +142,5 @@ export const stopsSchema = z.object({
   stop_lat: NumberStringJson,
 
   // "145.062950826245"
-  stop_lon: NumberStringJson
+  stop_lon: NumberStringJson,
 });

@@ -5,6 +5,7 @@ import { TrainQuery } from "../trainquery";
 import { GtfsData } from "./gtfs-data";
 import { GtfsConfig } from "../config/gtfs-config";
 import { parseGtfsFiles } from "./parse-gtfs-files";
+import { requireStop } from "../../shared/system/config-utils";
 // import AdmZip from "adm-zip";
 
 export class GtfsWorker {
@@ -25,6 +26,36 @@ export class GtfsWorker {
       .then((data) => {
         this._data = data;
         this._ctx.logger.logGtfsReady();
+
+        // <TEMP>
+        const acc = data.parsingReport.acceptedTrips;
+        const rej = data.parsingReport.rejectedTrips;
+        const accPerc = ((acc / (acc + rej)) * 100).toFixed(2) + "%";
+        const rejPerc = ((rej / (acc + rej)) * 100).toFixed(2) + "%";
+        console.log("[GTFS PARSING REPORT]");
+        console.log("");
+        console.log(`Trips accepted: ${acc} (${accPerc})`);
+        console.log(`Trips rejected: ${rej} (${rejPerc})`);
+        console.log("");
+        console.log("Unsupported stops:");
+        for (const s of data.parsingReport.unsupportedGtfsStopIDs.values()) {
+          console.log(` -  ${s}`);
+        }
+        if (data.parsingReport.unsupportedGtfsStopIDs.size == 0) {
+          console.log(`    None!`);
+        }
+        console.log("");
+        console.log("Unsupported routes:");
+        for (const r of data.parsingReport.unsupportedRoutes) {
+          const names = r.map(
+            (s) => requireStop(this._ctx.getConfig(), s).name
+          );
+          console.log(` -  ${names.join(" → ")}`);
+        }
+        if (data.parsingReport.unsupportedRoutes.length == 0) {
+          console.log(`    None!`);
+        }
+        // </TEMP>
       })
       .catch((err) => {
         this._ctx.logger.logGtfsDownloadError(err);
@@ -55,11 +86,7 @@ async function downloadGtfs(
       );
       // await extractZip(subzip, subfeedDirectory);
 
-      const data = await parseGtfsFiles(
-        ctx,
-        subfeedDirectory,
-        subfeed.stops
-      );
+      const data = await parseGtfsFiles(ctx, subfeedDirectory, subfeed.stops);
       parsedFeeds.push(data);
     }
 
@@ -68,11 +95,7 @@ async function downloadGtfs(
       gtfsConfig.subfeeds.map((f) => f.name)
     );
   } else {
-    const data = await parseGtfsFiles(
-      ctx,
-      dataFolder,
-      gtfsConfig.feed.stops
-    );
+    const data = await parseGtfsFiles(ctx, dataFolder, gtfsConfig.feed.stops);
     return data;
   }
 }

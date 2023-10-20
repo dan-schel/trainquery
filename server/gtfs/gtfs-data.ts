@@ -3,9 +3,14 @@ import { QDate } from "../../shared/qtime/qdate";
 import { QTimetableTime } from "../../shared/qtime/qtime";
 import { QWeekdayRange } from "../../shared/qtime/qweekdayrange";
 import { DirectionID, LineID, RouteVariantID } from "../../shared/system/ids";
+import { GtfsParsingReport } from "./gtfs-parsing-report";
 
 export class GtfsData {
-  constructor(readonly calendars: GtfsCalendar[], readonly trips: GtfsTrip[]) {}
+  constructor(
+    readonly calendars: GtfsCalendar[],
+    readonly trips: GtfsTrip[],
+    readonly parsingReport: GtfsParsingReport
+  ) {}
 
   static merge(feeds: GtfsData[], subfeedIDs: string[]): GtfsData {
     if (feeds.length != subfeedIDs.length || !unique(subfeedIDs)) {
@@ -23,7 +28,11 @@ export class GtfsData {
       )
       .flat();
 
-    return new GtfsData(calendars, trips);
+    const reporting = GtfsParsingReport.merge(
+      feeds.map((f) => f.parsingReport)
+    );
+
+    return new GtfsData(calendars, trips, reporting);
   }
 }
 
