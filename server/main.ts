@@ -31,7 +31,9 @@ async function createServer() {
     () => new ExpressServer(parseIntThrow(port), serveFrontend),
     getConfigProvider(isOffline || useOfflineData),
     getDatabase(isOffline),
-    new ConsoleLogger()
+    new ConsoleLogger(),
+    isOffline,
+    isProd
   );
 }
 

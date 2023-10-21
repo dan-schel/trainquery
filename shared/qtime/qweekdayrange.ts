@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { QDayOfWeek } from "./qdayofweek";
 
 export class QWeekdayRange {
@@ -10,6 +11,18 @@ export class QWeekdayRange {
     readonly sat: boolean,
     readonly sun: boolean
   ) {}
+
+  static readonly json = z.string().transform((x, ctx) => {
+    const result = QWeekdayRange.parse(x);
+    if (result == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Not a weekday range",
+      });
+      return z.NEVER;
+    }
+    return result;
+  });
 
   toString() {
     return (

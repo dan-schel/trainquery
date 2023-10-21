@@ -1,4 +1,7 @@
-import { StopID } from "../../shared/system/ids";
+import { z } from "zod";
+import { requireStop } from "../../shared/system/config-utils";
+import { StopID, StopIDJson } from "../../shared/system/ids";
+import { TrainQuery } from "../trainquery";
 
 export class GtfsParsingReport {
   constructor(
@@ -10,6 +13,32 @@ export class GtfsParsingReport {
 
   static blank() {
     return new GtfsParsingReport(new Set(), [], 0, 0);
+  }
+
+  static readonly json = z
+    .object({
+      unsupportedGtfsStopIDs: z.number().array(),
+      unsupportedRoutes: StopIDJson.array().array(),
+      rejectedTrips: z.number(),
+      acceptedTrips: z.number(),
+    })
+    .transform(
+      (x) =>
+        new GtfsParsingReport(
+          new Set(x.unsupportedGtfsStopIDs),
+          x.unsupportedRoutes,
+          x.rejectedTrips,
+          x.acceptedTrips
+        )
+    );
+
+  toJSON(): z.input<typeof GtfsParsingReport.json> {
+    return {
+      unsupportedGtfsStopIDs: Array.from(this.unsupportedGtfsStopIDs.values()),
+      unsupportedRoutes: this.unsupportedRoutes,
+      rejectedTrips: this.rejectedTrips,
+      acceptedTrips: this.acceptedTrips,
+    };
   }
 
   logRejectedStop(...gtfsStopIDs: number[]) {
@@ -52,6 +81,34 @@ export class GtfsParsingReport {
   }
   get acceptedTrips() {
     return this._acceptedTrips;
+  }
+
+  print(ctx: TrainQuery, printer: (input: string) => void) {
+    const acc = this.acceptedTrips;
+    const rej = this.rejectedTrips;
+    const accPerc = ((acc / (acc + rej)) * 100).toFixed(2) + "%";
+    const rejPerc = ((rej / (acc + rej)) * 100).toFixed(2) + "%";
+    printer("[GTFS PARSING REPORT]");
+    printer("");
+    printer(`Trips accepted: ${acc} (${accPerc})`);
+    printer(`Trips rejected: ${rej} (${rejPerc})`);
+    printer("");
+    printer("Unsupported stops:");
+    for (const s of this.unsupportedGtfsStopIDs.values()) {
+      printer(` -  ${s}`);
+    }
+    if (this.unsupportedGtfsStopIDs.size == 0) {
+      printer(`    None!`);
+    }
+    printer("");
+    printer("Unsupported routes:");
+    for (const r of this.unsupportedRoutes) {
+      const names = r.map((s) => requireStop(ctx.getConfig(), s).name);
+      printer(` -  ${names.join(" → ")}`);
+    }
+    if (this.unsupportedRoutes.length == 0) {
+      printer(`    None!`);
+    }
   }
 
   static merge(reports: GtfsParsingReport[]): GtfsParsingReport {

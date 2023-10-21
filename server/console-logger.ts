@@ -25,11 +25,20 @@ export class ConsoleLogger extends Logger {
     console.log(`Failed to load timetable "${path}".`);
   }
 
+  logLoadingGtfs(): void {
+    console.log("Retrieving GTFS data...");
+  }
   logGtfsDownloadError(err: unknown): void {
-    console.warn("Failed to load GTFS data.", err);
+    console.warn("Failed to retrieve GTFS data.", err);
+  }
+  logGtfsReady(): void {
+    console.log("Successfully retrieved GTFS data.");
   }
 
-  logGtfsReady(): void {
-    console.log("Successfully retrieved static GTFS data.");
+  logPersistingGtfs(): void {
+    console.log("Saving GTFS to database...");
+  }
+  logGtfsPersisted(): void {
+    console.log("Successfully saved GTFS data to database.");
   }
 }

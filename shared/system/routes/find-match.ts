@@ -36,15 +36,16 @@ export function matchToRoute<T>(
     const stoppingPattern: (T | null)[] = [];
     let currInOrder = 0;
     for (const stop of combination.stops) {
-      const curr = stoppingOrder[currInOrder];
-      if (stop == curr.stop) {
-        stoppingPattern.push(curr.value);
-        currInOrder++;
-        if (currInOrder == stoppingOrder.length) {
-          break;
-        }
-      } else {
+      if (currInOrder == stoppingOrder.length) {
         stoppingPattern.push(null);
+      } else {
+        const curr = stoppingOrder[currInOrder];
+        if (stop == curr.stop) {
+          stoppingPattern.push(curr.value);
+          currInOrder++;
+        } else {
+          stoppingPattern.push(null);
+        }
       }
     }
 

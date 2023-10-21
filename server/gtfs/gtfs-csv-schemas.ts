@@ -8,7 +8,7 @@ const BooleanStringJson = z.string().transform((x, ctx) => {
     return true;
   }
   if (x == "0") {
-    return true;
+    return false;
   }
   ctx.addIssue({
     code: z.ZodIssueCode.custom,

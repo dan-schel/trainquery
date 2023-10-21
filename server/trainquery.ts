@@ -12,15 +12,19 @@ export type TrainQuery = {
   readonly getConfig: () => FullConfig;
   readonly server: Server;
   readonly logger: Logger;
+  readonly database: TrainQueryDB | null;
+  readonly isOffline: boolean;
+  readonly isProduction: boolean;
   gtfs: GtfsWorker | null;
-  database: TrainQueryDB | null;
 };
 
 export async function trainQuery(
   serverBuilder: ServerBuilder,
   configProvider: ConfigProvider,
   database: TrainQueryDB | null,
-  logger: Logger
+  logger: Logger,
+  isOffline: boolean,
+  isProduction: boolean
 ) {
   let config = new FullConfig(await configProvider.fetchConfig(logger));
   logger.logConfigRefresh(config, true);
@@ -42,10 +46,12 @@ export async function trainQuery(
 
   const ctx: TrainQuery = {
     getConfig: () => config,
-    server: server,
-    database: database,
-    logger: logger,
+    server,
+    database,
+    logger,
     gtfs: null,
+    isOffline,
+    isProduction,
   };
 
   await database?.init();
@@ -93,7 +99,10 @@ export abstract class Logger {
   abstract logConfigRefresh(config: FullConfig, initial: boolean): void;
   abstract logTimetableLoadFail(path: string): void;
   abstract logGtfsDownloadError(err: unknown): void;
+  abstract logLoadingGtfs(): void;
   abstract logGtfsReady(): void;
+  abstract logPersistingGtfs(): void;
+  abstract logGtfsPersisted(): void;
 }
 
 function hashify(ctx: TrainQuery, result: object) {

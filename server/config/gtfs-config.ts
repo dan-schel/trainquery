@@ -8,20 +8,16 @@ export const RefreshPolicyJson = z.enum(RefreshPolicies);
 
 export class GtfsPersistenceConfig {
   constructor(
-    readonly mongoUrl: string,
     readonly refresh: RefreshPolicy,
     readonly refreshSeconds: number
   ) {}
 
   static readonly json = z
     .object({
-      mongoUrl: z.string(),
       refresh: RefreshPolicyJson,
       refreshSeconds: z.number(),
     })
-    .transform(
-      (x) => new GtfsPersistenceConfig(x.mongoUrl, x.refresh, x.refreshSeconds)
-    );
+    .transform((x) => new GtfsPersistenceConfig(x.refresh, x.refreshSeconds));
 }
 
 export class GtfsFeedConfig {
