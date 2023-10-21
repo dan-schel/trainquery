@@ -56,8 +56,8 @@ async function main() {
       console.log(error.toString());
       console.log(
         `${severityHeader(
-          "fatal"
-        )} Failed to parse config (invalid schema). See above for details.`
+          "fatal",
+        )} Failed to parse config (invalid schema). See above for details.`,
       );
     } else {
       console.error(`${severityHeader("fatal")} ${error}`);
@@ -66,7 +66,7 @@ async function main() {
 }
 
 function severityHeader(
-  severity: "pass" | "suggestion" | "warning" | "error" | "fatal"
+  severity: "pass" | "suggestion" | "warning" | "error" | "fatal",
 ) {
   return {
     pass: chalk.bgGreen.bold(" PASS "),

@@ -16,7 +16,7 @@ export class TrainQueryDB {
   constructor(
     private readonly _domain: string,
     private readonly _username: string,
-    private readonly _password: string
+    private readonly _password: string,
   ) {
     this._client = null;
     this._dbs = null;
@@ -52,7 +52,7 @@ export class TrainQueryDB {
 
     await this.dbs.gtfs.metadata.insertOne(gtfsData.metadataToJSON());
     await this.dbs.gtfs.calendars.insertMany(
-      gtfsData.calendars.map((c) => c.toJSON())
+      gtfsData.calendars.map((c) => c.toJSON()),
     );
     await this.dbs.gtfs.trips.insertMany(gtfsData.trips.map((t) => t.toJSON()));
   }
@@ -66,7 +66,7 @@ export class TrainQueryDB {
   get dbs(): DBs {
     if (this._dbs == null) {
       throw new Error(
-        "Database references not initialized. Did you forget to call init()?"
+        "Database references not initialized. Did you forget to call init()?",
       );
     }
     return this._dbs;

@@ -4,7 +4,10 @@ import { QTime, QTimetableTime } from "./qtime";
 import { type InformalDuration, QDuration } from "./qduration";
 
 export abstract class QDateTime<T extends QDateTime<T>> {
-  constructor(readonly date: QDate, readonly time: QTime) {}
+  constructor(
+    readonly date: QDate,
+    readonly time: QTime,
+  ) {}
 
   /** E.g. 145900 for 2:59pm. */
   asDecimal(): number {
@@ -104,7 +107,11 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
   });
 }
 export class QLocalDateTime extends QDateTime<QLocalDateTime> {
-  constructor(date: QDate, time: QTime, readonly offset: number) {
+  constructor(
+    date: QDate,
+    time: QTime,
+    readonly offset: number,
+  ) {
     super(date, time);
   }
 
@@ -133,7 +140,7 @@ export class QLocalDateTime extends QDateTime<QLocalDateTime> {
     const offsetTime = this.time.add({ h: -this.offset });
     return new QUtcDateTime(
       this.date.addDays(offsetTime.days),
-      offsetTime.time
+      offsetTime.time,
     );
   }
 
@@ -158,7 +165,7 @@ export class QLocalDateTime extends QDateTime<QLocalDateTime> {
     return new QLocalDateTime(
       date,
       time,
-      (offset.hour + offset.minute / 60) * sign
+      (offset.hour + offset.minute / 60) * sign,
     );
   }
 
@@ -178,7 +185,7 @@ export class QLocalDateTime extends QDateTime<QLocalDateTime> {
 export function toUTCDateTime(
   date: QDate,
   time: QTimetableTime,
-  offset: number
+  offset: number,
 ): QUtcDateTime {
   const dayOffset = Math.floor(time.hour / 24);
   const dateComponent = date.addDays(dayOffset);

@@ -24,7 +24,7 @@ export class Line {
     /** Type of service on this line, e.g. 'suburban' or 'regional'. */
     readonly serviceType: ServiceTypeID,
     /** Describes the stops and route this line takes. */
-    readonly route: Route
+    readonly route: Route,
   ) {}
 
   static readonly json = z
@@ -44,8 +44,8 @@ export class Line {
           x.color,
           x.specialEventsOnly,
           x.serviceType,
-          x.route
-        )
+          x.route,
+        ),
     );
 
   toJSON(): z.input<typeof Line.json> {

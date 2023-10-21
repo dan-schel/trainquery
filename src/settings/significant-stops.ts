@@ -2,7 +2,10 @@ import { type StopID, StopIDJson } from "shared/system/ids";
 import { z } from "zod";
 
 export class SignificantStop {
-  constructor(readonly stop: StopID, readonly significance: string) {}
+  constructor(
+    readonly stop: StopID,
+    readonly significance: string,
+  ) {}
 
   static readonly json = z
     .object({

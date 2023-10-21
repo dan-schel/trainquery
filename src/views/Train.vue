@@ -33,7 +33,7 @@ const train = computed(() => {
 });
 
 const diagram = computed(() =>
-  train.value != null ? getDiagramForService(train.value) : null
+  train.value != null ? getDiagramForService(train.value) : null,
 );
 
 const title = computed(() => {
@@ -46,7 +46,7 @@ const title = computed(() => {
 
   const perspective = train.value.perspective;
   const timeString = formatTime(
-    toLocalDateTimeLuxon(getConfig(), perspective.scheduledTime).time
+    toLocalDateTimeLuxon(getConfig(), perspective.scheduledTime).time,
   );
   const terminus = requireStop(getConfig(), train.value.terminus.stop).name;
   return {
@@ -63,7 +63,7 @@ const departureText = computed(() => {
   const name = requireStop(getConfig(), train.value.perspective.stop).name;
   const time = toLocalDateTimeLuxon(
     getConfig(),
-    train.value.perspective.scheduledTime
+    train.value.perspective.scheduledTime,
   );
   const timeString = formatRelativeTime(time, local.value);
   const verb = train.value.isArrival()

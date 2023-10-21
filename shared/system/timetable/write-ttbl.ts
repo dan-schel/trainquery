@@ -11,11 +11,11 @@ import { QWeekdayRange } from "../../qtime/qweekdayrange";
 export function writeTtbl(config: HasSharedConfig, timetable: Timetable) {
   const routeDirectionPairs = unique(
     timetable.entries.map((e) => ({ route: e.route, direction: e.direction })),
-    (a, b) => a.route == b.route && a.direction == b.direction
+    (a, b) => a.route == b.route && a.direction == b.direction,
   );
 
   const includeSeconds = timetable.entries.some((e) =>
-    e.rows.some((s) => s != null && s.second != 0)
+    e.rows.some((s) => s != null && s.second != 0),
   );
 
   const grids = routeDirectionPairs
@@ -30,8 +30,8 @@ export function writeTtbl(config: HasSharedConfig, timetable: Timetable) {
         // different grids.
         (_wdr) => true,
 
-        includeSeconds
-      )
+        includeSeconds,
+      ),
     )
     .filter(nonNull);
 
@@ -58,11 +58,13 @@ function writeGrid(
   route: RouteVariantID,
   direction: DirectionID,
   matchesWdr: (wdr: QWeekdayRange) => boolean,
-  includeSeconds: boolean
+  includeSeconds: boolean,
 ): string | null {
   const entries = timetable.entries.filter(
     (e) =>
-      e.route == route && e.direction == direction && matchesWdr(e.weekdayRange)
+      e.route == route &&
+      e.direction == direction &&
+      matchesWdr(e.weekdayRange),
   );
 
   if (entries.length == 0) {
@@ -72,7 +74,7 @@ function writeGrid(
   const header = `[${route}, ${direction}]`;
   const stops = requireLine(config, timetable.line).route.requireStops(
     route,
-    direction
+    direction,
   );
 
   const maxStopIDDigits = Math.max(...stops).toFixed().length;
@@ -86,7 +88,7 @@ function writeGrid(
 
   const headerSize = Math.max(
     header.length,
-    ...stopHeaders.map((h) => h.length)
+    ...stopHeaders.map((h) => h.length),
   );
   const columnSize = includeSeconds ? 10 : 8;
 
@@ -96,13 +98,13 @@ function writeGrid(
   const headerRow = `${header.padEnd(headerSize, " ")} ${wdrs}`;
 
   const times = entries.map((e) =>
-    e.rows.map((r) => (r == null ? "-" : r.toTtblString(includeSeconds)))
+    e.rows.map((r) => (r == null ? "-" : r.toTtblString(includeSeconds))),
   );
   const gridRows = stops.map(
     (_s, i) =>
       `${stopHeaders[i].padEnd(headerSize, " ")} ${times
         .map((t) => t[i].padEnd(columnSize, " "))
-        .join("")}`
+        .join("")}`,
   );
 
   return `${headerRow}\n${gridRows.join("\n")}\n`;

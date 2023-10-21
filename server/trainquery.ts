@@ -24,7 +24,7 @@ export async function trainQuery(
   database: TrainQueryDB | null,
   logger: Logger,
   isOffline: boolean,
-  isProduction: boolean
+  isProduction: boolean,
 ) {
   let config = new FullConfig(await configProvider.fetchConfig(logger));
   logger.logConfigRefresh(config, true);
@@ -85,7 +85,10 @@ export type ServerParams = Record<string, string>;
 export abstract class Server {
   abstract start(
     ctx: TrainQuery,
-    requestListener: (endpoint: string, params: ServerParams) => Promise<object>
+    requestListener: (
+      endpoint: string,
+      params: ServerParams,
+    ) => Promise<object>,
   ): Promise<void>;
 }
 

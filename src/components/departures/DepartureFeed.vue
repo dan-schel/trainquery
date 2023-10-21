@@ -45,7 +45,7 @@ const header = computed(() => {
           getConfig(),
           props.feed.stop,
           null,
-          props.feed.filter
+          props.feed.filter,
         ),
       },
     };
@@ -58,7 +58,7 @@ const header = computed(() => {
           getConfig(),
           props.feed.stop,
           null,
-          props.feed.filter
+          props.feed.filter,
         ),
       },
       subtitle: null,
@@ -80,15 +80,15 @@ const { settings, updateSettings } = useSettings();
 const pinned = computed(() =>
   settings.value == null
     ? false
-    : isPinned(settings.value, props.feed.stop, props.feed.filter)
+    : isPinned(settings.value, props.feed.stop, props.feed.filter),
 );
 const pinnable = computed(() =>
-  settings.value == null ? false : canPin(settings.value)
+  settings.value == null ? false : canPin(settings.value),
 );
 function handlePin() {
   if (settings.value != null) {
     updateSettings(
-      togglePinnedWidget(settings.value, props.feed.stop, props.feed.filter)
+      togglePinnedWidget(settings.value, props.feed.stop, props.feed.filter),
     );
   }
 }

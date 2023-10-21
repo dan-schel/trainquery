@@ -19,7 +19,7 @@ export class GtfsData {
     readonly calendars: GtfsCalendar[],
     readonly trips: GtfsTrip[],
     readonly parsingReport: GtfsParsingReport,
-    readonly age: QUtcDateTime
+    readonly age: QUtcDateTime,
   ) {}
 
   static merge(feeds: GtfsData[], subfeedIDs: string[]): GtfsData {
@@ -29,17 +29,17 @@ export class GtfsData {
 
     const calendars = subfeedIDs
       .map((subfeedID, i) =>
-        feeds[i].calendars.map((c) => c.withSubfeedID(subfeedID))
+        feeds[i].calendars.map((c) => c.withSubfeedID(subfeedID)),
       )
       .flat();
     const trips = subfeedIDs
       .map((subfeedID, i) =>
-        feeds[i].trips.map((c) => c.withSubfeedID(subfeedID))
+        feeds[i].trips.map((c) => c.withSubfeedID(subfeedID)),
       )
       .flat();
 
     const reporting = GtfsParsingReport.merge(
-      feeds.map((f) => f.parsingReport)
+      feeds.map((f) => f.parsingReport),
     );
 
     // As they say, "a feed is only as old as it's oldest subfeed".
@@ -71,7 +71,7 @@ export class GtfsCalendar {
     readonly start: QDate,
     readonly end: QDate,
     readonly additionalDates: QDate[],
-    readonly exceptions: QDate[]
+    readonly exceptions: QDate[],
   ) {}
 
   static readonly json = z
@@ -93,8 +93,8 @@ export class GtfsCalendar {
           x.start,
           x.end,
           x.additionalDates,
-          x.exceptions
-        )
+          x.exceptions,
+        ),
     );
 
   withSubfeedID(subfeedID: string): GtfsCalendar {
@@ -105,7 +105,7 @@ export class GtfsCalendar {
       this.start,
       this.end,
       this.additionalDates,
-      this.exceptions
+      this.exceptions,
     );
   }
 
@@ -131,7 +131,7 @@ export class GtfsTrip {
     readonly associatedLines: LineID[],
     readonly route: RouteVariantID,
     readonly direction: DirectionID,
-    readonly times: (QTimetableTime | null)[]
+    readonly times: (QTimetableTime | null)[],
   ) {}
 
   static readonly json = z
@@ -155,8 +155,8 @@ export class GtfsTrip {
           x.associatedLines,
           x.route,
           x.direction,
-          x.times
-        )
+          x.times,
+        ),
     );
 
   withSubfeedID(subfeedID: string): GtfsTrip {
@@ -168,7 +168,7 @@ export class GtfsTrip {
       this.associatedLines,
       this.route,
       this.direction,
-      this.times
+      this.times,
     );
   }
 

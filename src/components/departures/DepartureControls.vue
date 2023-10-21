@@ -26,7 +26,7 @@ const openDropdown = ref<"none" | "time" | "filter">("none");
 
 const filterLabel = computed(() => formatFilter(props.filter, props.stop));
 const showResetButton = computed(
-  () => !props.isDefaultFilter || props.time != null
+  () => !props.isDefaultFilter || props.time != null,
 );
 
 // Stores changes to the filter until the dropdown is closed, when the changes
@@ -36,7 +36,7 @@ watch(
   () => props.filter,
   () => {
     filterElect.value = props.filter;
-  }
+  },
 );
 
 function handleTimeButtonClick() {

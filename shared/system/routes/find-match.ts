@@ -16,7 +16,7 @@ export type MatchedRoute<T> = {
 
 export function matchToRoute<T>(
   config: HasSharedConfig,
-  stoppingOrder: { stop: StopID; value: T }[]
+  stoppingOrder: { stop: StopID; value: T }[],
 ): MatchedRoute<T> | null {
   const combinations = config.shared.lines
     .map((l) =>
@@ -25,7 +25,7 @@ export function matchToRoute<T>(
         route: s.variant,
         direction: s.direction,
         stops: s.stops,
-      }))
+      })),
     )
     .flat();
 

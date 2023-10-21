@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export function mapJson<A extends string | number, B>(
   keySchema: z.ZodType<A, z.ZodTypeDef, string>,
-  valueSchema: z.ZodType<B, z.ZodTypeDef, any>
+  valueSchema: z.ZodType<B, z.ZodTypeDef, any>,
 ): z.ZodType<Map<A, B>, z.ZodTypeDef, any> {
   return z.record(z.string(), valueSchema).transform((x, ctx) => {
     const result = new Map<A, B>();

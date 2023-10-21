@@ -7,7 +7,7 @@ export function getTimetableForDay(ctx: TrainQuery, day: QDate, line: LineID) {
   const timetables = ctx
     .getConfig()
     .server.timetables.filter(
-      (t) => t.line == line && isWithin(day, t.begins, t.ends)
+      (t) => t.line == line && isWithin(day, t.begins, t.ends),
     );
 
   // There should only be (at most) one of each type at a time, so we're fine
@@ -27,7 +27,7 @@ export function getTimetableForDay(ctx: TrainQuery, day: QDate, line: LineID) {
 export function getTimetablesForDay(
   ctx: TrainQuery,
   day: QDate,
-  lines: LineID[]
+  lines: LineID[],
 ) {
   return lines.map((l) => getTimetableForDay(ctx, day, l)).filter(nonNull);
 }

@@ -25,7 +25,7 @@ export class Timetable {
     /** The date the timetable was created. */
     readonly created: QDate,
     /** The services in the timetable. */
-    entries: TimetableEntry[]
+    entries: TimetableEntry[],
   ) {
     this.entries = entries.map(
       (e, i) =>
@@ -36,8 +36,8 @@ export class Timetable {
           e.route,
           e.direction,
           e.weekdayRange,
-          e.rows
-        )
+          e.rows,
+        ),
     );
   }
 }
@@ -51,7 +51,7 @@ export class TimetableEntry {
     /** Which days of the week this services operates on. */
     readonly weekdayRange: QWeekdayRange,
     /** The value of each row (either the time, or null if it doesn't stop). */
-    readonly rows: (QTimetableTime | null)[]
+    readonly rows: (QTimetableTime | null)[],
   ) {}
 }
 
@@ -70,7 +70,7 @@ export class FullTimetableEntry extends TimetableEntry {
     /** Which days of the week this services operates on. */
     weekdayRange: QWeekdayRange,
     /** The value of each row (either the time, or null if it doesn't stop). */
-    rows: (QTimetableTime | null)[]
+    rows: (QTimetableTime | null)[],
   ) {
     super(route, direction, weekdayRange, rows);
   }

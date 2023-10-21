@@ -11,7 +11,7 @@ import { mapJson } from "../utils";
 export class UrlNames {
   constructor(
     readonly stops: Map<StopID, string>,
-    readonly lines: Map<LineID, string>
+    readonly lines: Map<LineID, string>,
   ) {}
 
   static readonly json = z

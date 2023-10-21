@@ -6,7 +6,7 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
   constructor(
     readonly hour: number,
     readonly minute: number,
-    readonly second: number
+    readonly second: number,
   ) {}
 
   protected abstract _getNumOfHours(): number;
@@ -188,7 +188,7 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
     return new QTimetableTime(
       time.hour + (input.startsWith(">") ? 24 : 0),
       time.minute,
-      time.second
+      time.second,
     );
   }
 

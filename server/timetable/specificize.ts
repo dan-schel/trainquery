@@ -14,12 +14,12 @@ import { Departure } from "../../shared/system/service/departure";
 export function specificize(
   ctx: TrainQuery,
   entry: FullTimetableEntry,
-  date: QDate
+  date: QDate,
 ) {
   const staticID = new StaticServiceIDComponents(
     entry.id,
     entry.entryIndex,
-    date
+    date,
   ).encode();
 
   const platforms = guessPlatformsOfEntry(ctx, entry, date);
@@ -45,9 +45,9 @@ export function specificize(
         null,
         setsDown,
         picksUp,
-        platform
+        platform,
       );
-    })
+    }),
   );
 
   return new Service(
@@ -58,7 +58,7 @@ export function specificize(
     stoppingPattern,
     staticID,
     [],
-    null
+    null,
   );
 }
 
@@ -66,7 +66,7 @@ export function specificizeDeparture(
   ctx: TrainQuery,
   entry: FullTimetableEntry,
   date: QDate,
-  perspectiveIndex: number
+  perspectiveIndex: number,
 ): Departure {
   const service = specificize(ctx, entry, date);
   return Departure.fromService(service, perspectiveIndex);

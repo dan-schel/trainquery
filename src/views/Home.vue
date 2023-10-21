@@ -19,8 +19,8 @@ const feeds = computed(() =>
   settings.value == null
     ? null
     : settings.value.pinnedWidgets.map(
-        (w) => new DepartureFeed(w.stop, 3, w.filter)
-      )
+        (w) => new DepartureFeed(w.stop, 3, w.filter),
+      ),
 );
 </script>
 

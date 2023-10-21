@@ -8,7 +8,7 @@ export function formatMode(
     plural = false,
     line = false,
     capital = false,
-  }: { plural?: boolean; line?: boolean; capital?: boolean } = {}
+  }: { plural?: boolean; line?: boolean; capital?: boolean } = {},
 ): string {
   const suffix = plural
     ? line

@@ -16,7 +16,7 @@ import type { ViaRuleFilteringData } from "shared/system/via-rule";
 
 export function getTerminusString(
   departure: Departure,
-  patternList: PatternList
+  patternList: PatternList,
 ) {
   if (departure.isArrival()) {
     return "Arrival";
@@ -55,13 +55,13 @@ export function getViaString(departure: Departure, patternList: PatternList) {
 export function getDeparturePlatformString(departure: Departure) {
   return getPlatformString(
     departure.perspective.platform,
-    departure.perspective.stop
+    departure.perspective.stop,
   );
 }
 
 export function getPlatformString(
   platform: { id: PlatformID; confidence: ConfidenceLevel } | null,
-  perspectiveStop: StopID
+  perspectiveStop: StopID,
 ) {
   if (platform == null) {
     return null;

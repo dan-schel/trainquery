@@ -27,7 +27,7 @@ const offset = ref(0);
 const alternate = computed(() =>
   offset.value >= 0
     ? props.next(props.modelValue)
-    : props.prev(props.modelValue)
+    : props.prev(props.modelValue),
 );
 const dragOffset = ref<number | null>(null);
 const dragLength = ref<number | null>(null);

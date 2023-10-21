@@ -12,7 +12,7 @@ export function formatFilter(filter: DepartureFilter, perspective: StopID) {
     prefix = listifyAnd(
       filter.directions
         .map((d, i) => formatDirection(d, { capital: i == 0 }))
-        .sort((a, b) => a.localeCompare(b))
+        .sort((a, b) => a.localeCompare(b)),
     );
   }
 
@@ -21,7 +21,7 @@ export function formatFilter(filter: DepartureFilter, perspective: StopID) {
     const linesNames = listifyAnd(
       filter.lines
         .map((l) => requireLine(getConfig(), l).name)
-        .sort((a, b) => a.localeCompare(b))
+        .sort((a, b) => a.localeCompare(b)),
     );
     if (prefix != null) {
       prefix += " " + linesNames;
@@ -36,9 +36,9 @@ export function formatFilter(filter: DepartureFilter, perspective: StopID) {
     noun = listifyAnd(
       filter.serviceTypes
         .map((s, i) =>
-          formatMode(s, { capital: i == 0 && prefix == null, plural: true })
+          formatMode(s, { capital: i == 0 && prefix == null, plural: true }),
         )
-        .sort((a, b) => a.localeCompare(b))
+        .sort((a, b) => a.localeCompare(b)),
     );
   }
 
@@ -48,7 +48,7 @@ export function formatFilter(filter: DepartureFilter, perspective: StopID) {
     const numbers = listifyAnd(
       filter.platforms
         .map((p) => requirePlatform(getConfig(), perspective, p).name)
-        .sort((a, b) => a.localeCompare(b))
+        .sort((a, b) => a.localeCompare(b)),
     );
     suffix =
       filter.platforms.length == 1
@@ -77,7 +77,7 @@ export function formatFilter(filter: DepartureFilter, perspective: StopID) {
 
 export function formatDirection(
   direction: DirectionID,
-  { capital = false }: { capital?: boolean } = {}
+  { capital = false }: { capital?: boolean } = {},
 ) {
   const name = getConfig().frontend.directionNames.getName(direction, capital);
   if (name == null) {

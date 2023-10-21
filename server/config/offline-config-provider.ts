@@ -12,7 +12,7 @@ export class OfflineConfigProvider extends ConfigProvider {
      * The value to use for the canonical url in the config. Provided by an
      * environment variable.
      */
-    readonly canonicalUrl: string
+    readonly canonicalUrl: string,
   ) {
     super();
   }
@@ -25,7 +25,7 @@ export class OfflineConfigProvider extends ConfigProvider {
       dataFolder,
       this.zipOrFolderPath,
       this.canonicalUrl,
-      logger
+      logger,
     );
 
     await deleteDataFolder(dataFolder);

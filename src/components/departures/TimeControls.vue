@@ -29,7 +29,7 @@ watch(
       time.value = (props.time ?? local.value).time;
       date.value = (props.time ?? local.value).date;
     }
-  }
+  },
 );
 
 function handleSubmitButton() {

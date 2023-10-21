@@ -3,7 +3,10 @@ import { type ServiceMode, ServiceModeJson } from "./enums";
 import { type ServiceTypeID, ServiceTypeIDJson } from "./ids";
 
 export class ServiceType {
-  constructor(readonly id: ServiceTypeID, readonly mode: ServiceMode) {}
+  constructor(
+    readonly id: ServiceTypeID,
+    readonly mode: ServiceMode,
+  ) {}
 
   static json = z
     .object({

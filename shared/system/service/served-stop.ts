@@ -21,7 +21,7 @@ export class ServedStop {
     readonly platform: {
       id: PlatformID;
       confidence: ConfidenceLevel;
-    } | null
+    } | null,
   ) {}
 
   static readonly json = z
@@ -52,8 +52,8 @@ export class ServedStop {
           x.liveTime,
           x.setsDown,
           x.picksUp,
-          x.platform
-        )
+          x.platform,
+        ),
     );
 
   toJSON(): z.input<typeof ServedStop.json> {

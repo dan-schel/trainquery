@@ -40,7 +40,7 @@ export class QDate {
   constructor(
     readonly year: number,
     readonly month: number,
-    readonly day: number
+    readonly day: number,
   ) {}
   isValid(): { valid: true } | { valid: false; issue: string } {
     const invalid = (issue: string) => ({ valid: false, issue: issue });
@@ -60,7 +60,7 @@ export class QDate {
       return invalid(
         `${getMonthAcronym(this.month)} ${
           this.year
-        } only has ${daysInMonth} days.`
+        } only has ${daysInMonth} days.`,
       );
     }
 
@@ -156,7 +156,7 @@ export class QDate {
       const endOfOtherMonth = new QDate(
         other.year,
         other.month,
-        getDaysInMonth(other.year, other.month)
+        getDaysInMonth(other.year, other.month),
       );
       const startOfThisMonth = new QDate(this.year, this.month, 1);
       let daysBetween = 1;

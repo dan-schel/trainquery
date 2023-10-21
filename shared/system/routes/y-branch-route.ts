@@ -17,7 +17,7 @@ export class Branch {
      * Stops, ordered from the end of the branch to the stop before the shared
      * section begins.
      */
-    readonly stops: RouteStop[]
+    readonly stops: RouteStop[],
   ) {}
 
   static readonly json = z
@@ -53,7 +53,7 @@ export class YBranchRoute extends Route {
      */
     readonly secondBranch: Branch,
     /** Stops, ordered the first shared stop to the end of the 'fork handle'. */
-    readonly shared: RouteStop[]
+    readonly shared: RouteStop[],
   ) {
     super("y-branch");
   }
@@ -73,7 +73,7 @@ export class YBranchRoute extends Route {
       x.reverse,
       x.firstBranch,
       x.secondBranch,
-      x.shared
+      x.shared,
     );
   }
 

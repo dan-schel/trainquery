@@ -9,7 +9,7 @@ export const RefreshPolicyJson = z.enum(RefreshPolicies);
 export class GtfsPersistenceConfig {
   constructor(
     readonly refresh: RefreshPolicy,
-    readonly refreshSeconds: number
+    readonly refreshSeconds: number,
   ) {}
 
   static readonly json = z
@@ -23,7 +23,7 @@ export class GtfsPersistenceConfig {
 export class GtfsFeedConfig {
   constructor(
     /** Maps the stop IDs used by GTFS to the ones used by TrainQuery. */
-    readonly stops: Map<number, StopID>
+    readonly stops: Map<number, StopID>,
   ) {}
 
   static readonly rawJson = z.object({
@@ -38,7 +38,7 @@ export class GtfsSubfeedConfig extends GtfsFeedConfig {
   constructor(
     readonly name: string,
     readonly path: string,
-    stops: Map<number, StopID>
+    stops: Map<number, StopID>,
   ) {
     super(stops);
   }
@@ -57,7 +57,7 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
     readonly persist: GtfsPersistenceConfig | null,
     readonly usesSubfeeds: UsesSubfeeds,
     readonly subfeeds: UsesSubfeeds extends true ? GtfsSubfeedConfig[] : null,
-    readonly feed: UsesSubfeeds extends false ? GtfsFeedConfig : null
+    readonly feed: UsesSubfeeds extends false ? GtfsFeedConfig : null,
   ) {}
 
   static readonly json = z.union([
@@ -68,7 +68,7 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
         subfeeds: GtfsSubfeedConfig.json.array(),
       })
       .transform(
-        (x) => new GtfsConfig(x.staticUrl, x.persist, true, x.subfeeds, null)
+        (x) => new GtfsConfig(x.staticUrl, x.persist, true, x.subfeeds, null),
       ),
     GtfsFeedConfig.rawJson
       .extend({
@@ -82,8 +82,8 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
             x.persist,
             false,
             null,
-            GtfsFeedConfig.transform(x)
-          )
+            GtfsFeedConfig.transform(x),
+          ),
       ),
   ]);
 
@@ -101,7 +101,7 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
         throw new Error(`This GTFS config uses subfeeds (cannot get "null").`);
       } else if (feed != null && !this.usesSubfeeds) {
         throw new Error(
-          `This GTFS config doesn't use subfeeds (cannot get "${feed}").`
+          `This GTFS config doesn't use subfeeds (cannot get "${feed}").`,
         );
       } else {
         throw new Error(`Cannot get subfeed "${feed}" on this GTFS config.`);

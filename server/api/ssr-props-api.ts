@@ -11,7 +11,7 @@ export async function ssrAppPropsApi(ctx: TrainQuery): Promise<object> {
 
 export async function ssrRoutePropsApi(
   ctx: TrainQuery,
-  params: ServerParams
+  params: ServerParams,
 ): Promise<object> {
   const page = requireParam(params, "page");
   const path = requireParam(params, "path");
@@ -54,7 +54,7 @@ function trainPage(ctx: TrainQuery, path: string) {
     if (perspectiveIndex == null) {
       return Departure.fromService(
         service,
-        service.pattern.origin.stopListIndex
+        service.pattern.origin.stopListIndex,
       );
     }
 

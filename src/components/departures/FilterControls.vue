@@ -44,7 +44,7 @@ const noAvailableFilters =
           @click="
             $emit(
               'update:modelValue',
-              toggleFilter(filter, modelValue, availableFilters)
+              toggleFilter(filter, modelValue, availableFilters),
             )
           "
           :key="filter.line"
@@ -63,7 +63,7 @@ const noAvailableFilters =
           @click="
             $emit(
               'update:modelValue',
-              toggleFilter(filter, modelValue, availableFilters)
+              toggleFilter(filter, modelValue, availableFilters),
             )
           "
           :key="filter.direction"
@@ -82,7 +82,7 @@ const noAvailableFilters =
           @click="
             $emit(
               'update:modelValue',
-              toggleFilter(filter, modelValue, availableFilters)
+              toggleFilter(filter, modelValue, availableFilters),
             )
           "
           :key="filter.platform"

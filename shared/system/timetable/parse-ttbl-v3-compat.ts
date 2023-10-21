@@ -23,7 +23,7 @@ type ErrorProcedure = (error: string) => null;
  */
 export function parseTtblV3Compat(
   input: string,
-  logError?: ErrorLogger
+  logError?: ErrorLogger,
 ): Timetable | null {
   const error = (message: string) => {
     if (logError != null) {
@@ -77,7 +77,7 @@ export function parseTtblV3Compat(
     metadata.begins,
     metadata.ends,
     metadata.created,
-    entries.filter(nonNull).flat()
+    entries.filter(nonNull).flat(),
   );
 }
 
@@ -135,7 +135,7 @@ function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
   const begins = wildcardDate(beginsString);
   if (begins == "INVALID!") {
     return error(
-      `"${beginsString}" is not a ISO8601 compliant date (or a "*").`
+      `"${beginsString}" is not a ISO8601 compliant date (or a "*").`,
     );
   }
   const endsString = get("ends");
@@ -169,11 +169,11 @@ function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
 
 function parseGrid(
   gridInput: string[],
-  error: ErrorProcedure
+  error: ErrorProcedure,
 ): TimetableEntry[] | null {
   if (!/^\[[^[\]]+\]$/g.test(gridInput[0])) {
     return error(
-      "Grid header unrecognized. Could not find opening/closing brackets."
+      "Grid header unrecognized. Could not find opening/closing brackets.",
     );
   }
 
@@ -189,7 +189,7 @@ function parseGrid(
   const route = getRouteVariantAndDirection(args[0]);
   if (route == null) {
     return error(
-      `"${args[0]}" is cannot be interpreted (in v3.5 compatibility mode).`
+      `"${args[0]}" is cannot be interpreted (in v3.5 compatibility mode).`,
     );
   }
   const wdr = QWeekdayRange.parse(args[1]);
@@ -220,7 +220,7 @@ function parseGrid(
     const badTime = potentialTimes.find((t) => t.time == "INVALID!");
     if (badTime != null) {
       return error(
-        `"${badTime.input}" is not a valid timetable time string (or a "-").`
+        `"${badTime.input}" is not a valid timetable time string (or a "-").`,
       );
     }
     return potentialTimes
@@ -241,8 +241,8 @@ function parseGrid(
         route.variant,
         route.direction,
         wdr,
-        rows.map((r) => r[i])
-      )
+        rows.map((r) => r[i]),
+      ),
     );
   }
 

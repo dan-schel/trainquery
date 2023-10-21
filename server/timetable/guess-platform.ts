@@ -37,7 +37,7 @@ function createPlatformGuesser(ctx: TrainQuery, entry: FullTimetableEntry) {
 
 export function guessPlatformOfPossibility(
   ctx: TrainQuery,
-  possibility: Possibility
+  possibility: Possibility,
 ) {
   const { guesser, stopList } = createPlatformGuesser(ctx, possibility.entry);
   return guesser(stopList[possibility.perspectiveIndex], possibility.date);
@@ -46,18 +46,18 @@ export function guessPlatformOfPossibility(
 export function guessPlatformsOfEntry(
   ctx: TrainQuery,
   entry: FullTimetableEntry,
-  date: QDate
+  date: QDate,
 ) {
   const { guesser, stopList } = createPlatformGuesser(ctx, entry);
   return stopList.map((s, i) =>
-    entry.rows[i] != null ? guesser(s, date) : null
+    entry.rows[i] != null ? guesser(s, date) : null,
   );
 }
 
 function guessPlatform(
   ctx: TrainQuery,
   stop: StopID,
-  service: PlatformFilteringData
+  service: PlatformFilteringData,
 ): {
   id: PlatformID;
   confidence: ConfidenceLevel;

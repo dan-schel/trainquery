@@ -10,7 +10,7 @@ export class FrontendConfig {
     /** Shared config properties. */
     readonly shared: SharedConfig,
     /** Frontend config properties. */
-    readonly frontend: FrontendOnlyConfig
+    readonly frontend: FrontendOnlyConfig,
   ) {}
 
   static readonly json = z

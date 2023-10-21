@@ -49,7 +49,7 @@ export class GtfsWorker {
 
 async function downloadGtfs(
   ctx: TrainQuery,
-  gtfsConfig: GtfsConfig<true> | GtfsConfig<false>
+  gtfsConfig: GtfsConfig<true> | GtfsConfig<false>,
 ): Promise<GtfsData> {
   const dataFolder = "offline/gtfs-temporary"; // generateDataFolderPath();
   // const zipPath = path.join(dataFolder, "gtfs.zip");
@@ -66,7 +66,7 @@ async function downloadGtfs(
       // const subzip = new AdmZip(subzipPath);
       const subfeedDirectory = path.join(
         dataFolder,
-        path.dirname(subfeed.path)
+        path.dirname(subfeed.path),
       );
       // await extractZip(subzip, subfeedDirectory);
 
@@ -76,7 +76,7 @@ async function downloadGtfs(
 
     return GtfsData.merge(
       parsedFeeds,
-      gtfsConfig.subfeeds.map((f) => f.name)
+      gtfsConfig.subfeeds.map((f) => f.name),
     );
   } else {
     const data = await parseGtfsFiles(ctx, dataFolder, gtfsConfig.feed.stops);

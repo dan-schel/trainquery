@@ -23,7 +23,7 @@ export class OnlineConfigProvider extends ConfigProvider {
      * The value to use for the canonical url in the config. Provided by an
      * environment variable.
      */
-    readonly canonicalUrl: string
+    readonly canonicalUrl: string,
   ) {
     super();
   }
@@ -41,7 +41,7 @@ export class OnlineConfigProvider extends ConfigProvider {
 
       if (!(supportedVersion in manifest)) {
         throw new Error(
-          `"${supportedVersion}" data is unavailable at "${this.url}"`
+          `"${supportedVersion}" data is unavailable at "${this.url}"`,
         );
       }
       return manifest[supportedVersion].latest;
@@ -56,7 +56,7 @@ export class OnlineConfigProvider extends ConfigProvider {
       dataFolder,
       zipPath,
       this.canonicalUrl,
-      logger
+      logger,
     );
 
     await deleteDataFolder(dataFolder);
@@ -73,5 +73,5 @@ const manifestJson = z.object({}).catchall(
   z.object({
     latest: z.string(),
     backup: z.string().optional(),
-  })
+  }),
 );

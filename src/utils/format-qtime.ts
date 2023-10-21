@@ -7,7 +7,7 @@ import type { QTime } from "shared/qtime/qtime";
 
 export function formatTime(
   time: QTime,
-  { includeSeconds = false }: { includeSeconds?: boolean } = {}
+  { includeSeconds = false }: { includeSeconds?: boolean } = {},
 ) {
   const hour12 = hour24To12(time.hour);
   const hrs = hour12.hour.toFixed();
@@ -22,7 +22,7 @@ export function formatTime(
 
 export function formatDuration(
   duration: QDuration,
-  { round = false }: { round?: boolean } = {}
+  { round = false }: { round?: boolean } = {},
 ) {
   const { d, h, m, s } = duration.positiveComponents;
   const components = [];
@@ -54,7 +54,7 @@ export function formatDate(date: QDate) {
 export function formatRelativeTime(
   time: QLocalDateTime,
   now: QLocalDateTime,
-  { suppressEarlierToday = false }: { suppressEarlierToday?: boolean } = {}
+  { suppressEarlierToday = false }: { suppressEarlierToday?: boolean } = {},
 ) {
   const timeString = formatTime(time.time);
   const dayDiff = time.date.diff(now.date);

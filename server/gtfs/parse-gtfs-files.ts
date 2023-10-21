@@ -20,26 +20,26 @@ import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 export async function parseGtfsFiles(
   ctx: TrainQuery,
   directory: string,
-  stopMap: Map<number, StopID>
+  stopMap: Map<number, StopID>,
 ): Promise<GtfsData> {
   const parsingReport = GtfsParsingReport.blank();
   const rawCalendars = await readCsv(
     path.join(directory, "calendar.txt"),
-    calendarSchema
+    calendarSchema,
   );
   const rawCalendarDates = await readCsv(
     path.join(directory, "calendar_dates.txt"),
-    calendarDatesSchema
+    calendarDatesSchema,
   );
   const calendars = parseCalendars(rawCalendars, rawCalendarDates);
 
   const rawTrips = await readCsv(
     path.join(directory, "trips.txt"),
-    tripsSchema
+    tripsSchema,
   );
   const rawStopTimes = await readCsv(
     path.join(directory, "stop_times.txt"),
-    stopTimesSchema
+    stopTimesSchema,
   );
   const trips = parseTrips(ctx, rawTrips, rawStopTimes, stopMap, parsingReport);
 
@@ -48,7 +48,7 @@ export async function parseGtfsFiles(
 
 function parseCalendars(
   rawCalendars: z.infer<typeof calendarSchema>[],
-  rawCalendarDates: z.infer<typeof calendarDatesSchema>[]
+  rawCalendarDates: z.infer<typeof calendarDatesSchema>[],
 ): GtfsCalendar[] {
   return rawCalendars.map((c) => {
     const gtfsCalendarID = c.service_id;
@@ -59,18 +59,18 @@ function parseCalendars(
       c.thursday,
       c.friday,
       c.saturday,
-      c.sunday
+      c.sunday,
     );
     const start = c.start_date;
     const end = c.end_date;
     const additionalDates = rawCalendarDates
       .filter(
-        (d) => d.service_id == c.service_id && d.exception_type == "added"
+        (d) => d.service_id == c.service_id && d.exception_type == "added",
       )
       .map((d) => d.date);
     const exceptions = rawCalendarDates
       .filter(
-        (d) => d.service_id == c.service_id && d.exception_type == "removed"
+        (d) => d.service_id == c.service_id && d.exception_type == "removed",
       )
       .map((d) => d.date);
     return new GtfsCalendar(
@@ -80,7 +80,7 @@ function parseCalendars(
       start,
       end,
       additionalDates,
-      exceptions
+      exceptions,
     );
   });
 }
@@ -90,7 +90,7 @@ function parseTrips(
   rawTrips: z.infer<typeof tripsSchema>[],
   rawStopTimes: z.infer<typeof stopTimesSchema>[],
   stopMap: Map<number, StopID>,
-  parsingReport: GtfsParsingReport
+  parsingReport: GtfsParsingReport,
 ): GtfsTrip[] {
   rawTrips.sort((a, b) => a.trip_id.localeCompare(b.trip_id));
   rawStopTimes.sort((a, b) => a.trip_id.localeCompare(b.trip_id));
@@ -139,8 +139,8 @@ function parseTrips(
         associatedLines,
         route,
         direction,
-        times
-      )
+        times,
+      ),
     );
     parsingReport.logAcceptedTrip();
   }
@@ -153,7 +153,7 @@ function parseTrips(
         tripIndex++;
         if (tripIndex >= rawTrips.length) {
           throw new Error(
-            "Trips mentioned in stop_times.txt are not present in trips.txt."
+            "Trips mentioned in stop_times.txt are not present in trips.txt.",
           );
         }
       }
@@ -174,7 +174,7 @@ function parseTrips(
 
 async function readCsv<T extends z.ZodType>(
   path: string,
-  schema: T
+  schema: T,
 ): Promise<z.infer<T>[]> {
   return await new Promise((resolve) => {
     const results: z.infer<T>[] = [];
@@ -182,7 +182,7 @@ async function readCsv<T extends z.ZodType>(
       .pipe(
         csvParser({
           mapHeaders: ({ header }) => header.trim(),
-        })
+        }),
       )
       .on("data", (row) => {
         results.push(schema.parse(row));

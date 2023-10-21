@@ -15,7 +15,7 @@ const maxCount = 20;
 
 export async function departuresApi(
   ctx: TrainQuery,
-  params: ServerParams
+  params: ServerParams,
 ): Promise<object> {
   const feedsString = requireParam(params, "feeds");
   const feeds = DepartureFeed.decode(feedsString);
@@ -24,18 +24,18 @@ export async function departuresApi(
   }
   if (feeds.length > maxFeeds || feeds.some((f) => f.count > maxCount)) {
     throw new BadApiCallError(
-      `Too many feeds or too many departures per feed.`
+      `Too many feeds or too many departures per feed.`,
     );
   }
 
   const time = requireDateTimeParam(params, "time");
 
   const buckets = feeds.map(
-    (f) => new FilteredBucket(ctx, f.stop, f.count, f.filter)
+    (f) => new FilteredBucket(ctx, f.stop, f.count, f.filter),
   );
   const uniqueStops = unique(
     feeds.map((f) => f.stop),
-    (a, b) => a == b
+    (a, b) => a == b,
   );
 
   uniqueStops.forEach((s) => {
@@ -44,7 +44,7 @@ export async function departuresApi(
       s,
       time,
       buckets.filter((b) => b.stop == s),
-      specificizeDeparture
+      specificizeDeparture,
     );
   });
 

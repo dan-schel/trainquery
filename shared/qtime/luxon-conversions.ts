@@ -7,7 +7,7 @@ import { QTime } from "./qtime";
 export function getOffset(
   date: QDate,
   zoneID: string,
-  offsetCheckHour: number
+  offsetCheckHour: number,
 ) {
   const localTime = DateTime.local(
     date.year,
@@ -16,7 +16,7 @@ export function getOffset(
     offsetCheckHour,
     0,
     0,
-    { zone: zoneID }
+    { zone: zoneID },
   );
   const utcTime = localTime.toUTC();
   const offsetUtc = localTime.setZone("utc", { keepLocalTime: true });
@@ -25,7 +25,7 @@ export function getOffset(
 
 export function toLocalDateTimeLuxon(
   config: HasSharedConfig,
-  input: QUtcDateTime
+  input: QUtcDateTime,
 ): QLocalDateTime {
   if ("offset" in config.shared.timezone) {
     const offset = config.shared.timezone.offset;
@@ -33,7 +33,7 @@ export function toLocalDateTimeLuxon(
     return new QLocalDateTime(
       input.date.addDays(offsetTime.days),
       offsetTime.time,
-      offset
+      offset,
     );
   }
 
@@ -43,7 +43,7 @@ export function toLocalDateTimeLuxon(
     input.date.day,
     input.time.hour,
     input.time.minute,
-    input.time.second
+    input.time.second,
   );
   const converted = luxonUTC.setZone(config.shared.timezone.id);
   const offsetLocal = luxonUTC.setZone(config.shared.timezone.id, {
@@ -54,12 +54,12 @@ export function toLocalDateTimeLuxon(
   const convertedDate = new QDate(
     converted.year,
     converted.month,
-    converted.day
+    converted.day,
   );
   const convertedTime = new QTime(
     converted.hour,
     converted.minute,
-    converted.second
+    converted.second,
   );
   return new QLocalDateTime(convertedDate, convertedTime, offset);
 }
@@ -68,7 +68,7 @@ export function nowUTCLuxon(): QUtcDateTime {
   const now = DateTime.utc();
   return new QUtcDateTime(
     new QDate(now.year, now.month, now.day),
-    new QTime(now.hour, now.minute, now.second)
+    new QTime(now.hour, now.minute, now.second),
   );
 }
 
@@ -79,7 +79,7 @@ export function nowLocalLuxon(config: HasSharedConfig): QLocalDateTime {
 export function buildLocalDateTimeLuxon(
   config: HasSharedConfig,
   date: QDate,
-  time: QTime
+  time: QTime,
 ): QLocalDateTime {
   if ("offset" in config.shared.timezone) {
     const offset = config.shared.timezone.offset;
@@ -94,7 +94,7 @@ export function buildLocalDateTimeLuxon(
       time.hour,
       time.minute,
       time.second,
-      { zone: config.shared.timezone.id }
+      { zone: config.shared.timezone.id },
     ).offset / 60;
   return new QLocalDateTime(date, time, offset);
 }

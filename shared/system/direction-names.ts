@@ -5,7 +5,7 @@ import { mapJson } from "../utils";
 /** Provides the strings used for the stop and line page URLs. */
 export class DirectionNames {
   constructor(
-    readonly names: Map<DirectionID, { regular: string; capital: string }>
+    readonly names: Map<DirectionID, { regular: string; capital: string }>,
   ) {}
 
   getName(direction: DirectionID, capital: boolean) {
@@ -21,7 +21,7 @@ export class DirectionNames {
     z.object({
       regular: z.string(),
       capital: z.string(),
-    })
+    }),
   ).transform((x) => new DirectionNames(x));
 
   toJSON(): z.input<typeof DirectionNames.json> {

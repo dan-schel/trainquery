@@ -16,7 +16,7 @@ export type Specificizer<T> = (
   ctx: TrainQuery,
   entry: FullTimetableEntry,
   date: QDate,
-  perspectiveIndex: number
+  perspectiveIndex: number,
 ) => T;
 
 export function getDepartures<T>(
@@ -33,7 +33,7 @@ export function getDepartures<T>(
     reverse?: boolean;
     filterLines?: LineID[] | null;
     maxIteration?: number;
-  } = {}
+  } = {},
 ) {
   const lines = getRelevantLines(ctx, stop, filterLines);
   const getPossibilities = (iteration: number) =>
@@ -47,7 +47,7 @@ export function getDepartures<T>(
     for (const possibility of possibilities) {
       // Determine which buckets (if any) want this departure.
       const approvingBuckets = buckets.filter(
-        (b) => !b.isFull() && b.willAccept(possibility)
+        (b) => !b.isFull() && b.willAccept(possibility),
       );
       if (approvingBuckets.length > 0) {
         // This operation is treated as being potentially expensive, which is
@@ -56,7 +56,7 @@ export function getDepartures<T>(
           ctx,
           possibility.entry,
           possibility.date,
-          possibility.perspectiveIndex
+          possibility.perspectiveIndex,
         );
         approvingBuckets.forEach((b) => b.push(specificized));
       }
@@ -74,7 +74,7 @@ export function getDepartures<T>(
 function getRelevantLines(
   ctx: TrainQuery,
   stop: StopID,
-  filterLines: LineID[] | null
+  filterLines: LineID[] | null,
 ) {
   const stoppingLines = linesThatStopAt(ctx.getConfig(), stop).map((l) => l.id);
   if (filterLines == null) {

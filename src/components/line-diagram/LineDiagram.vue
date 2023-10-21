@@ -13,7 +13,7 @@ const stopList = computed(() => {
   function stopType(
     stops: LineDiagramStop<ServedData, ExpressData>[],
     type: string,
-    transparentTo: number
+    transparentTo: number,
   ) {
     return stops.map((s, i) => ({
       type: type,

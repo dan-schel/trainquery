@@ -4,7 +4,7 @@ export class QCache<K, V> {
   constructor(
     private readonly _calculate: (value: K) => V,
     private readonly _hashify: (value: K) => string,
-    private readonly _maxSize: number
+    private readonly _maxSize: number,
   ) {
     this._map = new Map();
   }

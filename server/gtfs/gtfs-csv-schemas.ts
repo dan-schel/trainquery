@@ -127,7 +127,7 @@ export const calendarDatesSchema = z.object({
       ({
         "1": "added" as const,
         "2": "removed" as const,
-      }[x])
+      })[x],
   ),
 });
 

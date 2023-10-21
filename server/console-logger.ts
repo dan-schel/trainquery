@@ -17,7 +17,7 @@ export class ConsoleLogger extends Logger {
     const hash = config.hash;
     const verb = initial ? "Loaded" : "Refreshed";
     console.log(
-      `${verb} config "${hash}" (${stopCount} stop(s), ${lineCount} line(s)).`
+      `${verb} config "${hash}" (${stopCount} stop(s), ${lineCount} line(s)).`,
     );
   }
 

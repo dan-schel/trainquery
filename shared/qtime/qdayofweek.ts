@@ -16,10 +16,10 @@ const _names = [
 const _cache = new QCache<QDate, QDayOfWeek>(
   (d) =>
     new QDayOfWeek(
-      posMod(new Date(d.year, d.month - 1, d.day).getDay() - 1, 7)
+      posMod(new Date(d.year, d.month - 1, d.day).getDay() - 1, 7),
     ),
   (d) => d.toISO(),
-  100
+  100,
 );
 
 export class QDayOfWeek {

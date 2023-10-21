@@ -14,7 +14,7 @@ defineEmits<{
 }>();
 
 const nonHiddenItems = computed(() =>
-  props.items.filter((i) => !(i.hideOnDesktop ?? false))
+  props.items.filter((i) => !(i.hideOnDesktop ?? false)),
 );
 </script>
 

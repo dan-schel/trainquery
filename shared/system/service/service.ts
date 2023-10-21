@@ -23,7 +23,7 @@ export class Service<
     | KnownPerspectivePattern =
     | CompletePattern
     | KnownOriginPattern
-    | KnownPerspectivePattern
+    | KnownPerspectivePattern,
 > {
   constructor(
     readonly line: LineID,
@@ -33,6 +33,6 @@ export class Service<
     readonly pattern: Pattern,
     readonly staticID: StaticServiceID | null,
     readonly sources: ServiceSource[],
-    readonly continuation: Continuation | null
+    readonly continuation: Continuation | null,
   ) {}
 }

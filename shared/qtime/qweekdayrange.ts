@@ -9,7 +9,7 @@ export class QWeekdayRange {
     readonly thu: boolean,
     readonly fri: boolean,
     readonly sat: boolean,
-    readonly sun: boolean
+    readonly sun: boolean,
   ) {}
 
   static readonly json = z.string().transform((x, ctx) => {
@@ -48,7 +48,7 @@ export class QWeekdayRange {
       input[3] == "T",
       input[4] == "F",
       input[5] == "S",
-      input[6] == "S"
+      input[6] == "S",
     );
   }
 

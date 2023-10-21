@@ -60,8 +60,8 @@ export default viteSSR(
 
       const res = await fetch(
         `${baseUrl}/api/ssrRouteProps?page=${String(
-          to.name
-        )}&path=${encodeURIComponent(to.fullPath)}`
+          to.name,
+        )}&path=${encodeURIComponent(to.fullPath)}`,
       );
 
       to.meta.state = {
@@ -101,5 +101,5 @@ export default viteSSR(
     }
 
     return { head };
-  }
+  },
 );

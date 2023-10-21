@@ -13,7 +13,10 @@ defineEmits<{
       type="checkbox"
       autocomplete="off"
       :checked="modelValue"
-      @change="(e) => $emit('update:modelValue', (e.target as HTMLInputElement).checked)"
+      @change="
+        (e) =>
+          $emit('update:modelValue', (e.target as HTMLInputElement).checked)
+      "
     />
     <div>
       <div class="switch-graphic"></div>

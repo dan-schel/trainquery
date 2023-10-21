@@ -17,7 +17,7 @@ export class OffsetCalculator {
           return getOffset(d, config.id, config.offsetCheckHour);
         },
         (d) => d.toISO(),
-        100
+        100,
       );
     }
   }

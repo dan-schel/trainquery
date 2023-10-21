@@ -8,7 +8,7 @@ export class GtfsParsingReport {
     readonly unsupportedGtfsStopIDs: Set<number>,
     readonly unsupportedRoutes: StopID[][],
     private _rejectedTrips: number,
-    private _acceptedTrips: number
+    private _acceptedTrips: number,
   ) {}
 
   static blank() {
@@ -28,8 +28,8 @@ export class GtfsParsingReport {
           new Set(x.unsupportedGtfsStopIDs),
           x.unsupportedRoutes,
           x.rejectedTrips,
-          x.acceptedTrips
-        )
+          x.acceptedTrips,
+        ),
     );
 
   toJSON(): z.input<typeof GtfsParsingReport.json> {
@@ -116,7 +116,7 @@ export class GtfsParsingReport {
       new Set(...reports.map((r) => r.unsupportedGtfsStopIDs.values()).flat()),
       reports.map((r) => r.unsupportedRoutes).flat(),
       reports.reduce((sum, r) => sum + r.rejectedTrips, 0),
-      reports.reduce((sum, r) => sum + r.acceptedTrips, 0)
+      reports.reduce((sum, r) => sum + r.acceptedTrips, 0),
     );
   }
 }

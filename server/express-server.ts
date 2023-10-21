@@ -12,15 +12,18 @@ export class ExpressServer extends Server {
     readonly port: number,
     private readonly _setupFrontend: (
       ctx: TrainQuery,
-      app: Express
-    ) => Promise<void>
+      app: Express,
+    ) => Promise<void>,
   ) {
     super();
   }
 
   async start(
     ctx: TrainQuery,
-    requestListener: (endpoint: string, params: ServerParams) => Promise<object>
+    requestListener: (
+      endpoint: string,
+      params: ServerParams,
+    ) => Promise<object>,
   ): Promise<void> {
     const app = express();
 

@@ -12,6 +12,6 @@ export function useNow() {
     {} as {
       local: Ref<QLocalDateTime>;
       utc: Ref<QUtcDateTime>;
-    }
+    },
   );
 }

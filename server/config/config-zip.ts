@@ -21,7 +21,7 @@ export async function loadConfigFromFiles(
   dataFolder: string,
   zipOrFolderPath: string,
   canonicalUrl: string,
-  logger?: Logger
+  logger?: Logger,
 ): Promise<ServerConfig> {
   const isDirectory = (await fsp.lstat(zipOrFolderPath)).isDirectory();
   if (isDirectory) {
@@ -48,7 +48,7 @@ export async function loadConfigFromFiles(
 async function loadShared(
   input: unknown,
   dataFolder: string,
-  canonicalUrl: string
+  canonicalUrl: string,
 ): Promise<SharedConfig> {
   const schema = z
     .object({ stops: z.string(), lines: z.string(), urlNames: z.string() })
@@ -70,7 +70,7 @@ async function loadShared(
 async function loadServer(
   input: unknown,
   dataFolder: string,
-  logger?: Logger
+  logger?: Logger,
 ): Promise<ServerOnlyConfig> {
   const schema = z
     .object({
@@ -87,17 +87,17 @@ async function loadServer(
   const timetables = await loadTimetables(
     dataFolder,
     server.timetables,
-    (path) => logger?.logTimetableLoadFail(path)
+    (path) => logger?.logTimetableLoadFail(path),
   );
   const platformRules = PlatformRules.json.parse(
-    await loadYml(dataFolder, server.platformRules, z.any())
+    await loadYml(dataFolder, server.platformRules, z.any()),
   );
   const gtfs =
     server.gtfs != null
       ? GtfsConfig.json.parse(await loadYml(dataFolder, server.gtfs, z.any()))
       : null;
   const linter = LinterRules.json.parse(
-    await loadYml(dataFolder, server.linter, z.any())
+    await loadYml(dataFolder, server.linter, z.any()),
   );
   const about = await loadText(dataFolder, server.about);
 
@@ -106,7 +106,7 @@ async function loadServer(
 
 async function loadFrontend(
   input: unknown,
-  dataFolder: string
+  dataFolder: string,
 ): Promise<FrontendOnlyConfig> {
   const schema = z.object({ departureFeeds: z.string() }).passthrough();
 
@@ -127,7 +127,7 @@ async function loadText(dataFolder: string, filePath: string) {
 async function loadYml<T extends ZodType>(
   dataFolder: string,
   filePath: string,
-  schema: T
+  schema: T,
 ): Promise<z.infer<T>> {
   const fullPath = path.join(dataFolder, filePath);
   const text = await fsp.readFile(fullPath, { encoding: "utf-8" });
@@ -137,7 +137,7 @@ async function loadYml<T extends ZodType>(
 async function loadTimetables(
   dataFolder: string,
   globString: string,
-  onFail: (path: string) => void
+  onFail: (path: string) => void,
 ): Promise<Timetable[]> {
   const files = await glob(globString, { cwd: dataFolder });
 

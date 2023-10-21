@@ -15,7 +15,7 @@ type FeedException = {
 export class DefaultDepartureFeeds {
   constructor(
     readonly defaultFeeds: PartialDepartureFeed[],
-    readonly exceptions: FeedException[]
+    readonly exceptions: FeedException[],
   ) {}
 
   getFeeds(
@@ -23,10 +23,10 @@ export class DefaultDepartureFeeds {
     {
       arrivals = undefined,
       setDownOnly = undefined,
-    }: { arrivals?: boolean; setDownOnly?: boolean } = {}
+    }: { arrivals?: boolean; setDownOnly?: boolean } = {},
   ) {
     const exception = this.exceptions.find((e) =>
-      e.stops.some((s) => s == stop)
+      e.stops.some((s) => s == stop),
     );
     if (exception != null) {
       return exception.feeds.map(
@@ -34,8 +34,8 @@ export class DefaultDepartureFeeds {
           new DepartureFeed(
             stop,
             f.count,
-            f.filter.with({ arrivals, setDownOnly })
-          )
+            f.filter.with({ arrivals, setDownOnly }),
+          ),
       );
     }
     return this.defaultFeeds.map(
@@ -43,8 +43,8 @@ export class DefaultDepartureFeeds {
         new DepartureFeed(
           stop,
           f.count,
-          f.filter.with({ arrivals, setDownOnly })
-        )
+          f.filter.with({ arrivals, setDownOnly }),
+        ),
     );
   }
 

@@ -18,7 +18,7 @@ export class DepartureFilter {
     null,
     null,
     false,
-    false
+    false,
   );
 
   constructor(
@@ -27,7 +27,7 @@ export class DepartureFilter {
     readonly platforms: PlatformID[] | null,
     readonly serviceTypes: ServiceTypeID[] | null,
     readonly arrivals: boolean,
-    readonly setDownOnly: boolean
+    readonly setDownOnly: boolean,
   ) {}
 
   with({
@@ -51,7 +51,7 @@ export class DepartureFilter {
       platforms === undefined ? this.platforms : platforms,
       serviceTypes === undefined ? this.serviceTypes : serviceTypes,
       arrivals === undefined ? this.arrivals : arrivals,
-      setDownOnly === undefined ? this.setDownOnly : setDownOnly
+      setDownOnly === undefined ? this.setDownOnly : setDownOnly,
     );
   }
 
@@ -80,28 +80,28 @@ export class DepartureFilter {
       filters.push(
         ...this.lines
           .map((l) => `line-${l.toFixed()}`)
-          .sort((a, b) => a.localeCompare(b))
+          .sort((a, b) => a.localeCompare(b)),
       );
     }
     if (this.directions != null) {
       filters.push(
         ...this.directions
           .map((d) => `direction-${d}`)
-          .sort((a, b) => a.localeCompare(b))
+          .sort((a, b) => a.localeCompare(b)),
       );
     }
     if (this.platforms != null) {
       filters.push(
         ...this.platforms
           .map((d) => `platform-${d}`)
-          .sort((a, b) => a.localeCompare(b))
+          .sort((a, b) => a.localeCompare(b)),
       );
     }
     if (this.serviceTypes != null) {
       filters.push(
         ...this.serviceTypes
           .map((d) => `service-type-${d}`)
-          .sort((a, b) => a.localeCompare(b))
+          .sort((a, b) => a.localeCompare(b)),
       );
     }
     if (this.arrivals && !ignoreArrivals) {
@@ -161,7 +161,7 @@ export class DepartureFilter {
       platforms.length == 0 ? null : platforms,
       serviceTypes.length == 0 ? null : serviceTypes,
       arrivals,
-      setDownOnly
+      setDownOnly,
     );
   }
 
@@ -170,7 +170,7 @@ export class DepartureFilter {
     {
       ignoreArrivals = false,
       ignoreSetDownOnly = false,
-    }: { ignoreArrivals?: boolean; ignoreSetDownOnly?: boolean } = {}
+    }: { ignoreArrivals?: boolean; ignoreSetDownOnly?: boolean } = {},
   ) {
     return (
       this.asString({ ignoreArrivals, ignoreSetDownOnly }) ==

@@ -20,6 +20,6 @@ export class ServerOnlyConfig {
      * The markdown code for the about page. Stored in server config so it's
      * only sent to the client when the about page is requested.
      */
-    readonly aboutMarkdown: string
+    readonly aboutMarkdown: string,
   ) {}
 }

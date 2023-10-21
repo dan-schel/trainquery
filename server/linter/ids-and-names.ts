@@ -3,35 +3,35 @@ import { LintContext, examplify, listDuplicated } from "./utils";
 export function lintUniqueIDs(ctx: LintContext) {
   const duplicatedStopIDs = listDuplicated(
     ctx.shared.stops.map((s) => s.id),
-    (a, b) => a == b
+    (a, b) => a == b,
   ).map((s) => s.toFixed());
   const duplicatedLineIDs = listDuplicated(
     ctx.shared.lines.map((s) => s.id),
-    (a, b) => a == b
+    (a, b) => a == b,
   ).map((l) => l.toFixed());
 
   ctx.logPluralizedError(
     duplicatedStopIDs,
     (a) => `${a} is used as a stop ID more than once.`,
     (a) => `${a} are used as stop IDs more than once.`,
-    examplify(duplicatedStopIDs, 3)
+    examplify(duplicatedStopIDs, 3),
   );
   ctx.logPluralizedError(
     duplicatedLineIDs,
     (a) => `${a} is used as a stop ID more than once.`,
     (a) => `${a} are used as stop IDs more than once.`,
-    examplify(duplicatedLineIDs, 3)
+    examplify(duplicatedLineIDs, 3),
   );
 }
 
 export function lintUniqueNames(ctx: LintContext) {
   const duplicatedStopNames = listDuplicated(
     ctx.shared.stops.map((s) => s.name),
-    (a, b) => a == b
+    (a, b) => a == b,
   ).map((s) => `"${s}"`);
   const duplicatedLineNames = listDuplicated(
     ctx.shared.lines.map((s) => s.name),
-    (a, b) => a == b
+    (a, b) => a == b,
   ).map((l) => `"${l}"`);
 
   if (duplicatedStopNames.length > 0) {
@@ -58,13 +58,13 @@ export function lintStopAndLineNames(ctx: LintContext) {
     failingStops,
     (a) => `${a} does not follow the stop naming convention.`,
     (a) => `${a} do not follow the stop naming convention.`,
-    examplify(failingStops, 3)
+    examplify(failingStops, 3),
   );
 
   ctx.logPluralizedWarning(
     failingLines,
     (a) => `${a} does not follow the line naming convention.`,
     (a) => `${a} do not follow the line naming convention.`,
-    examplify(failingLines, 3)
+    examplify(failingLines, 3),
   );
 }

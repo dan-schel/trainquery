@@ -22,7 +22,7 @@ const emit = defineEmits<{
 const typeable = ref(false);
 const typeableTime = ref(TypeableTime.blank);
 const typeableSubmitEnabled = computed(
-  () => typeableTime.value.extractTime() != null
+  () => typeableTime.value.extractTime() != null,
 );
 
 const timeComponents = computed(() => {
@@ -47,7 +47,7 @@ watch(
       ampm.value = timeComponents.value.ampm;
       typeable.value = false;
     }
-  }
+  },
 );
 watch([hours, minutes, ampm], ([newHour, newMinute, newAmpm]) => {
   // Ensure the model value is updated when the wheels are spun.

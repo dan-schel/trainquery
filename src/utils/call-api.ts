@@ -4,7 +4,7 @@ import { getConfig } from "./get-config";
 export async function callAPI<T extends z.ZodType>(
   endpoint: string,
   params: Record<string, string>,
-  schema: T
+  schema: T,
 ): Promise<z.infer<T>> {
   const paramStrings = [];
   for (const key of Object.keys(params)) {
@@ -14,7 +14,7 @@ export async function callAPI<T extends z.ZodType>(
   const raw = await resiliantFetch(
     paramStrings.length == 0
       ? `/api/${endpoint}`
-      : `/api/${endpoint}?${paramStrings.join("&")}`
+      : `/api/${endpoint}?${paramStrings.join("&")}`,
   );
 
   const json = z

@@ -33,7 +33,7 @@ async function createServer() {
     getDatabase(isOffline),
     new ConsoleLogger(),
     isOffline,
-    isProd
+    isProd,
   );
 }
 

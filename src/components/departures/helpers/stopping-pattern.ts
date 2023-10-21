@@ -8,7 +8,7 @@ import { CompletePattern } from "shared/system/service/complete-pattern";
 
 export function getStoppingPatternString(
   departure: Departure,
-  patternList: PatternList
+  patternList: PatternList,
 ): string {
   const name = (stop: StopID) => requireStop(getConfig(), stop).name;
 

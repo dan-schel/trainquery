@@ -9,7 +9,10 @@ import { getConfig } from "@/utils/get-config";
 const maxPinnedWidgets = 6;
 
 export class PinnedWidget {
-  constructor(readonly stop: StopID, readonly filter: DepartureFilter) {}
+  constructor(
+    readonly stop: StopID,
+    readonly filter: DepartureFilter,
+  ) {}
 
   static readonly json = z
     .object({
@@ -30,10 +33,10 @@ export class PinnedWidget {
 export function isPinned(
   settings: Settings,
   stop: StopID,
-  filter: DepartureFilter
+  filter: DepartureFilter,
 ) {
   return settings.pinnedWidgets.some(
-    (w) => w.stop == stop && w.filter.equals(filter)
+    (w) => w.stop == stop && w.filter.equals(filter),
   );
 }
 
@@ -44,12 +47,12 @@ export function canPin(settings: Settings) {
 export function togglePinnedWidget(
   settings: Settings,
   stop: StopID,
-  filter: DepartureFilter
+  filter: DepartureFilter,
 ): Settings {
   if (isPinned(settings, stop, filter)) {
     return settings.with({
       pinnedWidgets: settings.pinnedWidgets.filter(
-        (w) => w.stop != stop || !w.filter.equals(filter)
+        (w) => w.stop != stop || !w.filter.equals(filter),
       ),
     });
   } else if (canPin(settings)) {
@@ -67,18 +70,18 @@ export function togglePinnedWidget(
 
 export function validatePinnedWidgetsAgainstConfig(
   pinnedWidgets: PinnedWidget[],
-  logger: (msg: string) => void
+  logger: (msg: string) => void,
 ) {
   const okFilters = pinnedWidgets.filter(
     (w) =>
-      getStop(getConfig(), w.stop) != null && isValidFilter(w.filter, w.stop)
+      getStop(getConfig(), w.stop) != null && isValidFilter(w.filter, w.stop),
   );
   if (okFilters.length < pinnedWidgets.length) {
     const removed = pinnedWidgets.length - okFilters.length;
     logger(
       `${removed} ${
         removed == 1 ? "pinned widget was" : "pinned widgets were"
-      } removed due to config updates.`
+      } removed due to config updates.`,
     );
   }
   return okFilters;

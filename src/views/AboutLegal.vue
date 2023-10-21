@@ -56,7 +56,7 @@ const packages = computed(() =>
       licenseUrl: "https://github.com/vuejs/router/blob/main/LICENSE",
       copyright: "Copyright (c) 2019-present Eduardo San Martin Morote",
     },
-  ].sort((a, b) => a.name.localeCompare(b.name))
+  ].sort((a, b) => a.name.localeCompare(b.name)),
 );
 
 useHead({

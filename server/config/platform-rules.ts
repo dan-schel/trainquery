@@ -41,9 +41,9 @@ export class PlatformRules {
             return z.NEVER;
           }
           return result;
-        })
+        }),
       ),
-    })
+    }),
   ).transform((x) => new PlatformRules(x));
 
   get(stop: StopID) {
@@ -123,24 +123,24 @@ function matchesClause(clause: string, service: PlatformFilteringData) {
   } else if (absClause.startsWith("route-variant-")) {
     return negate(
       absClause == `route-variant-${service.routeVariant}`,
-      negated
+      negated,
     );
   } else if (absClause.startsWith("service-type-")) {
     return negate(absClause == `service-type-${service.serviceType}`, negated);
   } else if (absClause.startsWith("originates-at-")) {
     return negate(
       absClause == `originates-at-${service.origin.toFixed()}`,
-      negated
+      negated,
     );
   } else if (absClause.startsWith("stops-at-")) {
     return negate(
       service.stops.some((s) => absClause == `stops-at-${s.toFixed()}`),
-      negated
+      negated,
     );
   } else if (absClause.startsWith("terminates-at-")) {
     return negate(
       absClause == `terminates-at-${service.terminus.toFixed()}`,
-      negated
+      negated,
     );
   } else if (absClause == `weekend`) {
     return negate(service.dayOfWeek.isWeekend(), negated);
