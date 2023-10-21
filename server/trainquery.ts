@@ -75,7 +75,7 @@ export async function trainQuery(
     }
     throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
   });
-  logger.logListening(server);
+  logger.logServerListening(server);
 
   return ctx;
 }
@@ -98,14 +98,20 @@ export abstract class ConfigProvider {
 }
 
 export abstract class Logger {
-  abstract logListening(server: Server): void;
+  abstract logServerListening(server: Server): void;
   abstract logConfigRefresh(config: FullConfig, initial: boolean): void;
   abstract logTimetableLoadFail(path: string): void;
-  abstract logGtfsDownloadError(err: unknown): void;
-  abstract logLoadingGtfs(): void;
-  abstract logGtfsReady(): void;
+
+  abstract logRecallingGtfs(): void;
+  abstract logRecallingGtfsSuccess(): void;
+  abstract logRecallingGtfsEmpty(): void;
+  abstract logRecallingGtfsFailure(err: unknown): void;
+  abstract logDownloadingGtfs(): void;
+  abstract logDownloadingGtfsSuccess(): void;
+  abstract logDownloadingGtfsFailure(err: unknown): void;
   abstract logPersistingGtfs(): void;
-  abstract logGtfsPersisted(): void;
+  abstract logPersistingGtfsSuccess(): void;
+  abstract logPersistingGtfsFailure(err: unknown): void;
 }
 
 function hashify(ctx: TrainQuery, result: object) {

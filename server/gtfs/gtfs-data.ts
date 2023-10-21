@@ -13,6 +13,7 @@ import {
 import { GtfsParsingReport } from "./gtfs-parsing-report";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { z } from "zod";
+import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 
 export class GtfsData {
   constructor(
@@ -60,6 +61,10 @@ export class GtfsData {
       parsingReport: this.parsingReport.toJSON(),
       age: this.age.toJSON(),
     };
+  }
+
+  isOld(refreshSeconds: number) {
+    return this.age.isBeforeOrEqual(nowUTCLuxon().add({ s: -refreshSeconds }));
   }
 }
 

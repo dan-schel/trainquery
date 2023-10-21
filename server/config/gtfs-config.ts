@@ -2,24 +2,6 @@ import { z } from "zod";
 import { StopID, StopIDJson } from "../../shared/system/ids";
 import { IntStringJson, mapJson } from "../../shared/utils";
 
-export const RefreshPolicies = ["always", "when-stale", "production"] as const;
-export type RefreshPolicy = (typeof RefreshPolicies)[number];
-export const RefreshPolicyJson = z.enum(RefreshPolicies);
-
-export class GtfsPersistenceConfig {
-  constructor(
-    readonly refresh: RefreshPolicy,
-    readonly refreshSeconds: number,
-  ) {}
-
-  static readonly json = z
-    .object({
-      refresh: RefreshPolicyJson,
-      refreshSeconds: z.number(),
-    })
-    .transform((x) => new GtfsPersistenceConfig(x.refresh, x.refreshSeconds));
-}
-
 export class GtfsFeedConfig {
   constructor(
     /** Maps the stop IDs used by GTFS to the ones used by TrainQuery. */
@@ -54,7 +36,8 @@ export class GtfsSubfeedConfig extends GtfsFeedConfig {
 export class GtfsConfig<UsesSubfeeds extends boolean> {
   constructor(
     readonly staticUrl: string,
-    readonly persist: GtfsPersistenceConfig | null,
+    readonly refreshSeconds: number,
+    readonly persist: boolean,
     readonly usesSubfeeds: UsesSubfeeds,
     readonly subfeeds: UsesSubfeeds extends true ? GtfsSubfeedConfig[] : null,
     readonly feed: UsesSubfeeds extends false ? GtfsFeedConfig : null,
@@ -64,21 +47,32 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
     z
       .object({
         staticUrl: z.string(),
-        persist: GtfsPersistenceConfig.json.nullable(),
+        refreshSeconds: z.number(),
+        persist: z.boolean(),
         subfeeds: GtfsSubfeedConfig.json.array(),
-      })
-      .transform(
-        (x) => new GtfsConfig(x.staticUrl, x.persist, true, x.subfeeds, null),
-      ),
-    GtfsFeedConfig.rawJson
-      .extend({
-        staticUrl: z.string(),
-        persist: GtfsPersistenceConfig.json.nullable(),
       })
       .transform(
         (x) =>
           new GtfsConfig(
             x.staticUrl,
+            x.refreshSeconds,
+            x.persist,
+            true,
+            x.subfeeds,
+            null,
+          ),
+      ),
+    GtfsFeedConfig.rawJson
+      .extend({
+        staticUrl: z.string(),
+        refreshSeconds: z.number(),
+        persist: z.boolean(),
+      })
+      .transform(
+        (x) =>
+          new GtfsConfig(
+            x.staticUrl,
+            x.refreshSeconds,
             x.persist,
             false,
             null,

@@ -1,5 +1,5 @@
 import { Collection, MongoClient, Document } from "mongodb";
-import { GtfsData } from "./gtfs/gtfs-data";
+import { GtfsCalendar, GtfsData, GtfsTrip } from "./gtfs/gtfs-data";
 
 type DBs = {
   gtfs: {
@@ -40,9 +40,29 @@ export class TrainQueryDB {
     };
   }
 
+  get dbs(): DBs {
+    if (this._dbs == null) {
+      throw new Error(
+        "Database references not initialized. Did you forget to call init()?",
+      );
+    }
+    return this._dbs;
+  }
+
   async fetchGtfs(): Promise<GtfsData | null> {
-    // TODO: Do something :)
-    return null;
+    const metadataDoc = await this.dbs.gtfs.metadata.findOne();
+    if (metadataDoc == null) {
+      return null;
+    }
+
+    const metadata = GtfsData.metadataJson.parse(metadataDoc);
+    const calendars = GtfsCalendar.json
+      .array()
+      .parse(await this.dbs.gtfs.calendars.find().toArray());
+    const trips = GtfsTrip.json
+      .array()
+      .parse(await this.dbs.gtfs.trips.find().toArray());
+    return new GtfsData(calendars, trips, metadata.parsingReport, metadata.age);
   }
 
   async writeGtfs(gtfsData: GtfsData) {
@@ -55,20 +75,5 @@ export class TrainQueryDB {
       gtfsData.calendars.map((c) => c.toJSON()),
     );
     await this.dbs.gtfs.trips.insertMany(gtfsData.trips.map((t) => t.toJSON()));
-  }
-
-  private _requireClient(): MongoClient {
-    if (this._client == null) {
-      throw new Error("Client not initialized. Did you forget to call init()?");
-    }
-    return this._client;
-  }
-  get dbs(): DBs {
-    if (this._dbs == null) {
-      throw new Error(
-        "Database references not initialized. Did you forget to call init()?",
-      );
-    }
-    return this._dbs;
   }
 }
