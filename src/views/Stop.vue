@@ -24,7 +24,7 @@ const route = useRoute();
 function parseParams() {
   const stop = requireStopFromUrlName(
     getConfig(),
-    requiredParam(route.params.id)
+    requiredParam(route.params.id),
   );
 
   let filter = DepartureFilter.default;
@@ -79,7 +79,7 @@ watch([stop], () => {
 });
 watch([filter, time], () => {
   router.replace(
-    getStopPageRoute(getConfig(), stop.value.id, time.value, filter.value)
+    getStopPageRoute(getConfig(), stop.value.id, time.value, filter.value),
   );
 });
 
@@ -99,7 +99,7 @@ const feeds = computed(() => {
 const lines = computed(() =>
   linesThatStopAt(getConfig(), stop.value.id, {
     ignoreSpecialEventsOnlyLines: true,
-  }).map((l) => l.id)
+  }).map((l) => l.id),
 );
 
 const head = computed(() => ({

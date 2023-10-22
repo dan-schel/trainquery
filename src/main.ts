@@ -41,7 +41,13 @@ export default viteSSR(
 
     // Download route props when navigating pages (the first route's props are
     // downloaded with this code too, but on the server during SSR).
-    router.beforeEach(async (to, _from, next) => {
+    router.beforeEach(async (to, from, next) => {
+      // When applying a filter on the stop page, a full page reload is not
+      // required, but I still want to change the URL, ok?
+      if (to.name == "stop" && to.path == from.path) {
+        return next();
+      }
+
       startedNavigating();
 
       // I get several of these calls when loading every page for some reason.
@@ -60,8 +66,8 @@ export default viteSSR(
 
       const res = await fetch(
         `${baseUrl}/api/ssrRouteProps?page=${String(
-          to.name
-        )}&path=${encodeURIComponent(to.fullPath)}`
+          to.name,
+        )}&path=${encodeURIComponent(to.fullPath)}`,
       );
 
       to.meta.state = {
@@ -101,5 +107,5 @@ export default viteSSR(
     }
 
     return { head };
-  }
+  },
 );
