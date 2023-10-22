@@ -104,8 +104,9 @@ useHead(head);
 
   <NotFoundLayout
     :title="title.short"
-    message="That train can't be found right now. It might be from an old timetable, no longer running, or not stopping here anymore."
+    message="This train can't be found right now. It might be from an old timetable, no longer running, or not stopping here anymore."
     v-if="train == null"
+    v-bind="$attrs"
   ></NotFoundLayout>
 </template>
 

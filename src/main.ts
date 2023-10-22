@@ -4,11 +4,7 @@ import App from "./App.vue";
 import routes from "./router/routes";
 import viteSSR from "vite-ssr/vue";
 import { createHead } from "@vueuse/head";
-import { getConfig, initConfig, provideConfig } from "./utils/get-config";
-import {
-  getLineFromUrlName,
-  getStopFromUrlName,
-} from "shared/system/config-utils";
+import { initConfig, provideConfig } from "./utils/get-config";
 import { FrontendConfig } from "shared/system/config/frontend-config";
 import {
   finishedNavigating,
@@ -75,23 +71,6 @@ export default viteSSR(
         route: await res.json(),
       };
       next();
-    });
-
-    router.beforeEach(async (to, _from, next) => {
-      if (
-        to.name == "line" &&
-        getLineFromUrlName(getConfig(), to.params.id as string) == null
-      ) {
-        await router.replace("/error/notfound");
-      }
-      if (
-        to.name == "stop" &&
-        getStopFromUrlName(getConfig(), to.params.id as string) == null
-      ) {
-        await router.replace("/error/notfound");
-      }
-
-      return next();
     });
 
     router.afterEach(() => {

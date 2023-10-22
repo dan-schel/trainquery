@@ -10,6 +10,6 @@ useHead({
 <template>
   <NotFoundLayout
     title="Page not found"
-    message="That page doesn't exist, at least not anymore!"
+    message="This page doesn't exist, at least not anymore!"
   ></NotFoundLayout>
 </template>
