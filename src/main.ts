@@ -4,11 +4,7 @@ import App from "./App.vue";
 import routes from "./router/routes";
 import viteSSR from "vite-ssr/vue";
 import { createHead } from "@vueuse/head";
-import { getConfig, initConfig, provideConfig } from "./utils/get-config";
-import {
-  getLineFromUrlName,
-  getStopFromUrlName,
-} from "shared/system/config-utils";
+import { initConfig, provideConfig } from "./utils/get-config";
 import { FrontendConfig } from "shared/system/config/frontend-config";
 import {
   finishedNavigating,
@@ -41,7 +37,13 @@ export default viteSSR(
 
     // Download route props when navigating pages (the first route's props are
     // downloaded with this code too, but on the server during SSR).
-    router.beforeEach(async (to, _from, next) => {
+    router.beforeEach(async (to, from, next) => {
+      // When applying a filter on the stop page, a full page reload is not
+      // required, but I still want to change the URL, ok?
+      if (to.name == "stop" && to.path == from.path) {
+        return next();
+      }
+
       startedNavigating();
 
       // I get several of these calls when loading every page for some reason.
@@ -60,8 +62,8 @@ export default viteSSR(
 
       const res = await fetch(
         `${baseUrl}/api/ssrRouteProps?page=${String(
-          to.name
-        )}&path=${encodeURIComponent(to.fullPath)}`
+          to.name,
+        )}&path=${encodeURIComponent(to.fullPath)}`,
       );
 
       to.meta.state = {
@@ -69,23 +71,6 @@ export default viteSSR(
         route: await res.json(),
       };
       next();
-    });
-
-    router.beforeEach(async (to, _from, next) => {
-      if (
-        to.name == "line" &&
-        getLineFromUrlName(getConfig(), to.params.id as string) == null
-      ) {
-        await router.replace("/error/notfound");
-      }
-      if (
-        to.name == "stop" &&
-        getStopFromUrlName(getConfig(), to.params.id as string) == null
-      ) {
-        await router.replace("/error/notfound");
-      }
-
-      return next();
     });
 
     router.afterEach(() => {
@@ -101,5 +86,5 @@ export default viteSSR(
     }
 
     return { head };
-  }
+  },
 );

@@ -4,7 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import {
   getStopPageRoute,
   linesThatStopAt,
-  requireStopFromUrlName,
+  getStopFromUrlName,
 } from "shared/system/config-utils";
 import { computed, ref, watch } from "vue";
 import { getConfig } from "@/utils/get-config";
@@ -17,15 +17,22 @@ import { DepartureFilter } from "shared/system/timetable/departure-filter";
 import { QLocalDateTime } from "shared/qtime/qdatetime";
 import { nullableEquals, requiredParam, unparam } from "@/utils/param-utils";
 import { isValidFilter } from "@/components/departures/helpers/available-filters";
+import NotFoundLayout from "@/components/NotFoundLayout.vue";
+import { itsOk } from "@schel-d/js-utils";
 
 const router = useRouter();
 const route = useRoute();
 
 function parseParams() {
-  const stop = requireStopFromUrlName(
-    getConfig(),
-    requiredParam(route.params.id)
-  );
+  const stop = getStopFromUrlName(getConfig(), requiredParam(route.params.id));
+
+  if (stop == null) {
+    return {
+      stop: null,
+      filter: DepartureFilter.default,
+      time: null,
+    };
+  }
 
   let filter = DepartureFilter.default;
   const filterString = unparam(route.query.filter);
@@ -79,13 +86,22 @@ watch([stop], () => {
 });
 watch([filter, time], () => {
   router.replace(
-    getStopPageRoute(getConfig(), stop.value.id, time.value, filter.value)
+    getStopPageRoute(
+      getConfig(),
+      itsOk(stop.value).id,
+      time.value,
+      filter.value,
+    ),
   );
 });
 
 const isDefaultFilter = computed(() => filter.value.isDefault());
 
 const feeds = computed(() => {
+  if (stop.value == null) {
+    return [];
+  }
+
   if (isDefaultFilter.value) {
     // Use the default feeds for this stop
     return getConfig().frontend.departureFeeds.getFeeds(stop.value.id, {
@@ -96,28 +112,46 @@ const feeds = computed(() => {
   return [new DepartureFeed(stop.value.id, 10, filter.value)];
 });
 
-const lines = computed(() =>
-  linesThatStopAt(getConfig(), stop.value.id, {
-    ignoreSpecialEventsOnlyLines: true,
-  }).map((l) => l.id)
-);
+const lines = computed(() => {
+  if (stop.value == null) {
+    return [];
+  }
 
-const head = computed(() => ({
-  title: stop.value.name,
-  link: [
-    {
-      rel: "canonical",
-      href:
-        getConfig().shared.canonicalUrl +
-        getStopPageRoute(getConfig(), stop.value.id, null, null),
-    },
-  ],
-}));
+  return linesThatStopAt(getConfig(), stop.value.id, {
+    ignoreSpecialEventsOnlyLines: true,
+  }).map((l) => l.id);
+});
+
+const head = computed(() => {
+  if (stop.value == null) {
+    return {
+      title: "Stop not found",
+      meta: [{ name: "robots", content: "noindex" }],
+    };
+  }
+
+  return {
+    title: stop.value.name,
+    link: [
+      {
+        rel: "canonical",
+        href:
+          getConfig().shared.canonicalUrl +
+          getStopPageRoute(getConfig(), stop.value.id, null, null),
+      },
+    ],
+  };
+});
 useHead(head);
 </script>
 
 <template>
-  <PageContent :title="`${stop.name}`" title-margin="0.5rem">
+  <PageContent
+    :title="`${stop.name}`"
+    title-margin="0.5rem"
+    v-if="stop != null"
+    v-bind="$attrs"
+  >
     <LineList :lines="lines"></LineList>
     <DepartureControls
       class="controls"
@@ -136,6 +170,13 @@ useHead(head);
       :center-single="false"
     ></DepartureGroup>
   </PageContent>
+
+  <NotFoundLayout
+    title="Stop not found"
+    message="This stop doesn't exist, at least not anymore!"
+    v-if="stop == null"
+    v-bind="$attrs"
+  ></NotFoundLayout>
 </template>
 
 <style scoped lang="scss">
