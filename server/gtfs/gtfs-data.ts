@@ -129,9 +129,15 @@ export class GtfsCalendar {
 
 export class GtfsTrip {
   constructor(
-    readonly gtfsTripID: string,
+    /**
+     * This trip might be multiple duplicated trips from different calendars
+     * combined.
+     */
+    readonly idPairs: {
+      gtfsTripID: string;
+      gtfsCalendarID: string;
+    }[],
     readonly gtfsSubfeedID: string | null,
-    readonly gtfsCalendarID: string,
     readonly line: LineID,
     readonly associatedLines: LineID[],
     readonly route: RouteVariantID,
@@ -141,9 +147,13 @@ export class GtfsTrip {
 
   static readonly json = z
     .object({
-      gtfsTripID: z.string(),
+      idPairs: z
+        .object({
+          gtfsTripID: z.string(),
+          gtfsCalendarID: z.string(),
+        })
+        .array(),
       gtfsSubfeedID: z.string().nullable(),
-      gtfsCalendarID: z.string(),
       line: LineIDJson,
       associatedLines: LineIDJson.array(),
       route: RouteVariantIDJson,
@@ -153,9 +163,8 @@ export class GtfsTrip {
     .transform(
       (x) =>
         new GtfsTrip(
-          x.gtfsTripID,
+          x.idPairs,
           x.gtfsSubfeedID,
-          x.gtfsCalendarID,
           x.line,
           x.associatedLines,
           x.route,
@@ -166,9 +175,20 @@ export class GtfsTrip {
 
   withSubfeedID(subfeedID: string): GtfsTrip {
     return new GtfsTrip(
-      this.gtfsTripID,
+      this.idPairs,
       subfeedID,
-      this.gtfsCalendarID,
+      this.line,
+      this.associatedLines,
+      this.route,
+      this.direction,
+      this.times,
+    );
+  }
+
+  addIDPair(idPair: { gtfsTripID: string; gtfsCalendarID: string }): GtfsTrip {
+    return new GtfsTrip(
+      [...this.idPairs, idPair],
+      this.gtfsSubfeedID,
       this.line,
       this.associatedLines,
       this.route,
@@ -179,14 +199,22 @@ export class GtfsTrip {
 
   toJSON(): z.input<typeof GtfsTrip.json> {
     return {
-      gtfsTripID: this.gtfsTripID,
+      idPairs: this.idPairs,
       gtfsSubfeedID: this.gtfsSubfeedID,
-      gtfsCalendarID: this.gtfsCalendarID,
       line: this.line,
       associatedLines: this.associatedLines,
       route: this.route,
       direction: this.direction,
       times: this.times.map((t) => t?.toJSON() ?? null),
     };
+  }
+
+  get hashKey() {
+    return JSON.stringify({
+      line: this.line,
+      route: this.route,
+      direction: this.direction,
+      times: this.times.map((t) => t?.toJSON() ?? null),
+    });
   }
 }

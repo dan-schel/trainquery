@@ -95,7 +95,7 @@ function parseTrips(
   rawTrips.sort((a, b) => a.trip_id.localeCompare(b.trip_id));
   rawStopTimes.sort((a, b) => a.trip_id.localeCompare(b.trip_id));
 
-  const result: GtfsTrip[] = [];
+  const result = new Map<string, GtfsTrip>();
 
   let thisTrip: {
     stop: number | null;
@@ -130,19 +130,26 @@ function parseTrips(
     const { line, associatedLines, route, direction } = match;
     const times = match.values;
 
-    result.push(
-      new GtfsTrip(
-        gtfsTripID,
-        null,
-        gtfsCalendarID,
-        line,
-        associatedLines,
-        route,
-        direction,
-        times,
-      ),
+    const idPair = { gtfsTripID: gtfsTripID, gtfsCalendarID: gtfsCalendarID };
+    const parsedTrip = new GtfsTrip(
+      [idPair],
+      null,
+      line,
+      associatedLines,
+      route,
+      direction,
+      times,
     );
-    parsingReport.logAcceptedTrip();
+    const hashKey = parsedTrip.hashKey;
+
+    const existing = result.get(hashKey);
+    if (existing != null) {
+      result.set(hashKey, existing.addIDPair(idPair));
+      parsingReport.logDuplicatedTrip();
+    } else {
+      result.set(hashKey, parsedTrip);
+      parsingReport.logAcceptedTrip();
+    }
   }
 
   for (let i = 0; i < rawStopTimes.length; i++) {
@@ -169,7 +176,7 @@ function parseTrips(
   }
   addResult();
 
-  return result;
+  return Array.from(result.values());
 }
 
 async function readCsv<T extends z.ZodType>(

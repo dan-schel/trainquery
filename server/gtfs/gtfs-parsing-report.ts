@@ -9,10 +9,11 @@ export class GtfsParsingReport {
     readonly unsupportedRoutes: StopID[][],
     private _rejectedTrips: number,
     private _acceptedTrips: number,
+    private _duplicatedTrips: number,
   ) {}
 
   static blank() {
-    return new GtfsParsingReport(new Set(), [], 0, 0);
+    return new GtfsParsingReport(new Set(), [], 0, 0, 0);
   }
 
   static readonly json = z
@@ -21,6 +22,7 @@ export class GtfsParsingReport {
       unsupportedRoutes: StopIDJson.array().array(),
       rejectedTrips: z.number(),
       acceptedTrips: z.number(),
+      duplicatedTrips: z.number(),
     })
     .transform(
       (x) =>
@@ -29,6 +31,7 @@ export class GtfsParsingReport {
           x.unsupportedRoutes,
           x.rejectedTrips,
           x.acceptedTrips,
+          x.duplicatedTrips,
         ),
     );
 
@@ -38,6 +41,7 @@ export class GtfsParsingReport {
       unsupportedRoutes: this.unsupportedRoutes,
       rejectedTrips: this.rejectedTrips,
       acceptedTrips: this.acceptedTrips,
+      duplicatedTrips: this.duplicatedTrips,
     };
   }
 
@@ -75,6 +79,9 @@ export class GtfsParsingReport {
   logAcceptedTrip() {
     this._acceptedTrips++;
   }
+  logDuplicatedTrip() {
+    this._duplicatedTrips++;
+  }
 
   get rejectedTrips() {
     return this._rejectedTrips;
@@ -82,16 +89,24 @@ export class GtfsParsingReport {
   get acceptedTrips() {
     return this._acceptedTrips;
   }
+  get duplicatedTrips() {
+    return this._duplicatedTrips;
+  }
 
   print(ctx: TrainQuery, printer: (input: string) => void) {
     const acc = this.acceptedTrips;
     const rej = this.rejectedTrips;
-    const accPerc = ((acc / (acc + rej)) * 100).toFixed(2) + "%";
-    const rejPerc = ((rej / (acc + rej)) * 100).toFixed(2) + "%";
+    const dup = this.duplicatedTrips;
+    const accPerc = ((acc / (acc + rej + dup)) * 100).toFixed(2) + "%";
+    const rejPerc = ((rej / (acc + rej + dup)) * 100).toFixed(2) + "%";
+    const dupPerc = ((dup / (acc + rej + dup)) * 100).toFixed(2) + "%";
+
     printer("[GTFS PARSING REPORT]");
     printer("");
     printer(`Trips accepted: ${acc} (${accPerc})`);
+    printer(`Trips duplicated: ${dup} (${dupPerc})`);
     printer(`Trips rejected: ${rej} (${rejPerc})`);
+
     printer("");
     printer("Unsupported stops:");
     for (const s of this.unsupportedGtfsStopIDs.values()) {
@@ -100,6 +115,7 @@ export class GtfsParsingReport {
     if (this.unsupportedGtfsStopIDs.size == 0) {
       printer(`    None!`);
     }
+
     printer("");
     printer("Unsupported routes:");
     for (const r of this.unsupportedRoutes) {
@@ -117,6 +133,7 @@ export class GtfsParsingReport {
       reports.map((r) => r.unsupportedRoutes).flat(),
       reports.reduce((sum, r) => sum + r.rejectedTrips, 0),
       reports.reduce((sum, r) => sum + r.acceptedTrips, 0),
+      reports.reduce((sum, r) => sum + r.duplicatedTrips, 0),
     );
   }
 }
