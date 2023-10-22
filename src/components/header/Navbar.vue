@@ -14,7 +14,7 @@ defineEmits<{
 }>();
 
 const nonHiddenItems = computed(() =>
-  props.items.filter((i) => !(i.hideOnDesktop ?? false))
+  props.items.filter((i) => !(i.hideOnDesktop ?? false)),
 );
 </script>
 
@@ -80,7 +80,7 @@ nav {
   @include utils.shadow;
   opacity: 100%;
   transition: opacity 0.25s;
-  border-top: 1px solid var(--color-ink-10);
+  border-top: 1px solid var(--color-navbar-glint);
 
   &.blend {
     opacity: 0%;
