@@ -23,15 +23,13 @@ watch(route, () => {
   }
 });
 
-const line = computed(
-  () => requireLineFromUrlName(getConfig(), params.value.id as string),
+const line = computed(() =>
   getLineFromUrlName(getConfig(), params.value.id as string),
 );
 const diagram = computed(() =>
   line.value == null ? null : getRouteDiagram(line.value),
 );
-const modeString = computed(
-  () => formatMode(line.value.serviceType, { capital: true, line: true }),
+const modeString = computed(() =>
   line.value == null
     ? ""
     : formatMode(line.value.serviceType, { capital: true, line: true }),
