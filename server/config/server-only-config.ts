@@ -1,15 +1,16 @@
 import { LinterRules } from "../../shared/system/linter-rules";
 import { Timetable } from "../../shared/system/timetable/timetable";
+import { ContinuationConfig } from "./continuation-config";
 import { GtfsConfig } from "./gtfs-config";
 import { PlatformRules } from "./platform-rules";
 
 /** The config properties used by the server and never sent to the frontend. */
 export class ServerOnlyConfig {
   constructor(
-    /* TODO: continuation */
-
     /** Static timetables. */
     readonly timetables: Timetable[],
+    /** Continuation rules (i.e. which lines continue on as which others). */
+    readonly continuation: ContinuationConfig,
     /** Static rules for which trains use which platforms. */
     readonly platformRules: PlatformRules,
     /** Configuration for a GTFS data source, if applicable. */

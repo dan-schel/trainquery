@@ -16,6 +16,7 @@ import { ServerOnlyConfig } from "./server-only-config";
 import { PlatformRules } from "./platform-rules";
 import { GtfsConfig } from "./gtfs-config";
 import { extractZip } from "./download-utils";
+import { ContinuationConfig } from "./continuation-config";
 
 export async function loadConfigFromFiles(
   dataFolder: string,
@@ -89,6 +90,9 @@ async function loadServer(
     server.timetables,
     (path) => logger?.logTimetableLoadFail(path),
   );
+  const continuation = ContinuationConfig.json.parse(
+    await loadYml(dataFolder, server.continuation, z.any()),
+  );
   const platformRules = PlatformRules.json.parse(
     await loadYml(dataFolder, server.platformRules, z.any()),
   );
@@ -101,7 +105,14 @@ async function loadServer(
   );
   const about = await loadText(dataFolder, server.about);
 
-  return new ServerOnlyConfig(timetables, platformRules, gtfs, linter, about);
+  return new ServerOnlyConfig(
+    timetables,
+    continuation,
+    platformRules,
+    gtfs,
+    linter,
+    about,
+  );
 }
 
 async function loadFrontend(
