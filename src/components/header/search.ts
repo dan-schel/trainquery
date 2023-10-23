@@ -35,7 +35,7 @@ export function searchOptionsStops(): SearchOption[] {
         data: { stop: s.id },
         boost: 1.2,
       };
-    })
+    }),
   );
 
   return options;
@@ -56,7 +56,7 @@ export function searchOptionsLines(): SearchOption[] {
         data: { line: l.id },
         boost: 1,
       };
-    })
+    }),
   );
   return options;
 }
@@ -139,7 +139,7 @@ export function search(query: string, options: SearchOption[]): SearchOption[] {
     // too. Allows out of order words to still gain points (scaled to punish
     // longer titles).
     const titleBitsInQuery = titleBits.filter((q) =>
-      queryBits.includes(q)
+      queryBits.includes(q),
     ).length;
     score += (titleBitsInQuery / titleBits.length) * 2;
 
@@ -147,14 +147,14 @@ export function search(query: string, options: SearchOption[]): SearchOption[] {
     // query. Allows for out of order and misspelled words to still gain points
     // (scaled to punish longer titles).
     titleBits.forEach((t) =>
-      queryBits.forEach((q) => (score += similarity(q, t) / titleBits.length))
+      queryBits.forEach((q) => (score += similarity(q, t) / titleBits.length)),
     );
 
     // Same as above, but for the tags (which gain less points).
     const tagsInQuery = o.tags.filter((q) => queryBits.includes(q)).length;
     score += tagsInQuery / titleBits.length;
     o.tags.forEach((t) =>
-      queryBits.forEach((q) => (score += similarity(q, t) * 0.5))
+      queryBits.forEach((q) => (score += similarity(q, t) * 0.5)),
     );
 
     // Some options are more likely to be searched for than others (e.g.
@@ -174,7 +174,7 @@ export function search(query: string, options: SearchOption[]): SearchOption[] {
   // better than the 20th are eliminated.
   const threshold = Math.max(
     (sorted[0]?.score ?? 0) * 0.5,
-    (sorted[20]?.score ?? 0) * 1.2
+    (sorted[20]?.score ?? 0) * 1.2,
   );
   const mostRelevant = sorted.slice(0, 10).filter((r) => r.score >= threshold);
 

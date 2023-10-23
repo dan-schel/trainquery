@@ -7,7 +7,7 @@ export class Platform {
     /** Uniquely identifies this platform from others at this stop. */
     readonly id: PlatformID,
     /** The user-facing platform name, e.g. '1' or '15A'. */
-    readonly name: string
+    readonly name: string,
   ) {}
 
   static readonly json = z
@@ -16,7 +16,7 @@ export class Platform {
       name: z.union([z.number(), z.string()]).optional(),
     })
     .transform(
-      (x) => new Platform(fuzzyPlatformID(x.id), fuzzyName(x.name ?? x.id))
+      (x) => new Platform(fuzzyPlatformID(x.id), fuzzyName(x.name ?? x.id)),
     );
 
   toJSON(): z.input<typeof Platform.json> {

@@ -8,7 +8,7 @@ export class KnownPerspectivePattern {
     readonly terminus: {
       stop: StopID;
       stopListIndex: number;
-    }
+    },
   ) {}
 
   static readonly json = z

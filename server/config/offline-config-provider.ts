@@ -1,7 +1,8 @@
 import { ConfigProvider, Logger } from "../trainquery";
 import fsp from "fs/promises";
-import { generateDataFolderPath, loadConfigFromFiles } from "./config-zip";
+import { loadConfigFromFiles } from "./config-zip";
 import { ServerConfig } from "./server-config";
+import { deleteDataFolder, generateDataFolderPath } from "./download-utils";
 
 export class OfflineConfigProvider extends ConfigProvider {
   constructor(
@@ -11,7 +12,7 @@ export class OfflineConfigProvider extends ConfigProvider {
      * The value to use for the canonical url in the config. Provided by an
      * environment variable.
      */
-    readonly canonicalUrl: string
+    readonly canonicalUrl: string,
   ) {
     super();
   }
@@ -24,15 +25,10 @@ export class OfflineConfigProvider extends ConfigProvider {
       dataFolder,
       this.zipOrFolderPath,
       this.canonicalUrl,
-      logger
+      logger,
     );
 
-    await fsp.rm(dataFolder, {
-      recursive: true,
-      force: true,
-      retryDelay: 100,
-      maxRetries: 5,
-    });
+    await deleteDataFolder(dataFolder);
 
     return config;
   }

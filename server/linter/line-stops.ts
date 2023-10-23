@@ -12,7 +12,7 @@ export function lintOrphanStops(ctx: LintContext) {
     orphanStops,
     (a) => `${a} is not served by any line.`,
     (a) => `${a} are not served by any lines.`,
-    examplify(orphanStops, 3)
+    examplify(orphanStops, 3),
   );
 }
 
@@ -32,7 +32,7 @@ export function lintMissingLineStops(ctx: LintContext) {
     const line = pair.lineName;
     const stop = pair.stop.toFixed();
     ctx.logError(
-      `The ${line} Line references the non-existent stop "${stop}".`
+      `The ${line} Line references the non-existent stop "${stop}".`,
     );
   }
 }
@@ -46,7 +46,7 @@ export function lintLineServiceTypes(ctx: LintContext) {
     badLines,
     (a) => `${a} refers to a service type which is not listed.`,
     (a) => `${a} refer to service types which are not listed.`,
-    examplify(badLines, 3)
+    examplify(badLines, 3),
   );
 }
 

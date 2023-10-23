@@ -7,7 +7,10 @@ import { QUtcDateTime } from "../shared/qtime/qdatetime";
 
 export class BadApiCallError extends Error {
   readonly type = "bad-api-call";
-  constructor(message: string, readonly statusCode = 400) {
+  constructor(
+    message: string,
+    readonly statusCode = 400,
+  ) {
     super(message);
   }
   static detect(error: unknown): error is BadApiCallError {
@@ -31,7 +34,7 @@ export function requireParam(params: ServerParams, name: string): string {
 export function requireParamThat<T>(
   params: ServerParams,
   name: string,
-  validator: (input: string) => T | null
+  validator: (input: string) => T | null,
 ): T {
   const value = requireParam(params, name);
   const result = validator(value);
@@ -53,7 +56,7 @@ export function requireStopIDParam(params: ServerParams, name: string): StopID {
 export function requireStopParam(
   ctx: TrainQuery,
   params: ServerParams,
-  name: string
+  name: string,
 ): Stop {
   const id = requireStopIDParam(params, name);
   const stop = getStop(ctx.getConfig(), id);
@@ -65,13 +68,13 @@ export function requireStopParam(
 
 export function requireDateTimeParam(
   params: ServerParams,
-  name: string
+  name: string,
 ): QUtcDateTime {
   const value = requireParam(params, name);
   const date = QUtcDateTime.parse(value);
   if (date == null || !date.isValid().valid) {
     throw new BadApiCallError(
-      `"${name}" param should be a valid ISO8601 UTC date/time.`
+      `"${name}" param should be a valid ISO8601 UTC date/time.`,
     );
   }
   return date;

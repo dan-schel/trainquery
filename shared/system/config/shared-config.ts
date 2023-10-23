@@ -39,7 +39,7 @@ export class SharedConfig {
      */
     readonly serviceTypes: ServiceType[],
     /** E.g. 'https://trainquery.com'. */
-    readonly canonicalUrl: string
+    readonly canonicalUrl: string,
   ) {}
 
   static readonly json = z
@@ -69,8 +69,8 @@ export class SharedConfig {
           x.usePlatforms,
           x.timezone,
           x.serviceTypes,
-          x.canonicalUrl
-        )
+          x.canonicalUrl,
+        ),
     );
 
   toJSON(): z.input<typeof SharedConfig.json> {

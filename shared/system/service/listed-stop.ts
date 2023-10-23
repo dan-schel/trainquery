@@ -62,7 +62,7 @@ export function listedFromSkipped(stop: SkippedStop): ListedSkip {
 
 export function listedUnknown(
   stop: StopID,
-  stopListIndex: number
+  stopListIndex: number,
 ): ListedUnknown {
   return {
     type: "unknown",
@@ -73,7 +73,7 @@ export function listedUnknown(
 
 export function getPatternList(
   config: HasSharedConfig,
-  service: Service
+  service: Service,
 ): PatternList {
   const pattern = service.pattern;
   if (pattern instanceof CompletePattern) {
@@ -81,7 +81,7 @@ export function getPatternList(
       .filter(
         (s) =>
           s.stopListIndex >= pattern.origin.stopListIndex &&
-          s.stopListIndex <= pattern.terminus.stopListIndex
+          s.stopListIndex <= pattern.terminus.stopListIndex,
       )
       .map((x) => {
         if (!x.express) {
@@ -93,11 +93,12 @@ export function getPatternList(
   } else if (pattern instanceof KnownOriginPattern) {
     const stopList = requireLine(config, service.line).route.requireStopList(
       service.route,
-      service.direction
+      service.direction,
     );
     const trimmed = stopList.stops.filter(
       (s, i) =>
-        i >= pattern.origin.stopListIndex && i <= pattern.terminus.stopListIndex
+        i >= pattern.origin.stopListIndex &&
+        i <= pattern.terminus.stopListIndex,
     );
     return trimmed.map((x, i) => {
       if (i == 0) {
@@ -111,10 +112,10 @@ export function getPatternList(
   } else {
     const stopList = requireLine(config, service.line).route.requireStopList(
       service.route,
-      service.direction
+      service.direction,
     );
     const trimmed = stopList.stops.filter(
-      (s, i) => i <= pattern.terminus.stopListIndex
+      (s, i) => i <= pattern.terminus.stopListIndex,
     );
     return trimmed.map((x, i) => {
       if (i == pattern.perspective.stopListIndex) {

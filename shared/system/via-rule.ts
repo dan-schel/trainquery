@@ -76,7 +76,10 @@ export class ViaRuleFilter {
 }
 
 export class ViaRule {
-  constructor(readonly text: string, readonly rules: ViaRuleFilter[]) {}
+  constructor(
+    readonly text: string,
+    readonly rules: ViaRuleFilter[],
+  ) {}
 
   static readonly json = z
     .object({
@@ -110,21 +113,21 @@ function matchesClause(clause: string, service: ViaRuleFilteringData) {
   } else if (absClause.startsWith("route-variant-")) {
     return negate(
       absClause == `route-variant-${service.routeVariant}`,
-      negated
+      negated,
     );
   } else if (absClause.startsWith("service-type-")) {
     return negate(absClause == `service-type-${service.serviceType}`, negated);
   } else if (absClause.startsWith("will-stop-at-")) {
     return negate(
       service.futureStops.some(
-        (s) => absClause == `will-stop-at-${s.toFixed()}`
+        (s) => absClause == `will-stop-at-${s.toFixed()}`,
       ),
-      negated
+      negated,
     );
   } else if (absClause.startsWith("terminates-at-")) {
     return negate(
       absClause == `terminates-at-${service.terminus.toFixed()}`,
-      negated
+      negated,
     );
   } else if (absClause == "continues") {
     return negate(service.continues, negated);

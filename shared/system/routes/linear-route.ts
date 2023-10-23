@@ -18,7 +18,7 @@ export class LinearRoute extends Route {
     /** Direction details to use for stops in the reverse order. */
     readonly reverse: DirectionDefinition,
     /** Array of stops this line stops at or travels via. */
-    readonly stops: RouteStop[]
+    readonly stops: RouteStop[],
   ) {
     super("linear");
   }

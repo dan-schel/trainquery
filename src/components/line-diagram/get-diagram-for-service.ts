@@ -17,7 +17,7 @@ export type AdditionalServedData = {
 };
 
 export function getDiagramForService(
-  departure: Departure
+  departure: Departure,
 ): LineDiagramData<AdditionalServedData, null> | null {
   // Without this check the first stop is not guaranteed to be served, and line
   // diagrams do not currently support showing the first stop as express.
@@ -27,7 +27,7 @@ export function getDiagramForService(
 
   const stops = getPatternList(getConfig(), departure);
   const transparentTo = stops.findIndex(
-    (s) => s.stopListIndex == departure.perspectiveIndex
+    (s) => s.stopListIndex == departure.perspectiveIndex,
   );
 
   return {

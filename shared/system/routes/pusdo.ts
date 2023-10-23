@@ -8,7 +8,7 @@ export class PusdoFilter {
 
   constructor(
     readonly directions: DirectionID[] | null,
-    readonly none: boolean
+    readonly none: boolean,
   ) {}
 
   static json = z.string().transform((x, ctx) => {
@@ -38,7 +38,7 @@ export class PusdoFilter {
       filters.push(
         ...this.directions
           .map((d) => `direction-${d}`)
-          .sort((a, b) => a.localeCompare(b))
+          .sort((a, b) => a.localeCompare(b)),
       );
     }
     return filters.join(" ");

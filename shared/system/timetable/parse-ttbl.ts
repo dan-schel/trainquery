@@ -17,7 +17,7 @@ type ErrorProcedure = (error: string) => null;
 
 export function parseTtbl(
   input: string,
-  logError?: ErrorLogger
+  logError?: ErrorLogger,
 ): Timetable | null {
   const error = (message: string) => {
     if (logError != null) {
@@ -71,7 +71,7 @@ export function parseTtbl(
     metadata.begins,
     metadata.ends,
     metadata.created,
-    entries.filter(nonNull).flat()
+    entries.filter(nonNull).flat(),
   );
 }
 
@@ -129,7 +129,7 @@ function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
   const begins = wildcardDate(beginsString);
   if (begins == "INVALID!") {
     return error(
-      `"${beginsString}" is not a ISO8601 compliant date (or a "*").`
+      `"${beginsString}" is not a ISO8601 compliant date (or a "*").`,
     );
   }
   const endsString = get("ends");
@@ -163,11 +163,11 @@ function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
 
 function parseGrid(
   gridInput: string[],
-  error: ErrorProcedure
+  error: ErrorProcedure,
 ): TimetableEntry[] | null {
   if (!/^\[[^[\]]+\][^[\]]*$/g.test(gridInput[0])) {
     return error(
-      "Grid header unrecognized. Could not find opening/closing brackets."
+      "Grid header unrecognized. Could not find opening/closing brackets.",
     );
   }
 
@@ -220,7 +220,7 @@ function parseGrid(
     const badTime = potentialTimes.find((t) => t.time == "INVALID!");
     if (badTime != null) {
       return error(
-        `"${badTime.input}" is not a valid timetable time string (or a "-").`
+        `"${badTime.input}" is not a valid timetable time string (or a "-").`,
       );
     }
     return potentialTimes
@@ -239,8 +239,8 @@ function parseGrid(
         routeVariant,
         direction,
         w,
-        rows.map((r) => r[i])
-      )
+        rows.map((r) => r[i]),
+      ),
   );
 
   return entries;

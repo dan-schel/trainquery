@@ -25,7 +25,7 @@ export function linesThatStopAt(
   }: {
     ignoreSpecialEventsOnlyLines?: boolean;
     sortAlphabetically?: boolean;
-  } = {}
+  } = {},
 ) {
   let lines = config.shared.lines.filter((l) => l.route.stopsAt(stop));
   if (
@@ -67,7 +67,7 @@ export function requireStop(config: HasSharedConfig, stop: StopID) {
 export function getPlatform(
   config: HasSharedConfig,
   stop: StopID,
-  platform: PlatformID
+  platform: PlatformID,
 ) {
   const stopData = getStop(config, stop);
   if (stopData == null) {
@@ -79,7 +79,7 @@ export function getPlatform(
 export function requirePlatform(
   config: HasSharedConfig,
   stop: StopID,
-  platform: PlatformID
+  platform: PlatformID,
 ) {
   const platformData = getPlatform(config, stop, platform);
   if (platformData == null) {
@@ -122,24 +122,24 @@ export function requireStopID(value: string): StopID {
 
 export function getStopUrlName(
   config: HasSharedConfig,
-  stop: StopID
+  stop: StopID,
 ): string | null {
   return config.shared.urlNames.stops.get(stop) ?? null;
 }
 
 export function getLineUrlName(
   config: HasSharedConfig,
-  line: LineID
+  line: LineID,
 ): string | null {
   return config.shared.urlNames.lines.get(line) ?? null;
 }
 
 export function getStopFromUrlName(
   config: HasSharedConfig,
-  param: string
+  param: string,
 ): Stop | null {
   const urlNameMatch = config.shared.stops.find(
-    (s) => config.shared.urlNames.stops.get(s.id) == param
+    (s) => config.shared.urlNames.stops.get(s.id) == param,
   );
   if (urlNameMatch != null) {
     return urlNameMatch;
@@ -150,7 +150,7 @@ export function getStopFromUrlName(
 
 export function requireStopFromUrlName(
   config: HasSharedConfig,
-  param: string
+  param: string,
 ): Stop {
   const stop = getStopFromUrlName(config, param);
   if (stop == null) {
@@ -161,10 +161,10 @@ export function requireStopFromUrlName(
 
 export function getLineFromUrlName(
   config: HasSharedConfig,
-  param: string
+  param: string,
 ): Line | null {
   const urlNameMatch = config.shared.lines.find(
-    (l) => config.shared.urlNames.lines.get(l.id) == param
+    (l) => config.shared.urlNames.lines.get(l.id) == param,
   );
   if (urlNameMatch != null) {
     return urlNameMatch;
@@ -175,7 +175,7 @@ export function getLineFromUrlName(
 
 export function requireLineFromUrlName(
   config: HasSharedConfig,
-  param: string
+  param: string,
 ): Line {
   const line = getLineFromUrlName(config, param);
   if (line == null) {
@@ -189,7 +189,7 @@ export function getStopPageRoute(
   config: HasSharedConfig,
   stop: StopID,
   time: QLocalDateTime | null,
-  filter: DepartureFilter | null
+  filter: DepartureFilter | null,
 ): string {
   const base = `/stops/${getStopUrlName(config, stop) ?? stop.toFixed()}`;
   const params: { key: string; value: string }[] = [];
@@ -215,7 +215,7 @@ export function getStopPageRoute(
 /** E.g. "/lines/pakenham" or "/lines/20". */
 export function getLinePageRoute(
   config: HasSharedConfig,
-  line: LineID
+  line: LineID,
 ): string {
   return `/lines/${getLineUrlName(config, line) ?? line.toFixed()}`;
 }
@@ -223,7 +223,7 @@ export function getLinePageRoute(
 /** E.g. "/train/[something]". */
 export function getServicePageRoute(
   service: Service,
-  perspectiveIndex?: number
+  perspectiveIndex?: number,
 ): string {
   // <TEMP>
   // Not all services have a static ID, and live data sources aren't used here
@@ -236,14 +236,14 @@ export function getServicePageRoute(
 
 export function getServiceType(
   config: HasSharedConfig,
-  serviceType: ServiceTypeID
+  serviceType: ServiceTypeID,
 ) {
   return config.shared.serviceTypes.find((l) => l.id == serviceType) ?? null;
 }
 
 export function requireServiceType(
   config: HasSharedConfig,
-  serviceType: ServiceTypeID
+  serviceType: ServiceTypeID,
 ) {
   const serviceTypeData = getServiceType(config, serviceType);
   if (serviceTypeData == null) {

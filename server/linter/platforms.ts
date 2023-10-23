@@ -10,7 +10,7 @@ export function lintPlatforms(ctx: LintContext) {
       stopsWithoutPlatforms,
       (a) => `${a} does not list platforms.`,
       (a) => `${a} do not list platform.`,
-      examplify(stopsWithoutPlatforms, 3)
+      examplify(stopsWithoutPlatforms, 3),
     );
   } else {
     const stopsWithPlatforms = ctx.shared.stops
@@ -21,7 +21,7 @@ export function lintPlatforms(ctx: LintContext) {
       stopsWithPlatforms,
       (a) => `${a} lists platforms.`,
       (a) => `${a} list platforms.`,
-      examplify(stopsWithPlatforms, 3)
+      examplify(stopsWithPlatforms, 3),
     );
   }
 }

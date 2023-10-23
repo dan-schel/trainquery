@@ -13,7 +13,7 @@ const stopList = computed(() => {
   function stopType(
     stops: LineDiagramStop<ServedData, ExpressData>[],
     type: string,
-    transparentTo: number
+    transparentTo: number,
   ) {
     return stops.map((s, i) => ({
       type: type,
@@ -261,12 +261,16 @@ $default-stop-gap: 1rem;
 
 // Stretch from the top of the first row to the top of the stop tick.
 .rod-top {
-  bottom: calc(50% + $tick-height * 0.5);
+  // Extend by 1px to close gaps that sometimes occur (due to rounding done when
+  // the browsers render it idk?)
+  bottom: calc(50% + $tick-height * 0.5 - 1px);
 }
 
 // Stretch from the bottom of the stop tick to the bottom of the first row.
 .rod-bottom {
-  top: calc(50% + $tick-height * 0.5);
+  // Extend by 1px to close gaps that sometimes occur (due to rounding done when
+  // the browsers render it idk?)
+  top: calc(50% + $tick-height * 0.5 - 1px);
 }
 
 // Stretch from the top of the second row, across the margin between stops, to

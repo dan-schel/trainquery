@@ -12,11 +12,11 @@ export function continuify(departure: Departure): PatternList {
 
   const lists = services
     .map((s, i) =>
-      getPatternList(getConfig(), s).map((e) => ({ stint: i, ...e }))
+      getPatternList(getConfig(), s).map((e) => ({ stint: i, ...e })),
     )
     .flat()
     .filter(
-      (e) => e.stint == 0 && e.stopListIndex >= departure.perspectiveIndex
+      (e) => e.stint == 0 && e.stopListIndex >= departure.perspectiveIndex,
     );
 
   const result: PatternList = [];

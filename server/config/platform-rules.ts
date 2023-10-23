@@ -15,6 +15,7 @@ import {
   StopID,
   StopIDStringJson,
 } from "../../shared/system/ids";
+import { mapJson } from "../../shared/utils";
 
 type StopPlatformRule = {
   confidence: ConfidenceLevel;
@@ -24,48 +25,26 @@ type StopPlatformRule = {
 export class PlatformRules {
   constructor(readonly rules: Map<StopID, StopPlatformRule>) {}
 
-  static json = z
-    .record(
-      StopIDStringJson,
-      z.object({
-        confidence: ConfidenceLevelJson,
-        rules: z
-          .record(
-            PlatformIDJson,
-            z.string().transform((x, ctx) => {
-              const result = PlatformFilter.parseMany(x);
-              if (result == null) {
-                ctx.addIssue({
-                  code: z.ZodIssueCode.custom,
-                  message: "Not a valid list of platform filters.",
-                });
-                return z.NEVER;
-              }
-              return result;
-            })
-          )
-          .transform(
-            (x) =>
-              new Map(
-                Object.entries(x).map(([platform, rule]) => [
-                  PlatformIDJson.parse(platform),
-                  rule!,
-                ])
-              )
-          ),
-      })
-    )
-    .transform(
-      (x) =>
-        new PlatformRules(
-          new Map(
-            Object.entries(x).map(([stop, rule]) => [
-              StopIDStringJson.parse(stop),
-              rule!,
-            ])
-          )
-        )
-    );
+  static json = mapJson(
+    StopIDStringJson,
+    z.object({
+      confidence: ConfidenceLevelJson,
+      rules: mapJson(
+        PlatformIDJson,
+        z.string().transform((x, ctx) => {
+          const result = PlatformFilter.parseMany(x);
+          if (result == null) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Not a valid list of platform filters.",
+            });
+            return z.NEVER;
+          }
+          return result;
+        }),
+      ),
+    }),
+  ).transform((x) => new PlatformRules(x));
 
   get(stop: StopID) {
     return this.rules.get(stop) ?? null;
@@ -144,24 +123,24 @@ function matchesClause(clause: string, service: PlatformFilteringData) {
   } else if (absClause.startsWith("route-variant-")) {
     return negate(
       absClause == `route-variant-${service.routeVariant}`,
-      negated
+      negated,
     );
   } else if (absClause.startsWith("service-type-")) {
     return negate(absClause == `service-type-${service.serviceType}`, negated);
   } else if (absClause.startsWith("originates-at-")) {
     return negate(
       absClause == `originates-at-${service.origin.toFixed()}`,
-      negated
+      negated,
     );
   } else if (absClause.startsWith("stops-at-")) {
     return negate(
       service.stops.some((s) => absClause == `stops-at-${s.toFixed()}`),
-      negated
+      negated,
     );
   } else if (absClause.startsWith("terminates-at-")) {
     return negate(
       absClause == `terminates-at-${service.terminus.toFixed()}`,
-      negated
+      negated,
     );
   } else if (absClause == `weekend`) {
     return negate(service.dayOfWeek.isWeekend(), negated);

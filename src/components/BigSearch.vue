@@ -72,7 +72,9 @@ form {
   position: relative;
 
   border-radius: 0.75rem;
-  transition: background-color 0.1s, border-color 0.1s;
+  transition:
+    background-color 0.1s,
+    border-color 0.1s;
 
   .icon {
     color: var(--color-ink-50);

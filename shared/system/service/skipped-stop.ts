@@ -4,7 +4,10 @@ import { type StopID, StopIDJson } from "../ids";
 export class SkippedStop {
   readonly express = true;
 
-  constructor(readonly stop: StopID, readonly stopListIndex: number) {}
+  constructor(
+    readonly stop: StopID,
+    readonly stopListIndex: number,
+  ) {}
 
   static readonly json = z
     .object({

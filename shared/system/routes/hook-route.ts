@@ -32,7 +32,7 @@ export class HookRoute extends Route {
      * Stops that travel directly to the terminus (avoiding the hooked section),
      * ordered with the terminus last.
      */
-    readonly direct: RouteStop[]
+    readonly direct: RouteStop[],
   ) {
     super("hook");
   }

@@ -123,7 +123,10 @@ header {
   @include utils.shadow;
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
-  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s,
+    visibility 0.2s;
 
   overflow: hidden;
 

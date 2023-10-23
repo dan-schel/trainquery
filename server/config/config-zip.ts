@@ -2,7 +2,6 @@ import AdmZip from "adm-zip";
 import fsp from "fs/promises";
 import path from "path";
 import YAML from "yaml";
-import { uuid } from "@schel-d/js-utils";
 import { ZodType, z } from "zod";
 import { LinterRules } from "../../shared/system/linter-rules";
 import { glob } from "glob";
@@ -15,12 +14,14 @@ import { FrontendOnlyConfig } from "../../shared/system/config/frontend-only-con
 import { SharedConfig } from "../../shared/system/config/shared-config";
 import { ServerOnlyConfig } from "./server-only-config";
 import { PlatformRules } from "./platform-rules";
+import { GtfsConfig } from "./gtfs-config";
+import { extractZip } from "./download-utils";
 
 export async function loadConfigFromFiles(
   dataFolder: string,
   zipOrFolderPath: string,
   canonicalUrl: string,
-  logger?: Logger
+  logger?: Logger,
 ): Promise<ServerConfig> {
   const isDirectory = (await fsp.lstat(zipOrFolderPath)).isDirectory();
   if (isDirectory) {
@@ -47,7 +48,7 @@ export async function loadConfigFromFiles(
 async function loadShared(
   input: unknown,
   dataFolder: string,
-  canonicalUrl: string
+  canonicalUrl: string,
 ): Promise<SharedConfig> {
   const schema = z
     .object({ stops: z.string(), lines: z.string(), urlNames: z.string() })
@@ -69,38 +70,43 @@ async function loadShared(
 async function loadServer(
   input: unknown,
   dataFolder: string,
-  logger?: Logger
+  logger?: Logger,
 ): Promise<ServerOnlyConfig> {
   const schema = z
     .object({
       timetables: z.string(),
       continuation: z.string(),
       platformRules: z.string(),
+      gtfs: z.string().optional(),
       linter: z.string(),
       about: z.string(),
     })
     .passthrough();
 
   const server = schema.parse(input);
-  const linter = LinterRules.json.parse(
-    await loadYml(dataFolder, server.linter, z.any())
-  );
   const timetables = await loadTimetables(
     dataFolder,
     server.timetables,
-    (path) => logger?.logTimetableLoadFail(path)
+    (path) => logger?.logTimetableLoadFail(path),
   );
   const platformRules = PlatformRules.json.parse(
-    await loadYml(dataFolder, server.platformRules, z.any())
+    await loadYml(dataFolder, server.platformRules, z.any()),
+  );
+  const gtfs =
+    server.gtfs != null
+      ? GtfsConfig.json.parse(await loadYml(dataFolder, server.gtfs, z.any()))
+      : null;
+  const linter = LinterRules.json.parse(
+    await loadYml(dataFolder, server.linter, z.any()),
   );
   const about = await loadText(dataFolder, server.about);
 
-  return new ServerOnlyConfig(timetables, platformRules, linter, about);
+  return new ServerOnlyConfig(timetables, platformRules, gtfs, linter, about);
 }
 
 async function loadFrontend(
   input: unknown,
-  dataFolder: string
+  dataFolder: string,
 ): Promise<FrontendOnlyConfig> {
   const schema = z.object({ departureFeeds: z.string() }).passthrough();
 
@@ -121,7 +127,7 @@ async function loadText(dataFolder: string, filePath: string) {
 async function loadYml<T extends ZodType>(
   dataFolder: string,
   filePath: string,
-  schema: T
+  schema: T,
 ): Promise<z.infer<T>> {
   const fullPath = path.join(dataFolder, filePath);
   const text = await fsp.readFile(fullPath, { encoding: "utf-8" });
@@ -131,7 +137,7 @@ async function loadYml<T extends ZodType>(
 async function loadTimetables(
   dataFolder: string,
   globString: string,
-  onFail: (path: string) => void
+  onFail: (path: string) => void,
 ): Promise<Timetable[]> {
   const files = await glob(globString, { cwd: dataFolder });
 
@@ -149,20 +155,4 @@ async function loadTimetables(
   }
 
   return timetables;
-}
-
-async function extractZip(zip: AdmZip, location: string): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
-    zip.extractAllToAsync(location, true, false, (error) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve();
-      }
-    });
-  });
-}
-
-export function generateDataFolderPath(): string {
-  return `data-${uuid()}`;
 }

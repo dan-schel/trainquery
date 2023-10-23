@@ -13,13 +13,13 @@ export function lintMissingUrlNames(ctx: LintContext) {
     stopsWithoutUrls,
     (a) => `Missing stop URL name for ${a}.`,
     (a) => `Missing stop URL names for ${a}.`,
-    examplify(stopsWithoutUrls, 3)
+    examplify(stopsWithoutUrls, 3),
   );
   ctx.logPluralizedWarning(
     linesWithoutUrls,
     (a) => `Missing line URL name for ${a}.`,
     (a) => `Missing line URL names for ${a}.`,
-    examplify(linesWithoutUrls, 3)
+    examplify(linesWithoutUrls, 3),
   );
 }
 
@@ -47,13 +47,13 @@ export function lintUrlNameSimilarity(ctx: LintContext) {
     oddStopUrlNames,
     (a) => `${a} has an unconventional URL, given the stop's name.`,
     (a) => `${a} have unconventional URLs, given each stop's name.`,
-    examplify(oddStopUrlNames, 3)
+    examplify(oddStopUrlNames, 3),
   );
   ctx.logPluralizedWarning(
     oddLineUrlNames,
     (a) => `${a} has an unconventional URL, given the line's name.`,
     (a) => `${a} have unconventional URLs, given each line's name.`,
-    examplify(oddLineUrlNames, 3)
+    examplify(oddLineUrlNames, 3),
   );
 }
 
@@ -70,13 +70,13 @@ export function lintUrlNamesAgainstRegex(ctx: LintContext) {
     badStops,
     (a) => `${a} contains illegal characters for a stop URL.`,
     (a) => `${a} contain illegal characters for stop URLs.`,
-    examplify(badStops, 3)
+    examplify(badStops, 3),
   );
   ctx.logPluralizedError(
     badLines,
     (a) => `${a} contains illegal characters for a line URL.`,
     (a) => `${a} contain illegal characters for line URLs.`,
-    examplify(badLines, 3)
+    examplify(badLines, 3),
   );
 }
 
@@ -85,25 +85,25 @@ export function lintUniqueUrlNames(ctx: LintContext) {
     ctx.shared.stops
       .map((s) => ctx.shared.urlNames.stops.get(s.id) ?? null)
       .filter(nonNull),
-    (a, b) => a == b
+    (a, b) => a == b,
   ).map((s) => `"${s}"`);
   const duplicatedLineUrls = listDuplicated(
     ctx.shared.lines
       .map((l) => ctx.shared.urlNames.lines.get(l.id) ?? null)
       .filter(nonNull),
-    (a, b) => a == b
+    (a, b) => a == b,
   ).map((l) => `"${l}"`);
 
   ctx.logPluralizedError(
     duplicatedStopUrls,
     (a) => `Multiple stops use the stop URL ${a}`,
     (a) => `Multiple stops use the stop URLs ${a}`,
-    examplify(duplicatedStopUrls, 3)
+    examplify(duplicatedStopUrls, 3),
   );
   ctx.logPluralizedError(
     duplicatedLineUrls,
     (a) => `Multiple lines use the stop URL ${a}`,
     (a) => `Multiple lines use the stop URLs ${a}`,
-    examplify(duplicatedLineUrls, 3)
+    examplify(duplicatedLineUrls, 3),
   );
 }

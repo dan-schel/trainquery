@@ -28,7 +28,7 @@ export class Departure extends Service<
     staticID: StaticServiceID | null,
     sources: ServiceSource[],
     continuation: Continuation | null,
-    readonly perspectiveIndex: number
+    readonly perspectiveIndex: number,
   ) {
     super(
       line,
@@ -38,7 +38,7 @@ export class Departure extends Service<
       pattern,
       staticID,
       sources,
-      continuation
+      continuation,
     );
   }
 
@@ -70,8 +70,8 @@ export class Departure extends Service<
           x.staticID,
           x.sources,
           x.continuation,
-          x.perspectiveIndex
-        )
+          x.perspectiveIndex,
+        ),
     );
 
   toJSON(): z.input<typeof Departure.json> {
@@ -123,7 +123,7 @@ export class Departure extends Service<
 
   static fromService<T extends CompletePattern | KnownPerspectivePattern>(
     service: Service<T>,
-    perspectiveIndex: number
+    perspectiveIndex: number,
   ) {
     return new Departure(
       service.line,
@@ -134,7 +134,7 @@ export class Departure extends Service<
       service.staticID,
       service.sources,
       service.continuation,
-      perspectiveIndex
+      perspectiveIndex,
     );
   }
 }

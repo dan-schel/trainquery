@@ -5,36 +5,21 @@ import {
   type StopID,
   StopIDStringJson,
 } from "./ids";
+import { mapJson } from "../utils";
 
 /** Provides the strings used for the stop and line page URLs. */
 export class UrlNames {
   constructor(
     readonly stops: Map<StopID, string>,
-    readonly lines: Map<LineID, string>
+    readonly lines: Map<LineID, string>,
   ) {}
 
   static readonly json = z
     .object({
-      stops: z.record(StopIDStringJson, z.string()),
-      lines: z.record(LineIDStringJson, z.string()),
+      stops: mapJson(StopIDStringJson, z.string()),
+      lines: mapJson(LineIDStringJson, z.string()),
     })
-    .transform(
-      (x) =>
-        new UrlNames(
-          new Map(
-            Object.entries(x.stops).map(([stop, urlName]) => [
-              StopIDStringJson.parse(stop),
-              urlName!,
-            ])
-          ),
-          new Map(
-            Object.entries(x.lines).map(([line, urlName]) => [
-              LineIDStringJson.parse(line),
-              urlName!,
-            ])
-          )
-        )
-    );
+    .transform((x) => new UrlNames(x.stops, x.lines));
 
   toJSON(): z.input<typeof UrlNames.json> {
     return {

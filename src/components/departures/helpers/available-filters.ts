@@ -48,7 +48,7 @@ export function getAvailableFilters(stop: StopID): AvailableFilters {
 
   const directions = unique(
     lines.map((l) => l.route.getPossibleDirections()).flat(),
-    (a, b) => a == b
+    (a, b) => a == b,
   );
   const directionFilters =
     directions.length < 2
@@ -79,7 +79,7 @@ export function isFilterSelected(
     | { line: LineID }
     | { direction: DirectionID }
     | { platform: PlatformID },
-  current: DepartureFilter
+  current: DepartureFilter,
 ) {
   if ("line" in option) {
     return current.lines != null && current.lines.includes(option.line);
@@ -104,7 +104,7 @@ export function toggleFilter(
     | { direction: DirectionID }
     | { platform: PlatformID },
   current: DepartureFilter,
-  available: AvailableFilters
+  available: AvailableFilters,
 ): DepartureFilter {
   if ("line" in option) {
     if (current.lines != null && current.lines.includes(option.line)) {

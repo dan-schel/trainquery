@@ -19,7 +19,7 @@ export class StaticServiceIDComponents {
   constructor(
     readonly timetable: TimetableID,
     readonly index: number,
-    readonly date: QDate
+    readonly date: QDate,
   ) {}
 
   asString() {
@@ -49,11 +49,11 @@ export class StaticServiceIDComponents {
 
   encode(): StaticServiceID {
     return toStaticServiceID(
-      reencode(this.asString(), encodedAlpha, base48Safe)
+      reencode(this.asString(), encodedAlpha, base48Safe),
     );
   }
   static decode(
-    input: string | StaticServiceID
+    input: string | StaticServiceID,
   ): StaticServiceIDComponents | null {
     const decodedString = tryReencode(input, base48Safe, encodedAlpha);
     if (decodedString == null) {

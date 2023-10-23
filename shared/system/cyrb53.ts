@@ -10,7 +10,7 @@ export function hashString(
   /** The string. */
   str: string,
   /** An optional seed. */
-  seed: number = 0
+  seed: number = 0,
 ): string {
   let h1 = 0xdeadbeef ^ seed,
     h2 = 0x41c6ce57 ^ seed;

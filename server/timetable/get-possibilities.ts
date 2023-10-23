@@ -28,7 +28,7 @@ export function getPossibilities(
   time: QUtcDateTime,
   iteration: number,
   reverse: boolean,
-  lines: LineID[]
+  lines: LineID[],
 ): Possibility[] {
   const result: (Possibility & { sortTime: number })[] = [];
 
@@ -63,7 +63,7 @@ export function getPossibilities(
         const indices = retrieveIndices(
           stopLists,
           entry.route,
-          entry.direction
+          entry.direction,
         );
         for (const index of indices) {
           const time = entry.rows[index];
@@ -93,10 +93,10 @@ function retrieveIndices(
     indices: number[];
   }[],
   variant: RouteVariantID,
-  direction: DirectionID
+  direction: DirectionID,
 ) {
   const result = stopLists.find(
-    (l) => l.variant == variant && l.direction == direction
+    (l) => l.variant == variant && l.direction == direction,
   );
   if (result == null) {
     throw badVariantOrDirection(variant, direction);
@@ -121,7 +121,7 @@ function getSearchTimes(
   ctx: TrainQuery,
   time: QUtcDateTime,
   iteration: number,
-  reverse: boolean
+  reverse: boolean,
 ): SearchTimeRange[] {
   const blockOffset = !reverse ? iteration : -1 - iteration;
   const start = time.add({ h: iterationSizeHours * blockOffset });
@@ -133,7 +133,7 @@ function getSearchTimes(
     start1: QUtcDateTime,
     end1: QUtcDateTime,
     start2: QUtcDateTime,
-    end2: QUtcDateTime
+    end2: QUtcDateTime,
   ) => {
     if (end1.isBeforeOrEqual(start2)) {
       return null;
@@ -182,7 +182,7 @@ function getSearchTimes(
 function isWithin(
   time: QTimetableTime,
   start: QTimetableTime | null,
-  end: QTimetableTime | null
+  end: QTimetableTime | null,
 ) {
   if (start != null && time.isBefore(start)) {
     return false;

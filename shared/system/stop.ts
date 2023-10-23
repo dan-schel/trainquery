@@ -10,7 +10,7 @@ export class Stop {
     /** E.g. 'Pakenham'. */
     readonly name: string,
     /** The platforms this stop has, if this transit system has platforms. */
-    readonly platforms: readonly Platform[]
+    readonly platforms: readonly Platform[],
   ) {}
 
   static readonly json = z

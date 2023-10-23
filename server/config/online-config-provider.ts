@@ -2,11 +2,15 @@ import fetch from "node-fetch";
 import { ConfigProvider, Logger } from "../trainquery";
 import YAML from "yaml";
 import { z } from "zod";
-import fs from "fs";
 import fsp from "fs/promises";
 import path from "path";
-import { generateDataFolderPath, loadConfigFromFiles } from "./config-zip";
+import { loadConfigFromFiles } from "./config-zip";
 import { ServerConfig } from "./server-config";
+import {
+  deleteDataFolder,
+  download,
+  generateDataFolderPath,
+} from "./download-utils";
 
 const refreshMs = 1000 * 60 * 10;
 const supportedVersion = "v1";
@@ -19,7 +23,7 @@ export class OnlineConfigProvider extends ConfigProvider {
      * The value to use for the canonical url in the config. Provided by an
      * environment variable.
      */
-    readonly canonicalUrl: string
+    readonly canonicalUrl: string,
   ) {
     super();
   }
@@ -37,7 +41,7 @@ export class OnlineConfigProvider extends ConfigProvider {
 
       if (!(supportedVersion in manifest)) {
         throw new Error(
-          `"${supportedVersion}" data is unavailable at "${this.url}"`
+          `"${supportedVersion}" data is unavailable at "${this.url}"`,
         );
       }
       return manifest[supportedVersion].latest;
@@ -52,15 +56,10 @@ export class OnlineConfigProvider extends ConfigProvider {
       dataFolder,
       zipPath,
       this.canonicalUrl,
-      logger
+      logger,
     );
 
-    await fsp.rm(dataFolder, {
-      recursive: true,
-      force: true,
-      retryDelay: 100,
-      maxRetries: 5,
-    });
+    await deleteDataFolder(dataFolder);
 
     return config;
   }
@@ -74,22 +73,5 @@ const manifestJson = z.object({}).catchall(
   z.object({
     latest: z.string(),
     backup: z.string().optional(),
-  })
+  }),
 );
-
-async function download(url: string, destinationPath: string) {
-  const response = await fetch(url);
-
-  await new Promise<void>((resolve, reject) => {
-    if (response.body == null) {
-      throw new Error(`Failed to download "${url}".`);
-    }
-
-    const destination = fs.createWriteStream(destinationPath);
-
-    response.body.pipe(destination);
-    response.body.on("error", () => reject());
-    destination.on("error", () => reject());
-    destination.on("finish", resolve);
-  });
-}

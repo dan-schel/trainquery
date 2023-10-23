@@ -34,7 +34,7 @@ const detail = computed(() => {
     platform: getDeparturePlatformString(props.departure),
     stoppingPatternString: getStoppingPatternString(
       props.departure,
-      patternList
+      patternList,
     ),
     lineColor: requireLine(getConfig(), props.departure.line).color,
     timeString: getTimeString(props.departure, utc.value),

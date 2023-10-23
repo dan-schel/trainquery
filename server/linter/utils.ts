@@ -80,7 +80,7 @@ export function examplify(items: string[], max: number) {
 
 export function listDuplicated<T>(
   items: T[],
-  equalityFunc: (a: T, b: T) => boolean
+  equalityFunc: (a: T, b: T) => boolean,
 ): T[] {
   const duplicated = new Set<T>();
 

@@ -38,7 +38,7 @@ export class Settings {
     readonly pinnedWidgets: PinnedWidget[],
     readonly significantStops: SignificantStop[],
     readonly enableContinuations: boolean,
-    readonly limitMapFPS: boolean
+    readonly limitMapFPS: boolean,
   ) {}
 
   static json = settingsV1.transform(
@@ -47,8 +47,8 @@ export class Settings {
         x.pinnedWidgets,
         x.significantStops,
         x.enableContinuations,
-        x.limitMapFPS
-      )
+        x.limitMapFPS,
+      ),
   );
 
   static default = new Settings([], [], false, false);
@@ -78,7 +78,7 @@ export class Settings {
       pinnedWidgets ?? this.pinnedWidgets,
       significantStops ?? this.significantStops,
       enableContinuations ?? this.enableContinuations,
-      limitMapFPS ?? this.limitMapFPS
+      limitMapFPS ?? this.limitMapFPS,
     );
   }
 
@@ -86,7 +86,7 @@ export class Settings {
     return this.with({
       pinnedWidgets: validatePinnedWidgetsAgainstConfig(
         this.pinnedWidgets,
-        logger
+        logger,
       ),
     });
   }

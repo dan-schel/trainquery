@@ -10,6 +10,10 @@ A rewrite of [TrainQuery](https://github.com/schel-d/melbpt) using a monolithic 
 
 The offline folder is "gitignored" for this purpose.
 
+## Developing using local config
+
+If you want to use the offline config as explained above, but still enable online features like the use of GTFS feeds or the PTV API, use `npm run dev -- offline-data` or `npm run build && npm run start -- offline-data`.
+
 ## Checking for static data errors
 
 Run `npm run tqlint -- [data source]`, where `[data source]` is one of:

@@ -26,7 +26,7 @@ export class FrontendOnlyConfig {
     /** Default departure feeds, e.g. Southern Cross does regional vs suburban. */
     readonly departureFeeds: DefaultDepartureFeeds,
     /** E.g. 'citybound' for up. */
-    readonly directionNames: DirectionNames
+    readonly directionNames: DirectionNames,
   ) {}
 
   static readonly json = z
@@ -50,8 +50,8 @@ export class FrontendOnlyConfig {
           x.metaDescription,
           x.via,
           x.departureFeeds,
-          x.directionNames
-        )
+          x.directionNames,
+        ),
     );
 
   toJSON(): z.input<typeof FrontendOnlyConfig.json> {

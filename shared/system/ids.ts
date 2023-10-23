@@ -184,7 +184,7 @@ function badID(
     | "service type"
     | "timetable"
     | "static service",
-  val: number | string
+  val: number | string,
 ): Error {
   return new Error(`Bad ${type} ID: ${val}`);
 }

@@ -23,7 +23,7 @@ watch(
       // Doesn't work without the delay for some reason :/
       setTimeout(() => input.value?.focus(), 100);
     }
-  }
+  },
 );
 
 const router = useRouter();

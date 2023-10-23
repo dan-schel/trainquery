@@ -10,7 +10,7 @@ export class TypeableTime {
     readonly hour: string,
     readonly explicitlyDivided: boolean,
     readonly minute: string,
-    readonly ampm: string
+    readonly ampm: string,
   ) {}
 
   with({
@@ -30,7 +30,7 @@ export class TypeableTime {
         ? this.explicitlyDivided
         : explicitlyDivided,
       minute === undefined ? this.minute : minute,
-      ampm === undefined ? this.ampm : ampm
+      ampm === undefined ? this.ampm : ampm,
     );
   }
 

@@ -24,7 +24,7 @@ export abstract class Route {
 
   constructor(
     /** E.g. 'linear', 'y-branch', etc. */
-    readonly type: LineRouteType
+    readonly type: LineRouteType,
   ) {}
 
   abstract getStopLists(): StopList[];
@@ -38,14 +38,14 @@ export abstract class Route {
 
   getStopList(
     variant: RouteVariantID,
-    direction: DirectionID
+    direction: DirectionID,
   ): StopList | null {
     if (this._stopLists == null) {
       this._stopLists = this.getStopLists();
     }
     return (
       this._stopLists.find(
-        (l) => l.variant == variant && l.direction == direction
+        (l) => l.variant == variant && l.direction == direction,
       ) ?? null
     );
   }
@@ -72,26 +72,26 @@ export abstract class Route {
     }
     return unique(
       this._stopLists.map((l) => l.direction),
-      (a, b) => a == b
+      (a, b) => a == b,
     );
   }
 
   picksUp(
     variant: RouteVariantID,
     direction: DirectionID,
-    index: number
+    index: number,
   ): boolean {
     return this.requireStopList(variant, direction).picksUp[index].matches(
-      direction
+      direction,
     );
   }
   setsDown(
     variant: RouteVariantID,
     direction: DirectionID,
-    index: number
+    index: number,
   ): boolean {
     return this.requireStopList(variant, direction).setsDown[index].matches(
-      direction
+      direction,
     );
   }
 }
@@ -99,7 +99,7 @@ export abstract class Route {
 export class DirectionDefinition {
   constructor(
     /** Uniquely identify this direction from others on this line. */
-    readonly id: DirectionID
+    readonly id: DirectionID,
   ) {}
 
   static readonly json = z
@@ -128,7 +128,7 @@ export class RouteStop<T extends boolean = boolean> {
     /** Can passengers alight at this station? */
     readonly setsDown: T extends false ? PusdoFilter : undefined,
     /** Can passengers board at this station? */
-    readonly picksUp: T extends false ? PusdoFilter : undefined
+    readonly picksUp: T extends false ? PusdoFilter : undefined,
   ) {}
 
   static readonly json = z
@@ -148,7 +148,7 @@ export class RouteStop<T extends boolean = boolean> {
     ])
     .transform(
       (x) =>
-        new RouteStop(x.stops ?? x.via, x.via != null, x.setsDown, x.picksUp)
+        new RouteStop(x.stops ?? x.via, x.via != null, x.setsDown, x.picksUp),
     );
 
   toJSON(): z.input<typeof RouteStop.json> {
@@ -168,10 +168,10 @@ export class RouteStop<T extends boolean = boolean> {
 
 export function badVariantOrDirection(
   variant: RouteVariantID,
-  direction: DirectionID
+  direction: DirectionID,
 ): Error {
   return new Error(
-    `Route variant "${variant}" and direction "${direction}" is invalid for this line.`
+    `Route variant "${variant}" and direction "${direction}" is invalid for this line.`,
   );
 }
 

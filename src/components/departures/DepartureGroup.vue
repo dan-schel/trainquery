@@ -20,7 +20,7 @@ const props = defineProps<{
 const loading = ref(true);
 const error = ref<"unknown" | null>(null);
 const departureLists = ref<Departure[][]>(
-  repeat(null, props.feeds.length).map((_x) => [])
+  repeat(null, props.feeds.length).map((_x) => []),
 );
 
 const { utc } = useNow();
@@ -41,7 +41,7 @@ async function init(reset: boolean) {
           feeds: DepartureFeed.encode(props.feeds),
           time: (props.time?.toUTC() ?? utc.value).toISO(),
         },
-        Departure.json.array().array()
+        Departure.json.array().array(),
       );
     } catch (err) {
       console.warn(err);
@@ -60,7 +60,7 @@ watch(
   () => ({ feeds: props.feeds, time: props.time }),
   () => {
     init(true);
-  }
+  },
 );
 watch(utc, () => {
   if (props.time == null) {

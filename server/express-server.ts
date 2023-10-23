@@ -7,27 +7,42 @@ import { rateLimit } from "express-rate-limit";
 const rateLimitWindow = 1000 * 60 * 5;
 const rateLimitRequests = 100;
 
+function nullMiddleware() {
+  return (
+    _req: express.Request,
+    _res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    next();
+  };
+}
+
 export class ExpressServer extends Server {
   constructor(
     readonly port: number,
     private readonly _setupFrontend: (
       ctx: TrainQuery,
-      app: Express
-    ) => Promise<void>
+      app: Express,
+    ) => Promise<void>,
   ) {
     super();
   }
 
   async start(
     ctx: TrainQuery,
-    requestListener: (endpoint: string, params: ServerParams) => Promise<object>
+    requestListener: (
+      endpoint: string,
+      params: ServerParams,
+    ) => Promise<object>,
   ): Promise<void> {
     const app = express();
 
-    const apiRateLimit = rateLimit({
-      windowMs: rateLimitWindow,
-      limit: rateLimitRequests,
-    });
+    const apiRateLimit = ctx.isProduction
+      ? rateLimit({
+          windowMs: rateLimitWindow,
+          limit: rateLimitRequests,
+        })
+      : nullMiddleware();
 
     app.get("/api/*", apiRateLimit, async (req, res) => {
       const path = req.path.replace(/^\/api\//, "");

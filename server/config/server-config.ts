@@ -18,13 +18,13 @@ export class ServerConfig {
      * Frontend config properties, available here for SSR and to enable
      * distribution to the client.
      */
-    readonly frontend: FrontendOnlyConfig
+    readonly frontend: FrontendOnlyConfig,
   ) {
     this.hash = hashString(
       JSON.stringify({
         shared: this.shared.toJSON(),
         frontend: this.frontend.toJSON(),
-      })
+      }),
     );
   }
 

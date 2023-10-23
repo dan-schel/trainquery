@@ -9,12 +9,14 @@ import { parseIntThrow } from "@schel-d/js-utils";
 import "dotenv/config";
 import { OfflineConfigProvider } from "./config/offline-config-provider";
 import { ssrAppPropsApi } from "./api/ssr-props-api";
+import { TrainQueryDB } from "./trainquery-db";
 
 createServer();
 
 async function createServer() {
   const isProd = process.env.NODE_ENV == "production";
   const isOffline = process.argv.includes("offline");
+  const useOfflineData = process.argv.includes("offline-data");
   const port = process.env.PORT ?? "3000";
 
   const serveFrontend = async (ctx: TrainQuery, app: Express) => {
@@ -27,30 +29,37 @@ async function createServer() {
 
   await trainQuery(
     () => new ExpressServer(parseIntThrow(port), serveFrontend),
-    getConfigProvider(isOffline),
-    new ConsoleLogger()
+    getConfigProvider(isOffline || useOfflineData),
+    getDatabase(isOffline),
+    new ConsoleLogger(),
+    isOffline,
+    isProd,
   );
 }
 
-function getConfigProvider(isOffline: boolean): ConfigProvider {
-  const canonicalUrl = process.env.URL;
-  if (canonicalUrl == null) {
-    throw new Error("URL environment variable not set.");
-  }
-
-  if (isOffline) {
-    const zipOrFolderPath = process.env.CONFIG_OFFLINE;
-    if (zipOrFolderPath == null) {
-      throw new Error("CONFIG_OFFLINE environment variable not provided.");
-    }
+function getConfigProvider(useOfflineData: boolean): ConfigProvider {
+  const canonicalUrl = requireEnv("URL");
+  if (useOfflineData) {
+    const zipOrFolderPath = requireEnv("CONFIG_OFFLINE");
     return new OfflineConfigProvider(zipOrFolderPath, canonicalUrl);
   } else {
-    const configUrl = process.env.CONFIG;
-    if (configUrl == null) {
-      throw new Error("CONFIG environment variable not provided.");
-    }
+    const configUrl = requireEnv("CONFIG");
     return new OnlineConfigProvider(configUrl, canonicalUrl);
   }
+}
+
+function getDatabase(isOffline: boolean): TrainQueryDB | null {
+  if (isOffline) {
+    return null;
+  }
+
+  const domain = process.env.MONGO_DOMAIN;
+  if (domain == null) {
+    return null;
+  }
+  const username = requireEnv("MONGO_USERNAME");
+  const password = requireEnv("MONGO_PASSWORD");
+  return new TrainQueryDB(domain, username, password);
 }
 
 async function setupDevServer(app: Express) {
@@ -91,4 +100,12 @@ async function setupProdServer(ctx: TrainQuery, app: Express) {
     res.writeHead(status || 200, statusText || headers, headers);
     res.end(html);
   });
+}
+
+function requireEnv(variable: string): string {
+  const value = process.env[variable];
+  if (value == null) {
+    throw new Error(`"${variable}" environment variable not provided.`);
+  }
+  return value;
 }

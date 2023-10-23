@@ -15,7 +15,7 @@ export class DepartureFeed {
   constructor(
     readonly stop: StopID,
     readonly count: number,
-    readonly filter: DepartureFilter
+    readonly filter: DepartureFilter,
   ) {}
 
   toString(): string {
@@ -47,7 +47,7 @@ export class DepartureFeed {
     return reencode(
       feeds.map((x) => x.toString()).join("|"),
       encodedAlpha,
-      base48Safe
+      base48Safe,
     );
   }
 
@@ -64,7 +64,7 @@ export class DepartureFeed {
     const result: DepartureFeed[] = [];
     for (let i = 0; i < components.length; i += 3) {
       const parsed = DepartureFeed.parse(
-        `${components[i]}|${components[i + 1]}|${components[i + 2]}`
+        `${components[i]}|${components[i + 1]}|${components[i + 2]}`,
       );
       if (parsed == null) {
         return null;

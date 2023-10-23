@@ -14,7 +14,7 @@ export class FilteredBucket extends Bucket<Departure> {
     private readonly _ctx: TrainQuery,
     readonly stop: StopID,
     readonly capacity: number,
-    readonly filter: DepartureFilter
+    readonly filter: DepartureFilter,
   ) {
     super();
   }
@@ -33,7 +33,7 @@ export class FilteredBucket extends Bucket<Departure> {
 function filterAccepts(
   ctx: TrainQuery,
   filter: DepartureFilter,
-  x: Possibility
+  x: Possibility,
 ) {
   // Filter by line.
   if (filter.lines != null && !filter.lines.some((l) => l == x.entry.line)) {
@@ -78,7 +78,7 @@ function filterAccepts(
   const picksUp = line.route.picksUp(
     x.entry.route,
     x.entry.direction,
-    x.perspectiveIndex
+    x.perspectiveIndex,
   );
   if (!filter.setDownOnly && !picksUp) {
     return false;
