@@ -1,16 +1,17 @@
 import { z } from "zod";
-import { type LineID, LineIDJson } from "./ids";
+import { type LineID, LineIDJson, type StopID, StopIDJson } from "./ids";
 import { NumberRange } from "../utils";
 
-export class ContinuationGroup<Method extends String> {
+export abstract class ContinuationGroup<Method extends String> {
   constructor(readonly method: Method) {}
 }
 
 export class LinearContinuationGroup extends ContinuationGroup<"linear"> {
   constructor(
-    readonly layoverMins: NumberRange,
+    readonly from: StopID,
     readonly sideA: LineID[],
     readonly sideB: LineID[],
+    readonly layoverMins: NumberRange,
   ) {
     super("linear");
   }
@@ -18,28 +19,31 @@ export class LinearContinuationGroup extends ContinuationGroup<"linear"> {
   static readonly json = z
     .object({
       method: z.literal("linear"),
-      layoverMins: NumberRange.json,
+      from: StopIDJson,
       sideA: LineIDJson.array(),
       sideB: LineIDJson.array(),
+      layoverMins: NumberRange.json,
     })
     .transform(
-      (x) => new LinearContinuationGroup(x.layoverMins, x.sideA, x.sideB),
+      (x) =>
+        new LinearContinuationGroup(x.from, x.sideA, x.sideB, x.layoverMins),
     );
 
   toJSON(): z.input<typeof LinearContinuationGroup.json> {
     return {
       method: "linear",
-      layoverMins: this.layoverMins.toJSON(),
+      from: this.from,
       sideA: this.sideA,
       sideB: this.sideB,
+      layoverMins: this.layoverMins.toJSON(),
     };
   }
 }
 
 export class HookContinuationGroup extends ContinuationGroup<"hook"> {
   constructor(
-    readonly layoverMins: NumberRange,
     readonly lines: LineID[],
+    readonly layoverMins: NumberRange,
   ) {
     super("hook");
   }
@@ -47,16 +51,16 @@ export class HookContinuationGroup extends ContinuationGroup<"hook"> {
   static readonly json = z
     .object({
       method: z.literal("hook"),
-      layoverMins: NumberRange.json,
       lines: LineIDJson.array(),
+      layoverMins: NumberRange.json,
     })
-    .transform((x) => new HookContinuationGroup(x.layoverMins, x.lines));
+    .transform((x) => new HookContinuationGroup(x.lines, x.layoverMins));
 
   toJSON(): z.input<typeof HookContinuationGroup.json> {
     return {
       method: "hook",
-      layoverMins: this.layoverMins.toJSON(),
       lines: this.lines,
+      layoverMins: this.layoverMins.toJSON(),
     };
   }
 }
