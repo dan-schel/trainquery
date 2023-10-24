@@ -16,7 +16,9 @@ createServer();
 async function createServer() {
   const isProd = process.env.NODE_ENV == "production";
   const isOffline = process.argv.includes("offline");
-  const useOfflineData = process.argv.includes("offline-data");
+  const useOfflineData =
+    process.argv.includes("offline-data") ||
+    process.argv.includes("data-offline");
   const port = process.env.PORT ?? "3000";
 
   const serveFrontend = async (ctx: TrainQuery, app: Express) => {

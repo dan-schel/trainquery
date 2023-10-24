@@ -55,7 +55,7 @@ async function loadShared(
       stops: z.string(),
       lines: z.string(),
       urlNames: z.string(),
-      continuation: z.string(),
+      continuation: z.string().optional(),
     })
     .passthrough();
 
@@ -69,9 +69,11 @@ async function loadShared(
     stops: (await loadYml(dataFolder, shared.stops, stopsYml)).stops,
     lines: (await loadYml(dataFolder, shared.lines, linesYml)).lines,
     urlNames: await loadYml(dataFolder, shared.urlNames, z.any()),
-    continuationRules: (
-      await loadYml(dataFolder, shared.continuation, continuationYml)
-    ).rules,
+    continuationRules:
+      shared.continuation == null
+        ? undefined
+        : (await loadYml(dataFolder, shared.continuation, continuationYml))
+            .rules,
     canonicalUrl: canonicalUrl,
   });
 }

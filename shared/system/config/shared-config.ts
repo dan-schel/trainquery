@@ -58,7 +58,8 @@ export class SharedConfig {
       urlNames: UrlNames.json,
       continuationRules: z
         .union([LinearContinuationGroup.json, HookContinuationGroup.json])
-        .array(),
+        .array()
+        .default([]),
       usePlatforms: z.boolean(),
       timezone: z.union([
         z.object({
@@ -91,7 +92,10 @@ export class SharedConfig {
       stops: this.stops.map((s) => s.toJSON()),
       lines: this.lines.map((l) => l.toJSON()),
       urlNames: this.urlNames.toJSON(),
-      continuationRules: this.continuationRules.map((c) => c.toJSON()),
+      continuationRules:
+        this.continuationRules.length == 0
+          ? undefined
+          : this.continuationRules.map((c) => c.toJSON()),
       usePlatforms: this.usePlatforms,
       timezone: this.timezone,
       serviceTypes: this.serviceTypes.map((s) => s.toJSON()),

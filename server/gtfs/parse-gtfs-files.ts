@@ -10,7 +10,7 @@ import {
   tripsSchema,
 } from "./gtfs-csv-schemas";
 import { QWeekdayRange } from "../../shared/qtime/qweekdayrange";
-import { matchToRoute } from "../../shared/system/routes/find-match";
+import { matchToRoute } from "./find-match";
 import { StopID } from "../../shared/system/ids";
 import { TrainQuery } from "../trainquery";
 import { QTimetableTime } from "../../shared/qtime/qtime";
