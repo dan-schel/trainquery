@@ -24,6 +24,11 @@ export class ExpressServer extends Server {
       ctx: TrainQuery,
       app: Express,
     ) => Promise<void>,
+    /**
+     * How many proxies there are between the client and express server.
+     * (https://github.com/express-rate-limit/express-rate-limit/wiki/Troubleshooting-Proxy-Issues)
+     */
+    readonly proxies: number,
   ) {
     super();
   }
@@ -36,6 +41,7 @@ export class ExpressServer extends Server {
     ) => Promise<object>,
   ): Promise<void> {
     const app = express();
+    app.set("trust proxy", this.proxies);
 
     const apiRateLimit = ctx.isProduction
       ? rateLimit({
@@ -43,6 +49,8 @@ export class ExpressServer extends Server {
           limit: rateLimitRequests,
         })
       : nullMiddleware();
+
+    app.get("/ip", (request, response) => response.send(request.ip));
 
     app.get("/api/*", apiRateLimit, async (req, res) => {
       const path = req.path.replace(/^\/api\//, "");
