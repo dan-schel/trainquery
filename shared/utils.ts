@@ -46,3 +46,54 @@ export const NumberStringJson = z.string().transform((x, ctx) => {
   }
   return result;
 });
+
+export class NumberRange {
+  constructor(
+    readonly min: number,
+    readonly max: number,
+  ) {}
+
+  static parse(input: string): NumberRange | null {
+    if (!input.includes("..")) {
+      const n = parseFloat(input);
+      if (isNaN(n)) {
+        return null;
+      }
+      return new NumberRange(n, n);
+    }
+
+    const components = input.split("..");
+    if (components.length != 2) {
+      return null;
+    }
+    const min = parseFloat(components[0]);
+    const max = parseFloat(components[1]);
+    if (isNaN(min) || isNaN(max)) {
+      return null;
+    }
+    return new NumberRange(min, max);
+  }
+
+  asString() {
+    if (this.min == this.max) {
+      return this.min.toString();
+    }
+    return `${this.min}..${this.max}`;
+  }
+
+  static readonly json = z.string().transform((x, ctx) => {
+    const result = NumberRange.parse(x);
+    if (result == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Not a valid number range.",
+      });
+      return z.NEVER;
+    }
+    return result;
+  });
+
+  toJSON(): z.input<typeof NumberRange.json> {
+    return this.asString();
+  }
+}

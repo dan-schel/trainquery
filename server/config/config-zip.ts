@@ -16,7 +16,6 @@ import { ServerOnlyConfig } from "./server-only-config";
 import { PlatformRules } from "./platform-rules";
 import { GtfsConfig } from "./gtfs-config";
 import { extractZip } from "./download-utils";
-import { ContinuationConfig } from "./continuation-config";
 
 export async function loadConfigFromFiles(
   dataFolder: string,
@@ -52,18 +51,27 @@ async function loadShared(
   canonicalUrl: string,
 ): Promise<SharedConfig> {
   const schema = z
-    .object({ stops: z.string(), lines: z.string(), urlNames: z.string() })
+    .object({
+      stops: z.string(),
+      lines: z.string(),
+      urlNames: z.string(),
+      continuation: z.string(),
+    })
     .passthrough();
 
   const shared = schema.parse(input);
   const stopsYml = z.object({ stops: z.any() });
   const linesYml = z.object({ lines: z.any() });
+  const continuationYml = z.object({ rules: z.any() });
 
   return SharedConfig.json.parse({
     ...shared,
     stops: (await loadYml(dataFolder, shared.stops, stopsYml)).stops,
     lines: (await loadYml(dataFolder, shared.lines, linesYml)).lines,
     urlNames: await loadYml(dataFolder, shared.urlNames, z.any()),
+    continuationRules: (
+      await loadYml(dataFolder, shared.continuation, continuationYml)
+    ).rules,
     canonicalUrl: canonicalUrl,
   });
 }
@@ -76,7 +84,6 @@ async function loadServer(
   const schema = z
     .object({
       timetables: z.string(),
-      continuation: z.string(),
       platformRules: z.string(),
       gtfs: z.string().optional(),
       linter: z.string(),
@@ -90,9 +97,6 @@ async function loadServer(
     server.timetables,
     (path) => logger?.logTimetableLoadFail(path),
   );
-  const continuation = ContinuationConfig.json.parse(
-    await loadYml(dataFolder, server.continuation, z.any()),
-  );
   const platformRules = PlatformRules.json.parse(
     await loadYml(dataFolder, server.platformRules, z.any()),
   );
@@ -105,14 +109,7 @@ async function loadServer(
   );
   const about = await loadText(dataFolder, server.about);
 
-  return new ServerOnlyConfig(
-    timetables,
-    continuation,
-    platformRules,
-    gtfs,
-    linter,
-    about,
-  );
+  return new ServerOnlyConfig(timetables, platformRules, gtfs, linter, about);
 }
 
 async function loadFrontend(
