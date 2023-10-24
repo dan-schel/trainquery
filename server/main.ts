@@ -18,7 +18,6 @@ async function createServer() {
   const isOffline = process.argv.includes("offline");
   const useOfflineData = process.argv.includes("offline-data");
   const port = process.env.PORT ?? "3000";
-  const proxies = process.env.PROXIES ?? "0";
 
   const serveFrontend = async (ctx: TrainQuery, app: Express) => {
     if (isProd) {
@@ -29,12 +28,7 @@ async function createServer() {
   };
 
   await trainQuery(
-    () =>
-      new ExpressServer(
-        parseIntThrow(port),
-        serveFrontend,
-        parseIntThrow(proxies),
-      ),
+    () => new ExpressServer(parseIntThrow(port), serveFrontend),
     getConfigProvider(isOffline || useOfflineData),
     getDatabase(isOffline),
     new ConsoleLogger(),
