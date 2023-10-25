@@ -57,9 +57,14 @@ export function matchToRoute<T>(
         values: stoppingPattern,
         continuation: null,
       });
-    } else if (stoppingPattern[stoppingPattern.length - 1] != null) {
+    } else if (
+      currInOrder > 1 &&
+      stoppingPattern[stoppingPattern.length - 1] != null
+    ) {
       // If we still have stops to get through and we stopped at this route's
       // terminus, maybe the remaining stops come from a continuation?
+      // We check currInOrder > 1 because it's silly if the terminus is the ONLY
+      // stop that matched!
       const options = getContinuationOptions(
         config,
         combination.line,
@@ -95,7 +100,7 @@ export function matchToRoute<T>(
     associatedLines: unique(
       matches.map((m) => m.line),
       (a, b) => a == b,
-    ),
+    ).filter((x) => x != matches[0].line),
   };
 }
 

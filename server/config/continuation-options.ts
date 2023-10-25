@@ -95,6 +95,6 @@ function hook(
       routeVariant == HookRoute.directID
         ? HookRoute.hookedID
         : HookRoute.directID,
-    direction: route.forward.id,
+    direction: route.reverse.id,
   }));
 }
