@@ -93,7 +93,7 @@ function writeGrid(
   const columnSize = includeSeconds ? 10 : 8;
 
   const wdrs = entries
-    .map((e) => e.weekdayRange.toString().padEnd(columnSize, " "))
+    .map((e) => e.weekdayRange.asString().padEnd(columnSize, " "))
     .join("");
   const headerRow = `${header.padEnd(headerSize, " ")} ${wdrs}`;
 
