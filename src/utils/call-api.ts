@@ -11,7 +11,7 @@ export async function callAPI<T extends z.ZodType>(
     paramStrings.push(`${key}=${encodeURIComponent(params[key])}`);
   }
 
-  const raw = await resiliantFetch(
+  const raw = await resilientFetch(
     paramStrings.length == 0
       ? `/api/${endpoint}`
       : `/api/${endpoint}?${paramStrings.join("&")}`,
@@ -33,8 +33,27 @@ export async function callAPI<T extends z.ZodType>(
   return json.result;
 }
 
-export async function resiliantFetch(url: string) {
-  // TODO: This is not resiliant!
-  const response = await fetch(url);
-  return response.json();
+export async function resilientFetch(url: string) {
+  const response = await multiFetch(url, [500, 2000]);
+  if (!response.ok) {
+    throw new Error(`Status code ${response.status} when fetching "${url}".`);
+  }
+  return await response.json();
+}
+
+async function multiFetch(url: string, timeouts: number[]): Promise<Response> {
+  // If we're not gonna attempt to retry anyway, don't even bother catching the
+  // error.
+  if (timeouts.length == 0) {
+    return await fetch(url);
+  }
+
+  try {
+    // Just try/catch getting a response. We shouldn't retry if we get a
+    // response with a bad status code because that's probably our fault!
+    return await fetch(url);
+  } catch {
+    await new Promise((resolve) => setTimeout(resolve, timeouts[0]));
+    return await multiFetch(url, timeouts.slice(1));
+  }
 }
