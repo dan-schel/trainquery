@@ -73,6 +73,18 @@ export class QTime extends QTimeBase<QTime> {
     return `${h}:${m}:${s}`;
   }
 
+  static readonly json = z.string().transform((x, ctx) => {
+    const result = QTime.parse(x);
+    if (result == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Not a time.",
+      });
+      return z.NEVER;
+    }
+    return result;
+  });
+
   /**
    * Add `h` hours, `m` minutes, and `s` seconds to this time. `h`/`m`/`s` can
    * be negative.
@@ -121,7 +133,7 @@ export class QTime extends QTimeBase<QTime> {
     return new QTime(numbers[0], numbers[1], numbers[2] ?? 0);
   }
 
-  toJSON() {
+  toJSON(): z.input<typeof QTime.json> {
     return this.toISO();
   }
 }
@@ -212,7 +224,7 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
     return `${timeString}:${s}`;
   }
 
-  toJSON() {
+  toJSON(): z.input<typeof QTimetableTime.json> {
     return this.toTtblString(this.second != 0);
   }
 }

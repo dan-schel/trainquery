@@ -36,6 +36,10 @@ export class QWeekdayRange {
     );
   }
 
+  toJSON(): z.input<typeof QWeekdayRange.json> {
+    return this.toString();
+  }
+
   static parse(input: string) {
     input = input.toUpperCase();
     if (input.length != 7) {

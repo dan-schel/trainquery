@@ -119,10 +119,10 @@ export class GtfsCalendar {
       gtfsCalendarID: this.gtfsCalendarID,
       gtfsSubfeedID: this.gtfsSubfeedID,
       wdr: this.wdr.toString(),
-      start: this.start.toISO(),
-      end: this.end.toISO(),
-      additionalDates: this.additionalDates.map((d) => d.toISO()),
-      exceptions: this.exceptions.map((d) => d.toISO()),
+      start: this.start.toJSON(),
+      end: this.end.toJSON(),
+      additionalDates: this.additionalDates.map((d) => d.toJSON()),
+      exceptions: this.exceptions.map((d) => d.toJSON()),
     };
   }
 }
