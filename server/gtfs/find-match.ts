@@ -17,6 +17,7 @@ export type MatchedRoute<T> = {
   route: RouteVariantID;
   direction: DirectionID;
   values: (T | null)[];
+  stopCount: number;
   continuation: MatchedRoute<T> | null;
 };
 
@@ -55,6 +56,7 @@ export function matchToRoute<T>(
         route: combination.route,
         direction: combination.direction,
         values: stoppingPattern,
+        stopCount: currInOrder,
         continuation: null,
       });
     } else if (
@@ -85,6 +87,7 @@ export function matchToRoute<T>(
           route: combination.route,
           direction: combination.direction,
           values: stoppingPattern,
+          stopCount: currInOrder,
           continuation: continuation,
         });
       }
@@ -95,12 +98,20 @@ export function matchToRoute<T>(
     return null;
   }
 
+  // The best match is the one that matches the most stops. Prevents the
+  // route unnecessarily being split into continuations when it can be done in
+  // one.
+  const sortedMatches = matches.sort((a, b) => -(a.stopCount - b.stopCount));
+  const bestMatches = sortedMatches.filter(
+    (m) => m.stopCount == sortedMatches[0].stopCount,
+  );
+
   return {
-    ...matches[0],
+    ...bestMatches[0],
     associatedLines: unique(
-      matches.map((m) => m.line),
+      bestMatches.map((m) => m.line),
       (a, b) => a == b,
-    ).filter((x) => x != matches[0].line),
+    ).filter((x) => x != bestMatches[0].line),
   };
 }
 
