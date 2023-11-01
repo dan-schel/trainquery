@@ -15,7 +15,7 @@ import {
   StopID,
   StopIDStringJson,
 } from "../../shared/system/ids";
-import { mapJson } from "../../shared/utils";
+import { mapJson } from "@schel-d/js-utils";
 
 type StopPlatformRule = {
   confidence: ConfidenceLevel;

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { type LineID, LineIDJson, type StopID, StopIDJson } from "./ids";
-import { NumberRange } from "../utils";
+import { NumberRange } from "@schel-d/js-utils";
 
 export abstract class ContinuationGroup<Method extends String> {
   constructor(readonly method: Method) {}

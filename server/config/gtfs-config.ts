@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { StopID, StopIDJson } from "../../shared/system/ids";
-import { IntStringJson, mapJson } from "../../shared/utils";
+import { IntStringJson, mapJson } from "@schel-d/js-utils";
 
 export class GtfsFeedConfig {
   constructor(

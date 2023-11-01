@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { type DirectionID, DirectionIDJson } from "./ids";
-import { mapJson } from "../utils";
+import { mapJson } from "@schel-d/js-utils";
 
 /** Provides the strings used for the stop and line page URLs. */
 export class DirectionNames {

@@ -5,7 +5,7 @@ import {
   type StopID,
   StopIDStringJson,
 } from "./ids";
-import { mapJson } from "../utils";
+import { mapJson } from "@schel-d/js-utils";
 
 /** Provides the strings used for the stop and line page URLs. */
 export class UrlNames {
