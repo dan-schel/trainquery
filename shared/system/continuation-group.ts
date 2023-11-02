@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { type LineID, LineIDJson, type StopID, StopIDJson } from "./ids";
 import { NumberRange } from "@schel-d/js-utils";
+import { NumberRangeJson } from "../utils";
 
 export abstract class ContinuationGroup<Method extends String> {
   constructor(readonly method: Method) {}
@@ -22,7 +23,7 @@ export class LinearContinuationGroup extends ContinuationGroup<"linear"> {
       from: StopIDJson,
       sideA: LineIDJson.array(),
       sideB: LineIDJson.array(),
-      layoverMins: NumberRange.json,
+      layoverMins: NumberRangeJson,
     })
     .transform(
       (x) =>
@@ -35,7 +36,7 @@ export class LinearContinuationGroup extends ContinuationGroup<"linear"> {
       from: this.from,
       sideA: this.sideA,
       sideB: this.sideB,
-      layoverMins: this.layoverMins.toJSON(),
+      layoverMins: this.layoverMins.asString(),
     };
   }
 }
@@ -52,7 +53,7 @@ export class HookContinuationGroup extends ContinuationGroup<"hook"> {
     .object({
       method: z.literal("hook"),
       lines: LineIDJson.array(),
-      layoverMins: NumberRange.json,
+      layoverMins: NumberRangeJson,
     })
     .transform((x) => new HookContinuationGroup(x.lines, x.layoverMins));
 
@@ -60,7 +61,7 @@ export class HookContinuationGroup extends ContinuationGroup<"hook"> {
     return {
       method: "hook",
       lines: this.lines,
-      layoverMins: this.layoverMins.toJSON(),
+      layoverMins: this.layoverMins.asString(),
     };
   }
 }

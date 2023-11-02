@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { QTimetableTime } from "../../shared/qtime/qtime";
 import { QDate } from "../../shared/qtime/qdate";
-import { IntStringJson, NumberStringJson } from "@schel-d/js-utils";
+import { IntStringJson, NumberStringJson } from "../../shared/utils";
 
 const BooleanStringJson = z.string().transform((x, ctx) => {
   if (x == "1") {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { StopID, StopIDJson } from "../../shared/system/ids";
-import { IntStringJson, mapJson } from "@schel-d/js-utils";
+import { IntStringJson, mapJson } from "../../shared/utils";
 
 export class GtfsFeedConfig {
   constructor(
@@ -35,7 +35,7 @@ export class GtfsSubfeedConfig extends GtfsFeedConfig {
 
 export class GtfsConfig<UsesSubfeeds extends boolean> {
   constructor(
-    readonly staticUrl: string,
+    readonly staticData: string,
     readonly refreshSeconds: number,
     readonly persist: boolean,
     readonly usesSubfeeds: UsesSubfeeds,
@@ -46,7 +46,7 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
   static readonly json = z.union([
     z
       .object({
-        staticUrl: z.string(),
+        staticData: z.string(),
         refreshSeconds: z.number(),
         persist: z.boolean(),
         subfeeds: GtfsSubfeedConfig.json.array(),
@@ -54,7 +54,7 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
       .transform(
         (x) =>
           new GtfsConfig(
-            x.staticUrl,
+            x.staticData,
             x.refreshSeconds,
             x.persist,
             true,
@@ -64,14 +64,14 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
       ),
     GtfsFeedConfig.rawJson
       .extend({
-        staticUrl: z.string(),
+        staticData: z.string(),
         refreshSeconds: z.number(),
         persist: z.boolean(),
       })
       .transform(
         (x) =>
           new GtfsConfig(
-            x.staticUrl,
+            x.staticData,
             x.refreshSeconds,
             x.persist,
             false,
