@@ -128,10 +128,17 @@ function parseTrips(
       return null;
     }
 
-    for (const matchedRoute of continuationsArray(match)) {
+    const matchedRoutes = continuationsArray(match);
+
+    for (let i = 0; i < matchedRoutes.length; i++) {
+      const matchedRoute = matchedRoutes[i];
       const { line, associatedLines, route, direction, values } = matchedRoute;
 
-      const idPair = { gtfsTripID: gtfsTripID, gtfsCalendarID: gtfsCalendarID };
+      const idPair = {
+        gtfsTripID: gtfsTripID,
+        gtfsCalendarID: gtfsCalendarID,
+        continuationIndex: i,
+      };
       const parsedTrip = new GtfsTrip(
         [idPair],
         null,
