@@ -69,12 +69,12 @@ export class GtfsWorker {
 
   private async _refresh() {
     try {
-      this._ctx.logger.logDownloadingGtfs();
+      this._ctx.logger.logRefreshingGtfs();
       const data = await downloadGtfs(this._ctx, this._gtfsConfig);
       this._data = data;
-      this._ctx.logger.logDownloadingGtfsSuccess();
+      this._ctx.logger.logRefreshingGtfsSuccess();
     } catch (err) {
-      this._ctx.logger.logDownloadingGtfsFailure(err);
+      this._ctx.logger.logRefreshingGtfsFailure(err);
     }
 
     if (
