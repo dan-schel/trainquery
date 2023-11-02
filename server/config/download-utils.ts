@@ -11,10 +11,6 @@ export function generateDataFolderPath(): string {
 export async function download(url: string, destinationPath: string) {
   const response = await fetch(url);
 
-  const interval = setInterval(() => {
-    console.log(printSize(process.memoryUsage().heapUsed));
-  }, 100);
-
   await new Promise<void>((resolve, reject) => {
     if (response.body == null) {
       throw new Error(`Failed to download "${url}".`);
@@ -27,8 +23,6 @@ export async function download(url: string, destinationPath: string) {
     destination.on("error", () => reject());
     destination.on("finish", resolve);
   });
-
-  clearInterval(interval);
 }
 
 export async function deleteDataFolder(dataFolder: string) {
@@ -50,18 +44,4 @@ export async function extractZip(zip: AdmZip, location: string): Promise<void> {
       }
     });
   });
-}
-
-function printSize(bytes: number) {
-  let output = bytes;
-  let steps = 0;
-
-  const units = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"];
-
-  while (output > 1024) {
-    output /= 1024;
-    steps++;
-  }
-
-  return output.toFixed(2) + " " + units[steps];
 }
