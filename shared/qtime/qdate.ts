@@ -90,6 +90,10 @@ export class QDate {
     return result;
   });
 
+  toJSON(): z.input<typeof QDate.json> {
+    return this.toISO();
+  }
+
   /** Parses "2023-09-04" or "20230904" to a QDate. Does not check for date validity. */
   static parse(input: string): QDate | null {
     if (!/^[0-9]{4}-?[0-9]{2}-?[0-9]{2}$/.test(input)) {

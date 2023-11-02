@@ -106,9 +106,9 @@ export abstract class Logger {
   abstract logRecallingGtfsSuccess(): void;
   abstract logRecallingGtfsEmpty(): void;
   abstract logRecallingGtfsFailure(err: unknown): void;
-  abstract logDownloadingGtfs(): void;
-  abstract logDownloadingGtfsSuccess(): void;
-  abstract logDownloadingGtfsFailure(err: unknown): void;
+  abstract logRefreshingGtfs(): void;
+  abstract logRefreshingGtfsSuccess(): void;
+  abstract logRefreshingGtfsFailure(err: unknown): void;
   abstract logPersistingGtfs(): void;
   abstract logPersistingGtfsSuccess(): void;
   abstract logPersistingGtfsFailure(err: unknown): void;

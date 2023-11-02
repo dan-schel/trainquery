@@ -21,7 +21,8 @@ const settings = ref<Settings | null>(null);
 const nowUtc = ref(nowUTCLuxon().startOfMinute());
 const nowLocal = ref(toLocalDateTimeLuxon(getConfig(), nowUtc.value));
 
-let timeout: NodeJS.Timer;
+// setInterval thinks its a NodeJS.Timer, but vue-tsc thinks it shouldn't be...
+let timeout: NodeJS.Timeout;
 
 function updateSettings(newSettings: Settings) {
   if (settings.value == null) {

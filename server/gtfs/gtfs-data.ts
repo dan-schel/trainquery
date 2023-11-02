@@ -118,11 +118,11 @@ export class GtfsCalendar {
     return {
       gtfsCalendarID: this.gtfsCalendarID,
       gtfsSubfeedID: this.gtfsSubfeedID,
-      wdr: this.wdr.toString(),
-      start: this.start.toISO(),
-      end: this.end.toISO(),
-      additionalDates: this.additionalDates.map((d) => d.toISO()),
-      exceptions: this.exceptions.map((d) => d.toISO()),
+      wdr: this.wdr.toJSON(),
+      start: this.start.toJSON(),
+      end: this.end.toJSON(),
+      additionalDates: this.additionalDates.map((d) => d.toJSON()),
+      exceptions: this.exceptions.map((d) => d.toJSON()),
     };
   }
 }
@@ -136,6 +136,7 @@ export class GtfsTrip {
     readonly idPairs: {
       gtfsTripID: string;
       gtfsCalendarID: string;
+      continuationIndex: number;
     }[],
     readonly gtfsSubfeedID: string | null,
     readonly line: LineID,
@@ -151,6 +152,7 @@ export class GtfsTrip {
         .object({
           gtfsTripID: z.string(),
           gtfsCalendarID: z.string(),
+          continuationIndex: z.number(),
         })
         .array(),
       gtfsSubfeedID: z.string().nullable(),
@@ -185,7 +187,11 @@ export class GtfsTrip {
     );
   }
 
-  addIDPair(idPair: { gtfsTripID: string; gtfsCalendarID: string }): GtfsTrip {
+  addIDPair(idPair: {
+    gtfsTripID: string;
+    gtfsCalendarID: string;
+    continuationIndex: number;
+  }): GtfsTrip {
     return new GtfsTrip(
       [...this.idPairs, idPair],
       this.gtfsSubfeedID,

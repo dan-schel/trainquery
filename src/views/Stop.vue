@@ -15,10 +15,10 @@ import LineList from "@/components/LineList.vue";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { DepartureFilter } from "shared/system/timetable/departure-filter";
 import { QLocalDateTime } from "shared/qtime/qdatetime";
-import { nullableEquals, requiredParam, unparam } from "@/utils/param-utils";
+import { requiredParam, unparam } from "@/utils/param-utils";
 import { isValidFilter } from "@/components/departures/helpers/available-filters";
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
-import { itsOk } from "@schel-d/js-utils";
+import { nullableEquals, itsOk } from "@schel-d/js-utils";
 
 const router = useRouter();
 const route = useRoute();
@@ -74,7 +74,7 @@ watch(route, () => {
     if (!parsed.filter.equals(filter.value)) {
       filter.value = parsed.filter;
     }
-    if (!nullableEquals(parsed.time, time.value)) {
+    if (!nullableEquals(parsed.time, time.value, (a, b) => a.equals(b))) {
       time.value = parsed.time;
     }
   }

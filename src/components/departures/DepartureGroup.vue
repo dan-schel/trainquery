@@ -74,7 +74,7 @@ watch(utc, () => {
     <DepartureFeedVue
       v-for="(feed, i) of feeds"
       class="feed"
-      :key="feed.toString()"
+      :key="feed.asString()"
       :feed="feed"
       :departures="departureLists[i]"
       :loading="loading"

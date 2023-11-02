@@ -3,6 +3,10 @@ import { Line } from "../line";
 import { ServiceType } from "../service-type";
 import { Stop } from "../stop";
 import { UrlNames } from "../url-names";
+import {
+  HookContinuationGroup,
+  LinearContinuationGroup,
+} from "../continuation-group";
 
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
@@ -29,6 +33,11 @@ export class SharedConfig {
     readonly lines: Line[],
     /** Maps stops to more memorable URLs. */
     readonly urlNames: UrlNames,
+    /** How services form new services upon reaching their termini. */
+    readonly continuationRules: (
+      | LinearContinuationGroup
+      | HookContinuationGroup
+    )[],
     /** True if stops should list their platforms. Enables platform filtering. */
     readonly usePlatforms: boolean,
     /** The timezone the transit system's timetables use. */
@@ -47,6 +56,10 @@ export class SharedConfig {
       stops: Stop.json.array(),
       lines: Line.json.array(),
       urlNames: UrlNames.json,
+      continuationRules: z
+        .union([LinearContinuationGroup.json, HookContinuationGroup.json])
+        .array()
+        .default([]),
       usePlatforms: z.boolean(),
       timezone: z.union([
         z.object({
@@ -66,6 +79,7 @@ export class SharedConfig {
           x.stops,
           x.lines,
           x.urlNames,
+          x.continuationRules,
           x.usePlatforms,
           x.timezone,
           x.serviceTypes,
@@ -78,6 +92,10 @@ export class SharedConfig {
       stops: this.stops.map((s) => s.toJSON()),
       lines: this.lines.map((l) => l.toJSON()),
       urlNames: this.urlNames.toJSON(),
+      continuationRules:
+        this.continuationRules.length == 0
+          ? undefined
+          : this.continuationRules.map((c) => c.toJSON()),
       usePlatforms: this.usePlatforms,
       timezone: this.timezone,
       serviceTypes: this.serviceTypes.map((s) => s.toJSON()),

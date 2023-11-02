@@ -2,7 +2,7 @@
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
 import { useHead } from "@vueuse/head";
 useHead({
-  title: "Not found",
+  title: "Page not found",
   meta: [{ name: "robots", content: "noindex" }],
 });
 </script>

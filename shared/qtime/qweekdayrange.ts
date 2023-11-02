@@ -24,7 +24,7 @@ export class QWeekdayRange {
     return result;
   });
 
-  toString() {
+  asString() {
     return (
       (this.mon ? "M" : "_") +
       (this.tue ? "T" : "_") +
@@ -34,6 +34,10 @@ export class QWeekdayRange {
       (this.sat ? "S" : "_") +
       (this.sun ? "S" : "_")
     );
+  }
+
+  toJSON(): z.input<typeof QWeekdayRange.json> {
+    return this.asString();
   }
 
   static parse(input: string) {

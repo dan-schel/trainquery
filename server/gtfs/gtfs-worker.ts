@@ -69,12 +69,12 @@ export class GtfsWorker {
 
   private async _refresh() {
     try {
-      this._ctx.logger.logDownloadingGtfs();
+      this._ctx.logger.logRefreshingGtfs();
       const data = await downloadGtfs(this._ctx, this._gtfsConfig);
       this._data = data;
-      this._ctx.logger.logDownloadingGtfsSuccess();
+      this._ctx.logger.logRefreshingGtfsSuccess();
     } catch (err) {
-      this._ctx.logger.logDownloadingGtfsFailure(err);
+      this._ctx.logger.logRefreshingGtfsFailure(err);
     }
 
     if (
@@ -102,9 +102,20 @@ async function downloadGtfs(
   gtfsConfig: GtfsConfig<true> | GtfsConfig<false>,
 ): Promise<GtfsData> {
   const dataFolder = generateDataFolderPath();
-  const zipPath = path.join(dataFolder, "gtfs.zip");
+
+  const onlineSource =
+    gtfsConfig.staticData.startsWith("http://") ||
+    gtfsConfig.staticData.startsWith("https://");
+
+  const zipPath = onlineSource
+    ? path.join(dataFolder, "gtfs.zip")
+    : gtfsConfig.staticData;
+
   await fsp.mkdir(dataFolder);
-  await download(gtfsConfig.staticUrl, zipPath);
+
+  if (onlineSource) {
+    await download(gtfsConfig.staticData, zipPath);
+  }
 
   const zip = new AdmZip(zipPath);
   await extractZip(zip, dataFolder);

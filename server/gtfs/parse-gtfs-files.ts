@@ -10,7 +10,7 @@ import {
   tripsSchema,
 } from "./gtfs-csv-schemas";
 import { QWeekdayRange } from "../../shared/qtime/qweekdayrange";
-import { matchToRoute } from "../../shared/system/routes/find-match";
+import { MatchedRoute, matchToRoute } from "./find-match";
 import { StopID } from "../../shared/system/ids";
 import { TrainQuery } from "../trainquery";
 import { QTimetableTime } from "../../shared/qtime/qtime";
@@ -127,28 +127,37 @@ function parseTrips(
       parsingReport.logRejectedTrip();
       return null;
     }
-    const { line, associatedLines, route, direction } = match;
-    const times = match.values;
 
-    const idPair = { gtfsTripID: gtfsTripID, gtfsCalendarID: gtfsCalendarID };
-    const parsedTrip = new GtfsTrip(
-      [idPair],
-      null,
-      line,
-      associatedLines,
-      route,
-      direction,
-      times,
-    );
-    const hashKey = parsedTrip.hashKey;
+    const matchedRoutes = continuationsArray(match);
 
-    const existing = result.get(hashKey);
-    if (existing != null) {
-      result.set(hashKey, existing.addIDPair(idPair));
-      parsingReport.logDuplicatedTrip();
-    } else {
-      result.set(hashKey, parsedTrip);
-      parsingReport.logAcceptedTrip();
+    for (let i = 0; i < matchedRoutes.length; i++) {
+      const matchedRoute = matchedRoutes[i];
+      const { line, associatedLines, route, direction, values } = matchedRoute;
+
+      const idPair = {
+        gtfsTripID: gtfsTripID,
+        gtfsCalendarID: gtfsCalendarID,
+        continuationIndex: i,
+      };
+      const parsedTrip = new GtfsTrip(
+        [idPair],
+        null,
+        line,
+        associatedLines,
+        route,
+        direction,
+        values,
+      );
+      const hashKey = parsedTrip.hashKey;
+
+      const existing = result.get(hashKey);
+      if (existing != null) {
+        result.set(hashKey, existing.addIDPair(idPair));
+        parsingReport.logDuplicatedTrip();
+      } else {
+        result.set(hashKey, parsedTrip);
+        parsingReport.logAcceptedTrip();
+      }
     }
   }
 
@@ -198,4 +207,13 @@ async function readCsv<T extends z.ZodType>(
         resolve(results);
       });
   });
+}
+
+function continuationsArray<T>(
+  match: MatchedRoute<T>,
+): Omit<MatchedRoute<T>, "continuation">[] {
+  if (match.continuation != null) {
+    return [match, ...continuationsArray(match.continuation)];
+  }
+  return [match];
 }

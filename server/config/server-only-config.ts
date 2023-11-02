@@ -6,8 +6,6 @@ import { PlatformRules } from "./platform-rules";
 /** The config properties used by the server and never sent to the frontend. */
 export class ServerOnlyConfig {
   constructor(
-    /* TODO: continuation */
-
     /** Static timetables. */
     readonly timetables: Timetable[],
     /** Static rules for which trains use which platforms. */

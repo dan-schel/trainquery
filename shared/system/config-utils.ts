@@ -13,6 +13,10 @@ import { Service } from "./service/service";
 import { SharedConfig } from "./config/shared-config";
 import { DepartureFilter } from "./timetable/departure-filter";
 import { QLocalDateTime } from "../qtime/qdatetime";
+import {
+  HookContinuationGroup,
+  LinearContinuationGroup,
+} from "./continuation-group";
 
 export type HasSharedConfig = { shared: SharedConfig };
 
@@ -250,4 +254,19 @@ export function requireServiceType(
     throw new Error(`No service type with ID "${serviceType}".`);
   }
   return serviceTypeData;
+}
+
+export function getContinuationGroupForLine(
+  config: HasSharedConfig,
+  line: LineID,
+): LinearContinuationGroup | HookContinuationGroup | null {
+  return (
+    config.shared.continuationRules.find((r) => {
+      if (r instanceof LinearContinuationGroup) {
+        return r.sideA.includes(line) || r.sideB.includes(line);
+      } else {
+        return r.lines.includes(line);
+      }
+    }) ?? null
+  );
 }

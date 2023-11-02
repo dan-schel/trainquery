@@ -37,14 +37,14 @@ export class ConsoleLogger extends Logger {
   logRecallingGtfsFailure(err: unknown): void {
     console.warn("Failed to retrieve GTFS data from database.", err);
   }
-  logDownloadingGtfs(): void {
-    console.log("Downloading GTFS data...");
+  logRefreshingGtfs(): void {
+    console.log("Refreshing/parsing GTFS data...");
   }
-  logDownloadingGtfsSuccess(): void {
-    console.log("Successfully downloaded GTFS data.");
+  logRefreshingGtfsSuccess(): void {
+    console.log("Successfully refreshed/parsed GTFS data.");
   }
-  logDownloadingGtfsFailure(err: unknown): void {
-    console.warn("Failed to download GTFS data.", err);
+  logRefreshingGtfsFailure(err: unknown): void {
+    console.warn("Failed to refresh/parse GTFS data.", err);
   }
   logPersistingGtfs(): void {
     console.log("Saving GTFS to database...");

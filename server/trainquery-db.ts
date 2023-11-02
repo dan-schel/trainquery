@@ -55,13 +55,11 @@ export class TrainQueryDB {
       return null;
     }
 
+    const calendarDocs = await this.dbs.gtfs.calendars.find().toArray();
+    const tripDocs = await this.dbs.gtfs.trips.find().toArray();
     const metadata = GtfsData.metadataJson.parse(metadataDoc);
-    const calendars = GtfsCalendar.json
-      .array()
-      .parse(await this.dbs.gtfs.calendars.find().toArray());
-    const trips = GtfsTrip.json
-      .array()
-      .parse(await this.dbs.gtfs.trips.find().toArray());
+    const calendars = GtfsCalendar.json.array().parse(calendarDocs);
+    const trips = GtfsTrip.json.array().parse(tripDocs);
     return new GtfsData(calendars, trips, metadata.parsingReport, metadata.age);
   }
 

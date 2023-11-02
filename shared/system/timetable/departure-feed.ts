@@ -18,7 +18,7 @@ export class DepartureFeed {
     readonly filter: DepartureFilter,
   ) {}
 
-  toString(): string {
+  asString(): string {
     return `${this.stop.toFixed()}|${this.count.toFixed()}|${this.filter.asString()}`;
   }
 
@@ -45,7 +45,7 @@ export class DepartureFeed {
 
   static encode(feeds: DepartureFeed[]) {
     return reencode(
-      feeds.map((x) => x.toString()).join("|"),
+      feeds.map((x) => x.asString()).join("|"),
       encodedAlpha,
       base48Safe,
     );

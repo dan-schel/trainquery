@@ -8,7 +8,7 @@ import { formatDate } from "@/utils/format-qtime";
 import { QLocalDateTime } from "shared/qtime/qdatetime";
 import { useNow } from "@/utils/now-provider";
 import TimeInput from "./TimeInput.vue";
-import { nullableEquals } from "@/utils/param-utils";
+import { nullableEquals } from "@schel-d/js-utils";
 
 const props = defineProps<{
   time: QLocalDateTime | null;
@@ -25,7 +25,10 @@ const date = ref((props.time ?? local.value).date);
 watch(
   [() => props.isShown, () => props.time],
   ([isShown, newTime], [wasShown, oldTime]) => {
-    if (!nullableEquals(newTime, oldTime) || (isShown && !wasShown)) {
+    if (
+      !nullableEquals(newTime, oldTime, (a, b) => a.equals(b)) ||
+      (isShown && !wasShown)
+    ) {
       time.value = (props.time ?? local.value).time;
       date.value = (props.time ?? local.value).date;
     }
