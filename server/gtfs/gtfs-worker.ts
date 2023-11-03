@@ -63,7 +63,7 @@ export class GtfsWorker {
         }
       };
       refreshIfNeeded();
-      setTimeout(refreshIfNeeded, checkOutdatedInterval);
+      setInterval(refreshIfNeeded, checkOutdatedInterval);
     })();
   }
 
