@@ -4,10 +4,10 @@ import { requireLine, requireStop } from "../../shared/system/config-utils";
 import { PlatformID, StopID } from "../../shared/system/ids";
 import { PlatformFilteringData } from "../config/platform-rules";
 import { TrainQuery } from "../trainquery";
-import { Possibility } from "./get-possibilities";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { QDate } from "../../shared/qtime/qdate";
 import { ConfidenceLevel } from "../../shared/system/enums";
+import { Possibility } from "../departures/timetable-departure-source";
 
 function createPlatformGuesser(ctx: TrainQuery, entry: FullTimetableEntry) {
   const line = requireLine(ctx.getConfig(), entry.line);

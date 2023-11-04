@@ -1,30 +1,21 @@
-import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
-import { linesThatStopAt } from "../../shared/system/config-utils";
 import { LineID, StopID } from "../../shared/system/ids";
-import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
-import { TrainQuery } from "../trainquery";
-import { Possibility, getPossibilities as gp } from "./get-possibilities";
+import { DepartureSource } from "../departures/departure-source";
 
-export abstract class Bucket<T> {
-  abstract willAccept(possibility: Possibility): boolean;
-  abstract push(service: T): void;
+export abstract class Bucket<A, B> {
+  abstract willAccept(possibility: A): boolean;
+  abstract push(service: B): void;
   abstract isFull(): boolean;
 }
 
-export type Specificizer<T> = (
-  ctx: TrainQuery,
-  entry: FullTimetableEntry,
-  date: QDate,
-  perspectiveIndex: number,
-) => T;
+export type Specificizer<A, B> = (entry: A) => B;
 
-export function getDepartures<T>(
-  ctx: TrainQuery,
+export function getDepartures<A, B>(
+  source: DepartureSource<A>,
   stop: StopID,
   time: QUtcDateTime,
-  buckets: Bucket<T>[],
-  specificizer: Specificizer<T>,
+  buckets: Bucket<A, B>[],
+  specificizer: Specificizer<A, B>,
   {
     reverse = false,
     filterLines = null,
@@ -35,9 +26,9 @@ export function getDepartures<T>(
     maxIteration?: number;
   } = {},
 ) {
-  const lines = getRelevantLines(ctx, stop, filterLines);
+  source.prepare(stop, filterLines);
   const getPossibilities = (iteration: number) =>
-    gp(ctx, stop, time, iteration, reverse, lines);
+    source.getUnfiltered(time, iteration, reverse);
 
   let iteration = 0;
 
@@ -52,12 +43,7 @@ export function getDepartures<T>(
       if (approvingBuckets.length > 0) {
         // This operation is treated as being potentially expensive, which is
         // why buckets are encouraged to filter first on the possibility.
-        const specificized = specificizer(
-          ctx,
-          possibility.entry,
-          possibility.date,
-          possibility.perspectiveIndex,
-        );
+        const specificized = specificizer(possibility);
         approvingBuckets.forEach((b) => b.push(specificized));
       }
 
@@ -69,16 +55,4 @@ export function getDepartures<T>(
 
     iteration++;
   }
-}
-
-function getRelevantLines(
-  ctx: TrainQuery,
-  stop: StopID,
-  filterLines: LineID[] | null,
-) {
-  const stoppingLines = linesThatStopAt(ctx.getConfig(), stop).map((l) => l.id);
-  if (filterLines == null) {
-    return stoppingLines;
-  }
-  return stoppingLines.filter((f) => filterLines.includes(f));
 }

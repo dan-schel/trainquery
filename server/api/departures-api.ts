@@ -9,6 +9,7 @@ import { getDepartures } from "../timetable/get-departures";
 import { FilteredBucket } from "../timetable/filtering";
 import { specificizeDeparture } from "../timetable/specificize";
 import { unique } from "@schel-d/js-utils";
+import { TimetableDepartureSource } from "../departures/timetable-departure-source";
 
 const maxFeeds = 10;
 const maxCount = 20;
@@ -40,11 +41,11 @@ export async function departuresApi(
 
   uniqueStops.forEach((s) => {
     getDepartures(
-      ctx,
+      new TimetableDepartureSource(ctx),
       s,
       time,
       buckets.filter((b) => b.stop == s),
-      specificizeDeparture,
+      (x) => specificizeDeparture(ctx, x.entry, x.date, x.perspectiveIndex),
     );
   });
 

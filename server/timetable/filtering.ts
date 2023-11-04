@@ -2,12 +2,12 @@ import { requireLine } from "../../shared/system/config-utils";
 import { StopID } from "../../shared/system/ids";
 import { Departure } from "../../shared/system/service/departure";
 import { DepartureFilter } from "../../shared/system/timetable/departure-filter";
+import { Possibility } from "../departures/timetable-departure-source";
 import { TrainQuery } from "../trainquery";
 import { Bucket } from "./get-departures";
-import { Possibility } from "./get-possibilities";
 import { guessPlatformOfPossibility } from "./guess-platform";
 
-export class FilteredBucket extends Bucket<Departure> {
+export class FilteredBucket extends Bucket<Possibility, Departure> {
   readonly departures: Departure[] = [];
 
   constructor(
