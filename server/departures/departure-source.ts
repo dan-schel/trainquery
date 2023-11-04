@@ -12,9 +12,23 @@ export abstract class DepartureSource<T> {
    */
   abstract prepare(stop: StopID, filterLines: LineID[] | null): void;
 
-  abstract getUnfiltered(
+  /**
+   * Returns departures from this source. The result can be in raw form, as
+   * departures undergo another "specificizing" step once filtered.
+   * @param time The time to query departures for.
+   * @param iteration The iteration (see getDepartures implementation).
+   * @param reverse True if we want departures before this time, not after.
+   */
+  abstract fetch(
     time: QUtcDateTime,
     iteration: number,
     reverse: boolean,
-  ): T[];
+  ): Promise<T[]>;
+
+  /**
+   * True if getDepartures should call fetch repeatedly until it has as many
+   * departures as it desires, or false if fetch will return all possible
+   * departures immediately.
+   */
+  abstract isIterable(): boolean;
 }

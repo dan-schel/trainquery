@@ -10,7 +10,7 @@ export abstract class Bucket<A, B> {
 
 export type Specificizer<A, B> = (entry: A) => B;
 
-export function getDepartures<A, B>(
+export async function getDepartures<A, B>(
   source: DepartureSource<A>,
   stop: StopID,
   time: QUtcDateTime,
@@ -27,13 +27,14 @@ export function getDepartures<A, B>(
   } = {},
 ) {
   source.prepare(stop, filterLines);
-  const getPossibilities = (iteration: number) =>
-    source.getUnfiltered(time, iteration, reverse);
 
   let iteration = 0;
-
-  while (iteration <= maxIteration && !buckets.every((b) => b.isFull())) {
-    const possibilities = getPossibilities(iteration);
+  while (
+    iteration <= maxIteration &&
+    !buckets.every((b) => b.isFull()) &&
+    (iteration == 0 || source.isIterable())
+  ) {
+    const possibilities = await source.fetch(time, iteration, reverse);
 
     for (const possibility of possibilities) {
       // Determine which buckets (if any) want this departure.

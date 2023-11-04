@@ -14,7 +14,7 @@ import { isWithin } from "../../shared/utils";
 import { getTimetablesForDay } from "../timetable/get-timetables-for-day";
 import { TrainQuery } from "../trainquery";
 import { DepartureSource } from "./departure-source";
-import { SearchTimeRange, getSearchTimes } from "./search-time-range";
+import { SearchTimeRange, fetchAndSort } from "./search-time-range";
 
 export type Possibility = {
   entry: FullTimetableEntry;
@@ -38,24 +38,24 @@ export class TimetableDepartureSource extends DepartureSource<Possibility> {
         : stoppingLines.filter((f) => filterLines.includes(f));
   }
 
-  getUnfiltered(
+  async fetch(
     time: QUtcDateTime,
     iteration: number,
     reverse: boolean,
-  ): Possibility[] {
+  ): Promise<Possibility[]> {
     if (this._stop == null || this._lines == null) {
       throw new Error("Call setStop before getUnfiltered.");
     }
     const stop = this._stop;
     const lines = this._lines;
 
-    const searchTimes = getSearchTimes(this._ctx, time, iteration, reverse);
-    const result = searchTimes
-      .map((t) => getForSearchTime(this._ctx, stop, lines, t))
-      .flat();
-    result.sort((a, b) => (reverse ? -1 : 1) * (a.sortTime - b.sortTime));
+    return await fetchAndSort(this._ctx, time, iteration, reverse, async (t) =>
+      getForSearchTime(this._ctx, stop, lines, t),
+    );
+  }
 
-    return result;
+  isIterable(): boolean {
+    return true;
   }
 }
 

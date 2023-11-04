@@ -39,15 +39,17 @@ export async function departuresApi(
     (a, b) => a == b,
   );
 
-  uniqueStops.forEach((s) => {
-    getDepartures(
-      new TimetableDepartureSource(ctx),
-      s,
-      time,
-      buckets.filter((b) => b.stop == s),
-      (x) => specificizeDeparture(ctx, x.entry, x.date, x.perspectiveIndex),
-    );
-  });
+  await Promise.all(
+    uniqueStops.map((s) =>
+      getDepartures(
+        new TimetableDepartureSource(ctx),
+        s,
+        time,
+        buckets.filter((b) => b.stop == s),
+        (x) => specificizeDeparture(ctx, x.entry, x.date, x.perspectiveIndex),
+      ),
+    ),
+  );
 
   return buckets.map((b) => b.departures.map((d) => d.toJSON()));
 }

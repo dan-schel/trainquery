@@ -77,3 +77,19 @@ export function getSearchTimes(
 
   return result;
 }
+
+export async function fetchAndSort<A>(
+  ctx: TrainQuery,
+  time: QUtcDateTime,
+  iteration: number,
+  reverse: boolean,
+  fetch: (searchTime: SearchTimeRange) => Promise<(A & { sortTime: number })[]>,
+) {
+  const result: (A & { sortTime: number })[] = [];
+  for (const searchTime of getSearchTimes(ctx, time, iteration, reverse)) {
+    result.push(...(await fetch(searchTime)));
+  }
+
+  result.sort((a, b) => (reverse ? -1 : 1) * (a.sortTime - b.sortTime));
+  return result;
+}
