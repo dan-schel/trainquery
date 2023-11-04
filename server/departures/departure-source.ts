@@ -1,5 +1,5 @@
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
-import { LineID, StopID } from "../../shared/system/ids";
+import { StopID } from "../../shared/system/ids";
 import { TrainQuery } from "../trainquery";
 
 export abstract class DepartureSource<T> {
@@ -10,7 +10,7 @@ export abstract class DepartureSource<T> {
    * to cache details about this stop in advance, assuming they will be used
    * repetitively.
    */
-  abstract prepare(stop: StopID, filterLines: LineID[] | null): void;
+  abstract prepare(stop: StopID): void;
 
   /**
    * Returns departures from this source. The result can be in raw form, as

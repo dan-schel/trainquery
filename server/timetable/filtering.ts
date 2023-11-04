@@ -1,14 +1,13 @@
 import { requireLine } from "../../shared/system/config-utils";
 import { StopID } from "../../shared/system/ids";
-import { Departure } from "../../shared/system/service/departure";
 import { DepartureFilter } from "../../shared/system/timetable/departure-filter";
-import { Possibility } from "../departures/timetable-departure-source";
+import { TimetablePossibility } from "../departures/timetable-departure-source";
 import { TrainQuery } from "../trainquery";
 import { Bucket } from "./get-departures";
 import { guessPlatformOfPossibility } from "./guess-platform";
 
-export class FilteredBucket extends Bucket<Possibility, Departure> {
-  readonly departures: Departure[] = [];
+export class FilteredBucket<B> extends Bucket<TimetablePossibility, B> {
+  readonly items: B[] = [];
 
   constructor(
     private readonly _ctx: TrainQuery,
@@ -19,21 +18,42 @@ export class FilteredBucket extends Bucket<Possibility, Departure> {
     super();
   }
 
-  willAccept(possibility: Possibility): boolean {
+  willAccept(possibility: TimetablePossibility): boolean {
     return filterAccepts(this._ctx, this.filter, possibility);
   }
-  push(service: Departure): void {
-    this.departures.push(service);
+  push(item: B): void {
+    this.items.push(item);
   }
   isFull(): boolean {
-    return this.departures.length >= this.capacity;
+    return this.items.length >= this.capacity;
+  }
+}
+
+export class PassthroughBucket<B> extends Bucket<any, B> {
+  readonly items: B[] = [];
+
+  constructor(
+    readonly stop: StopID,
+    readonly capacity: number,
+  ) {
+    super();
+  }
+
+  willAccept(_possibility: any): boolean {
+    return true;
+  }
+  push(item: B): void {
+    this.items.push(item);
+  }
+  isFull(): boolean {
+    return this.items.length >= this.capacity;
   }
 }
 
 function filterAccepts(
   ctx: TrainQuery,
   filter: DepartureFilter,
-  x: Possibility,
+  x: TimetablePossibility,
 ) {
   // Filter by line.
   if (filter.lines != null && !filter.lines.some((l) => l == x.entry.line)) {

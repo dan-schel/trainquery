@@ -7,7 +7,7 @@ import { TrainQuery } from "../trainquery";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { QDate } from "../../shared/qtime/qdate";
 import { ConfidenceLevel } from "../../shared/system/enums";
-import { Possibility } from "../departures/timetable-departure-source";
+import { TimetablePossibility } from "../departures/timetable-departure-source";
 
 function createPlatformGuesser(ctx: TrainQuery, entry: FullTimetableEntry) {
   const line = requireLine(ctx.getConfig(), entry.line);
@@ -37,7 +37,7 @@ function createPlatformGuesser(ctx: TrainQuery, entry: FullTimetableEntry) {
 
 export function guessPlatformOfPossibility(
   ctx: TrainQuery,
-  possibility: Possibility,
+  possibility: TimetablePossibility,
 ) {
   const { guesser, stopList } = createPlatformGuesser(ctx, possibility.entry);
   return guesser(stopList[possibility.perspectiveIndex], possibility.date);

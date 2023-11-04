@@ -31,8 +31,12 @@ export async function trainQuery(
 
   const refreshConfig = async (skipFetch: boolean) => {
     if (!skipFetch) {
-      config = new FullConfig(await configProvider.fetchConfig(logger));
-      logger.logConfigRefresh(config, false);
+      try {
+        config = new FullConfig(await configProvider.fetchConfig(logger));
+        logger.logConfigRefresh(config, false);
+      } catch (err) {
+        logger.logConfigRefreshFailure(err);
+      }
     }
 
     const refreshMs = configProvider.getRefreshMs();
@@ -100,6 +104,7 @@ export abstract class ConfigProvider {
 export abstract class Logger {
   abstract logServerListening(server: Server): void;
   abstract logConfigRefresh(config: FullConfig, initial: boolean): void;
+  abstract logConfigRefreshFailure(err: unknown): void;
   abstract logTimetableLoadFail(path: string): void;
 
   abstract logRecallingGtfs(): void;

@@ -16,35 +16,28 @@ import { TrainQuery } from "../trainquery";
 import { DepartureSource } from "./departure-source";
 import { SearchTimeRange, fetchAndSort } from "./search-time-range";
 
-export type Possibility = {
+export type TimetablePossibility = {
   entry: FullTimetableEntry;
   date: QDate;
   perspectiveIndex: number;
 };
 
-export class TimetableDepartureSource extends DepartureSource<Possibility> {
+export class TimetableDepartureSource extends DepartureSource<TimetablePossibility> {
   private _stop: StopID | null = null;
   private _lines: LineID[] | null = null;
 
-  prepare(stop: StopID, filterLines: LineID[] | null): void {
+  prepare(stop: StopID): void {
     this._stop = stop;
-
-    const stoppingLines = linesThatStopAt(this._ctx.getConfig(), stop).map(
-      (l) => l.id,
-    );
-    this._lines =
-      filterLines == null
-        ? stoppingLines
-        : stoppingLines.filter((f) => filterLines.includes(f));
+    this._lines = linesThatStopAt(this._ctx.getConfig(), stop).map((l) => l.id);
   }
 
   async fetch(
     time: QUtcDateTime,
     iteration: number,
     reverse: boolean,
-  ): Promise<Possibility[]> {
+  ): Promise<TimetablePossibility[]> {
     if (this._stop == null || this._lines == null) {
-      throw new Error("Call setStop before getUnfiltered.");
+      throw new Error("Call prepare before fetch.");
     }
     const stop = this._stop;
     const lines = this._lines;
@@ -65,7 +58,7 @@ function getForSearchTime(
   lines: LineID[],
   searchTime: SearchTimeRange,
 ) {
-  const result: (Possibility & { sortTime: number })[] = [];
+  const result: (TimetablePossibility & { sortTime: number })[] = [];
 
   const dow = QDayOfWeek.fromDate(searchTime.date);
 

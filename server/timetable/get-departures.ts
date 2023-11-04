@@ -18,7 +18,6 @@ export async function getDepartures<A, B>(
   specificizer: Specificizer<A, B>,
   {
     reverse = false,
-    filterLines = null,
     maxIteration = 14,
   }: {
     reverse?: boolean;
@@ -26,7 +25,7 @@ export async function getDepartures<A, B>(
     maxIteration?: number;
   } = {},
 ) {
-  source.prepare(stop, filterLines);
+  source.prepare(stop);
 
   let iteration = 0;
   while (
