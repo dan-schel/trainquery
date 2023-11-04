@@ -1,6 +1,7 @@
 import { NumberRange, parseIntNull } from "@schel-d/js-utils";
 import { z } from "zod";
 import { QTimetableTime } from "./qtime/qtime";
+import { QDate } from "./qtime/qdate";
 
 // NOTE: While I'd love to move this stuff to @schel-d/js-utils, the zod stuff
 // can't go (at least the mapJson function) because zod uses instanceof in some
@@ -76,7 +77,7 @@ export const NumberRangeJson = z.string().transform((x, ctx) => {
 });
 
 // TODO: Add more types to the generic?
-export function isWithin<T extends QTimetableTime>(
+export function isWithinTimeRange<T extends QTimetableTime>(
   time: T,
   start: T | null,
   end: T | null,
@@ -85,6 +86,20 @@ export function isWithin<T extends QTimetableTime>(
     return false;
   }
   if (end != null && time.isAfterOrEqual(end)) {
+    return false;
+  }
+  return true;
+}
+
+export function isWithinDateRange(
+  day: QDate,
+  begins: QDate | null,
+  ends: QDate | null,
+) {
+  if (begins != null && day.isBefore(begins)) {
+    return false;
+  }
+  if (ends != null && day.isAfter(ends)) {
     return false;
   }
   return true;

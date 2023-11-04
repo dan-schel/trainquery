@@ -10,7 +10,7 @@ import {
 } from "../../shared/system/ids";
 import { badVariantOrDirection } from "../../shared/system/routes/line-route";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
-import { isWithin } from "../../shared/utils";
+import { isWithinTimeRange } from "../../shared/utils";
 import { getTimetablesForDay } from "../timetable/get-timetables-for-day";
 import { TrainQuery } from "../trainquery";
 import { DepartureSource } from "./departure-source";
@@ -86,7 +86,10 @@ function getForSearchTime(
       const indices = retrieveIndices(stopLists, entry.route, entry.direction);
       for (const index of indices) {
         const time = entry.rows[index];
-        if (time == null || !isWithin(time, searchTime.min, searchTime.max)) {
+        if (
+          time == null ||
+          !isWithinTimeRange(time, searchTime.min, searchTime.max)
+        ) {
           continue;
         }
 

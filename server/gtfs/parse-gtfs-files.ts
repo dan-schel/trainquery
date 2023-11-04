@@ -148,7 +148,7 @@ function parseTrips(
         direction,
         values,
       );
-      const hashKey = parsedTrip.hashKey;
+      const hashKey = parsedTrip.computeHashKey();
 
       const existing = result.get(hashKey);
       if (existing != null) {

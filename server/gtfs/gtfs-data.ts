@@ -14,6 +14,8 @@ import { GtfsParsingReport } from "./gtfs-parsing-report";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { z } from "zod";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
+import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
+import { isWithinDateRange } from "../../shared/utils";
 
 export class GtfsData {
   constructor(
@@ -125,6 +127,19 @@ export class GtfsCalendar {
       exceptions: this.exceptions.map((d) => d.toJSON()),
     };
   }
+
+  appliesOn(date: QDate) {
+    if (this.exceptions.find((d) => d.equals(date))) {
+      return false;
+    }
+    if (this.additionalDates.find((d) => d.equals(date))) {
+      return true;
+    }
+
+    const dowIncluded = this.wdr.includes(QDayOfWeek.fromDate(date));
+    const withinDates = isWithinDateRange(date, this.start, this.end);
+    return withinDates && dowIncluded;
+  }
 }
 
 export class GtfsTrip {
@@ -215,7 +230,7 @@ export class GtfsTrip {
     };
   }
 
-  get hashKey() {
+  computeHashKey() {
     return JSON.stringify({
       line: this.line,
       route: this.route,
