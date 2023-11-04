@@ -3,7 +3,7 @@ import { toUTCDateTime } from "../../shared/qtime/qdatetime";
 import { requireLine } from "../../shared/system/config-utils";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { TrainQuery } from "../trainquery";
-import { guessPlatformsOfEntry } from "./guess-platform";
+import { guessPlatformsOfEntry, guessPlatformsOfTrip } from "./guess-platform";
 import { StaticServiceIDComponents } from "./static-service-id";
 import { CompletePattern } from "../../shared/system/service/complete-pattern";
 import { SkippedStop } from "../../shared/system/service/skipped-stop";
@@ -83,7 +83,7 @@ export function specificizeGtfsTrip(
   // date into a single string.
   const id = "stuff";
 
-  // const platforms = guessPlatformsOfEntry(ctx, entry, date);
+  const platforms = guessPlatformsOfTrip(ctx, trip, date);
   const line = requireLine(ctx.getConfig(), trip.line);
   const stopList = line.route.requireStopList(trip.route, trip.direction);
   const offset = ctx.getConfig().computed.offset.get(date);
@@ -95,7 +95,7 @@ export function specificizeGtfsTrip(
       }
 
       const time = toUTCDateTime(date, r, offset);
-      const platform = null; // platforms[i];
+      const platform = platforms[i];
       const setsDown = stopList.setsDown[i].matches(trip.direction);
       const picksUp = stopList.picksUp[i].matches(trip.direction);
 

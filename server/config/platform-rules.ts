@@ -1,21 +1,16 @@
 import { z } from "zod";
-import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
 import {
   ConfidenceLevel,
   ConfidenceLevelJson,
-  LineColor,
 } from "../../shared/system/enums";
 import {
-  DirectionID,
-  LineID,
   PlatformID,
   PlatformIDJson,
-  RouteVariantID,
-  ServiceTypeID,
   StopID,
   StopIDStringJson,
 } from "../../shared/system/ids";
 import { mapJson } from "../../shared/utils";
+import { PlatformFilteringData } from "../timetable/filtering";
 
 type StopPlatformRule = {
   confidence: ConfidenceLevel;
@@ -65,18 +60,6 @@ const clauseMatchers = [
   /^none$/,
 ];
 
-export type PlatformFilteringData = {
-  line: LineID;
-  color: LineColor;
-  direction: DirectionID;
-  routeVariant: RouteVariantID;
-  serviceType: ServiceTypeID;
-  origin: StopID;
-  stops: StopID[];
-  terminus: StopID;
-  dayOfWeek: QDayOfWeek;
-};
-
 export class PlatformFilter {
   constructor(readonly clauses: string[]) {}
 
@@ -115,7 +98,7 @@ function matchesClause(clause: string, service: PlatformFilteringData) {
   const absClause = clause.replace("!", "");
 
   if (absClause.startsWith("line-")) {
-    return negate(absClause == `line-${service.line.toFixed()}`, negated);
+    return negate(absClause == `line-${service.line.id.toFixed()}`, negated);
   } else if (absClause.startsWith("color-")) {
     return negate(absClause == `color-${service.color}`, negated);
   } else if (absClause.startsWith("direction-")) {

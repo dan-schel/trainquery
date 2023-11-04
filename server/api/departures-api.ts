@@ -6,7 +6,6 @@ import {
 import { ServerParams, TrainQuery } from "../trainquery";
 import { DepartureFeed } from "../../shared/system/timetable/departure-feed";
 import { getDepartures } from "../timetable/get-departures";
-import { PassthroughBucket } from "../timetable/filtering";
 import { specificizeGtfsDeparture } from "../timetable/specificize";
 import { unique } from "@schel-d/js-utils";
 import {
@@ -14,6 +13,7 @@ import {
   GtfsPossibility,
 } from "../departures/gtfs-departure-source";
 import { Departure } from "../../shared/system/service/departure";
+import { FilteredBucket } from "../departures/filtered-bucket";
 
 const maxFeeds = 10;
 const maxCount = 20;
@@ -36,8 +36,7 @@ export async function departuresApi(
   const time = requireDateTimeParam(params, "time");
 
   const buckets = feeds.map(
-    // (f) => new FilteredBucket<Departure>(ctx, f.stop, f.count, f.filter),
-    (f) => new PassthroughBucket<Departure>(f.stop, f.count),
+    (f) => new FilteredBucket<Departure>(ctx, f.stop, f.count, f.filter),
   );
   const uniqueStops = unique(
     feeds.map((f) => f.stop),
