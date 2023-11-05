@@ -14,18 +14,30 @@ import { GtfsParsingReport } from "./gtfs-parsing-report";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { z } from "zod";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
+import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
+import { isWithinDateRange } from "../../shared/utils";
 
 export class GtfsData {
   constructor(
     readonly calendars: GtfsCalendar[],
     readonly trips: GtfsTrip[],
+    readonly configHash: string,
     readonly parsingReport: GtfsParsingReport,
     readonly age: QUtcDateTime,
   ) {}
 
   static merge(feeds: GtfsData[], subfeedIDs: string[]): GtfsData {
-    if (feeds.length != subfeedIDs.length || !unique(subfeedIDs)) {
-      throw new Error("Invalid arguments, cannot merge GTFS feeds.");
+    if (feeds.length < 0) {
+      throw new Error("Cannot merge, no feeds provided.");
+    }
+    if (feeds.length != subfeedIDs.length) {
+      throw new Error("Mismatch between feed count and subfeed ID count.");
+    }
+    if (!unique(subfeedIDs)) {
+      throw new Error("Subfeed IDs must be unique.");
+    }
+    if (!feeds.every((f) => f.configHash == feeds[0].configHash)) {
+      throw new Error("Cannot merge feeds created from differing configs.");
     }
 
     const calendars = subfeedIDs
@@ -48,16 +60,18 @@ export class GtfsData {
       .map((f) => f.age)
       .sort((a, b) => a.asDecimal() - b.asDecimal())[0];
 
-    return new GtfsData(calendars, trips, reporting, age);
+    return new GtfsData(calendars, trips, feeds[0].configHash, reporting, age);
   }
 
   static readonly metadataJson = z.object({
+    configHash: z.string(),
     parsingReport: GtfsParsingReport.json,
     age: QUtcDateTime.json,
   });
 
   metadataToJSON(): z.input<typeof GtfsData.metadataJson> {
     return {
+      configHash: this.configHash,
       parsingReport: this.parsingReport.toJSON(),
       age: this.age.toJSON(),
     };
@@ -124,6 +138,19 @@ export class GtfsCalendar {
       additionalDates: this.additionalDates.map((d) => d.toJSON()),
       exceptions: this.exceptions.map((d) => d.toJSON()),
     };
+  }
+
+  appliesOn(date: QDate) {
+    if (this.exceptions.find((d) => d.equals(date))) {
+      return false;
+    }
+    if (this.additionalDates.find((d) => d.equals(date))) {
+      return true;
+    }
+
+    const dowIncluded = this.wdr.includes(QDayOfWeek.fromDate(date));
+    const withinDates = isWithinDateRange(date, this.start, this.end);
+    return withinDates && dowIncluded;
   }
 }
 
@@ -215,12 +242,26 @@ export class GtfsTrip {
     };
   }
 
-  get hashKey() {
+  computeHashKey() {
     return JSON.stringify({
       line: this.line,
       route: this.route,
       direction: this.direction,
       times: this.times.map((t) => t?.toJSON() ?? null),
     });
+  }
+
+  requireIDPair(gtfsCalendarID: string): {
+    gtfsTripID: string;
+    gtfsCalendarID: string;
+    continuationIndex: number;
+  } {
+    const pair = this.idPairs.find((p) => p.gtfsCalendarID == gtfsCalendarID);
+    if (pair == null) {
+      throw new Error(
+        `Trip did not have an ID under calendar "${gtfsCalendarID}".`,
+      );
+    }
+    return pair;
   }
 }

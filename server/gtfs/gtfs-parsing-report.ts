@@ -129,7 +129,11 @@ export class GtfsParsingReport {
 
   static merge(reports: GtfsParsingReport[]): GtfsParsingReport {
     return new GtfsParsingReport(
-      new Set(...reports.map((r) => r.unsupportedGtfsStopIDs.values()).flat()),
+      new Set(
+        reports
+          .map((r) => Array.from(r.unsupportedGtfsStopIDs.values()))
+          .flat(),
+      ),
       reports.map((r) => r.unsupportedRoutes).flat(),
       reports.reduce((sum, r) => sum + r.rejectedTrips, 0),
       reports.reduce((sum, r) => sum + r.acceptedTrips, 0),

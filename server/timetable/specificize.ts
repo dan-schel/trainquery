@@ -3,13 +3,15 @@ import { toUTCDateTime } from "../../shared/qtime/qdatetime";
 import { requireLine } from "../../shared/system/config-utils";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { TrainQuery } from "../trainquery";
-import { guessPlatformsOfEntry } from "./guess-platform";
+import { guessPlatformsOfEntry, guessPlatformsOfTrip } from "./guess-platform";
 import { StaticServiceIDComponents } from "./static-service-id";
 import { CompletePattern } from "../../shared/system/service/complete-pattern";
 import { SkippedStop } from "../../shared/system/service/skipped-stop";
 import { ServedStop } from "../../shared/system/service/served-stop";
 import { Service } from "../../shared/system/service/service";
 import { Departure } from "../../shared/system/service/departure";
+import { GtfsTrip } from "../gtfs/gtfs-data";
+import { GtfsServiceIDComponents } from "../gtfs/gtfs-service-id";
 
 export function specificize(
   ctx: TrainQuery,
@@ -69,5 +71,77 @@ export function specificizeDeparture(
   perspectiveIndex: number,
 ): Departure {
   const service = specificize(ctx, entry, date);
+  return Departure.fromService(service, perspectiveIndex);
+}
+
+export function specificizeGtfsTrip(
+  ctx: TrainQuery,
+  trip: GtfsTrip,
+  gtfsCalendarID: string,
+  date: QDate,
+): Service<CompletePattern> {
+  // TODO: Encode trip ID (for the given calendar ID), continuation index, and
+  // date into a single string.
+  const idPair = trip.requireIDPair(gtfsCalendarID);
+  const id = new GtfsServiceIDComponents(
+    idPair.gtfsTripID,
+    idPair.continuationIndex,
+    trip.gtfsSubfeedID,
+    date,
+  ).encode();
+
+  const platforms = guessPlatformsOfTrip(ctx, trip, date);
+  const line = requireLine(ctx.getConfig(), trip.line);
+  const stopList = line.route.requireStopList(trip.route, trip.direction);
+  const offset = ctx.getConfig().computed.offset.get(date);
+
+  const stoppingPattern = new CompletePattern(
+    trip.times.map((r, i) => {
+      if (r == null) {
+        return new SkippedStop(stopList.stops[i], i);
+      }
+
+      const time = toUTCDateTime(date, r, offset);
+      const platform = platforms[i];
+      const setsDown = stopList.setsDown[i].matches(trip.direction);
+      const picksUp = stopList.picksUp[i].matches(trip.direction);
+
+      return new ServedStop(
+        stopList.stops[i],
+        i,
+        time,
+        null,
+        setsDown,
+        picksUp,
+        platform,
+      );
+    }),
+  );
+
+  return new Service(
+    trip.line,
+    trip.associatedLines,
+    trip.route,
+    trip.direction,
+    stoppingPattern,
+    null,
+    [
+      {
+        source: "gtfs",
+        id: id,
+      },
+    ],
+    null,
+  );
+}
+
+export function specificizeGtfsDeparture(
+  ctx: TrainQuery,
+  trip: GtfsTrip,
+  gtfsCalendarID: string,
+  date: QDate,
+  perspectiveIndex: number,
+): Departure {
+  const service = specificizeGtfsTrip(ctx, trip, gtfsCalendarID, date);
   return Departure.fromService(service, perspectiveIndex);
 }

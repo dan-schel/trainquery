@@ -1,88 +1,114 @@
+import { nonNull } from "@schel-d/js-utils";
 import { requireLine } from "../../shared/system/config-utils";
-import { StopID } from "../../shared/system/ids";
-import { Departure } from "../../shared/system/service/departure";
-import { DepartureFilter } from "../../shared/system/timetable/departure-filter";
+import {
+  DirectionID,
+  RouteVariantID,
+  ServiceTypeID,
+  StopID,
+} from "../../shared/system/ids";
+import { GtfsPossibility } from "../departures/gtfs-departure-source";
+import { TimetablePossibility } from "../departures/timetable-departure-source";
 import { TrainQuery } from "../trainquery";
-import { Bucket } from "./get-departures";
-import { Possibility } from "./get-possibilities";
-import { guessPlatformOfPossibility } from "./guess-platform";
+import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
+import { LineColor } from "../../shared/system/enums";
+import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
+import { GtfsTrip } from "../gtfs/gtfs-data";
+import { Line } from "../../shared/system/line";
+import { QDate } from "../../shared/qtime/qdate";
 
-export class FilteredBucket extends Bucket<Departure> {
-  readonly departures: Departure[] = [];
+export type GeneralFilteringData = {
+  line: Line;
+  color: LineColor;
+  direction: DirectionID;
+  routeVariant: RouteVariantID;
+  serviceType: ServiceTypeID;
+  origin: StopID;
+  stops: StopID[];
+  terminus: StopID;
+  routeStopList: StopID[];
+};
 
-  constructor(
-    private readonly _ctx: TrainQuery,
-    readonly stop: StopID,
-    readonly capacity: number,
-    readonly filter: DepartureFilter,
-  ) {
-    super();
-  }
+export type DepartureFilteringData = GeneralFilteringData & {
+  isArrival: boolean;
+  picksUp: boolean;
+};
+export type PlatformFilteringData = GeneralFilteringData & {
+  dayOfWeek: QDayOfWeek;
+};
+export type AllFilteringData = DepartureFilteringData & PlatformFilteringData;
 
-  willAccept(possibility: Possibility): boolean {
-    return filterAccepts(this._ctx, this.filter, possibility);
-  }
-  push(service: Departure): void {
-    this.departures.push(service);
-  }
-  isFull(): boolean {
-    return this.departures.length >= this.capacity;
-  }
+export function getFilteringData(
+  ctx: TrainQuery,
+  x: FullTimetableEntry | GtfsTrip,
+): GeneralFilteringData {
+  const rows = x instanceof FullTimetableEntry ? x.rows : x.times;
+
+  const line = requireLine(ctx.getConfig(), x.line);
+  const stopList = line.route.requireStops(x.route, x.direction);
+  const stops = rows
+    .map((r, i) => (r != null ? stopList[i] : null))
+    .filter(nonNull);
+
+  return {
+    line: line,
+    color: line.color,
+    direction: x.direction,
+    routeVariant: x.route,
+    serviceType: line.serviceType,
+    origin: stops[0],
+    stops: stops,
+    terminus: stops[stops.length - 1],
+    routeStopList: stopList,
+  };
 }
 
-function filterAccepts(
-  ctx: TrainQuery,
-  filter: DepartureFilter,
-  x: Possibility,
-) {
-  // Filter by line.
-  if (filter.lines != null && !filter.lines.some((l) => l == x.entry.line)) {
-    return false;
-  }
-
-  // Filter by direction.
-  if (
-    filter.directions != null &&
-    !filter.directions.some((d) => d == x.entry.direction)
-  ) {
-    return false;
-  }
-
-  // Filter by platform.
-  const platform = guessPlatformOfPossibility(ctx, x);
-  if (
-    filter.platforms != null &&
-    (platform == null || !filter.platforms.some((p) => p == platform.id))
-  ) {
-    return false;
-  }
-
-  // Filter by service type.
-  const line = requireLine(ctx.getConfig(), x.entry.line);
-  if (
-    filter.serviceTypes != null &&
-    !filter.serviceTypes.some((s) => s == line.serviceType)
-  ) {
-    return false;
-  }
+export function upgradeToDepartureFilteringData(
+  data: GeneralFilteringData,
+  x: TimetablePossibility | GtfsPossibility,
+): DepartureFilteringData {
+  const rows = "entry" in x ? x.entry.rows : x.trip.times;
 
   // Filter arrivals.
-  const isArrival = x.entry.rows
-    .slice(x.perspectiveIndex + 1)
-    .every((x) => x == null);
-  if (!filter.arrivals && isArrival) {
-    return false;
-  }
+  const isArrival = rows.slice(x.perspectiveIndex + 1).every((x) => x == null);
 
   // Filter set-down-only services.
-  const picksUp = line.route.picksUp(
-    x.entry.route,
-    x.entry.direction,
+  const picksUp = data.line.route.picksUp(
+    data.routeVariant,
+    data.direction,
     x.perspectiveIndex,
   );
-  if (!filter.setDownOnly && !picksUp) {
-    return false;
-  }
 
-  return true;
+  return {
+    ...data,
+    isArrival: isArrival,
+    picksUp: picksUp,
+  };
+}
+export function upgradeToPlatformFilteringData(
+  data: GeneralFilteringData,
+  date: QDate,
+): PlatformFilteringData {
+  return {
+    ...data,
+    dayOfWeek: QDayOfWeek.fromDate(date),
+  };
+}
+
+export function getPlatformFilteringData(
+  ctx: TrainQuery,
+  x: FullTimetableEntry | GtfsTrip,
+  date: QDate,
+) {
+  const base = getFilteringData(ctx, x);
+  return upgradeToPlatformFilteringData(base, date);
+}
+export function getAllFilteringData(
+  ctx: TrainQuery,
+  x: TimetablePossibility | GtfsPossibility,
+): AllFilteringData {
+  const base = getFilteringData(ctx, "entry" in x ? x.entry : x.trip);
+  return {
+    ...upgradeToDepartureFilteringData(base, x),
+    ...upgradeToPlatformFilteringData(base, x.date),
+  };
 }

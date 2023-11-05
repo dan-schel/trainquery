@@ -1,60 +1,34 @@
-import { nonNull } from "@schel-d/js-utils";
-import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
-import { requireLine, requireStop } from "../../shared/system/config-utils";
+import { requireStop } from "../../shared/system/config-utils";
 import { PlatformID, StopID } from "../../shared/system/ids";
-import { PlatformFilteringData } from "../config/platform-rules";
 import { TrainQuery } from "../trainquery";
-import { Possibility } from "./get-possibilities";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { QDate } from "../../shared/qtime/qdate";
 import { ConfidenceLevel } from "../../shared/system/enums";
-
-function createPlatformGuesser(ctx: TrainQuery, entry: FullTimetableEntry) {
-  const line = requireLine(ctx.getConfig(), entry.line);
-  const stopList = line.route.requireStops(entry.route, entry.direction);
-  const stops = entry.rows
-    .map((r, i) => (r != null ? stopList[i] : null))
-    .filter(nonNull);
-  const data = {
-    line: entry.line,
-    color: line.color,
-    direction: entry.direction,
-    routeVariant: entry.route,
-    serviceType: line.serviceType,
-    origin: stops[0],
-    stops: stops,
-    terminus: stops[stops.length - 1],
-  };
-  return {
-    guesser: (perspective: StopID, date: QDate) =>
-      guessPlatform(ctx, perspective, {
-        ...data,
-        dayOfWeek: QDayOfWeek.fromDate(date),
-      }),
-    stopList: stopList,
-  };
-}
-
-export function guessPlatformOfPossibility(
-  ctx: TrainQuery,
-  possibility: Possibility,
-) {
-  const { guesser, stopList } = createPlatformGuesser(ctx, possibility.entry);
-  return guesser(stopList[possibility.perspectiveIndex], possibility.date);
-}
+import { PlatformFilteringData, getPlatformFilteringData } from "./filtering";
+import { GtfsTrip } from "../gtfs/gtfs-data";
 
 export function guessPlatformsOfEntry(
   ctx: TrainQuery,
   entry: FullTimetableEntry,
   date: QDate,
 ) {
-  const { guesser, stopList } = createPlatformGuesser(ctx, entry);
-  return stopList.map((s, i) =>
-    entry.rows[i] != null ? guesser(s, date) : null,
+  const data = getPlatformFilteringData(ctx, entry, date);
+  return data.routeStopList.map((s, i) =>
+    entry.rows[i] != null ? guessPlatform(ctx, s, data) : null,
+  );
+}
+export function guessPlatformsOfTrip(
+  ctx: TrainQuery,
+  entry: GtfsTrip,
+  date: QDate,
+) {
+  const data = getPlatformFilteringData(ctx, entry, date);
+  return data.routeStopList.map((s, i) =>
+    entry.times[i] != null ? guessPlatform(ctx, s, data) : null,
   );
 }
 
-function guessPlatform(
+export function guessPlatform(
   ctx: TrainQuery,
   stop: StopID,
   service: PlatformFilteringData,

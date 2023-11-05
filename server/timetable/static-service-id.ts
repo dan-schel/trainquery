@@ -13,7 +13,7 @@ import {
   toStaticServiceID,
 } from "../../shared/system/ids";
 
-const encodedAlpha = decimal + "-|";
+const encodedAlpha = decimal + "|";
 
 export class StaticServiceIDComponents {
   constructor(
@@ -23,7 +23,13 @@ export class StaticServiceIDComponents {
   ) {}
 
   asString() {
-    return `${this.timetable.toFixed()}|${this.index.toFixed()}|${this.date.toISO()}`;
+    return (
+      this.timetable.toFixed() +
+      "|" +
+      this.index.toFixed() +
+      "|" +
+      this.date.toISO({ useDashes: false })
+    );
   }
   static parse(input: string): StaticServiceIDComponents | null {
     const components = input.split("|");

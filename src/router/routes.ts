@@ -15,17 +15,17 @@ export default [
     component: () => import("../views/LinesOverview.vue"),
   },
   {
-    path: "/lines/:id",
+    path: "/line/:id",
     name: "line",
     component: () => import("../views/Line.vue"),
   },
   {
-    path: "/stops/:id",
+    path: "/stop/:id",
     name: "stop",
     component: () => import("../views/Stop.vue"),
   },
   {
-    path: "/train/:id",
+    path: "/train/:source/:id",
     name: "train",
     component: () => import("../views/Train.vue"),
   },

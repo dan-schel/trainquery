@@ -20,6 +20,9 @@ export class ConsoleLogger extends Logger {
       `${verb} config "${hash}" (${stopCount} stop(s), ${lineCount} line(s)).`,
     );
   }
+  logConfigRefreshFailure(err: unknown): void {
+    console.log("Failed to refresh config.", err);
+  }
 
   logTimetableLoadFail(path: string): void {
     console.log(`Failed to load timetable "${path}".`);
