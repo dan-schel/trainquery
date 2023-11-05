@@ -11,6 +11,7 @@ import { ServedStop } from "../../shared/system/service/served-stop";
 import { Service } from "../../shared/system/service/service";
 import { Departure } from "../../shared/system/service/departure";
 import { GtfsTrip } from "../gtfs/gtfs-data";
+import { GtfsServiceIDComponents } from "../gtfs/gtfs-service-id";
 
 export function specificize(
   ctx: TrainQuery,
@@ -81,7 +82,13 @@ export function specificizeGtfsTrip(
 ): Service<CompletePattern> {
   // TODO: Encode trip ID (for the given calendar ID), continuation index, and
   // date into a single string.
-  const id = "stuff";
+  const idPair = trip.requireIDPair(gtfsCalendarID);
+  const id = new GtfsServiceIDComponents(
+    idPair.gtfsTripID,
+    idPair.continuationIndex,
+    trip.gtfsSubfeedID,
+    date,
+  ).encode();
 
   const platforms = guessPlatformsOfTrip(ctx, trip, date);
   const line = requireLine(ctx.getConfig(), trip.line);

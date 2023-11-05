@@ -71,11 +71,15 @@ export class QDate {
     return this.year * 10000 + this.month * 100 + this.day;
   }
   /** E.g. "2023-08-15" for 15th Aug 2023. */
-  toISO() {
+  toISO({ useDashes = true }: { useDashes?: boolean } = {}) {
     const y = this.year.toFixed().padStart(4, "0");
     const m = this.month.toFixed().padStart(2, "0");
     const d = this.day.toFixed().padStart(2, "0");
-    return `${y}-${m}-${d}`;
+    if (useDashes) {
+      return y + "-" + m + "-" + d;
+    } else {
+      return y + m + d;
+    }
   }
 
   static readonly json = z.string().transform((x, ctx) => {

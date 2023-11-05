@@ -188,14 +188,14 @@ export function requireLineFromUrlName(
   return line;
 }
 
-/** E.g. "/stops/pakenham" or "/stops/20". */
+/** E.g. "/stop/pakenham" or "/stop/20". */
 export function getStopPageRoute(
   config: HasSharedConfig,
   stop: StopID,
   time: QLocalDateTime | null,
   filter: DepartureFilter | null,
 ): string {
-  const base = `/stops/${getStopUrlName(config, stop) ?? stop.toFixed()}`;
+  const base = `/stop/${getStopUrlName(config, stop) ?? stop.toFixed()}`;
   const params: { key: string; value: string }[] = [];
   if (time != null) {
     params.push({ key: "time", value: time.toISO() });
@@ -216,25 +216,31 @@ export function getStopPageRoute(
   );
 }
 
-/** E.g. "/lines/pakenham" or "/lines/20". */
+/** E.g. "/line/pakenham" or "/line/20". */
 export function getLinePageRoute(
   config: HasSharedConfig,
   line: LineID,
 ): string {
-  return `/lines/${getLineUrlName(config, line) ?? line.toFixed()}`;
+  return `/line/${getLineUrlName(config, line) ?? line.toFixed()}`;
 }
 
-/** E.g. "/train/[something]". */
+/** E.g. "/train/[something]" or "/train/gtfs/[something]". */
 export function getServicePageRoute(
   service: Service,
   perspectiveIndex?: number,
 ): string {
   // <TEMP>
-  // Not all services have a static ID, and live data sources aren't used here
-  // at all.
+  // Not all services will either have a static ID or a GTFS ID in the future!
+  // They might have both, or PTV API, or something!
   const piParam =
     perspectiveIndex == null ? "" : `?from=${perspectiveIndex.toFixed()}`;
-  return `/train/${service.staticID}` + piParam;
+
+  const gtfs = service.sources.find((s) => s.source == "gtfs");
+  if (gtfs != null) {
+    return `/train/gtfs/${gtfs.id}`;
+  } else {
+    return `/train/ttbl/${service.staticID}` + piParam;
+  }
   // </TEMP>
 }
 

@@ -238,4 +238,18 @@ export class GtfsTrip {
       times: this.times.map((t) => t?.toJSON() ?? null),
     });
   }
+
+  requireIDPair(gtfsCalendarID: string): {
+    gtfsTripID: string;
+    gtfsCalendarID: string;
+    continuationIndex: number;
+  } {
+    const pair = this.idPairs.find((p) => p.gtfsCalendarID == gtfsCalendarID);
+    if (pair == null) {
+      throw new Error(
+        `Trip did not have an ID under calendar "${gtfsCalendarID}".`,
+      );
+    }
+    return pair;
+  }
 }
