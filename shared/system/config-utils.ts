@@ -237,7 +237,7 @@ export function getServicePageRoute(
 
   const gtfs = service.sources.find((s) => s.source == "gtfs");
   if (gtfs != null) {
-    return `/train/gtfs/${gtfs.id}`;
+    return `/train/gtfs/${gtfs.id}` + piParam;
   } else {
     return `/train/ttbl/${service.staticID}` + piParam;
   }

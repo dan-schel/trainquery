@@ -1,10 +1,14 @@
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
+import { GtfsServiceIDComponents } from "../gtfs/gtfs-service-id";
 import { TrainQuery } from "../trainquery";
 import { getTimetableForDay } from "./get-timetables-for-day";
-import { specificize } from "./specificize";
+import { specificize, specificizeGtfsTrip } from "./specificize";
 import { StaticServiceIDComponents } from "./static-service-id";
 
-export function getService(ctx: TrainQuery, id: StaticServiceIDComponents) {
+export function getTimetableService(
+  ctx: TrainQuery,
+  id: StaticServiceIDComponents,
+) {
   const timetable = ctx
     .getConfig()
     .server.timetables.find((t) => t.id == id.timetable);
@@ -29,4 +33,46 @@ export function getService(ctx: TrainQuery, id: StaticServiceIDComponents) {
 
   const service = specificize(ctx, entry, id.date);
   return service;
+}
+
+export function getGtfsService(ctx: TrainQuery, id: GtfsServiceIDComponents) {
+  const gtfsData = ctx.gtfs?.data;
+  if (gtfsData == null) {
+    return null;
+  }
+
+  const tripsForSubfeed = gtfsData.trips.filter(
+    (t) => t.gtfsSubfeedID == id.subfeedID,
+  );
+
+  for (const trip of tripsForSubfeed) {
+    const match = trip.idPairs.find(
+      (p) =>
+        p.gtfsTripID == id.gtfsTripID &&
+        p.continuationIndex == id.continuationIndex,
+    );
+
+    if (match == null) {
+      continue;
+    }
+
+    const calendar = gtfsData.calendars.find(
+      (c) =>
+        c.gtfsCalendarID == match.gtfsCalendarID &&
+        c.gtfsSubfeedID == id.subfeedID,
+    );
+    if (calendar == null || !calendar.appliesOn(id.date)) {
+      return null;
+    }
+
+    const service = specificizeGtfsTrip(
+      ctx,
+      trip,
+      match.gtfsCalendarID,
+      id.date,
+    );
+    return service;
+  }
+
+  return null;
 }
