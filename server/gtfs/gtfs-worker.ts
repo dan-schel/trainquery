@@ -40,7 +40,9 @@ export class GtfsWorker {
       if (this._gtfsConfig.persist && this._ctx.database != null) {
         try {
           this._ctx.logger.logRecallingGtfs();
-          this._data = await this._ctx.database.fetchGtfs();
+          this._data = await this._ctx.database.fetchGtfs(
+            this._ctx.getConfig().hash,
+          );
           if (this._data != null) {
             this._ctx.logger.logRecallingGtfsSuccess();
           } else {

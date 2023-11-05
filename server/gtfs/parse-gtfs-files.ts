@@ -16,12 +16,15 @@ import { TrainQuery } from "../trainquery";
 import { QTimetableTime } from "../../shared/qtime/qtime";
 import { GtfsParsingReport } from "./gtfs-parsing-report";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
+import { HasSharedConfig } from "../../shared/system/config-utils";
 
 export async function parseGtfsFiles(
   ctx: TrainQuery,
   directory: string,
   stopMap: Map<number, StopID>,
 ): Promise<GtfsData> {
+  const config = ctx.getConfig();
+
   const parsingReport = GtfsParsingReport.blank();
   const rawCalendars = await readCsv(
     path.join(directory, "calendar.txt"),
@@ -41,9 +44,21 @@ export async function parseGtfsFiles(
     path.join(directory, "stop_times.txt"),
     stopTimesSchema,
   );
-  const trips = parseTrips(ctx, rawTrips, rawStopTimes, stopMap, parsingReport);
+  const trips = parseTrips(
+    config,
+    rawTrips,
+    rawStopTimes,
+    stopMap,
+    parsingReport,
+  );
 
-  return new GtfsData(calendars, trips, parsingReport, nowUTCLuxon());
+  return new GtfsData(
+    calendars,
+    trips,
+    config.hash,
+    parsingReport,
+    nowUTCLuxon(),
+  );
 }
 
 function parseCalendars(
@@ -86,7 +101,7 @@ function parseCalendars(
 }
 
 function parseTrips(
-  ctx: TrainQuery,
+  config: HasSharedConfig,
   rawTrips: z.infer<typeof tripsSchema>[],
   rawStopTimes: z.infer<typeof stopTimesSchema>[],
   stopMap: Map<number, StopID>,
@@ -120,7 +135,7 @@ function parseTrips(
     }
 
     type AllGood = ((typeof stopTimes)[number] & { stop: StopID })[];
-    const match = matchToRoute(ctx.getConfig(), stopTimes as AllGood);
+    const match = matchToRoute(config, stopTimes as AllGood);
 
     if (match == null) {
       parsingReport.logRejectedRoute((stopTimes as AllGood).map((x) => x.stop));

@@ -21,13 +21,23 @@ export class GtfsData {
   constructor(
     readonly calendars: GtfsCalendar[],
     readonly trips: GtfsTrip[],
+    readonly configHash: string,
     readonly parsingReport: GtfsParsingReport,
     readonly age: QUtcDateTime,
   ) {}
 
   static merge(feeds: GtfsData[], subfeedIDs: string[]): GtfsData {
-    if (feeds.length != subfeedIDs.length || !unique(subfeedIDs)) {
-      throw new Error("Invalid arguments, cannot merge GTFS feeds.");
+    if (feeds.length < 0) {
+      throw new Error("Cannot merge, no feeds provided.");
+    }
+    if (feeds.length != subfeedIDs.length) {
+      throw new Error("Mismatch between feed count and subfeed ID count.");
+    }
+    if (!unique(subfeedIDs)) {
+      throw new Error("Subfeed IDs must be unique.");
+    }
+    if (!feeds.every((f) => f.configHash == feeds[0].configHash)) {
+      throw new Error("Cannot merge feeds created from differing configs.");
     }
 
     const calendars = subfeedIDs
@@ -50,16 +60,18 @@ export class GtfsData {
       .map((f) => f.age)
       .sort((a, b) => a.asDecimal() - b.asDecimal())[0];
 
-    return new GtfsData(calendars, trips, reporting, age);
+    return new GtfsData(calendars, trips, feeds[0].configHash, reporting, age);
   }
 
   static readonly metadataJson = z.object({
+    configHash: z.string(),
     parsingReport: GtfsParsingReport.json,
     age: QUtcDateTime.json,
   });
 
   metadataToJSON(): z.input<typeof GtfsData.metadataJson> {
     return {
+      configHash: this.configHash,
       parsingReport: this.parsingReport.toJSON(),
       age: this.age.toJSON(),
     };

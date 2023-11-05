@@ -49,18 +49,27 @@ export class TrainQueryDB {
     return this._dbs;
   }
 
-  async fetchGtfs(): Promise<GtfsData | null> {
+  async fetchGtfs(configHash: string): Promise<GtfsData | null> {
     const metadataDoc = await this.dbs.gtfs.metadata.findOne();
     if (metadataDoc == null) {
+      return null;
+    }
+    const metadata = GtfsData.metadataJson.parse(metadataDoc);
+    if (metadata.configHash != configHash) {
       return null;
     }
 
     const calendarDocs = await this.dbs.gtfs.calendars.find().toArray();
     const tripDocs = await this.dbs.gtfs.trips.find().toArray();
-    const metadata = GtfsData.metadataJson.parse(metadataDoc);
     const calendars = GtfsCalendar.json.array().parse(calendarDocs);
     const trips = GtfsTrip.json.array().parse(tripDocs);
-    return new GtfsData(calendars, trips, metadata.parsingReport, metadata.age);
+    return new GtfsData(
+      calendars,
+      trips,
+      metadata.configHash,
+      metadata.parsingReport,
+      metadata.age,
+    );
   }
 
   async writeGtfs(gtfsData: GtfsData) {
