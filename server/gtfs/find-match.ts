@@ -1,4 +1,4 @@
-import { unique } from "@schel-d/js-utils";
+import { nullableEquals, unique } from "@schel-d/js-utils";
 import { HasSharedConfig, requireLine } from "../../shared/system/config-utils";
 import {
   DirectionID,
@@ -75,21 +75,23 @@ export function matchToRoute<T>(
       );
 
       if (options.length != 0) {
-        // Attemt to match the future stops to the continuation options we found
-        // above. Be sure to include the previous terminus (the continuation's
-        // origin) in the stoplist. Because we know it stopped at the first
-        // service's terminus, currInOrder will always be at least 1.
+        // Attempt to match the future stops to the continuation options we
+        // found above. Be sure to include the previous terminus (the
+        // continuation's origin) in the stoplist. Because we know it stopped at
+        // the first service's terminus, currInOrder will always be at least 1.
         const futureStoppingOrder = stoppingOrder.slice(currInOrder - 1);
         const continuation = matchToRoute(config, futureStoppingOrder, options);
 
-        matches.push({
-          line: combination.line,
-          route: combination.route,
-          direction: combination.direction,
-          values: stoppingPattern,
-          stopCount: currInOrder,
-          continuation: continuation,
-        });
+        if (continuation != null) {
+          matches.push({
+            line: combination.line,
+            route: combination.route,
+            direction: combination.direction,
+            values: stoppingPattern,
+            stopCount: currInOrder,
+            continuation: continuation,
+          });
+        }
       }
     }
   }
@@ -106,12 +108,18 @@ export function matchToRoute<T>(
     (m) => m.stopCount == sortedMatches[0].stopCount,
   );
 
+  const allLines = unique(
+    bestMatches
+      .filter((m) =>
+        nullableEquals(m.continuation, bestMatches[0].continuation, sameRoute),
+      )
+      .map((m) => m.line),
+    (a, b) => a == b,
+  );
+
   return {
     ...bestMatches[0],
-    associatedLines: unique(
-      bestMatches.map((m) => m.line),
-      (a, b) => a == b,
-    ).filter((x) => x != bestMatches[0].line),
+    associatedLines: allLines.filter((x) => x != bestMatches[0].line),
   };
 }
 
@@ -140,4 +148,13 @@ function getCombinations(
       })),
     )
     .flat();
+}
+
+function sameRoute<T>(a: MatchedRoute<T>, b: MatchedRoute<T>): boolean {
+  return (
+    a.line == b.line &&
+    a.route == b.route &&
+    a.direction == b.direction &&
+    nullableEquals(a.continuation, b.continuation, sameRoute)
+  );
 }

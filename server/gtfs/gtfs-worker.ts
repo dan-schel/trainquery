@@ -31,10 +31,6 @@ export class GtfsWorker {
   }
 
   init() {
-    if (this._ctx.isOffline) {
-      return;
-    }
-
     (async () => {
       // First, attempt to retrieve the saved GTFS data from the database.
       if (this._gtfsConfig.persist && this._ctx.database != null) {
@@ -58,14 +54,16 @@ export class GtfsWorker {
       const refreshSeconds = this._gtfsConfig.refreshSeconds;
       const refreshIfNeeded = () => {
         if (
-          this._ctx.isProduction &&
+          (this._ctx.isProduction || !this._gtfsConfig.isOnlineSource()) &&
           (this._data == null || this._data.isOld(refreshSeconds))
         ) {
           this._refresh();
         }
       };
       refreshIfNeeded();
-      setInterval(refreshIfNeeded, checkOutdatedInterval);
+      if (this._gtfsConfig.isOnlineSource()) {
+        setInterval(refreshIfNeeded, checkOutdatedInterval);
+      }
     })();
   }
 
@@ -105,17 +103,13 @@ async function downloadGtfs(
 ): Promise<GtfsData> {
   const dataFolder = generateDataFolderPath();
 
-  const onlineSource =
-    gtfsConfig.staticData.startsWith("http://") ||
-    gtfsConfig.staticData.startsWith("https://");
-
-  const zipPath = onlineSource
+  const zipPath = gtfsConfig.isOnlineSource()
     ? path.join(dataFolder, "gtfs.zip")
     : gtfsConfig.staticData;
 
   await fsp.mkdir(dataFolder);
 
-  if (onlineSource) {
+  if (gtfsConfig.isOnlineSource()) {
     await download(gtfsConfig.staticData, zipPath);
   }
 

@@ -103,4 +103,11 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
     }
     return config;
   }
+
+  isOnlineSource() {
+    return (
+      this.staticData.startsWith("http://") ||
+      this.staticData.startsWith("https://")
+    );
+  }
 }
