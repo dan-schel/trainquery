@@ -178,10 +178,9 @@ export class DepartureFilter {
     );
   }
 
-  isDefault() {
-    return this.equals(DepartureFilter.default, {
-      ignoreArrivals: true,
-      ignoreSetDownOnly: true,
-    });
+  isDefault(
+    options: { ignoreArrivals?: boolean; ignoreSetDownOnly?: boolean } = {},
+  ) {
+    return this.equals(DepartureFilter.default, options);
   }
 }
