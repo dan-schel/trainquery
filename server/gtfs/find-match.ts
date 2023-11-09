@@ -100,10 +100,19 @@ export function matchToRoute<T>(
     return null;
   }
 
-  // The best match is the one that matches the most stops. Prevents the
-  // route unnecessarily being split into continuations when it can be done in
-  // one.
-  const sortedMatches = matches.sort((a, b) => -(a.stopCount - b.stopCount));
+  // Sort the matches to find the best one.
+  const sortedMatches = matches.sort((a, b) => {
+    if (a.stopCount != b.stopCount) {
+      // The best matches match the most stops in the first trip (rely on
+      // continuations as little as possible.)
+      return -(a.stopCount - b.stopCount);
+    } else {
+      // If there are multiple matches matching the same number of stops,
+      // prioritize the shorter ones (e.g. use direct over hooked route variants
+      // if possible).
+      return a.values.length - b.values.length;
+    }
+  });
   const bestMatches = sortedMatches.filter(
     (m) => m.stopCount == sortedMatches[0].stopCount,
   );
