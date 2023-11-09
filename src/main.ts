@@ -17,7 +17,8 @@ export default viteSSR(
   {
     routes,
     routerOptions: {
-      scrollBehavior: (_to, _from, _savedPosition) => ({ top: 0 }),
+      scrollBehavior: (_to, _from, savedPosition) =>
+        savedPosition ?? { top: 0 },
     },
   },
   async ({ app, router, initialState, isClient, url }) => {

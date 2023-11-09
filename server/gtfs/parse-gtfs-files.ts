@@ -235,7 +235,6 @@ function continuationsArray<T>(
 }
 
 function dedupeTrips(config: HasSharedConfig, trips: GtfsTrip[]): GtfsTrip[] {
-  console.log("Deduping...");
   for (let i = 0; i < trips.length - 1; i++) {
     for (let j = i + 1; j < trips.length; j++) {
       const a = trips[i];
@@ -276,7 +275,6 @@ function dedupeTrips(config: HasSharedConfig, trips: GtfsTrip[]): GtfsTrip[] {
       }
     }
   }
-  console.log("All deduped!");
   return trips;
 }
 
