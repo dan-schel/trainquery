@@ -95,7 +95,12 @@ watch([filter, time], () => {
   );
 });
 
-const isDefaultFilter = computed(() => filter.value.isDefault());
+const isDefaultFilter = computed(() =>
+  filter.value.isDefault({
+    ignoreArrivals: true,
+    ignoreSetDownOnly: true,
+  }),
+);
 
 const feeds = computed(() => {
   if (stop.value == null) {
