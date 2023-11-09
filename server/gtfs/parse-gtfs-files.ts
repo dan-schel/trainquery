@@ -16,7 +16,8 @@ import { TrainQuery } from "../trainquery";
 import { QTimetableTime } from "../../shared/qtime/qtime";
 import { GtfsParsingReport } from "./gtfs-parsing-report";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
-import { HasSharedConfig } from "../../shared/system/config-utils";
+import { HasSharedConfig, requireLine } from "../../shared/system/config-utils";
+import { nullableEquals } from "@schel-d/js-utils";
 
 export async function parseGtfsFiles(
   ctx: TrainQuery,
@@ -200,7 +201,7 @@ function parseTrips(
   }
   addResult();
 
-  return Array.from(result.values());
+  return dedupeTrips(config, Array.from(result.values()));
 }
 
 async function readCsv<T extends z.ZodType>(
@@ -231,4 +232,105 @@ function continuationsArray<T>(
     return [match, ...continuationsArray(match.continuation)];
   }
   return [match];
+}
+
+function dedupeTrips(config: HasSharedConfig, trips: GtfsTrip[]): GtfsTrip[] {
+  console.log("Deduping...");
+  for (let i = 0; i < trips.length - 1; i++) {
+    for (let j = i + 1; j < trips.length; j++) {
+      const a = trips[i];
+      const b = trips[j];
+
+      if (
+        [a.line, ...a.associatedLines].includes(b.line) ||
+        [b.line, ...b.associatedLines].includes(a.line)
+      ) {
+        continue;
+      }
+
+      const aBounds = determineBoundaryIndices(a.times);
+      const bBounds = determineBoundaryIndices(b.times);
+
+      const aStopList = requireLine(config, a.line)
+        .route.requireStopList(a.route, a.direction)
+        .stops.slice(aBounds.start, aBounds.end + 1);
+      const bStopList = requireLine(config, b.line)
+        .route.requireStopList(b.route, b.direction)
+        .stops.slice(aBounds.start, aBounds.end + 1);
+      const aSlice = a.times.slice(aBounds.start, aBounds.end + 1);
+      const bSlice = b.times.slice(bBounds.start, bBounds.end + 1);
+
+      if (aSlice.length > bSlice.length) {
+        if (isSubset(aSlice, bSlice, aStopList, bStopList)) {
+          trips[i] = mergeSubset(a, b);
+          trips.splice(j, 1);
+          j--;
+        }
+      } else {
+        if (isSubset(bSlice, aSlice, bStopList, aStopList)) {
+          trips[j] = mergeSubset(b, a);
+          trips.splice(i, 1);
+          i--;
+          j--;
+        }
+      }
+    }
+  }
+  console.log("All deduped!");
+  return trips;
+}
+
+function determineBoundaryIndices<T>(array: (T | null)[]) {
+  let start: number | null = null;
+  let end = 0;
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] != null) {
+      if (start == null) {
+        start = i;
+      }
+      end = i;
+    }
+  }
+  if (start == null) {
+    throw new Error(
+      "Cannot determine boundary indices, the array is either empty or " +
+        "contains only nulls.",
+    );
+  }
+  return { start, end };
+}
+
+function isSubset(
+  superset: (QTimetableTime | null)[],
+  subset: (QTimetableTime | null)[],
+  supersetStops: StopID[],
+  subsetStops: StopID[],
+): boolean {
+  for (let start = 0; start < superset.length - subset.length; start++) {
+    let matches = true;
+    for (let i = 0; i < subset.length; i++) {
+      if (supersetStops[i] != subsetStops[i + start]) {
+        matches = false;
+        break;
+      }
+
+      if (
+        i != subset.length - 1 &&
+        nullableEquals(superset[i], subset[i + start], (a, b) => a.equals(b))
+      ) {
+        matches = false;
+        break;
+      }
+    }
+
+    if (matches) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function mergeSubset(superset: GtfsTrip, subset: GtfsTrip) {
+  // TODO: Use known continuation from subset service if available.
+  return superset;
 }
