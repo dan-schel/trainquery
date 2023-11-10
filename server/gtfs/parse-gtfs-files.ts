@@ -172,7 +172,6 @@ function parseTrips(
         parsingReport.logDuplicatedTrip();
       } else {
         result.set(hashKey, parsedTrip);
-        parsingReport.logAcceptedTrip();
       }
     }
   }
@@ -201,7 +200,7 @@ function parseTrips(
   }
   addResult();
 
-  return dedupeTrips(config, Array.from(result.values()));
+  return dedupeTrips(config, Array.from(result.values()), parsingReport);
 }
 
 async function readCsv<T extends z.ZodType>(
@@ -234,7 +233,11 @@ function continuationsArray<T>(
   return [match];
 }
 
-function dedupeTrips(config: HasSharedConfig, trips: GtfsTrip[]): GtfsTrip[] {
+function dedupeTrips(
+  config: HasSharedConfig,
+  trips: GtfsTrip[],
+  parsingReport: GtfsParsingReport,
+): GtfsTrip[] {
   for (let i = 0; i < trips.length - 1; i++) {
     for (let j = i + 1; j < trips.length; j++) {
       const a = trips[i];
@@ -264,6 +267,7 @@ function dedupeTrips(config: HasSharedConfig, trips: GtfsTrip[]): GtfsTrip[] {
           trips[i] = mergeSubset(a, b);
           trips.splice(j, 1);
           j--;
+          parsingReport.logDuplicatedTrip();
         }
       } else {
         if (isSubset(bSlice, aSlice, bStopList, aStopList)) {
@@ -271,10 +275,13 @@ function dedupeTrips(config: HasSharedConfig, trips: GtfsTrip[]): GtfsTrip[] {
           trips.splice(i, 1);
           i--;
           j--;
+          parsingReport.logDuplicatedTrip();
         }
       }
     }
   }
+
+  parsingReport.logAcceptedTrips(trips.length);
   return trips;
 }
 

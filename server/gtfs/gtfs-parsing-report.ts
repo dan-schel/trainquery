@@ -76,8 +76,8 @@ export class GtfsParsingReport {
   logRejectedTrip() {
     this._rejectedTrips++;
   }
-  logAcceptedTrip() {
-    this._acceptedTrips++;
+  logAcceptedTrips(acceptedTrips: number) {
+    this._acceptedTrips = acceptedTrips;
   }
   logDuplicatedTrip() {
     this._duplicatedTrips++;
