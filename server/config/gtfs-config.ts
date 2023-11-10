@@ -36,7 +36,7 @@ export class GtfsSubfeedConfig extends GtfsFeedConfig {
 export class GtfsConfig<UsesSubfeeds extends boolean> {
   constructor(
     readonly staticData: string,
-    readonly refreshSeconds: number,
+    readonly refreshHourUtc: number,
     readonly persist: boolean,
     readonly usesSubfeeds: UsesSubfeeds,
     readonly subfeeds: UsesSubfeeds extends true ? GtfsSubfeedConfig[] : null,
@@ -47,7 +47,7 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
     z
       .object({
         staticData: z.string(),
-        refreshSeconds: z.number(),
+        refreshHourUtc: z.number(),
         persist: z.boolean(),
         subfeeds: GtfsSubfeedConfig.json.array(),
       })
@@ -55,7 +55,7 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
         (x) =>
           new GtfsConfig(
             x.staticData,
-            x.refreshSeconds,
+            x.refreshHourUtc,
             x.persist,
             true,
             x.subfeeds,
@@ -65,14 +65,14 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
     GtfsFeedConfig.rawJson
       .extend({
         staticData: z.string(),
-        refreshSeconds: z.number(),
+        refreshHourUtc: z.number(),
         persist: z.boolean(),
       })
       .transform(
         (x) =>
           new GtfsConfig(
             x.staticData,
-            x.refreshSeconds,
+            x.refreshHourUtc,
             x.persist,
             false,
             null,

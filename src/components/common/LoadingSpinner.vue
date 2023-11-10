@@ -24,26 +24,30 @@ svg {
 }
 circle:nth-child(2) {
   animation: pulse 1s linear 0s infinite;
+  transform-origin: 33% 33%;
 }
 circle:nth-child(3) {
   animation: pulse 1s linear 0.1s infinite;
+  transform-origin: 67% 33%;
 }
 circle:nth-child(4) {
   animation: pulse 1s linear 0.2s infinite;
+  transform-origin: 67% 67%;
 }
 circle:nth-child(5) {
   animation: pulse 1s linear 0.3s infinite;
+  transform-origin: 33% 67%;
 }
 
 @keyframes pulse {
   0% {
-    r: 2px;
+    transform: scale(1);
   }
   10% {
-    r: 4px;
+    transform: scale(2);
   }
   30% {
-    r: 2px;
+    transform: scale(1);
   }
 }
 

@@ -11,6 +11,9 @@ import { GtfsData } from "./gtfs-data";
 import { GtfsConfig } from "../config/gtfs-config";
 import { parseGtfsFiles } from "./parse-gtfs-files";
 import AdmZip from "adm-zip";
+import { QUtcDateTime } from "../../shared/qtime/qdatetime";
+import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
+import { QTime } from "../../shared/qtime/qtime";
 
 // How often to CHECK if the data is outdated. We should check far more often
 // than the refresh interval itself because when the data is pulled from the
@@ -20,9 +23,11 @@ const checkOutdatedInterval = 10 * 60 * 1000;
 export class GtfsWorker {
   private _data: GtfsData | null;
   private readonly _gtfsConfig: GtfsConfig<true> | GtfsConfig<false>;
+  private _lastAttempt: QUtcDateTime | null;
 
   constructor(private readonly _ctx: TrainQuery) {
     this._data = null;
+    this._lastAttempt = null;
     const gtfsConfig = this._ctx.getConfig().server.gtfs;
     if (gtfsConfig == null) {
       throw new Error("Cannot create GTFS worker. No GTFS config provided.");
@@ -39,7 +44,9 @@ export class GtfsWorker {
           this._data = await this._ctx.database.fetchGtfs(
             this._ctx.getConfig().hash,
           );
+
           if (this._data != null) {
+            this._lastAttempt = this._data.age;
             this._ctx.logger.logRecallingGtfsSuccess();
           } else {
             this._ctx.logger.logRecallingGtfsEmpty();
@@ -51,12 +58,30 @@ export class GtfsWorker {
 
       // Next, begin a polling process which refreshes the GTFS data when
       // necessary.
-      const refreshSeconds = this._gtfsConfig.refreshSeconds;
+      const refreshTime = new QTime(this._gtfsConfig.refreshHourUtc, 0, 0);
       const refreshIfNeeded = () => {
+        if (!this._ctx.isProduction && this._gtfsConfig.isOnlineSource()) {
+          return;
+        }
+
+        if (this._lastAttempt == null) {
+          this._refresh();
+          return;
+        }
+
+        const now = nowUTCLuxon();
+        const thresholdToday = new QUtcDateTime(now.date, refreshTime);
+        const thresholdYesterday = new QUtcDateTime(
+          now.date.addDays(-1),
+          refreshTime,
+        );
+
         if (
-          (this._ctx.isProduction || !this._gtfsConfig.isOnlineSource()) &&
-          (this._data == null || this._data.isOld(refreshSeconds))
+          this._lastAttempt.isBefore(thresholdYesterday) ||
+          (this._lastAttempt.isBefore(thresholdToday) &&
+            now.isAfterOrEqual(thresholdToday))
         ) {
+          this._lastAttempt = now;
           this._refresh();
         }
       };
