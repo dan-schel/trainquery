@@ -15,7 +15,6 @@ import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { z } from "zod";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
-import { isWithinDateRange } from "../../shared/utils";
 
 export class GtfsData {
   constructor(
@@ -149,7 +148,9 @@ export class GtfsCalendar {
     }
 
     const dowIncluded = this.wdr.includes(QDayOfWeek.fromDate(date));
-    const withinDates = isWithinDateRange(date, this.start, this.end);
+    const withinDates = date.isWithin(this.start, this.end, {
+      maxInclusive: true,
+    });
     return withinDates && dowIncluded;
   }
 }

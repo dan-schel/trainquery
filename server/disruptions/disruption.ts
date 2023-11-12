@@ -17,13 +17,13 @@ export abstract class Disruption<Type extends string = string> {
   abstract affectsStop(
     ctx: TrainQuery,
     stop: StopID,
-    timeUTC: QUtcDateTime,
+    time: QUtcDateTime,
   ): boolean;
 
   abstract affectsLine(
     ctx: TrainQuery,
     line: LineID,
-    timeUTC: QUtcDateTime,
+    time: QUtcDateTime,
   ): boolean;
 
   abstract affectsDate(ctx: TrainQuery, date: QDate): boolean;

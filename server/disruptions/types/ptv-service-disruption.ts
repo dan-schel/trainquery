@@ -22,19 +22,11 @@ export class PtvServiceDisruption extends Disruption<"ptv-service"> {
     return false;
   }
 
-  affectsStop(
-    _ctx: TrainQuery,
-    _stop: StopID,
-    _timeUTC: QUtcDateTime,
-  ): boolean {
+  affectsStop(_ctx: TrainQuery, _stop: StopID, _time: QUtcDateTime): boolean {
     return false;
   }
 
-  affectsLine(
-    _ctx: TrainQuery,
-    _line: LineID,
-    _timeUTC: QUtcDateTime,
-  ): boolean {
+  affectsLine(_ctx: TrainQuery, _line: LineID, _time: QUtcDateTime): boolean {
     return false;
   }
 

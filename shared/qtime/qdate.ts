@@ -201,4 +201,21 @@ export class QDate {
   isAfterOrEqual(other: QDate) {
     return this.asDecimal() >= other.asDecimal();
   }
+
+  isWithin(
+    min: QDate | null,
+    max: QDate | null,
+    { maxInclusive = false }: { maxInclusive?: boolean } = {},
+  ) {
+    if (min != null && this.isBefore(min)) {
+      return false;
+    }
+    if (
+      max != null &&
+      (maxInclusive ? this.isAfter(max) : this.isAfterOrEqual(max))
+    ) {
+      return false;
+    }
+    return true;
+  }
 }

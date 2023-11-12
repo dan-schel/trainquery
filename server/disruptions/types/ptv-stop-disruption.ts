@@ -10,6 +10,8 @@ export class PtvStopDisruption extends Disruption<"ptv-stop"> {
     readonly stops: StopID[],
     readonly message: string,
     readonly url: string | null,
+    readonly starts: QUtcDateTime | null,
+    readonly ends: QUtcDateTime | null,
   ) {
     super();
   }
@@ -18,15 +20,11 @@ export class PtvStopDisruption extends Disruption<"ptv-stop"> {
     return false;
   }
 
-  affectsStop(_ctx: TrainQuery, stop: StopID, _timeUTC: QUtcDateTime): boolean {
-    return this.stops.includes(stop);
+  affectsStop(_ctx: TrainQuery, stop: StopID, time: QUtcDateTime): boolean {
+    return this.stops.includes(stop) && time.isWithin(this.starts, this.ends);
   }
 
-  affectsLine(
-    _ctx: TrainQuery,
-    _line: LineID,
-    _timeUTC: QUtcDateTime,
-  ): boolean {
+  affectsLine(_ctx: TrainQuery, _line: LineID, _time: QUtcDateTime): boolean {
     return false;
   }
 

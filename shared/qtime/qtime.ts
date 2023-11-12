@@ -51,6 +51,24 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
     return this.asDecimal() >= other.asDecimal();
   }
 
+  /** True if this time is within min (inclusive) and max (exclusive). */
+  isWithin(
+    min: T | null,
+    max: T | null,
+    { maxInclusive = false }: { maxInclusive?: boolean } = {},
+  ) {
+    if (min != null && this.isBefore(min)) {
+      return false;
+    }
+    if (
+      max != null &&
+      (maxInclusive ? this.isAfter(max) : this.isAfterOrEqual(max))
+    ) {
+      return false;
+    }
+    return true;
+  }
+
   startOfMinute() {
     return new QTime(this.hour, this.minute, 0);
   }

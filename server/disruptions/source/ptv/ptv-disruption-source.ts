@@ -4,6 +4,9 @@ import { TrainQuery } from "../../../trainquery";
 import { Disruption } from "../../disruption";
 import { DisruptionSource, NewDisruptionsHandler } from "../disruption-source";
 import { callPtvApi } from "./call-ptv-api";
+import { QUtcDateTime } from "../../../../shared/qtime/qdatetime";
+import { PtvLineDisruption } from "../../types/ptv-line-disruption";
+import { nonNull } from "@schel-d/js-utils";
 
 // Refresh disruptions from the PTV API every 5 minutes.
 const refreshInterval = 5 * 60 * 1000;
@@ -42,7 +45,11 @@ export class PtvDisruptionSource extends DisruptionSource {
   private async _refresh(): Promise<void> {
     try {
       this.ctx.logger.logFetchingDisruptions("ptv-api");
-      const disruptions = await fetchPtvDisruptions(this.devID, this.devKey);
+      const disruptions = await fetchPtvDisruptions(
+        this.ptvConfig,
+        this.devID,
+        this.devKey,
+      );
       this.ctx.logger.logFetchingDisruptionsSuccess(
         "ptv-api",
         disruptions.length,
@@ -54,15 +61,39 @@ export class PtvDisruptionSource extends DisruptionSource {
   }
 }
 
-const PtvDisruptionSchema = z.object({});
+const PtvDisruptionSchema = z.object({
+  disruption_id: z.number(),
+  title: z.string(),
+  url: z.string(),
+  description: z.string(),
+  disruption_type: z.string(),
+  published_on: QUtcDateTime.json,
+  last_updated: QUtcDateTime.json,
+  from_date: QUtcDateTime.json.nullable(),
+  to_date: QUtcDateTime.json.nullable(),
+  routes: z
+    .object({
+      route_id: z.number(),
+    })
+    .transform((x) => x.route_id)
+    .array(),
+  stops: z
+    .object({
+      stop_id: z.number(),
+    })
+    .transform((x) => x.stop_id)
+    .array(),
+});
 const PtvDisruptionsSchema = z.object({
   disruptions: z.object({
     metro_train: PtvDisruptionSchema.array(),
     regional_train: PtvDisruptionSchema.array(),
   }),
 });
+export type PtvRawDisruptionData = z.infer<typeof PtvDisruptionSchema>;
 
 async function fetchPtvDisruptions(
+  ptvConfig: PtvConfig,
   devID: string,
   devKey: string,
 ): Promise<Disruption[]> {
@@ -75,7 +106,38 @@ async function fetchPtvDisruptions(
     devKey,
   );
 
-  const parsed = PtvDisruptionsSchema.parse(json);
+  const raw = PtvDisruptionsSchema.parse(json);
+  const rawList = [
+    ...raw.disruptions.metro_train,
+    ...raw.disruptions.regional_train,
+  ];
 
-  return [];
+  const parsed = rawList
+    .map((d) => {
+      if (d.routes.length != 0) {
+        const lines = d.routes
+          .map((r) => ptvConfig.lines.get(r) ?? null)
+          .filter(nonNull);
+
+        if (lines.length == null) {
+          return [];
+        }
+
+        return [
+          new PtvLineDisruption(
+            lines,
+            "unknown",
+            d.title,
+            d.url,
+            d.from_date,
+            d.to_date,
+          ),
+        ];
+      } else {
+        return [];
+      }
+    })
+    .flat();
+
+  return parsed;
 }
