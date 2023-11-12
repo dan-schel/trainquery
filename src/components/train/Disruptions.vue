@@ -50,9 +50,8 @@ defineProps<{
 .disruption > p {
   grid-area: text;
   font-size: 0.8rem;
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-  margin-right: 0.5rem;
+  margin: 0.75rem;
+  margin-left: 0;
   font-stretch: semi-condensed;
 }
 .disruption-url {

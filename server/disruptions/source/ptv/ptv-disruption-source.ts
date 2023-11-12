@@ -11,6 +11,8 @@ import { nonNull } from "@schel-d/js-utils";
 // Refresh disruptions from the PTV API every 5 minutes.
 const refreshInterval = 5 * 60 * 1000;
 
+const blacklistedUrls = ["https://ptv.vic.gov.au/live-travel-updates/"];
+
 export class PtvDisruptionSource extends DisruptionSource {
   readonly devID: string;
   readonly devKey: string;
@@ -59,11 +61,30 @@ export class PtvDisruptionSource extends DisruptionSource {
   }
 }
 
+function cleanupText(text: string) {
+  const trimmed = text.trim().replace(/\s+/g, " ");
+  if (trimmed.endsWith(".")) {
+    return trimmed;
+  }
+  return trimmed + ".";
+}
+
+function cleanupUrl(url: string | null) {
+  if (url == null) {
+    return null;
+  }
+  const https = url.trim().replace("http://", "https://");
+  if (blacklistedUrls.includes(https)) {
+    return null;
+  }
+  return https;
+}
+
 const PtvDisruptionSchema = z.object({
   disruption_id: z.number(),
-  title: z.string(),
-  url: z.string(),
-  description: z.string(),
+  title: z.string().transform(cleanupText),
+  url: z.string().nullable().transform(cleanupUrl),
+  description: z.string().transform(cleanupText),
   disruption_type: z.string(),
   published_on: QUtcDateTime.json,
   last_updated: QUtcDateTime.json,
