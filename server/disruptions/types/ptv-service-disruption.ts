@@ -1,9 +1,10 @@
+import { SerializedDisruption } from "../../../shared/disruptions/serialized-disruption";
 import { QDate } from "../../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { LineID, StopID } from "../../../shared/system/ids";
 import { Service } from "../../../shared/system/service/service";
 import { TrainQuery } from "../../trainquery";
-import { Disruption, SerializedDisruption } from "../disruption";
+import { Disruption } from "../disruption";
 
 export type PtvServiceDisruptionCategory = "cancelled" | "unknown";
 

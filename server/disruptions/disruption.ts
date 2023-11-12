@@ -3,13 +3,7 @@ import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { LineID, StopID } from "../../shared/system/ids";
 import { Service } from "../../shared/system/service/service";
 import { TrainQuery } from "../trainquery";
-
-export type SerializedDisruption<Type extends string> = {
-  type: Type;
-  message: string;
-  url: string | null;
-  [others: string]: any;
-};
+import { SerializedDisruption } from "../../shared/disruptions/serialized-disruption";
 
 export abstract class Disruption<Type extends string = string> {
   abstract affectsService(ctx: TrainQuery, service: Service): boolean;

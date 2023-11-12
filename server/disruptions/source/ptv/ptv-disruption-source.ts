@@ -36,8 +36,6 @@ export class PtvDisruptionSource extends DisruptionSource {
   }
 
   async init(): Promise<void> {
-    console.log("Initializing PTV disruption source...");
-
     await this._refresh();
     setInterval(() => this._refresh(), refreshInterval);
   }

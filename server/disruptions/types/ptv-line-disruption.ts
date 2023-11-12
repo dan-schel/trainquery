@@ -1,10 +1,11 @@
+import { SerializedDisruption } from "../../../shared/disruptions/serialized-disruption";
 import { QDate } from "../../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { LineID, StopID } from "../../../shared/system/ids";
 import { CompletePattern } from "../../../shared/system/service/complete-pattern";
 import { Service } from "../../../shared/system/service/service";
 import { TrainQuery } from "../../trainquery";
-import { Disruption, SerializedDisruption } from "../disruption";
+import { Disruption } from "../disruption";
 
 export type PtvLineDisruptionCategory =
   | "buses"
@@ -42,7 +43,8 @@ export class PtvLineDisruption extends Disruption<"ptv-line"> {
       );
     }
 
-    // Otherwise we'll be cautious, and display it for all services, I guess.
+    // Otherwise we'll be cautious and display it for all services on the
+    // affected lines, I guess.
     return true;
   }
 
