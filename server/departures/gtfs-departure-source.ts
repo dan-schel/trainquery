@@ -2,7 +2,6 @@ import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { getLine, linesThatStopAt } from "../../shared/system/config-utils";
 import { StopID } from "../../shared/system/ids";
-import { isWithinTimeRange } from "../../shared/utils";
 import { GtfsCalendar, GtfsData, GtfsTrip } from "../gtfs/gtfs-data";
 import { TrainQuery } from "../trainquery";
 import { DepartureSource } from "./departure-source";
@@ -108,7 +107,7 @@ function getForSearchTime(
       if (time == null) {
         continue;
       }
-      if (isWithinTimeRange(time, searchTime.min, searchTime.max)) {
+      if (time.isWithin(searchTime.min, searchTime.max)) {
         result.push({
           trip: trip,
           date: searchTime.date,

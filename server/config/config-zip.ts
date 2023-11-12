@@ -16,6 +16,7 @@ import { ServerOnlyConfig } from "./server-only-config";
 import { PlatformRules } from "./platform-rules";
 import { GtfsConfig } from "./gtfs-config";
 import { extractZip } from "./download-utils";
+import { PtvConfig } from "./ptv-config";
 
 export async function loadConfigFromFiles(
   dataFolder: string,
@@ -88,6 +89,7 @@ async function loadServer(
       timetables: z.string(),
       platformRules: z.string(),
       gtfs: z.string().optional(),
+      ptv: z.string().optional(),
       linter: z.string(),
       about: z.string(),
     })
@@ -106,12 +108,23 @@ async function loadServer(
     server.gtfs != null
       ? GtfsConfig.json.parse(await loadYml(dataFolder, server.gtfs, z.any()))
       : null;
+  const ptv =
+    server.ptv != null
+      ? PtvConfig.json.parse(await loadYml(dataFolder, server.ptv, z.any()))
+      : null;
   const linter = LinterRules.json.parse(
     await loadYml(dataFolder, server.linter, z.any()),
   );
   const about = await loadText(dataFolder, server.about);
 
-  return new ServerOnlyConfig(timetables, platformRules, gtfs, linter, about);
+  return new ServerOnlyConfig(
+    timetables,
+    platformRules,
+    gtfs,
+    ptv,
+    linter,
+    about,
+  );
 }
 
 async function loadFrontend(

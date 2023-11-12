@@ -75,6 +75,47 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
     return new QUtcDateTime(this.date, this.time.startOfMinute());
   }
 
+  isWithin(
+    min: QUtcDateTime | null,
+    max: QUtcDateTime | null,
+    { maxInclusive = false }: { maxInclusive?: boolean } = {},
+  ) {
+    if (min != null && this.isBefore(min)) {
+      return false;
+    }
+    if (
+      max != null &&
+      (maxInclusive ? this.isAfter(max) : this.isAfterOrEqual(max))
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  static rangesIntersect(
+    minA: QUtcDateTime | null,
+    maxA: QUtcDateTime | null,
+    minB: QUtcDateTime | null,
+    maxB: QUtcDateTime | null,
+    { maxInclusive = false }: { maxInclusive?: boolean } = {},
+  ): boolean {
+    if (
+      maxA != null &&
+      minB != null &&
+      (maxInclusive ? maxA.isBefore(minB) : maxA.isBeforeOrEqual(minB))
+    ) {
+      return false;
+    }
+    if (
+      maxB != null &&
+      minA != null &&
+      (maxInclusive ? maxB.isBefore(minA) : maxB.isBeforeOrEqual(minA))
+    ) {
+      return false;
+    }
+    return true;
+  }
+
   /** Parses "2023-09-23T20:30:55Z". Does not check for date/time validity. */
   static parse(input: string): QUtcDateTime | null {
     const components = input.split("T");

@@ -11,6 +11,7 @@ import UilCheck from "./UilCheck.vue";
 import UilClock from "./UilClock.vue";
 import UilCodeBranch from "./UilCodeBranch.vue";
 import UilExclamationCircle from "./UilExclamationCircle.vue";
+import UilExternalLinkAlt from "./UilExternalLinkAlt.vue";
 import UilFilter from "./UilFilter.vue";
 import UilGithub from "./UilGithub.vue";
 import UilHome from "./UilHome.vue";
@@ -36,6 +37,7 @@ export type IconID =
   | "uil:clock"
   | "uil:code-branch"
   | "uil:exclamation-circle"
+  | "uil:external-link-alt"
   | "uil:filter"
   | "uil:github"
   | "uil:home"
@@ -81,6 +83,10 @@ defineProps<{
     v-else-if="id == 'uil:exclamation-circle'"
     class="icon"
   ></UilExclamationCircle>
+  <UilExternalLinkAlt
+    v-else-if="id == 'uil:external-link-alt'"
+    class="icon"
+  ></UilExternalLinkAlt>
   <UilFilter v-else-if="id == 'uil:filter'" class="icon"></UilFilter>
   <UilGithub v-else-if="id == 'uil:github'" class="icon"></UilGithub>
   <UilHome v-else-if="id == 'uil:home'" class="icon"></UilHome>

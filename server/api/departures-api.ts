@@ -70,5 +70,7 @@ export async function departuresApi(
     console.log("Departures empty since GTFS is not loaded yet.");
   }
 
-  return buckets.map((b) => b.items.map((d) => d.toJSON()));
+  return buckets.map((b) =>
+    b.items.map((d) => ctx.disruptions.determineDisruptions(d).toJSON()),
+  );
 }

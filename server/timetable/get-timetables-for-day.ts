@@ -2,13 +2,14 @@ import { nonNull } from "@schel-d/js-utils";
 import { QDate } from "../../shared/qtime/qdate";
 import { LineID } from "../../shared/system/ids";
 import { TrainQuery } from "../trainquery";
-import { isWithinDateRange } from "../../shared/utils";
 
 export function getTimetableForDay(ctx: TrainQuery, day: QDate, line: LineID) {
   const timetables = ctx
     .getConfig()
     .server.timetables.filter(
-      (t) => t.line == line && isWithinDateRange(day, t.begins, t.ends),
+      (t) =>
+        t.line == line &&
+        day.isWithin(t.begins, t.ends, { maxInclusive: true }),
     );
 
   // There should only be (at most) one of each type at a time, so we're fine

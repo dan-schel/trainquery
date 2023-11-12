@@ -3,19 +3,21 @@ import { departuresApi } from "./api/departures-api";
 import { ssrAppPropsApi, ssrRoutePropsApi } from "./api/ssr-props-api";
 import { FullConfig } from "./config/computed-config";
 import { ServerConfig } from "./config/server-config";
+import { Disruptions } from "./disruptions/disruptions";
 import { GtfsWorker } from "./gtfs/gtfs-worker";
 import { BadApiCallError } from "./param-utils";
 import { TrainQueryDB } from "./trainquery-db";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
-  readonly getConfig: () => FullConfig;
-  readonly server: Server;
-  readonly logger: Logger;
-  readonly database: TrainQueryDB | null;
   readonly isOffline: boolean;
   readonly isProduction: boolean;
+  readonly getConfig: () => FullConfig;
+  readonly server: Server;
+  readonly database: TrainQueryDB | null;
+  readonly disruptions: Disruptions;
   gtfs: GtfsWorker | null;
+  readonly logger: Logger;
 };
 
 export async function trainQuery(
@@ -48,17 +50,21 @@ export async function trainQuery(
 
   const server = serverBuilder();
 
+  const disruptions = new Disruptions();
+
   const ctx: TrainQuery = {
     getConfig: () => config,
     server,
     database,
     logger,
     gtfs: null,
+    disruptions,
     isOffline,
     isProduction,
   };
 
   await database?.init();
+  await disruptions.init(ctx);
 
   const gtfs = ctx.getConfig().server.gtfs != null ? new GtfsWorker(ctx) : null;
   ctx.gtfs = gtfs;
@@ -117,6 +123,10 @@ export abstract class Logger {
   abstract logPersistingGtfs(): void;
   abstract logPersistingGtfsSuccess(): void;
   abstract logPersistingGtfsFailure(err: unknown): void;
+
+  abstract logFetchingDisruptions(source: string): void;
+  abstract logFetchingDisruptionsSuccess(source: string, count: number): void;
+  abstract logFetchingDisruptionsFailure(source: string, err: unknown): void;
 }
 
 function hashify(ctx: TrainQuery, result: object) {

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Departure } from "shared/system/service/departure";
 import LoadingSpinner from "../common/LoadingSpinner.vue";
 import OneLineP from "../common/OneLineP.vue";
 import SimpleButton from "../common/SimpleButton.vue";
@@ -21,10 +20,11 @@ import {
   canPin,
 } from "@/settings/pinned-widgets";
 import { useSettings } from "@/settings/settings";
+import type { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
 
 const props = defineProps<{
   feed: DepartureFeed;
-  departures: Departure[];
+  departures: DepartureWithDisruptions[];
   loading: boolean;
   error: "unknown" | null;
   allowPinning: boolean;
@@ -159,7 +159,7 @@ function handlePin() {
           :class="{ loading: loading }"
           v-for="departure in departures"
           :continuations-enabled="false"
-          :key="getServicePageRoute(departure)"
+          :key="getServicePageRoute(departure.departure)"
           :departure="departure"
           :perspective="feed.stop"
         ></DepartureVue>

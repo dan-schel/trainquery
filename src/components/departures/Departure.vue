@@ -2,12 +2,12 @@
 import OneLineP from "@/components/common/OneLineP.vue";
 import Icon from "../icons/Icon.vue";
 import { RouterLink } from "vue-router";
-import { Departure } from "shared/system/service/departure";
 import { getServicePageRoute, requireLine } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
 import { computed } from "vue";
 import {
   getDeparturePlatformString,
+  getDisruptionsString,
   getLinesString,
   getTerminusString,
   getTimeString,
@@ -17,9 +17,10 @@ import { getStoppingPatternString } from "./helpers/stopping-pattern";
 import type { StopID } from "shared/system/ids";
 import { continuify } from "./helpers/continuify";
 import { useNow } from "@/utils/now-provider";
+import type { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
 
 const props = defineProps<{
-  departure: Departure;
+  departure: DepartureWithDisruptions;
   continuationsEnabled: boolean;
   perspective: StopID;
 }>();
@@ -27,18 +28,19 @@ const props = defineProps<{
 const { utc } = useNow();
 
 const detail = computed(() => {
-  const patternList = continuify(props.departure);
+  const patternList = continuify(props.departure.departure);
   return {
-    terminus: getTerminusString(props.departure, patternList),
-    via: getViaString(props.departure, patternList),
-    platform: getDeparturePlatformString(props.departure),
+    terminus: getTerminusString(props.departure.departure, patternList),
+    via: getViaString(props.departure.departure, patternList),
+    platform: getDeparturePlatformString(props.departure.departure),
     stoppingPatternString: getStoppingPatternString(
-      props.departure,
+      props.departure.departure,
       patternList,
     ),
-    lineColor: requireLine(getConfig(), props.departure.line).color,
-    timeString: getTimeString(props.departure, utc.value),
-    linesString: getLinesString(props.departure),
+    lineColor: requireLine(getConfig(), props.departure.departure.line).color,
+    timeString: getTimeString(props.departure.departure, utc.value),
+    linesString: getLinesString(props.departure.departure),
+    disruptionsString: getDisruptionsString(props.departure.disruptions),
   };
 });
 </script>
@@ -47,7 +49,12 @@ const detail = computed(() => {
   <RouterLink
     class="departure"
     :class="`accent-${detail.lineColor}`"
-    :to="getServicePageRoute(departure, departure.perspectiveIndex)"
+    :to="
+      getServicePageRoute(
+        departure.departure,
+        departure.departure.perspectiveIndex,
+      )
+    "
   >
     <div class="primary">
       <OneLineP class="terminus">{{ detail.terminus }}</OneLineP>
@@ -57,15 +64,15 @@ const detail = computed(() => {
     <div class="details">
       <OneLineP>{{ detail.stoppingPatternString }}</OneLineP>
 
-      <div class="extra">
+      <div v-if="detail.disruptionsString == null" class="extra">
         <OneLineP class="extra-text">{{ detail.linesString }}</OneLineP>
       </div>
-      <!-- <div class="extra disruption">
+      <div v-if="detail.disruptionsString != null" class="extra disruption">
         <Icon id="uil:exclamation-circle"></Icon>
         <OneLineP class="extra-text">
-          Potentially replaced by buses after Westall
+          {{ detail.disruptionsString }}
         </OneLineP>
-      </div> -->
+      </div>
     </div>
     <div class="platform" v-if="detail.platform != null">
       <p>Platform</p>
@@ -196,4 +203,3 @@ const detail = computed(() => {
   margin-left: 0.5rem;
 }
 </style>
-./helpers/continuify ./helpers/continuified-departure

@@ -13,6 +13,7 @@ import type { Departure } from "shared/system/service/departure";
 import type { PlatformID, StopID } from "shared/system/ids";
 import type { ConfidenceLevel } from "shared/system/enums";
 import type { ViaRuleFilteringData } from "shared/system/via-rule";
+import type { SerializedDisruption } from "shared/disruptions/serialized-disruption";
 
 export function getTerminusString(
   departure: Departure,
@@ -92,4 +93,16 @@ export function getLinesString(departure: Departure) {
     .map((l) => requireLine(getConfig(), l).name)
     .sort((a, b) => a.localeCompare(b));
   return `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "lines"}`;
+}
+
+export function getDisruptionsString(
+  disruptions: SerializedDisruption[],
+): string | null {
+  if (disruptions.length == 0) {
+    return null;
+  }
+
+  return `Possibly affected by ${disruptions.length.toFixed()} ${
+    disruptions.length == 1 ? "disruption" : "disruptions"
+  }`;
 }

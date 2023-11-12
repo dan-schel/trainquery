@@ -7,7 +7,6 @@ import { z } from "zod";
 import LineList from "@/components/LineList.vue";
 import { getDiagramForService } from "@/components/line-diagram/get-diagram-for-service";
 import LineDiagram from "@/components/line-diagram/LineDiagram.vue";
-import { Departure } from "shared/system/service/departure";
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import { getConfig } from "@/utils/get-config";
@@ -15,69 +14,66 @@ import { formatRelativeTime, formatTime } from "@/utils/format-qtime";
 import { requireStop } from "shared/system/config-utils";
 import TrainPageStop from "@/components/line-diagram/TrainPageStop.vue";
 import { useNow } from "@/utils/now-provider";
+import Disruptions from "@/components/train/Disruptions.vue";
+import { DepartureWithDisruptions } from "../../shared/disruptions/departure-with-disruptions";
 
 const { local } = useNow();
 
 const route = useRoute();
 
-const train = computed(() => {
+const data = computed(() => {
   const metaSchema = z.object({
     state: z.object({
       route: z.object({
-        departure: Departure.json.optional(),
+        departure: DepartureWithDisruptions.json.optional(),
       }),
     }),
   });
   const meta = metaSchema.parse(route.meta);
-  return meta.state.route.departure;
-});
+  const departureWithDisruptions = meta.state.route.departure;
 
-const diagram = computed(() =>
-  train.value != null ? getDiagramForService(train.value) : null,
-);
+  if (departureWithDisruptions != null) {
+    const train = departureWithDisruptions.departure;
 
-const title = computed(() => {
-  if (train.value == null) {
+    const departureTime = toLocalDateTimeLuxon(
+      getConfig(),
+      train.perspective.scheduledTime,
+    );
+    const timeString = formatTime(departureTime.time);
+    const relativeTimeString = formatRelativeTime(departureTime, local.value);
+
+    const perspectiveName = requireStop(
+      getConfig(),
+      train.perspective.stop,
+    ).name;
+    const terminusName = requireStop(getConfig(), train.terminus.stop).name;
+
+    const verb = train.isArrival()
+      ? departureTime.isBefore(local.value)
+        ? "Arrived at"
+        : "Arrives at"
+      : departureTime.isBefore(local.value)
+      ? "Departed"
+      : "Departs";
+    const departureText = `${verb} ${perspectiveName} at ${relativeTimeString}`;
+
     return {
-      short: "Train not found",
-      long: "Train not found",
+      title: {
+        short: `${terminusName} train`,
+        long: `${timeString} ${terminusName} train`,
+      },
+      departureText: departureText,
+      lines: [train.line, ...train.associatedLines],
+      disruptions: departureWithDisruptions.disruptions,
+      diagram: getDiagramForService(train),
     };
+  } else {
+    return null;
   }
-
-  const perspective = train.value.perspective;
-  const timeString = formatTime(
-    toLocalDateTimeLuxon(getConfig(), perspective.scheduledTime).time,
-  );
-  const terminus = requireStop(getConfig(), train.value.terminus.stop).name;
-  return {
-    short: `${terminus} train`,
-    long: `${timeString} ${terminus} train`,
-  };
-});
-
-const departureText = computed(() => {
-  if (train.value == null) {
-    return "";
-  }
-
-  const name = requireStop(getConfig(), train.value.perspective.stop).name;
-  const time = toLocalDateTimeLuxon(
-    getConfig(),
-    train.value.perspective.scheduledTime,
-  );
-  const timeString = formatRelativeTime(time, local.value);
-  const verb = train.value.isArrival()
-    ? time.isBefore(local.value)
-      ? "Arrived at"
-      : "Arrives at"
-    : time.isBefore(local.value)
-    ? "Departed"
-    : "Departs";
-  return `${verb} ${name} at ${timeString}`;
 });
 
 const head = computed(() => ({
-  title: title.value.long,
+  title: data.value != null ? data.value.title.long : "Train not found",
   meta: [{ name: "robots", content: "noindex" }],
 }));
 useHead(head);
@@ -85,17 +81,23 @@ useHead(head);
 
 <template>
   <PageContent
-    :title="title.short"
+    v-if="data != null"
+    :title="data.title.short"
     title-margin="0.5rem"
-    v-if="train != null"
     v-bind="$attrs"
   >
-    <p class="subtitle">{{ departureText }}</p>
-    <LineList
-      class="line-list"
-      :lines="[train.line, ...train.associatedLines]"
-    ></LineList>
-    <LineDiagram v-if="diagram != null" :diagram="diagram" class="diagram">
+    <p class="subtitle">{{ data.departureText }}</p>
+    <LineList class="line-list" :lines="data.lines"></LineList>
+    <Disruptions
+      class="disruptions"
+      v-if="data.disruptions.length > 0"
+      :disruptions="data.disruptions"
+    ></Disruptions>
+    <LineDiagram
+      v-if="data.diagram != null"
+      :diagram="data.diagram"
+      class="diagram"
+    >
       <template #stop="slotProps">
         <TrainPageStop :stop-data="slotProps.stopData" />
       </template>
@@ -103,9 +105,9 @@ useHead(head);
   </PageContent>
 
   <NotFoundLayout
-    :title="title.short"
+    title="Train not found"
     message="This train can't be found right now. It might be from an old timetable, no longer running, or not stopping here anymore."
-    v-if="train == null"
+    v-if="data == null"
     v-bind="$attrs"
   ></NotFoundLayout>
 </template>
@@ -113,13 +115,17 @@ useHead(head);
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
 .line-list {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 .subtitle {
+  margin-bottom: 1rem;
+}
+.disruptions {
   margin-bottom: 1rem;
 }
 .diagram {
   --stop-gap: 1.25rem;
   margin-bottom: 2rem;
+  margin-top: 1rem;
 }
 </style>

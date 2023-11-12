@@ -54,8 +54,11 @@ export function getTrainPageProps(ctx: TrainQuery, path: string) {
     return {};
   }
 
+  const departureWithDisruptions =
+    ctx.disruptions.determineDisruptions(departure);
+
   return {
-    departure: departure.toJSON(),
+    departure: departureWithDisruptions.toJSON(),
   };
 }
 
