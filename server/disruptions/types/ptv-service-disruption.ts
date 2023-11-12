@@ -9,7 +9,7 @@ export type PtvServiceDisruptionCategory = "cancelled" | "unknown";
 
 export class PtvServiceDisruption extends Disruption<"ptv-service"> {
   constructor(
-    readonly lines: LineID[],
+    // TODO: Features to identify the service.
     readonly category: PtvServiceDisruptionCategory,
     readonly message: string,
     readonly url: string | null,
@@ -18,6 +18,7 @@ export class PtvServiceDisruption extends Disruption<"ptv-service"> {
   }
 
   affectsService(_ctx: TrainQuery, _service: Service): boolean {
+    // TODO: Use said features to now, y'know, identify the service!
     return false;
   }
 

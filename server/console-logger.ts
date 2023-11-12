@@ -58,4 +58,14 @@ export class ConsoleLogger extends Logger {
   logPersistingGtfsFailure(err: unknown): void {
     console.warn("Failed to save GTFS data to database.", err);
   }
+
+  logFetchingDisruptions(source: string): void {
+    console.log(`Fetching disruptions from "${source}"...`);
+  }
+  logFetchingDisruptionsSuccess(source: string, count: number): void {
+    console.log(`Successfully fetched ${count} disruptions from "${source}".`);
+  }
+  logFetchingDisruptionsFailure(source: string, err: unknown): void {
+    console.warn(`Failed to fetch disruptions from "${source}".`, err);
+  }
 }
