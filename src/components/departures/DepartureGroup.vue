@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 import DepartureFeedVue from "./DepartureFeed.vue";
-import { Departure } from "shared/system/service/departure";
 import { repeat } from "@schel-d/js-utils";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { callAPI } from "@/utils/call-api";
 import { useNow } from "@/utils/now-provider";
 import type { QLocalDateTime } from "shared/qtime/qdatetime";
+import { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
 
 const props = defineProps<{
   feeds: DepartureFeed[];
@@ -19,7 +19,7 @@ const props = defineProps<{
 
 const loading = ref(true);
 const error = ref<"unknown" | null>(null);
-const departureLists = ref<Departure[][]>(
+const departureLists = ref<DepartureWithDisruptions[][]>(
   repeat(null, props.feeds.length).map((_x) => []),
 );
 
@@ -41,7 +41,7 @@ async function init(reset: boolean) {
           feeds: DepartureFeed.encode(props.feeds),
           time: (props.time?.toUTC() ?? utc.value).toISO(),
         },
-        Departure.json.array().array(),
+        DepartureWithDisruptions.json.array().array(),
       );
     } catch (err) {
       console.warn(err);

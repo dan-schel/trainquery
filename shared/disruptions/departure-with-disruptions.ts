@@ -11,10 +11,12 @@ export class DepartureWithDisruptions {
     readonly disruptions: SerializedDisruption[],
   ) {}
 
-  static json = z.object({
-    departure: Departure.json,
-    disruptions: DisruptionJson.array(),
-  });
+  static json = z
+    .object({
+      departure: Departure.json,
+      disruptions: DisruptionJson.array(),
+    })
+    .transform((x) => new DepartureWithDisruptions(x.departure, x.disruptions));
 
   toJSON(): z.input<typeof DepartureWithDisruptions.json> {
     return {
