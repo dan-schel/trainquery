@@ -10,6 +10,7 @@ import "dotenv/config";
 import { OfflineConfigProvider } from "./config/offline-config-provider";
 import { ssrAppPropsApi } from "./api/ssr-props-api";
 import { TrainQueryDB } from "./trainquery-db";
+import { createSitemapXml } from "./sitemap-xml";
 
 createServer();
 
@@ -25,7 +26,7 @@ async function createServer() {
     if (isProd) {
       await setupProdServer(ctx, app);
     } else {
-      await setupDevServer(app);
+      await setupDevServer(ctx, app);
     }
   };
 
@@ -64,7 +65,9 @@ function getDatabase(isOffline: boolean): TrainQueryDB | null {
   return new TrainQueryDB(domain, username, password);
 }
 
-async function setupDevServer(app: Express) {
+async function setupDevServer(ctx: TrainQuery, app: Express) {
+  serveSitemapXml(app, ctx);
+
   // Create vite-ssr server in middleware mode.
   const viteServer = await createSsrServer({
     server: { middlewareMode: true },
@@ -74,6 +77,8 @@ async function setupDevServer(app: Express) {
 }
 
 async function setupProdServer(ctx: TrainQuery, app: Express) {
+  serveSitemapXml(app, ctx);
+
   const dist = `../dist`;
 
   // Serve static assets.
@@ -110,4 +115,11 @@ function requireEnv(variable: string): string {
     throw new Error(`"${variable}" environment variable not provided.`);
   }
   return value;
+}
+
+function serveSitemapXml(app: Express, ctx: TrainQuery) {
+  app.get("/sitemap.xml", (_req, res) => {
+    const xml = createSitemapXml(ctx.getConfig());
+    res.set("Content-Type", "text/xml").send(xml);
+  });
 }
