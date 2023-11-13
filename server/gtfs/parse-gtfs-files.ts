@@ -169,7 +169,7 @@ function parseTrips(
       const existing = result.get(hashKey);
       if (existing != null) {
         result.set(hashKey, existing.addIDPair(idPair));
-        parsingReport.logDuplicatedTrip();
+        parsingReport.logMergedTrip();
       } else {
         result.set(hashKey, parsedTrip);
       }
@@ -255,6 +255,16 @@ function dedupeTrips(
         continue;
       }
 
+      // Don't bother unless at least some calendars are in common (see
+      // mergeSubset implementation).
+      if (
+        !a.idPairs.some((p1) =>
+          b.idPairs.some((p2) => p1.gtfsCalendarID == p2.gtfsCalendarID),
+        )
+      ) {
+        continue;
+      }
+
       const aBounds = determineBoundaryIndices(a.times);
       const bBounds = determineBoundaryIndices(b.times);
 
@@ -269,18 +279,30 @@ function dedupeTrips(
 
       if (aSlice.length > bSlice.length) {
         if (isSubset(aSlice, bSlice, aStopList, bStopList)) {
-          trips[i] = mergeSubset(a, b);
-          trips.splice(j, 1);
-          j--;
-          parsingReport.logDuplicatedTrip();
+          const [newI, newJ] = mergeSubset(a, b);
+          trips[i] = newI;
+          if (newJ != null) {
+            trips[j] = newJ;
+            parsingReport.logSplit();
+          } else {
+            trips.splice(j, 1);
+            j--;
+            parsingReport.logDuplicatedTrip();
+          }
         }
       } else {
         if (isSubset(bSlice, aSlice, bStopList, aStopList)) {
-          trips[j] = mergeSubset(b, a);
-          trips.splice(i, 1);
-          i--;
-          j--;
-          parsingReport.logDuplicatedTrip();
+          const [newJ, newI] = mergeSubset(b, a);
+          trips[j] = newJ;
+          if (newI != null) {
+            trips[i] = newI;
+            parsingReport.logSplit();
+          } else {
+            trips.splice(i, 1);
+            i--;
+            j--;
+            parsingReport.logDuplicatedTrip();
+          }
         }
       }
     }
@@ -340,7 +362,23 @@ function isSubset(
   return false;
 }
 
-function mergeSubset(superset: GtfsTrip, subset: GtfsTrip) {
+function mergeSubset(
+  superset: GtfsTrip,
+  subset: GtfsTrip,
+): [GtfsTrip, GtfsTrip | null] {
   // TODO: Use known continuation from subset service if available.
-  return superset;
+
+  // If the superset trip doesn't run on the same calendars as the subset
+  // service, then we can't just remove the subset service entirely! Instead
+  // replace it with a trip that only contains those calendars.
+  const unaccountedIDPairs = subset.idPairs.filter(
+    (p1) =>
+      !superset.idPairs.some((p2) => p1.gtfsCalendarID == p2.gtfsCalendarID),
+  );
+  const splitSubset =
+    unaccountedIDPairs.length == 0
+      ? null
+      : subset.withIDPairs(unaccountedIDPairs);
+
+  return [superset, splitSubset];
 }
