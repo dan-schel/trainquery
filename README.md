@@ -1,6 +1,8 @@
 # TrainQuery
 
-A rewrite of [TrainQuery](https://github.com/schel-d/melbpt) using a monolithic architecture and Vue.js.
+An unofficial guide to help you navigate Melbourne's train network, built on Vue.js, Express, and MongoDB. You can search for any suburban or regional train station to view upcoming departures, and adjust the departure time or filter to further refine the results.
+
+✅ Live at [trainquery.com](https://trainquery.com)!
 
 ## Developing without internet
 
