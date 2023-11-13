@@ -81,7 +81,6 @@ export class GtfsWorker {
           (this._lastAttempt.isBefore(thresholdToday) &&
             now.isAfterOrEqual(thresholdToday))
         ) {
-          this._lastAttempt = now;
           this._refresh();
         }
       };
@@ -93,6 +92,8 @@ export class GtfsWorker {
   }
 
   private async _refresh() {
+    this._lastAttempt = nowUTCLuxon();
+
     try {
       this._ctx.logger.logRefreshingGtfs();
       const data = await downloadGtfs(this._ctx, this._gtfsConfig);

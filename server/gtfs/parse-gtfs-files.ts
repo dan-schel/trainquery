@@ -243,6 +243,11 @@ function dedupeTrips(
       const a = trips[i];
       const b = trips[j];
 
+      // No point. These trips are all guaranteed to be from the same subfeed.
+      // if (a.gtfsSubfeedID != b.gtfsSubfeedID) {
+      //   continue;
+      // }
+
       if (
         [a.line, ...a.associatedLines].includes(b.line) ||
         [b.line, ...b.associatedLines].includes(a.line)
