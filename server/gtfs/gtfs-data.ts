@@ -220,8 +220,18 @@ export class GtfsTrip {
     gtfsCalendarID: string;
     continuationIndex: number;
   }): GtfsTrip {
+    return this.withIDPairs([...this.idPairs, idPair]);
+  }
+
+  withIDPairs(
+    idPairs: {
+      gtfsTripID: string;
+      gtfsCalendarID: string;
+      continuationIndex: number;
+    }[],
+  ): GtfsTrip {
     return new GtfsTrip(
-      [...this.idPairs, idPair],
+      idPairs,
       this.gtfsSubfeedID,
       this.line,
       this.associatedLines,
