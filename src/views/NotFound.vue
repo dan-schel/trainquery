@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
+import { generatePageHeadNotFound } from "@/utils/head";
 import { useHead } from "@vueuse/head";
-useHead({
-  title: "Page not found",
-  meta: [{ name: "robots", content: "noindex" }],
-});
+useHead(generatePageHeadNotFound("Page not found"));
 </script>
 
 <template>

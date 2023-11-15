@@ -9,10 +9,15 @@ import { computed } from "vue";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { useSettings } from "@/settings/settings";
 import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
+import { generatePageHead } from "@/utils/head";
 
-useHead({
-  title: "Home",
-});
+useHead(
+  generatePageHead({
+    title: "Home",
+    allowIndexing: true,
+    canonicalUrl: "/",
+  }),
+);
 
 const { settings } = useSettings();
 const feeds = computed(() =>

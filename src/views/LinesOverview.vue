@@ -6,6 +6,7 @@ import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { getLinePageRoute } from "shared/system/config-utils";
 import { formatMode } from "@/utils/format-mode";
+import { generatePageHead } from "@/utils/head";
 
 const modes = computed(() => {
   const c = getConfig().shared;
@@ -20,9 +21,13 @@ const modes = computed(() => {
     .filter((g) => g.lines.length > 0);
 });
 
-useHead({
-  title: "Lines",
-});
+useHead(
+  generatePageHead({
+    title: "Lines",
+    allowIndexing: true,
+    canonicalUrl: "/lines",
+  }),
+);
 </script>
 
 <template>

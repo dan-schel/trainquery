@@ -5,11 +5,15 @@ import Picker from "@/components/common/Picker.vue";
 import { onMounted, ref } from "vue";
 import { getTheme, setTheme, type Theme } from "@/settings/theme";
 import SimpleButton from "@/components/common/SimpleButton.vue";
+import { generatePageHead } from "@/utils/head";
 
-useHead({
-  title: "Settings",
-  meta: [{ name: "robots", content: "noindex" }],
-});
+useHead(
+  generatePageHead({
+    title: "Settings",
+    allowIndexing: false,
+    canonicalUrl: "/settings",
+  }),
+);
 
 const theme = ref<Theme>();
 onMounted(() => {

@@ -56,11 +56,7 @@ onUnmounted(() => {
 });
 
 useHead({
-  titleTemplate: (title?: string) =>
-    `${title ?? "Page"} | ${getConfig().frontend.appName}`,
-  meta: [
-    { name: "description", content: getConfig().frontend.metaDescription },
-  ],
+  title: "🚨 [TODO] Set document head correctly 🚨",
 });
 </script>
 

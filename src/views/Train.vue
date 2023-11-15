@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useHead } from "@vueuse/head";
+import { useHead, type UseHeadInput } from "@vueuse/head";
 import { useRoute } from "vue-router";
 import { computed } from "vue";
 import PageContent from "@/components/common/PageContent.vue";
@@ -11,11 +11,12 @@ import NotFoundLayout from "@/components/NotFoundLayout.vue";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import { getConfig } from "@/utils/get-config";
 import { formatRelativeTime, formatTime } from "@/utils/format-qtime";
-import { requireStop } from "shared/system/config-utils";
+import { getServicePageRoute, requireStop } from "shared/system/config-utils";
 import TrainPageStop from "@/components/line-diagram/TrainPageStop.vue";
 import { useNow } from "@/utils/now-provider";
 import Disruptions from "@/components/train/Disruptions.vue";
 import { DepartureWithDisruptions } from "../../shared/disruptions/departure-with-disruptions";
+import { generatePageHead, generatePageHeadNotFound } from "@/utils/head";
 
 const { local } = useNow();
 
@@ -66,17 +67,27 @@ const data = computed(() => {
       lines: [train.line, ...train.associatedLines],
       disruptions: departureWithDisruptions.disruptions,
       diagram: getDiagramForService(train),
+      departure: train,
     };
   } else {
     return null;
   }
 });
 
-const head = computed(() => ({
-  title: data.value != null ? data.value.title.long : "Train not found",
-  meta: [{ name: "robots", content: "noindex" }],
-}));
-useHead(head);
+const head = computed(() => {
+  if (data.value == null) {
+    return generatePageHeadNotFound("Train not found");
+  }
+  return generatePageHead({
+    title: data.value.title.long,
+    allowIndexing: false,
+    canonicalUrl: getServicePageRoute(
+      data.value.departure,
+      data.value.departure.perspectiveIndex,
+    ),
+  });
+});
+useHead(head as UseHeadInput<{}>);
 </script>
 
 <template>

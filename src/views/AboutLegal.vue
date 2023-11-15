@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import PageContent from "@/components/common/PageContent.vue";
+import { generatePageHead } from "@/utils/head";
 import { useHead } from "@vueuse/head";
 import { computed } from "vue";
 
@@ -59,9 +60,13 @@ const packages = computed(() =>
   ].sort((a, b) => a.name.localeCompare(b.name)),
 );
 
-useHead({
-  title: "Licences and attribution",
-});
+useHead(
+  generatePageHead({
+    title: "Licences and attribution",
+    allowIndexing: true,
+    canonicalUrl: "/about/legal",
+  }),
+);
 </script>
 
 <template>
