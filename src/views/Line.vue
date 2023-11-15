@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useHead } from "@vueuse/head";
+import { useHead, type UseHeadInput } from "@vueuse/head";
 import { useRoute } from "vue-router";
 import {
   getLinePageRoute,
@@ -13,6 +13,7 @@ import { getRouteDiagram } from "shared/system/routes/line-routes";
 import LinePageStop from "@/components/line-diagram/LinePageStop.vue";
 import { formatMode } from "@/utils/format-mode";
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
+import { generatePageHead, generatePageHeadNotFound } from "@/utils/head";
 
 const route = useRoute();
 const params = ref(route.params);
@@ -37,25 +38,15 @@ const modeString = computed(() =>
 
 const head = computed(() => {
   if (line.value == null) {
-    return {
-      title: "Line not found",
-      meta: [{ name: "robots", content: "noindex" }],
-    };
+    return generatePageHeadNotFound("Line not found");
   }
-
-  return {
+  return generatePageHead({
     title: `${line.value.name} Line`,
-    link: [
-      {
-        rel: "canonical",
-        href:
-          getConfig().shared.canonicalUrl +
-          getLinePageRoute(getConfig(), line.value.id),
-      },
-    ],
-  };
+    allowIndexing: true,
+    canonicalUrl: getLinePageRoute(getConfig(), line.value.id),
+  });
 });
-useHead(head);
+useHead(head as UseHeadInput<{}>);
 </script>
 
 <template>

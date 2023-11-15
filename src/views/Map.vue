@@ -1,8 +1,13 @@
 <script setup lang="ts">
+import { generatePageHead } from "@/utils/head";
 import { useHead } from "@vueuse/head";
-useHead({
-  title: "Train map",
-});
+useHead(
+  generatePageHead({
+    title: "Train map",
+    allowIndexing: true,
+    canonicalUrl: "/map",
+  }),
+);
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useHead } from "@vueuse/head";
+import { useHead, type UseHeadInput } from "@vueuse/head";
 import { useRoute, useRouter } from "vue-router";
 import {
   getStopPageRoute,
@@ -19,6 +19,7 @@ import { requiredParam, unparam } from "@/utils/param-utils";
 import { isValidFilter } from "@/components/departures/helpers/available-filters";
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
 import { nullableEquals, itsOk } from "@schel-d/js-utils";
+import { generatePageHead, generatePageHeadNotFound } from "@/utils/head";
 
 const router = useRouter();
 const route = useRoute();
@@ -129,25 +130,15 @@ const lines = computed(() => {
 
 const head = computed(() => {
   if (stop.value == null) {
-    return {
-      title: "Stop not found",
-      meta: [{ name: "robots", content: "noindex" }],
-    };
+    return generatePageHeadNotFound("Stop not found");
   }
-
-  return {
+  return generatePageHead({
     title: stop.value.name,
-    link: [
-      {
-        rel: "canonical",
-        href:
-          getConfig().shared.canonicalUrl +
-          getStopPageRoute(getConfig(), stop.value.id, null, null),
-      },
-    ],
-  };
+    allowIndexing: true,
+    canonicalUrl: getStopPageRoute(getConfig(), stop.value.id, null, null),
+  });
 });
-useHead(head);
+useHead(head as UseHeadInput<{}>);
 </script>
 
 <template>

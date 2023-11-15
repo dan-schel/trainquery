@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import PageContent from "@/components/common/PageContent.vue";
 import Icon from "@/components/icons/Icon.vue";
+import { generatePageHead } from "@/utils/head";
 import { parseMarkdown } from "@/utils/parse-markdown";
 import { useHead } from "@vueuse/head";
 import { computed } from "vue";
@@ -22,9 +23,13 @@ const innerHTML = computed(() => {
   return parseMarkdown(meta.state.route.aboutMarkdown);
 });
 
-useHead({
-  title: "About",
-});
+useHead(
+  generatePageHead({
+    title: "About",
+    allowIndexing: true,
+    canonicalUrl: "/about",
+  }),
+);
 </script>
 
 <template>
