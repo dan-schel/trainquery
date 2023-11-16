@@ -11,6 +11,7 @@ import { OfflineConfigProvider } from "./config/offline-config-provider";
 import { ssrAppPropsApi } from "./api/ssr-props-api";
 import { TrainQueryDB } from "./trainquery-db";
 import { createSitemapXml } from "./sitemap-xml";
+import { fetchRealtime } from "./gtfs/realtime/fetch";
 
 createServer();
 
@@ -29,6 +30,10 @@ async function createServer() {
       await setupDevServer(ctx, app);
     }
   };
+
+  // <TEMP>
+  await fetchRealtime();
+  // </TEMP>
 
   await trainQuery(
     () => new ExpressServer(parseIntThrow(port), serveFrontend),
