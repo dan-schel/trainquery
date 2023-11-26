@@ -232,6 +232,8 @@ function handleNextButton() {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: max-content;
+  height: max-content;
 
   font-size: var(--wheel-text-size, 2.5rem);
   font-weight: bold;
