@@ -46,7 +46,7 @@ An unofficial guide to help you navigate Melbourne's train network, built on Vue
 2.  Set the `CONFIG_OFFLINE` environment variable to point to it, e.g. `CONFIG_OFFLINE = offline/config.zip`.
 3.  Run `npm run dev -- offline` or `npm run build && npm run start -- offline`.
 
-The offline folder is "gitignored" for this purpose.
+The `offline` directory is included in the `.gitignore` file for this purpose.
 
 ## Developing using local config
 
