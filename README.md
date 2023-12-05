@@ -8,7 +8,7 @@ An unofficial guide to help you navigate Melbourne's train network, built on Vue
 
 1.  Clone the repo with submodules. Either run `git clone --recursive https://github.com/schel-d/trainquery.git`, or run `git submodule update --init --recursive` after cloning the repository.
 2.  Run `npm i` to install dependencies.
-3.  Create a `.env` file, which should contain:
+3.  Create a `.env` file, as described below:
 
     ```dotenv
     # All values provided below are examples. Customize the values for your needs.
@@ -22,23 +22,16 @@ An unofficial guide to help you navigate Melbourne's train network, built on Vue
     # The port to run the server on (optional).
     PORT = 3000
 
-    # The path of the transit network configuration data for offline mode (optional).
+    # The path of the transit network configuration data for offline mode (optional - see "Developing without internet" below).
     CONFIG_OFFLINE = "offline/config.zip"
 
-    # If using persisting data to a MongoDB database:
-    # ===============================================
-    # The database hostname.
+    # If persisting data to a MongoDB database, the domain, username, and password to use to connect to the database (optional).
     MONGO_DOMAIN = "db.trainquery.com"
-    # The username to log in to the database.
     MONGO_USERNAME = "..."
-    # The password to log in to the database.
     MONGO_PASSWORD = "..."
 
-    # If connecting to the PTV API:
-    # =============================
-    # The developer ID provided by PTV.
+    # If connecting to the PTV API, the credentials provided by PTV, used to query the API (optional).
     PTV_DEV_ID = "..."
-    # The developer key provided by PTV.
     PTV_DEV_KEY = "..."
     ```
 
