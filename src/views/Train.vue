@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHead, type UseHeadInput } from "@vueuse/head";
-import { useRoute } from "vue-router";
+import { RouterLink, useRoute } from "vue-router";
 import { computed } from "vue";
 import PageContent from "@/components/common/PageContent.vue";
 import { z } from "zod";
@@ -17,6 +17,7 @@ import { useNow } from "@/utils/now-provider";
 import Disruptions from "@/components/train/Disruptions.vue";
 import { DepartureWithDisruptions } from "../../shared/disruptions/departure-with-disruptions";
 import { generatePageHead, generatePageHeadNotFound } from "@/utils/head";
+import { useSettings } from "@/settings/settings";
 
 const { local } = useNow();
 
@@ -74,6 +75,9 @@ const data = computed(() => {
   }
 });
 
+const { settings } = useSettings();
+const developerMode = computed(() => settings.value?.developerMode ?? false);
+
 const head = computed(() => {
   if (data.value == null) {
     return generatePageHeadNotFound("Train not found");
@@ -113,6 +117,30 @@ useHead(head as UseHeadInput<{}>);
         <TrainPageStop :stop-data="slotProps.stopData" />
       </template>
     </LineDiagram>
+
+    <div class="flex-grow"></div>
+    <div
+      class="dev-info"
+      v-if="developerMode && Object.keys(data.departure.debugInfo).length > 0"
+    >
+      <h2>Developer info</h2>
+      <p
+        v-for="[key, value] in Object.entries(data.departure.debugInfo)"
+        :key="key"
+      >
+        {{ key }}:
+        <code>
+          <RouterLink
+            :to="value.replace(getConfig().shared.canonicalUrl, '')"
+            class="link"
+            v-if="value.startsWith(getConfig().shared.canonicalUrl)"
+          >
+            {{ value.replace(getConfig().shared.canonicalUrl, "") }}
+          </RouterLink>
+          <span v-else>{{ value }}</span>
+        </code>
+      </p>
+    </div>
   </PageContent>
 
   <NotFoundLayout
@@ -125,6 +153,7 @@ useHead(head as UseHeadInput<{}>);
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
+@use "@/assets/utils" as utils;
 .line-list {
   margin-bottom: 1rem;
 }
@@ -138,5 +167,22 @@ useHead(head as UseHeadInput<{}>);
   --stop-gap: 1.25rem;
   margin-bottom: 2rem;
   margin-top: 1rem;
+}
+.dev-info {
+  border-top: 1px solid var(--color-ink-20);
+  padding-top: 2rem;
+  margin-bottom: 2rem;
+  gap: 0.75rem;
+  h2 {
+    @include utils.h2;
+  }
+  span,
+  code,
+  a {
+    word-break: break-all;
+  }
+}
+.flex-grow {
+  @include template.flex-grow;
 }
 </style>

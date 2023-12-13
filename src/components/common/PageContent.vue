@@ -28,9 +28,11 @@ defineProps<{
 @use "@/assets/utils" as utils;
 main {
   @include template.page-centerer;
+  flex-grow: 1;
 }
 .content {
   padding: 0rem 1rem;
+  flex-grow: 1;
 }
 h1 {
   @include utils.h1;

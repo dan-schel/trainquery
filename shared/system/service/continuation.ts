@@ -28,6 +28,7 @@ const nonRecursiveJson = z.object({
     })
     .array(),
   pattern: z.union([CompletePattern.json, KnownOriginPattern.json]),
+  debugInfo: z.record(z.string()),
 });
 
 const rawJson: z.ZodType<Output, z.ZodTypeDef, Input> = nonRecursiveJson.extend(
@@ -55,6 +56,7 @@ export class Continuation extends Service<
     staticID: StaticServiceID | null,
     sources: ServiceSource[],
     continuation: Continuation | null,
+    debugInfo: Record<string, string>,
   ) {
     super(
       line,
@@ -65,6 +67,7 @@ export class Continuation extends Service<
       staticID,
       sources,
       continuation,
+      debugInfo,
     );
   }
 
@@ -80,6 +83,7 @@ export class Continuation extends Service<
       x.staticID,
       x.sources,
       x.continuation == null ? null : Continuation.transform(x.continuation),
+      x.debugInfo,
     );
   }
 
@@ -93,6 +97,7 @@ export class Continuation extends Service<
       staticID: this.staticID,
       sources: this.sources,
       continuation: this.continuation?.toJSON() ?? null,
+      debugInfo: this.debugInfo,
     };
   }
 

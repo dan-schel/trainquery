@@ -155,17 +155,19 @@ export class GtfsCalendar {
   }
 }
 
+export type GtfsTripIDPair = {
+  gtfsTripID: string;
+  gtfsCalendarID: string;
+  continuationIndex: number;
+};
+
 export class GtfsTrip {
   constructor(
     /**
      * This trip might be multiple duplicated trips from different calendars
      * combined.
      */
-    readonly idPairs: {
-      gtfsTripID: string;
-      gtfsCalendarID: string;
-      continuationIndex: number;
-    }[],
+    readonly idPairs: GtfsTripIDPair[],
     readonly gtfsSubfeedID: string | null,
     readonly line: LineID,
     readonly associatedLines: LineID[],
@@ -215,11 +217,7 @@ export class GtfsTrip {
     );
   }
 
-  addIDPair(idPair: {
-    gtfsTripID: string;
-    gtfsCalendarID: string;
-    continuationIndex: number;
-  }): GtfsTrip {
+  addIDPair(idPair: GtfsTripIDPair): GtfsTrip {
     return this.withIDPairs([...this.idPairs, idPair]);
   }
 
@@ -262,11 +260,7 @@ export class GtfsTrip {
     });
   }
 
-  requireIDPair(gtfsCalendarID: string): {
-    gtfsTripID: string;
-    gtfsCalendarID: string;
-    continuationIndex: number;
-  } {
+  requireIDPair(gtfsCalendarID: string): GtfsTripIDPair {
     const pair = this.idPairs.find((p) => p.gtfsCalendarID == gtfsCalendarID);
     if (pair == null) {
       throw new Error(

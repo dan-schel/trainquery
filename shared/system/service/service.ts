@@ -34,5 +34,6 @@ export class Service<
     readonly staticID: StaticServiceID | null,
     readonly sources: ServiceSource[],
     readonly continuation: Continuation | null,
+    readonly debugInfo: Record<string, string>,
   ) {}
 }
