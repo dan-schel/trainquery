@@ -79,6 +79,13 @@
   @include template.link;
 }
 
+code {
+  background-color: var(--color-ink-10);
+  border-radius: 0.25rem;
+  font-family: "Fira Code", monospace;
+  padding: 0 0.25rem;
+}
+
 html,
 body,
 #app {

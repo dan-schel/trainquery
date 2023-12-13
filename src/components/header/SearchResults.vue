@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import Icon from "../icons/Icon.vue";
 import { search, searchOptionsWholeSite } from "./search";
+import { useSettings } from "@/settings/settings";
 
 const props = defineProps<{
   query: string;
@@ -11,6 +12,9 @@ const emits = defineEmits<{
   (e: "topResultChange", payload: { url: string }): void;
   (e: "resultClick"): void;
 }>();
+
+const { settings } = useSettings();
+const developerMode = computed(() => settings.value?.developerMode ?? false);
 
 const results = computed(() => {
   const results = search(props.query, searchOptionsWholeSite());
@@ -36,6 +40,28 @@ const results = computed(() => {
         <p class="title">{{ result.title }}</p>
         <p class="subtitle" v-if="result.subtitle != null">
           {{ result.subtitle }}
+          <template
+            v-if="
+              developerMode &&
+              result.data != null &&
+              typeof result.data == 'object' &&
+              'line' in result.data &&
+              typeof result.data.line == 'number'
+            "
+          >
+            &nbsp;•&nbsp;&nbsp;Line #{{ result.data.line }}
+          </template>
+          <template
+            v-if="
+              developerMode &&
+              result.data != null &&
+              typeof result.data == 'object' &&
+              'stop' in result.data &&
+              typeof result.data.stop == 'number'
+            "
+          >
+            &nbsp;•&nbsp;&nbsp;Stop #{{ result.data.stop }}
+          </template>
         </p>
       </div>
     </RouterLink>
