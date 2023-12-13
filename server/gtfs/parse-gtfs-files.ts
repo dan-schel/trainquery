@@ -238,6 +238,8 @@ function dedupeTrips(
   trips: GtfsTrip[],
   parsingReport: GtfsParsingReport,
 ): GtfsTrip[] {
+  // DO NOT EDIT THIS FUNCTION... without writing unit tests for it. No actually!
+
   for (let i = 0; i < trips.length - 1; i++) {
     for (let j = i + 1; j < trips.length; j++) {
       const a = trips[i];
@@ -249,8 +251,10 @@ function dedupeTrips(
       // }
 
       if (
-        [a.line, ...a.associatedLines].includes(b.line) ||
-        [b.line, ...b.associatedLines].includes(a.line)
+        !(
+          [a.line, ...a.associatedLines].includes(b.line) ||
+          [b.line, ...b.associatedLines].includes(a.line)
+        )
       ) {
         continue;
       }
@@ -273,7 +277,7 @@ function dedupeTrips(
         .stops.slice(aBounds.start, aBounds.end + 1);
       const bStopList = requireLine(config, b.line)
         .route.requireStopList(b.route, b.direction)
-        .stops.slice(aBounds.start, aBounds.end + 1);
+        .stops.slice(bBounds.start, bBounds.end + 1);
       const aSlice = a.times.slice(aBounds.start, aBounds.end + 1);
       const bSlice = b.times.slice(bBounds.start, bBounds.end + 1);
 
@@ -286,8 +290,10 @@ function dedupeTrips(
             parsingReport.logSplit();
           } else {
             trips.splice(j, 1);
-            j--;
             parsingReport.logDuplicatedTrip();
+
+            // Since we just removed j, the next loop should repeat this j index.
+            j--;
           }
         }
       } else {
@@ -299,9 +305,12 @@ function dedupeTrips(
             parsingReport.logSplit();
           } else {
             trips.splice(i, 1);
-            i--;
-            j--;
             parsingReport.logDuplicatedTrip();
+
+            // Since we just removed i, we should stop iterating this inner loop
+            // and start the next outer loop, repeating this index.
+            i--;
+            break;
           }
         }
       }
@@ -338,17 +347,22 @@ function isSubset(
   supersetStops: StopID[],
   subsetStops: StopID[],
 ): boolean {
-  for (let start = 0; start < superset.length - subset.length; start++) {
+  // DO NOT EDIT THIS FUNCTION... without writing unit tests for it. No actually!
+
+  for (let start = 0; start <= superset.length - subset.length; start++) {
     let matches = true;
     for (let i = 0; i < subset.length; i++) {
-      if (supersetStops[i] != subsetStops[i + start]) {
+      // Check the stopping orders match.
+      if (supersetStops[i + start] != subsetStops[i]) {
         matches = false;
         break;
       }
 
+      // Check the stopping times match, except for the last stop (arrival times
+      // might not match the continuation's departure time).
       if (
         i != subset.length - 1 &&
-        nullableEquals(superset[i], subset[i + start], (a, b) => a.equals(b))
+        !nullableEquals(superset[i + start], subset[i], (a, b) => a.equals(b))
       ) {
         matches = false;
         break;
