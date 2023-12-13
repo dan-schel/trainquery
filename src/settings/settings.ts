@@ -16,22 +16,29 @@ const settingsV1 = z.object({
   limitMapFPS: z.boolean(),
 });
 
-// === WHEN IT'S TIME FOR V2 ===
-//
-// const settingsV2Raw = z.object({
-//   version: z.literal("v2"),
-//   ...
-// });
-// const settingsV2 = z.union([
-//   settingsV1.transform(s => migrateToV2(s)),
-//   settingsV2Raw
-// ]);
-// function migrateToV2(s: z.infer<typeof settingsV1>): z.infer<typeof settingsV2Raw> {
-//   return {
-//     version: "v2",
-//     ...
-//   };
-// }
+const settingsV2 = z.object({
+  // Note that theme is not stored here. It is a separate localStorage entry so
+  // a lightweight script can load it fast.
+  version: z.literal("v2"),
+  pinnedWidgets: PinnedWidget.json.array(),
+  significantStops: SignificantStop.json.array(),
+  enableContinuations: z.boolean(),
+  limitMapFPS: z.boolean(),
+  developerMode: z.boolean(),
+});
+
+function migrateToV2(
+  s: z.infer<typeof settingsV1>,
+): z.infer<typeof settingsV2> {
+  return {
+    version: "v2",
+    pinnedWidgets: s.pinnedWidgets,
+    significantStops: s.significantStops,
+    enableContinuations: s.enableContinuations,
+    limitMapFPS: s.limitMapFPS,
+    developerMode: false,
+  };
+}
 
 export class Settings {
   constructor(
@@ -39,27 +46,32 @@ export class Settings {
     readonly significantStops: SignificantStop[],
     readonly enableContinuations: boolean,
     readonly limitMapFPS: boolean,
+    readonly developerMode: boolean,
   ) {}
 
-  static json = settingsV1.transform(
-    (x) =>
-      new Settings(
-        x.pinnedWidgets,
-        x.significantStops,
-        x.enableContinuations,
-        x.limitMapFPS,
-      ),
-  );
+  static default = new Settings([], [], false, false, false);
 
-  static default = new Settings([], [], false, false);
+  static json = z
+    .union([settingsV1.transform((s) => migrateToV2(s)), settingsV2])
+    .transform(
+      (x) =>
+        new Settings(
+          x.pinnedWidgets,
+          x.significantStops,
+          x.enableContinuations,
+          x.limitMapFPS,
+          x.developerMode,
+        ),
+    );
 
-  toJSON(): z.input<typeof Settings.json> {
+  toJSON(): z.input<typeof settingsV2> {
     return {
-      version: "v1",
+      version: "v2",
       pinnedWidgets: this.pinnedWidgets.map((p) => p.toJSON()),
       significantStops: this.significantStops.map((s) => s.toJSON()),
       enableContinuations: this.enableContinuations,
       limitMapFPS: this.limitMapFPS,
+      developerMode: this.developerMode,
     };
   }
 
@@ -68,17 +80,20 @@ export class Settings {
     significantStops,
     enableContinuations,
     limitMapFPS,
+    developerMode,
   }: {
     pinnedWidgets?: PinnedWidget[];
     significantStops?: SignificantStop[];
     enableContinuations?: boolean;
     limitMapFPS?: boolean;
+    developerMode?: boolean;
   }) {
     return new Settings(
       pinnedWidgets ?? this.pinnedWidgets,
       significantStops ?? this.significantStops,
       enableContinuations ?? this.enableContinuations,
       limitMapFPS ?? this.limitMapFPS,
+      developerMode ?? this.developerMode,
     );
   }
 
