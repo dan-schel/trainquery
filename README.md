@@ -4,13 +4,49 @@ An unofficial guide to help you navigate Melbourne's train network, built on Vue
 
 ✅ Live at [trainquery.com](https://trainquery.com)!
 
+## Getting started
+
+1.  Clone the repo with submodules. Either run `git clone --recursive https://github.com/schel-d/trainquery.git`, or run `git submodule update --init --recursive` after cloning the repository.
+2.  Run `npm i` to install dependencies.
+3.  Create a `.env` file, as described below:
+
+    ```dotenv
+    # All values provided below are examples. Customize the values for your needs.
+
+    # The canonical URL.
+    URL = "https://trainquery.com"
+
+    # The URL of the transit network configuration data.
+    CONFIG = "https://static.trainquery.com/data.yml"
+
+    # The port to run the server on (optional).
+    PORT = 3000
+
+    # The path of the transit network configuration data for offline mode
+    # (optional - see "Developing without internet" below).
+    CONFIG_OFFLINE = "offline/config.zip"
+
+    # If persisting data to a MongoDB database, the domain, username, and password
+    # to use to connect to the database (optional).
+    MONGO_DOMAIN = "db.trainquery.com"
+    MONGO_USERNAME = "..."
+    MONGO_PASSWORD = "..."
+
+    # If connecting to the PTV API, the credentials provided by PTV, used to query
+    # the API (optional).
+    PTV_DEV_ID = "..."
+    PTV_DEV_KEY = "..."
+    ```
+
+4.  Run `npm run dev` (or `npm run build` and `npm run start`)!
+
 ## Developing without internet
 
-1. Download a local copy of the static data zip file you wish to use.
-2. Set the `CONFIG_OFFLINE` environment variable to point to it, e.g. `CONFIG_OFFLINE = offline/config.zip`.
-3. Run `npm run dev -- offline` or `npm run build && npm run start -- offline`.
+1.  Download a local copy of the static data zip file you wish to use.
+2.  Set the `CONFIG_OFFLINE` environment variable to point to it, e.g. `CONFIG_OFFLINE = offline/config.zip`.
+3.  Run `npm run dev -- offline` or `npm run build && npm run start -- offline`.
 
-The offline folder is "gitignored" for this purpose.
+The `offline` directory is included in the `.gitignore` file for this purpose.
 
 ## Developing using local config
 
