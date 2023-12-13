@@ -65,7 +65,10 @@ export function specificize(
     staticID,
     [],
     null,
-    {},
+    {
+      "Timetable ID": entry.id.toFixed(),
+      "Entry index": entry.entryIndex.toFixed(),
+    },
   );
 }
 
@@ -159,11 +162,11 @@ function getGtfsTripDebugInfo(
   gtfsCalendarID: string,
   date: QDate,
 ) {
-  let originalTripID: object = {};
-  if (idPair.continuationIndex != 0) {
+  let previousTripID: object = {};
+  if (idPair.continuationIndex > 0) {
     const originalID = new GtfsServiceIDComponents(
       idPair.gtfsTripID,
-      0,
+      idPair.continuationIndex - 1,
       trip.gtfsSubfeedID,
       date,
     );
@@ -171,22 +174,22 @@ function getGtfsTripDebugInfo(
 
     if (originalService != null) {
       const url = getServicePageRoute(originalService);
-      originalTripID = {
-        "Original Trip": ctx.getConfig().shared.canonicalUrl + url,
+      previousTripID = {
+        "Previous trip": ctx.getConfig().shared.canonicalUrl + url,
       };
     } else {
-      originalTripID = {
-        "Original Trip": "null",
+      previousTripID = {
+        "Previous trip": "<not found>",
       };
     }
   }
 
   return {
-    "Subfeed ID": trip.gtfsSubfeedID ?? "null",
+    "Subfeed ID": trip.gtfsSubfeedID ?? "<no subfeed>",
     "Trip ID": idPair.gtfsTripID,
-    "Continuation Index": idPair.continuationIndex.toFixed(),
-    Calendar: gtfsCalendarID,
-    "Other calendars": trip.idPairs.map((x) => x.gtfsCalendarID).join(", "),
-    ...originalTripID,
+    "Continuation index": idPair.continuationIndex.toFixed(),
+    "Relevant calendar": gtfsCalendarID,
+    "All calendars": trip.idPairs.map((x) => x.gtfsCalendarID).join(", "),
+    ...previousTripID,
   };
 }
