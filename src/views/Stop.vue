@@ -20,6 +20,7 @@ import { isValidFilter } from "@/components/departures/helpers/available-filters
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
 import { nullableEquals, itsOk } from "@schel-d/js-utils";
 import { generatePageHead, generatePageHeadNotFound } from "@/utils/head";
+import { useSettings } from "@/settings/settings";
 
 const router = useRouter();
 const route = useRoute();
@@ -128,6 +129,9 @@ const lines = computed(() => {
   }).map((l) => l.id);
 });
 
+const { settings } = useSettings();
+const developerMode = computed(() => settings.value?.developerMode ?? false);
+
 const head = computed(() => {
   if (stop.value == null) {
     return generatePageHeadNotFound("Stop not found");
@@ -148,6 +152,12 @@ useHead(head as UseHeadInput<{}>);
     v-if="stop != null"
     v-bind="$attrs"
   >
+    <template v-slot:title-inline v-if="developerMode">
+      <p class="stop-id">
+        <code>#{{ stop.id }}</code>
+      </p>
+    </template>
+
     <LineList :lines="lines"></LineList>
     <DepartureControls
       class="controls"
@@ -185,5 +195,8 @@ useHead(head as UseHeadInput<{}>);
 }
 .group {
   margin-bottom: 2rem;
+}
+.stop-id {
+  margin-left: 0.5rem;
 }
 </style>
