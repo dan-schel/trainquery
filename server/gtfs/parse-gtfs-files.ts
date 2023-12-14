@@ -10,7 +10,11 @@ import {
   tripsSchema,
 } from "./gtfs-csv-schemas";
 import { QWeekdayRange } from "../../shared/qtime/qweekdayrange";
-import { MatchedRoute, matchToRoute } from "./find-match";
+import {
+  MatchedRoute,
+  getCombinationsForRouteID,
+  matchToRoute,
+} from "./find-match";
 import { StopID } from "../../shared/system/ids";
 import { TrainQuery } from "../trainquery";
 import { QTimetableTime } from "../../shared/qtime/qtime";
@@ -18,11 +22,12 @@ import { GtfsParsingReport } from "./gtfs-parsing-report";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 import { HasSharedConfig, requireLine } from "../../shared/system/config-utils";
 import { nullableEquals } from "@schel-d/js-utils";
+import { GtfsFeedConfig } from "../config/gtfs-config";
 
 export async function parseGtfsFiles(
   ctx: TrainQuery,
   directory: string,
-  stopMap: Map<number, StopID>,
+  feedConfig: GtfsFeedConfig,
 ): Promise<GtfsData> {
   const config = ctx.getConfig();
 
@@ -49,7 +54,7 @@ export async function parseGtfsFiles(
     config,
     rawTrips,
     rawStopTimes,
-    stopMap,
+    feedConfig,
     parsingReport,
   );
 
@@ -105,7 +110,7 @@ function parseTrips(
   config: HasSharedConfig,
   rawTrips: z.infer<typeof tripsSchema>[],
   rawStopTimes: z.infer<typeof stopTimesSchema>[],
-  stopMap: Map<number, StopID>,
+  feedConfig: GtfsFeedConfig,
   parsingReport: GtfsParsingReport,
 ): GtfsTrip[] {
   rawTrips.sort((a, b) => a.trip_id.localeCompare(b.trip_id));
@@ -136,7 +141,12 @@ function parseTrips(
     }
 
     type AllGood = ((typeof stopTimes)[number] & { stop: StopID })[];
-    const match = matchToRoute(config, stopTimes as AllGood);
+    const combinations = getCombinationsForRouteID(
+      config,
+      feedConfig,
+      trip.route_id,
+    );
+    const match = matchToRoute(config, stopTimes as AllGood, combinations);
 
     if (match == null) {
       parsingReport.logRejectedRoute((stopTimes as AllGood).map((x) => x.stop));
@@ -148,7 +158,7 @@ function parseTrips(
 
     for (let i = 0; i < matchedRoutes.length; i++) {
       const matchedRoute = matchedRoutes[i];
-      const { line, associatedLines, route, direction, values } = matchedRoute;
+      const { line, route, direction, values } = matchedRoute;
 
       const idPair = {
         gtfsTripID: gtfsTripID,
@@ -158,8 +168,8 @@ function parseTrips(
       const parsedTrip = new GtfsTrip(
         [idPair],
         null,
+        [],
         line,
-        associatedLines,
         route,
         direction,
         values,
@@ -193,14 +203,19 @@ function parseTrips(
       thisTrip = [];
     }
     thisTrip.push({
-      stop: stopMap.get(thisStopTime.stop_id) ?? null,
+      stop: feedConfig.stops.get(thisStopTime.stop_id) ?? null,
       gtfsStop: thisStopTime.stop_id,
       value: thisStopTime.departure_time,
     });
   }
   addResult();
 
-  return dedupeTrips(config, Array.from(result.values()), parsingReport);
+  return dedupeTrips(
+    config,
+    feedConfig,
+    Array.from(result.values()),
+    parsingReport,
+  );
 }
 
 async function readCsv<T extends z.ZodType>(
@@ -235,6 +250,7 @@ function continuationsArray<T>(
 
 function dedupeTrips(
   config: HasSharedConfig,
+  feedConfig: GtfsFeedConfig,
   trips: GtfsTrip[],
   parsingReport: GtfsParsingReport,
 ): GtfsTrip[] {
@@ -242,7 +258,11 @@ function dedupeTrips(
 
   for (let i = 0; i < trips.length - 1; i++) {
     for (let j = i + 1; j < trips.length; j++) {
+      // It might seem like these can be moved to the outer loop, but they
+      // can't! The code below can modify the trips array, even at index i!
       const a = trips[i];
+      const rules = feedConfig.getParsingRulesForLine(a.line);
+      const dedupableLines = new Set([a.line, ...rules.canDedupeWith]);
       const b = trips[j];
 
       // No point. These trips are all guaranteed to be from the same subfeed.
@@ -250,12 +270,7 @@ function dedupeTrips(
       //   continue;
       // }
 
-      if (
-        !(
-          [a.line, ...a.associatedLines].includes(b.line) ||
-          [b.line, ...b.associatedLines].includes(a.line)
-        )
-      ) {
+      if (!dedupableLines.has(b.line)) {
         continue;
       }
 
@@ -389,10 +404,14 @@ function mergeSubset(
     (p1) =>
       !superset.idPairs.some((p2) => p1.gtfsCalendarID == p2.gtfsCalendarID),
   );
+  const vetoedCalendars = superset.idPairs.map((p) => p.gtfsCalendarID);
+
   const splitSubset =
     unaccountedIDPairs.length == 0
       ? null
-      : subset.withIDPairs(unaccountedIDPairs);
+      : subset
+          .withIDPairs(unaccountedIDPairs)
+          .withVetoedCalendars(vetoedCalendars);
 
   return [superset, splitSubset];
 }

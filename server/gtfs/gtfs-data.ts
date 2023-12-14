@@ -169,8 +169,8 @@ export class GtfsTrip {
      */
     readonly idPairs: GtfsTripIDPair[],
     readonly gtfsSubfeedID: string | null,
+    readonly vetoedCalendars: string[],
     readonly line: LineID,
-    readonly associatedLines: LineID[],
     readonly route: RouteVariantID,
     readonly direction: DirectionID,
     readonly times: (QTimetableTime | null)[],
@@ -186,8 +186,8 @@ export class GtfsTrip {
         })
         .array(),
       gtfsSubfeedID: z.string().nullable(),
+      vetoedCalendars: z.string().array(),
       line: LineIDJson,
-      associatedLines: LineIDJson.array(),
       route: RouteVariantIDJson,
       direction: DirectionIDJson,
       times: QTimetableTime.json.nullable().array(),
@@ -197,8 +197,8 @@ export class GtfsTrip {
         new GtfsTrip(
           x.idPairs,
           x.gtfsSubfeedID,
+          x.vetoedCalendars,
           x.line,
-          x.associatedLines,
           x.route,
           x.direction,
           x.times,
@@ -209,8 +209,8 @@ export class GtfsTrip {
     return new GtfsTrip(
       this.idPairs,
       subfeedID,
+      this.vetoedCalendars,
       this.line,
-      this.associatedLines,
       this.route,
       this.direction,
       this.times,
@@ -221,18 +221,24 @@ export class GtfsTrip {
     return this.withIDPairs([...this.idPairs, idPair]);
   }
 
-  withIDPairs(
-    idPairs: {
-      gtfsTripID: string;
-      gtfsCalendarID: string;
-      continuationIndex: number;
-    }[],
-  ): GtfsTrip {
+  withIDPairs(idPairs: GtfsTripIDPair[]): GtfsTrip {
     return new GtfsTrip(
       idPairs,
       this.gtfsSubfeedID,
+      this.vetoedCalendars,
       this.line,
-      this.associatedLines,
+      this.route,
+      this.direction,
+      this.times,
+    );
+  }
+
+  withVetoedCalendars(vetoedCalendars: string[]): GtfsTrip {
+    return new GtfsTrip(
+      this.idPairs,
+      this.gtfsSubfeedID,
+      vetoedCalendars,
+      this.line,
       this.route,
       this.direction,
       this.times,
@@ -243,8 +249,8 @@ export class GtfsTrip {
     return {
       idPairs: this.idPairs,
       gtfsSubfeedID: this.gtfsSubfeedID,
+      vetoedCalendars: this.vetoedCalendars,
       line: this.line,
-      associatedLines: this.associatedLines,
       route: this.route,
       direction: this.direction,
       times: this.times.map((t) => t?.toJSON() ?? null),
