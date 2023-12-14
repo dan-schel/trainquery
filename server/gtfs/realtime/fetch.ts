@@ -9,9 +9,9 @@ export async function fetchRealtime() {
     throw new Error("GTFS_REALTIME_KEY environment variable not set.");
   }
 
-  await fetchToFile("tripupdates", key, "_trip-updates.txt");
-  await fetchToFile("servicealerts", key, "_service-alerts.txt");
-  await fetchToFile("vehicleposition-updates", key, "_vehicle-positions.txt");
+  await fetchToFile("tripupdates", key, "_trip-updates.json");
+  await fetchToFile("servicealerts", key, "_service-alerts.json");
+  await fetchToFile("vehicleposition-updates", key, "_vehicle-positions.json");
 }
 
 async function fetchToFile(
@@ -32,7 +32,7 @@ async function fetchToFile(
   const bytes = new Uint8Array(buffer);
   const message = transit_realtime.FeedMessage.decode(bytes);
 
-  await fsp.writeFile(file, JSON.stringify(message.toJSON()));
+  await fsp.writeFile(file, JSON.stringify(message.toJSON(), null, 2));
 
   return message;
 }
