@@ -1,18 +1,56 @@
 import { z } from "zod";
-import { StopID, StopIDJson } from "../../shared/system/ids";
+import {
+  LineID,
+  LineIDJson,
+  LineIDStringJson,
+  StopID,
+  StopIDJson,
+} from "../../shared/system/ids";
 import { IntStringJson, mapJson } from "../../shared/utils";
+
+export class GtfsParsingRules {
+  constructor(
+    readonly routeIDRegex: RegExp[],
+    readonly ignoreStops: StopID[],
+    readonly canDedupeWith: LineID[],
+  ) {}
+
+  static readonly default = new GtfsParsingRules([], [], []);
+
+  static readonly json = z
+    .object({
+      routeIDRegex: z
+        .string()
+        .array()
+        .transform((x) => x.map((r) => new RegExp(r)))
+        .default([]),
+      ignoreStops: StopIDJson.array().default([]),
+      canDedupeWith: LineIDJson.array().default([]),
+    })
+    .transform(
+      (x) =>
+        new GtfsParsingRules(x.routeIDRegex, x.ignoreStops, x.canDedupeWith),
+    );
+}
 
 export class GtfsFeedConfig {
   constructor(
     /** Maps the stop IDs used by GTFS to the ones used by TrainQuery. */
     readonly stops: Map<number, StopID>,
+    readonly parsing: Map<LineID, GtfsParsingRules>,
   ) {}
+
+  getParsingRulesForLine(line: LineID) {
+    return this.parsing.get(line) ?? GtfsParsingRules.default;
+  }
 
   static readonly rawJson = z.object({
     stops: mapJson(IntStringJson, StopIDJson),
+    parsing: mapJson(LineIDStringJson, GtfsParsingRules.json),
   });
+
   static transform(x: z.infer<typeof GtfsFeedConfig.rawJson>) {
-    return new GtfsFeedConfig(x.stops);
+    return new GtfsFeedConfig(x.stops, x.parsing);
   }
 }
 
@@ -21,8 +59,9 @@ export class GtfsSubfeedConfig extends GtfsFeedConfig {
     readonly name: string,
     readonly path: string,
     stops: Map<number, StopID>,
+    parsing: Map<LineID, GtfsParsingRules>,
   ) {
-    super(stops);
+    super(stops, parsing);
   }
 
   static readonly json = GtfsFeedConfig.rawJson
@@ -30,7 +69,9 @@ export class GtfsSubfeedConfig extends GtfsFeedConfig {
       name: z.string(),
       path: z.string(),
     })
-    .transform((x) => new GtfsSubfeedConfig(x.name, x.path, x.stops));
+    .transform(
+      (x) => new GtfsSubfeedConfig(x.name, x.path, x.stops, x.parsing),
+    );
 }
 
 export class GtfsConfig<UsesSubfeeds extends boolean> {

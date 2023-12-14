@@ -1,6 +1,9 @@
 import { QDate } from "../../shared/qtime/qdate";
 import { toUTCDateTime } from "../../shared/qtime/qdatetime";
-import { requireLine } from "../../shared/system/config-utils";
+import {
+  getServicePageRoute,
+  requireLine,
+} from "../../shared/system/config-utils";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { TrainQuery } from "../trainquery";
 import { guessPlatformsOfEntry, guessPlatformsOfTrip } from "./guess-platform";
@@ -10,8 +13,9 @@ import { SkippedStop } from "../../shared/system/service/skipped-stop";
 import { ServedStop } from "../../shared/system/service/served-stop";
 import { Service } from "../../shared/system/service/service";
 import { Departure } from "../../shared/system/service/departure";
-import { GtfsTrip } from "../gtfs/gtfs-data";
+import { GtfsTrip, GtfsTripIDPair } from "../gtfs/gtfs-data";
 import { GtfsServiceIDComponents } from "../gtfs/gtfs-service-id";
+import { getGtfsService } from "./get-service";
 
 export function specificize(
   ctx: TrainQuery,
@@ -61,6 +65,10 @@ export function specificize(
     staticID,
     [],
     null,
+    {
+      "Timetable ID": entry.id.toFixed(),
+      "Entry index": entry.entryIndex.toFixed(),
+    },
   );
 }
 
@@ -120,7 +128,7 @@ export function specificizeGtfsTrip(
 
   return new Service(
     trip.line,
-    trip.associatedLines,
+    [],
     trip.route,
     trip.direction,
     stoppingPattern,
@@ -132,6 +140,7 @@ export function specificizeGtfsTrip(
       },
     ],
     null,
+    getGtfsTripDebugInfo(ctx, trip, idPair, gtfsCalendarID, date),
   );
 }
 
@@ -144,4 +153,43 @@ export function specificizeGtfsDeparture(
 ): Departure {
   const service = specificizeGtfsTrip(ctx, trip, gtfsCalendarID, date);
   return Departure.fromService(service, perspectiveIndex);
+}
+
+function getGtfsTripDebugInfo(
+  ctx: TrainQuery,
+  trip: GtfsTrip,
+  idPair: GtfsTripIDPair,
+  gtfsCalendarID: string,
+  date: QDate,
+) {
+  let previousTripID: object = {};
+  if (idPair.continuationIndex > 0) {
+    const originalID = new GtfsServiceIDComponents(
+      idPair.gtfsTripID,
+      idPair.continuationIndex - 1,
+      trip.gtfsSubfeedID,
+      date,
+    );
+    const originalService = getGtfsService(ctx, originalID);
+
+    if (originalService != null) {
+      const url = getServicePageRoute(originalService);
+      previousTripID = {
+        "Previous trip": ctx.getConfig().shared.canonicalUrl + url,
+      };
+    } else {
+      previousTripID = {
+        "Previous trip": "<not found>",
+      };
+    }
+  }
+
+  return {
+    "Subfeed ID": trip.gtfsSubfeedID ?? "<no subfeed>",
+    "Trip ID": idPair.gtfsTripID,
+    "Continuation index": idPair.continuationIndex.toFixed(),
+    "Relevant calendar": gtfsCalendarID,
+    "All calendars": trip.idPairs.map((x) => x.gtfsCalendarID).join(", "),
+    ...previousTripID,
+  };
 }

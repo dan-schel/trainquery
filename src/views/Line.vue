@@ -14,6 +14,7 @@ import LinePageStop from "@/components/line-diagram/LinePageStop.vue";
 import { formatMode } from "@/utils/format-mode";
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
 import { generatePageHead, generatePageHeadNotFound } from "@/utils/head";
+import { useSettings } from "@/settings/settings";
 
 const route = useRoute();
 const params = ref(route.params);
@@ -36,6 +37,9 @@ const modeString = computed(() =>
     : formatMode(line.value.serviceType, { capital: true, line: true }),
 );
 
+const { settings } = useSettings();
+const developerMode = computed(() => settings.value?.developerMode ?? false);
+
 const head = computed(() => {
   if (line.value == null) {
     return generatePageHeadNotFound("Line not found");
@@ -56,6 +60,12 @@ useHead(head as UseHeadInput<{}>);
     v-if="line != null"
     v-bind="$attrs"
   >
+    <template v-slot:title-inline v-if="developerMode">
+      <p class="line-id">
+        <code>#{{ line.id }}</code>
+      </p>
+    </template>
+
     <p class="subtitle">{{ modeString }}</p>
     <h2>Stops</h2>
     <LineDiagram v-if="diagram != null" :diagram="diagram" class="diagram">
@@ -87,5 +97,8 @@ h2 {
 .diagram {
   --stop-gap: 1.25rem;
   margin-bottom: 2rem;
+}
+.line-id {
+  margin-left: 0.5rem;
 }
 </style>

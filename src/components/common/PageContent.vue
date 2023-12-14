@@ -8,9 +8,16 @@ defineProps<{
 <template>
   <main>
     <div class="content">
-      <h1 v-if="title != null" :style="{ 'margin-bottom': titleMargin }">
-        {{ title }}
-      </h1>
+      <div
+        class="title-row"
+        v-if="title != null"
+        :style="{ 'margin-bottom': titleMargin }"
+      >
+        <h1>
+          {{ title }}
+        </h1>
+        <slot name="title-inline"> </slot>
+      </div>
       <slot></slot>
     </div>
   </main>
@@ -21,12 +28,20 @@ defineProps<{
 @use "@/assets/utils" as utils;
 main {
   @include template.page-centerer;
+  flex-grow: 1;
 }
 .content {
   padding: 0rem 1rem;
+  flex-grow: 1;
 }
 h1 {
   @include utils.h1;
+  min-width: 0;
+  flex-shrink: 1;
+}
+.title-row {
+  @include template.row;
   margin-top: 2rem;
+  min-width: 0;
 }
 </style>

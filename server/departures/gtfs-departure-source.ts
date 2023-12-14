@@ -33,6 +33,7 @@ export class GtfsDepartureSource extends DepartureSource<GtfsPossibility> {
       lines.includes(t.line),
     );
   }
+
   async fetch(
     time: QUtcDateTime,
     iteration: number,
@@ -78,6 +79,17 @@ function getForSearchTime(
       ) ?? null;
 
     if (applicableCalendar == null) {
+      continue;
+    }
+
+    const isVetoed = trip.vetoedCalendars.some((vetoed) =>
+      calendarsThatApply.some(
+        (c) =>
+          c.gtfsSubfeedID == trip.gtfsSubfeedID && c.gtfsCalendarID == vetoed,
+      ),
+    );
+
+    if (isVetoed) {
       continue;
     }
 

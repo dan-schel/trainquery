@@ -153,7 +153,7 @@ async function downloadGtfs(
       );
       await extractZip(subzip, subfeedDirectory);
 
-      const data = await parseGtfsFiles(ctx, subfeedDirectory, subfeed.stops);
+      const data = await parseGtfsFiles(ctx, subfeedDirectory, subfeed);
       parsedFeeds.push(data);
     }
 
@@ -163,7 +163,7 @@ async function downloadGtfs(
       gtfsConfig.subfeeds.map((f) => f.name),
     );
   } else {
-    const data = await parseGtfsFiles(ctx, dataFolder, gtfsConfig.feed.stops);
+    const data = await parseGtfsFiles(ctx, dataFolder, gtfsConfig.feed);
     await deleteDataFolder(dataFolder);
     return data;
   }

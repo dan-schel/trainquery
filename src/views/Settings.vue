@@ -6,6 +6,9 @@ import { onMounted, ref } from "vue";
 import { getTheme, setTheme, type Theme } from "@/settings/theme";
 import SimpleButton from "@/components/common/SimpleButton.vue";
 import { generatePageHead } from "@/utils/head";
+import Switch from "@/components/common/Switch.vue";
+import { useSettings } from "@/settings/settings";
+import type { Settings } from "@/settings/settings";
 
 useHead(
   generatePageHead({
@@ -16,12 +19,19 @@ useHead(
 );
 
 const theme = ref<Theme>();
+const { settings, updateSettings } = useSettings();
+
 onMounted(() => {
   theme.value = getTheme();
 });
 
 function handleThemeChange(newTheme: Theme) {
   setTheme(newTheme);
+}
+function handleSettingsChange(newSettings: Settings | undefined) {
+  if (newSettings != null) {
+    updateSettings(newSettings);
+  }
 }
 function handleReset() {
   if (confirm("This cannot be undone. Reset all settings?")) {
@@ -56,6 +66,17 @@ function handleReset() {
           <p>{{ slotProps.data.name }}</p>
         </template>
       </Picker>
+    </div>
+    <div class="section">
+      <h2>Miscellaneous</h2>
+      <Switch
+        :model-value="settings?.developerMode"
+        @update:model-value="
+          handleSettingsChange(settings?.with({ developerMode: $event }))
+        "
+        class="switch"
+        ><p>Enable developer mode</p></Switch
+      >
     </div>
     <div class="section">
       <h2>Reset</h2>
@@ -99,6 +120,9 @@ function handleReset() {
     height: 2rem;
     padding: 0 1.5rem;
   }
+}
+.switch p {
+  margin-left: 1rem;
 }
 .reset-button {
   --color-accent: var(--color-error);

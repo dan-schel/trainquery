@@ -28,6 +28,7 @@ export class Departure extends Service<
     staticID: StaticServiceID | null,
     sources: ServiceSource[],
     continuation: Continuation | null,
+    debugInfo: Record<string, string>,
     readonly perspectiveIndex: number,
   ) {
     super(
@@ -39,6 +40,7 @@ export class Departure extends Service<
       staticID,
       sources,
       continuation,
+      debugInfo,
     );
   }
 
@@ -57,6 +59,7 @@ export class Departure extends Service<
         })
         .array(),
       continuation: Continuation.json.nullable(),
+      debugInfo: z.record(z.string()),
       perspectiveIndex: z.number(),
     })
     .transform(
@@ -70,6 +73,7 @@ export class Departure extends Service<
           x.staticID,
           x.sources,
           x.continuation,
+          x.debugInfo,
           x.perspectiveIndex,
         ),
     );
@@ -84,6 +88,7 @@ export class Departure extends Service<
       staticID: this.staticID,
       sources: this.sources,
       continuation: this.continuation?.toJSON() ?? null,
+      debugInfo: this.debugInfo,
       perspectiveIndex: this.perspectiveIndex,
     };
   }
@@ -134,6 +139,7 @@ export class Departure extends Service<
       service.staticID,
       service.sources,
       service.continuation,
+      service.debugInfo,
       perspectiveIndex,
     );
   }
