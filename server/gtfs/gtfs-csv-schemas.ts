@@ -19,7 +19,7 @@ const BooleanStringJson = z.string().transform((x, ctx) => {
 
 export const tripsSchema = z.object({
   // "1-Ech-mjp-10"
-  // route_id: z.string(),
+  route_id: z.string(),
 
   // "T2_1"
   service_id: z.string(),

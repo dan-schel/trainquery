@@ -9,6 +9,7 @@ import {
   ContinuationOption,
   getContinuationOptions,
 } from "../config/continuation-options";
+import { GtfsFeedConfig } from "../config/gtfs-config";
 
 export type MatchedRoute<T> = {
   line: LineID;
@@ -19,14 +20,19 @@ export type MatchedRoute<T> = {
   continuation: MatchedRoute<T> | null;
 };
 
+export type RouteOption = {
+  line: LineID;
+  route: RouteVariantID;
+  direction: DirectionID;
+  stops: StopID[];
+};
+
 export function matchToRoute<T>(
   config: HasSharedConfig,
   stoppingOrder: { stop: StopID; value: T }[],
-  options: ContinuationOption[] | null = null,
+  combinations: RouteOption[],
 ): MatchedRoute<T> | null {
-  const combinations = getCombinations(config, options);
-
-  const matches: Omit<MatchedRoute<T>, "associatedLines">[] = [];
+  const matches: MatchedRoute<T>[] = [];
   for (const combination of combinations) {
     // Build the stopping pattern by slotting in the stops in the stopping order
     // as soon as possible.
@@ -78,7 +84,12 @@ export function matchToRoute<T>(
         // continuation's origin) in the stoplist. Because we know it stopped at
         // the first service's terminus, currInOrder will always be at least 1.
         const futureStoppingOrder = stoppingOrder.slice(currInOrder - 1);
-        const continuation = matchToRoute(config, futureStoppingOrder, options);
+        const continuationCombinations = mapWithStopLists(config, options);
+        const continuation = matchToRoute(
+          config,
+          futureStoppingOrder,
+          continuationCombinations,
+        );
 
         if (continuation != null) {
           matches.push({
@@ -115,27 +126,33 @@ export function matchToRoute<T>(
     (m) => m.stopCount == sortedMatches[0].stopCount,
   );
 
-  return {
-    ...bestMatches[0],
-  };
+  return bestMatches[0];
 }
 
-function getCombinations(
+function mapWithStopLists(
   config: HasSharedConfig,
-  options: ContinuationOption[] | null,
-) {
-  if (options != null) {
-    return options.map((o) => ({
-      ...o,
-      stops: requireLine(config, o.line).route.requireStopList(
-        o.route,
-        o.direction,
-      ).stops,
-    }));
-  }
+  options: ContinuationOption[],
+): RouteOption[] {
+  return options.map((o) => ({
+    ...o,
+    stops: requireLine(config, o.line).route.requireStopList(
+      o.route,
+      o.direction,
+    ).stops,
+  }));
+}
 
-  // Otherwise return every possible combination of line, route, and direction.
+export function getCombinationsForRouteID(
+  config: HasSharedConfig,
+  feedConfig: GtfsFeedConfig,
+  routeID: string,
+): RouteOption[] {
   return config.shared.lines
+    .filter((l) =>
+      feedConfig
+        .getParsingRulesForLine(l.id)
+        .routeIDRegex.some((r) => r.test(routeID)),
+    )
     .map((l) =>
       l.route.getStopLists().map((s) => ({
         line: l.id,

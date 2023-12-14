@@ -10,7 +10,11 @@ import {
   tripsSchema,
 } from "./gtfs-csv-schemas";
 import { QWeekdayRange } from "../../shared/qtime/qweekdayrange";
-import { MatchedRoute, matchToRoute } from "./find-match";
+import {
+  MatchedRoute,
+  getCombinationsForRouteID,
+  matchToRoute,
+} from "./find-match";
 import { StopID } from "../../shared/system/ids";
 import { TrainQuery } from "../trainquery";
 import { QTimetableTime } from "../../shared/qtime/qtime";
@@ -137,7 +141,12 @@ function parseTrips(
     }
 
     type AllGood = ((typeof stopTimes)[number] & { stop: StopID })[];
-    const match = matchToRoute(config, stopTimes as AllGood);
+    const combinations = getCombinationsForRouteID(
+      config,
+      feedConfig,
+      trip.route_id,
+    );
+    const match = matchToRoute(config, stopTimes as AllGood, combinations);
 
     if (match == null) {
       parsingReport.logRejectedRoute((stopTimes as AllGood).map((x) => x.stop));
@@ -248,11 +257,12 @@ function dedupeTrips(
   // DO NOT EDIT THIS FUNCTION... without writing unit tests for it. No actually!
 
   for (let i = 0; i < trips.length - 1; i++) {
-    const a = trips[i];
-    const rules = feedConfig.getParsingRulesForLine(a.line);
-    const dedupableLines = new Set([a.line, ...rules.canDedupeWith]);
-
     for (let j = i + 1; j < trips.length; j++) {
+      // It might seem like these can be moved to the outer loop, but they
+      // can't! The code below can modify the trips array, even at index i!
+      const a = trips[i];
+      const rules = feedConfig.getParsingRulesForLine(a.line);
+      const dedupableLines = new Set([a.line, ...rules.canDedupeWith]);
       const b = trips[j];
 
       // No point. These trips are all guaranteed to be from the same subfeed.
