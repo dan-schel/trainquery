@@ -128,7 +128,7 @@ export function specificizeGtfsTrip(
 
   return new Service(
     trip.line,
-    trip.associatedLines,
+    [],
     trip.route,
     trip.direction,
     stoppingPattern,

@@ -18,11 +18,12 @@ import { GtfsParsingReport } from "./gtfs-parsing-report";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 import { HasSharedConfig, requireLine } from "../../shared/system/config-utils";
 import { nullableEquals } from "@schel-d/js-utils";
+import { GtfsFeedConfig } from "../config/gtfs-config";
 
 export async function parseGtfsFiles(
   ctx: TrainQuery,
   directory: string,
-  stopMap: Map<number, StopID>,
+  feedConfig: GtfsFeedConfig,
 ): Promise<GtfsData> {
   const config = ctx.getConfig();
 
@@ -49,7 +50,7 @@ export async function parseGtfsFiles(
     config,
     rawTrips,
     rawStopTimes,
-    stopMap,
+    feedConfig,
     parsingReport,
   );
 
@@ -105,7 +106,7 @@ function parseTrips(
   config: HasSharedConfig,
   rawTrips: z.infer<typeof tripsSchema>[],
   rawStopTimes: z.infer<typeof stopTimesSchema>[],
-  stopMap: Map<number, StopID>,
+  feedConfig: GtfsFeedConfig,
   parsingReport: GtfsParsingReport,
 ): GtfsTrip[] {
   rawTrips.sort((a, b) => a.trip_id.localeCompare(b.trip_id));
@@ -148,7 +149,7 @@ function parseTrips(
 
     for (let i = 0; i < matchedRoutes.length; i++) {
       const matchedRoute = matchedRoutes[i];
-      const { line, associatedLines, route, direction, values } = matchedRoute;
+      const { line, route, direction, values } = matchedRoute;
 
       const idPair = {
         gtfsTripID: gtfsTripID,
@@ -160,7 +161,6 @@ function parseTrips(
         null,
         [],
         line,
-        associatedLines,
         route,
         direction,
         values,
@@ -194,14 +194,19 @@ function parseTrips(
       thisTrip = [];
     }
     thisTrip.push({
-      stop: stopMap.get(thisStopTime.stop_id) ?? null,
+      stop: feedConfig.stops.get(thisStopTime.stop_id) ?? null,
       gtfsStop: thisStopTime.stop_id,
       value: thisStopTime.departure_time,
     });
   }
   addResult();
 
-  return dedupeTrips(config, Array.from(result.values()), parsingReport);
+  return dedupeTrips(
+    config,
+    feedConfig,
+    Array.from(result.values()),
+    parsingReport,
+  );
 }
 
 async function readCsv<T extends z.ZodType>(
@@ -236,14 +241,18 @@ function continuationsArray<T>(
 
 function dedupeTrips(
   config: HasSharedConfig,
+  feedConfig: GtfsFeedConfig,
   trips: GtfsTrip[],
   parsingReport: GtfsParsingReport,
 ): GtfsTrip[] {
   // DO NOT EDIT THIS FUNCTION... without writing unit tests for it. No actually!
 
   for (let i = 0; i < trips.length - 1; i++) {
+    const a = trips[i];
+    const rules = feedConfig.getParsingRulesForLine(a.line);
+    const dedupableLines = new Set([a.line, ...rules.canDedupeWith]);
+
     for (let j = i + 1; j < trips.length; j++) {
-      const a = trips[i];
       const b = trips[j];
 
       // No point. These trips are all guaranteed to be from the same subfeed.
@@ -251,12 +260,7 @@ function dedupeTrips(
       //   continue;
       // }
 
-      if (
-        !(
-          [a.line, ...a.associatedLines].includes(b.line) ||
-          [b.line, ...b.associatedLines].includes(a.line)
-        )
-      ) {
+      if (!dedupableLines.has(b.line)) {
         continue;
       }
 

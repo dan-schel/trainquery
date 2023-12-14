@@ -1,4 +1,3 @@
-import { nullableEquals, unique } from "@schel-d/js-utils";
 import { HasSharedConfig, requireLine } from "../../shared/system/config-utils";
 import {
   DirectionID,
@@ -13,7 +12,6 @@ import {
 
 export type MatchedRoute<T> = {
   line: LineID;
-  associatedLines: LineID[];
   route: RouteVariantID;
   direction: DirectionID;
   values: (T | null)[];
@@ -117,18 +115,8 @@ export function matchToRoute<T>(
     (m) => m.stopCount == sortedMatches[0].stopCount,
   );
 
-  const allLines = unique(
-    bestMatches
-      .filter((m) =>
-        nullableEquals(m.continuation, bestMatches[0].continuation, sameRoute),
-      )
-      .map((m) => m.line),
-    (a, b) => a == b,
-  );
-
   return {
     ...bestMatches[0],
-    associatedLines: allLines.filter((x) => x != bestMatches[0].line),
   };
 }
 
@@ -157,13 +145,4 @@ function getCombinations(
       })),
     )
     .flat();
-}
-
-function sameRoute<T>(a: MatchedRoute<T>, b: MatchedRoute<T>): boolean {
-  return (
-    a.line == b.line &&
-    a.route == b.route &&
-    a.direction == b.direction &&
-    nullableEquals(a.continuation, b.continuation, sameRoute)
-  );
 }
