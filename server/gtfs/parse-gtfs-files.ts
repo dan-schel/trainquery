@@ -158,6 +158,7 @@ function parseTrips(
       const parsedTrip = new GtfsTrip(
         [idPair],
         null,
+        [],
         line,
         associatedLines,
         route,
@@ -389,10 +390,14 @@ function mergeSubset(
     (p1) =>
       !superset.idPairs.some((p2) => p1.gtfsCalendarID == p2.gtfsCalendarID),
   );
+  const vetoedCalendars = superset.idPairs.map((p) => p.gtfsCalendarID);
+
   const splitSubset =
     unaccountedIDPairs.length == 0
       ? null
-      : subset.withIDPairs(unaccountedIDPairs);
+      : subset
+          .withIDPairs(unaccountedIDPairs)
+          .withVetoedCalendars(vetoedCalendars);
 
   return [superset, splitSubset];
 }
