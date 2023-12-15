@@ -82,11 +82,10 @@ function getForSearchTime(
       continue;
     }
 
-    const isVetoed = trip.vetoedCalendars.some((vetoed) =>
-      calendarsThatApply.some(
-        (c) =>
-          c.gtfsSubfeedID == trip.gtfsSubfeedID && c.gtfsCalendarID == vetoed,
-      ),
+    const isVetoed = calendarsThatApply.some(
+      (c) =>
+        c.gtfsSubfeedID == trip.gtfsSubfeedID &&
+        trip.vetoedCalendars.has(c.gtfsCalendarID),
     );
 
     if (isVetoed) {
