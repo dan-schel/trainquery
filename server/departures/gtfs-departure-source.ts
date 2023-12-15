@@ -118,12 +118,12 @@ function getForSearchTime(
       if (time == null) {
         continue;
       }
-      if (time.isWithin(searchTime.min, searchTime.max)) {
+      if (time.time.isWithin(searchTime.min, searchTime.max)) {
         result.push({
           trip: trip,
           date: searchTime.date,
           gtfsCalendarID: applicableCalendar.gtfsCalendarID,
-          sortTime: searchTime.getSortTime(time),
+          sortTime: searchTime.getSortTime(time.time),
           perspectiveIndex: i,
         });
       }

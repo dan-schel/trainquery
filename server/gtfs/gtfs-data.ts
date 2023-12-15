@@ -161,6 +161,11 @@ export type GtfsTripIDPair = {
   continuationIndex: number;
 };
 
+export type TimeWithSequenceNumber = {
+  time: QTimetableTime;
+  sequence: number;
+};
+
 export class GtfsTrip {
   constructor(
     /**
@@ -173,7 +178,7 @@ export class GtfsTrip {
     readonly line: LineID,
     readonly route: RouteVariantID,
     readonly direction: DirectionID,
-    readonly times: (QTimetableTime | null)[],
+    readonly times: (TimeWithSequenceNumber | null)[],
   ) {}
 
   static readonly json = z
@@ -190,7 +195,13 @@ export class GtfsTrip {
       line: LineIDJson,
       route: RouteVariantIDJson,
       direction: DirectionIDJson,
-      times: QTimetableTime.json.nullable().array(),
+      times: z
+        .object({
+          time: QTimetableTime.json,
+          sequence: z.number(),
+        })
+        .nullable()
+        .array(),
     })
     .transform(
       (x) =>
@@ -253,7 +264,7 @@ export class GtfsTrip {
       line: this.line,
       route: this.route,
       direction: this.direction,
-      times: this.times.map((t) => t?.toJSON() ?? null),
+      times: this.timesJSON(),
     };
   }
 
@@ -262,8 +273,19 @@ export class GtfsTrip {
       line: this.line,
       route: this.route,
       direction: this.direction,
-      times: this.times.map((t) => t?.toJSON() ?? null),
+      times: this.timesJSON(),
     });
+  }
+
+  timesJSON() {
+    return this.times.map((t) =>
+      t == null
+        ? null
+        : {
+            time: t.time.toJSON(),
+            sequence: t.sequence,
+          },
+    );
   }
 
   requireIDPair(gtfsCalendarID: string): GtfsTripIDPair {

@@ -1,6 +1,11 @@
 import path from "path";
 import fs from "fs";
-import { GtfsCalendar, GtfsData, GtfsTrip } from "./gtfs-data";
+import {
+  GtfsCalendar,
+  GtfsData,
+  GtfsTrip,
+  TimeWithSequenceNumber,
+} from "./gtfs-data";
 import csvParser from "csv-parser";
 import { z } from "zod";
 import {
@@ -121,7 +126,7 @@ function parseTrips(
   let thisTrip: {
     stop: number | null;
     gtfsStop: number;
-    value: QTimetableTime;
+    value: TimeWithSequenceNumber;
   }[] = [];
   let tripIndex = 0;
   let trip = rawTrips[tripIndex];
@@ -205,7 +210,10 @@ function parseTrips(
     thisTrip.push({
       stop: feedConfig.stops.get(thisStopTime.stop_id) ?? null,
       gtfsStop: thisStopTime.stop_id,
-      value: thisStopTime.departure_time,
+      value: {
+        time: thisStopTime.departure_time,
+        sequence: thisStopTime.stop_sequence,
+      },
     });
   }
   addResult();
@@ -283,8 +291,12 @@ function dedupeTrips(
       const bStopList = requireLine(config, b.line)
         .route.requireStopList(b.route, b.direction)
         .stops.slice(bBounds.start, bBounds.end + 1);
-      const aSlice = a.times.slice(aBounds.start, aBounds.end + 1);
-      const bSlice = b.times.slice(bBounds.start, bBounds.end + 1);
+      const aSlice = a.times
+        .slice(aBounds.start, aBounds.end + 1)
+        .map((t) => t?.time ?? null);
+      const bSlice = b.times
+        .slice(bBounds.start, bBounds.end + 1)
+        .map((t) => t?.time ?? null);
 
       if (aSlice.length > bSlice.length) {
         if (isSubset(aSlice, bSlice, aStopList, bStopList)) {

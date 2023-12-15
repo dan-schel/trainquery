@@ -12,9 +12,10 @@ import { TrainQuery } from "../trainquery";
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
 import { LineColor } from "../../shared/system/enums";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
-import { GtfsTrip } from "../gtfs/gtfs-data";
+import { GtfsTrip, TimeWithSequenceNumber } from "../gtfs/gtfs-data";
 import { Line } from "../../shared/system/line";
 import { QDate } from "../../shared/qtime/qdate";
+import { QTimetableTime } from "../../shared/qtime/qtime";
 
 export type GeneralFilteringData = {
   line: Line;
@@ -69,7 +70,13 @@ export function upgradeToDepartureFilteringData(
   const rows = "entry" in x ? x.entry.rows : x.trip.times;
 
   // Filter arrivals.
-  const isArrival = rows.slice(x.perspectiveIndex + 1).every((x) => x == null);
+  const isArrival = (
+    rows.slice(x.perspectiveIndex + 1) as (
+      | QTimetableTime
+      | TimeWithSequenceNumber
+      | null
+    )[]
+  ).every((x) => x == null);
 
   // Filter set-down-only services.
   const picksUp = data.line.route.picksUp(

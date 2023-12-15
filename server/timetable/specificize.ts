@@ -109,7 +109,7 @@ export function specificizeGtfsTrip(
         return new SkippedStop(stopList.stops[i], i);
       }
 
-      const time = toUTCDateTime(date, r, offset);
+      const time = toUTCDateTime(date, r.time, offset);
       const platform = platforms[i];
       const setsDown = stopList.setsDown[i].matches(trip.direction);
       const picksUp = stopList.picksUp[i].matches(trip.direction);
