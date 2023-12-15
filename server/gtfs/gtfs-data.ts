@@ -169,7 +169,7 @@ export class GtfsTrip {
      */
     readonly idPairs: GtfsTripIDPair[],
     readonly gtfsSubfeedID: string | null,
-    readonly vetoedCalendars: string[],
+    readonly vetoedCalendars: Set<string>,
     readonly line: LineID,
     readonly route: RouteVariantID,
     readonly direction: DirectionID,
@@ -197,7 +197,7 @@ export class GtfsTrip {
         new GtfsTrip(
           x.idPairs,
           x.gtfsSubfeedID,
-          x.vetoedCalendars,
+          new Set(x.vetoedCalendars),
           x.line,
           x.route,
           x.direction,
@@ -233,11 +233,11 @@ export class GtfsTrip {
     );
   }
 
-  withVetoedCalendars(vetoedCalendars: string[]): GtfsTrip {
+  addVetoedCalendars(vetoedCalendars: string[]): GtfsTrip {
     return new GtfsTrip(
       this.idPairs,
       this.gtfsSubfeedID,
-      vetoedCalendars,
+      new Set([...this.vetoedCalendars, ...vetoedCalendars]),
       this.line,
       this.route,
       this.direction,
@@ -249,7 +249,7 @@ export class GtfsTrip {
     return {
       idPairs: this.idPairs,
       gtfsSubfeedID: this.gtfsSubfeedID,
-      vetoedCalendars: this.vetoedCalendars,
+      vetoedCalendars: Array.from(this.vetoedCalendars.values()),
       line: this.line,
       route: this.route,
       direction: this.direction,
@@ -274,5 +274,30 @@ export class GtfsTrip {
       );
     }
     return pair;
+  }
+
+  logIDPairs(name: string, log: (message: string) => void) {
+    log(name);
+    this.idPairs.forEach((p) => {
+      log(` -  ${p.gtfsCalendarID}: ${p.gtfsTripID} (${p.continuationIndex})`);
+    });
+    this.vetoedCalendars.forEach((c) => {
+      log(` -  VETOED: ${c}`);
+    });
+  }
+
+  hasIDPair(gtfsTripID: string, continuationIndex: number) {
+    return this.idPairs.some(
+      (p) =>
+        p.gtfsTripID == gtfsTripID && p.continuationIndex == continuationIndex,
+    );
+  }
+
+  static oneIs(
+    gtfsTripID: string,
+    continuationIndex: number,
+    ...trips: GtfsTrip[]
+  ) {
+    return trips.some((t) => t.hasIDPair(gtfsTripID, continuationIndex));
   }
 }
