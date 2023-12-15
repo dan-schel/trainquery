@@ -168,7 +168,7 @@ function parseTrips(
       const parsedTrip = new GtfsTrip(
         [idPair],
         null,
-        [],
+        new Set(),
         line,
         route,
         direction,
@@ -271,16 +271,6 @@ function dedupeTrips(
       // }
 
       if (!dedupableLines.has(b.line)) {
-        continue;
-      }
-
-      // Don't bother unless at least some calendars are in common (see
-      // mergeSubset implementation).
-      if (
-        !a.idPairs.some((p1) =>
-          b.idPairs.some((p2) => p1.gtfsCalendarID == p2.gtfsCalendarID),
-        )
-      ) {
         continue;
       }
 
@@ -411,7 +401,7 @@ function mergeSubset(
       ? null
       : subset
           .withIDPairs(unaccountedIDPairs)
-          .withVetoedCalendars(vetoedCalendars);
+          .addVetoedCalendars(vetoedCalendars);
 
   return [superset, splitSubset];
 }
