@@ -123,7 +123,7 @@ export class QDate {
       day -= getDaysInMonth(year, month);
       month++;
       if (month > 12) {
-        month = 0;
+        month = 1;
         year++;
       }
     }
