@@ -7,7 +7,7 @@ import {
   generateDataFolderPath,
 } from "../config/download-utils";
 import { TrainQuery } from "../trainquery";
-import { GtfsData } from "./gtfs-data";
+import { GtfsData } from "./data/gtfs-data";
 import { GtfsConfig } from "../config/gtfs-config";
 import { parseGtfsFiles } from "./parse-gtfs-files";
 import AdmZip from "adm-zip";

@@ -5,7 +5,7 @@ import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { QDate } from "../../shared/qtime/qdate";
 import { ConfidenceLevel } from "../../shared/system/enums";
 import { PlatformFilteringData, getPlatformFilteringData } from "./filtering";
-import { GtfsTrip } from "../gtfs/gtfs-data";
+import { GtfsTrip } from "../gtfs/data/gtfs-trip";
 
 export function guessPlatformsOfEntry(
   ctx: TrainQuery,

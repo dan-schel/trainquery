@@ -13,9 +13,9 @@ import { SkippedStop } from "../../shared/system/service/skipped-stop";
 import { ServedStop } from "../../shared/system/service/served-stop";
 import { Service } from "../../shared/system/service/service";
 import { Departure } from "../../shared/system/service/departure";
-import { GtfsTrip, GtfsTripIDPair } from "../gtfs/gtfs-data";
 import { GtfsServiceIDComponents } from "../gtfs/gtfs-service-id";
 import { getGtfsService } from "./get-service";
+import { GtfsTrip, GtfsTripIDPair } from "../gtfs/data/gtfs-trip";
 
 export function specificize(
   ctx: TrainQuery,

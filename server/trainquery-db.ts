@@ -1,5 +1,7 @@
 import { Collection, MongoClient, Document } from "mongodb";
-import { GtfsCalendar, GtfsData, GtfsTrip } from "./gtfs/gtfs-data";
+import { GtfsData } from "./gtfs/data/gtfs-data";
+import { GtfsCalendar } from "./gtfs/data/gtfs-calendar";
+import { GtfsTrip } from "./gtfs/data/gtfs-trip";
 
 type DBs = {
   gtfs: {

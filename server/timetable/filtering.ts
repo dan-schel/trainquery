@@ -12,10 +12,10 @@ import { TrainQuery } from "../trainquery";
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
 import { LineColor } from "../../shared/system/enums";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
-import { GtfsTrip, TimeWithSequenceNumber } from "../gtfs/gtfs-data";
 import { Line } from "../../shared/system/line";
 import { QDate } from "../../shared/qtime/qdate";
 import { QTimetableTime } from "../../shared/qtime/qtime";
+import { GtfsTrip, TimeWithSequenceNumber } from "../gtfs/data/gtfs-trip";
 
 export type GeneralFilteringData = {
   line: Line;

@@ -1,11 +1,5 @@
 import path from "path";
 import fs from "fs";
-import {
-  GtfsCalendar,
-  GtfsData,
-  GtfsTrip,
-  TimeWithSequenceNumber,
-} from "./gtfs-data";
 import csvParser from "csv-parser";
 import { z } from "zod";
 import {
@@ -28,6 +22,9 @@ import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 import { HasSharedConfig, requireLine } from "../../shared/system/config-utils";
 import { nullableEquals } from "@schel-d/js-utils";
 import { GtfsFeedConfig } from "../config/gtfs-config";
+import { GtfsCalendar } from "./data/gtfs-calendar";
+import { GtfsData } from "./data/gtfs-data";
+import { GtfsTrip, TimeWithSequenceNumber } from "./data/gtfs-trip";
 
 export async function parseGtfsFiles(
   ctx: TrainQuery,

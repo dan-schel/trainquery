@@ -2,10 +2,12 @@ import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { getLine, linesThatStopAt } from "../../shared/system/config-utils";
 import { StopID } from "../../shared/system/ids";
-import { GtfsCalendar, GtfsData, GtfsTrip } from "../gtfs/gtfs-data";
 import { TrainQuery } from "../trainquery";
 import { DepartureSource } from "./departure-source";
 import { SearchTimeRange, fetchAndSort } from "./search-time-range";
+import { GtfsTrip } from "../gtfs/data/gtfs-trip";
+import { GtfsData } from "../gtfs/data/gtfs-data";
+import { GtfsCalendar } from "../gtfs/data/gtfs-calendar";
 
 export type GtfsPossibility = {
   trip: GtfsTrip;
