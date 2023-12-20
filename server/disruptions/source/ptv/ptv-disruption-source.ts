@@ -133,6 +133,13 @@ async function fetchPtvDisruptions(
 
   const parsed = rawList
     .map((d) => {
+      // TODO: Remove this code and do it properly!
+      // <TEMP>
+      if (/^.{3,30}( line)? stations?:.{10}/gi.test(d.title)) {
+        return [];
+      }
+      // </TEMP>
+
       if (d.routes.length != 0) {
         const lines = d.routes
           .map((r) => ptvConfig.lines.get(r) ?? null)
