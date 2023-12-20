@@ -27,6 +27,7 @@ function inlineMarkup(line: string) {
     .replace(/\[([^[\]]+)\]\(([^()]+)\)/g, '<a class="link" href="$2">$1</a>')
     .replace(/\*\*(.*)\*\*/g, "<b>$1</b>")
     .replace(/\*(.*)\*/g, "<i>$1</i>")
+    .replace(/_(.*)_/g, "<i>$1</i>")
     .replace(
       /\{ERROR\}(.*)\{\/ERROR\}/g,
       '<span style="color: var(--color-error)">$1</span>',
