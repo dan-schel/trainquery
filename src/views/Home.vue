@@ -52,6 +52,8 @@ const feeds = computed(() =>
           :state-perspective="true"
           :is-default-feeds="false"
           :center-single="true"
+          :preserve-time="false"
+          :replace-on-navigate="false"
         ></DepartureGroup>
         <LoadingSpinner v-if="feeds == null" class="loading"></LoadingSpinner>
         <p class="empty" v-if="feeds != null && feeds.length == 0">

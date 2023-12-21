@@ -138,7 +138,7 @@ const head = computed(() => {
   }
   return generatePageHead({
     title: stop.value.name,
-    allowIndexing: true,
+    allowIndexing: filter.value.isDefault() && time.value == null,
     canonicalUrl: getStopPageRoute(getConfig(), stop.value.id, null, null),
   });
 });
@@ -174,6 +174,8 @@ useHead(head as UseHeadInput<{}>);
       :state-perspective="false"
       :is-default-feeds="isDefaultFilter"
       :center-single="false"
+      :preserve-time="true"
+      :replace-on-navigate="true"
     ></DepartureGroup>
   </PageContent>
 
