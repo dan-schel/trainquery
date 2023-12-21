@@ -21,7 +21,7 @@ export type SearchOption = {
 };
 
 /** Returns a search option for each stop. */
-export function searchOptionsStops(): SearchOption[] {
+export function searchOptionsStops(devMode: boolean): SearchOption[] {
   const options: SearchOption[] = [];
 
   options.push(
@@ -31,7 +31,7 @@ export function searchOptionsStops(): SearchOption[] {
         subtitle: stopSubtitle(s),
         icon: "uil:map-marker" as IconID,
         url: getStopPageRoute(getConfig(), s.id, null, null),
-        tags: [],
+        tags: devMode ? [`#${s.id}`] : [],
         data: { stop: s.id },
         boost: 1.2,
       };
@@ -42,7 +42,7 @@ export function searchOptionsStops(): SearchOption[] {
 }
 
 /** Returns a search option for each line. */
-export function searchOptionsLines(): SearchOption[] {
+export function searchOptionsLines(devMode: boolean): SearchOption[] {
   const options: SearchOption[] = [];
 
   options.push(
@@ -52,7 +52,7 @@ export function searchOptionsLines(): SearchOption[] {
         subtitle: formatMode(l.serviceType, { capital: true, line: true }),
         icon: "uil:slider-h-range" as IconID,
         url: getLinePageRoute(getConfig(), l.id),
-        tags: [],
+        tags: devMode ? [`#${l.id}`] : [],
         data: { line: l.id },
         boost: 1,
       };
@@ -62,8 +62,11 @@ export function searchOptionsLines(): SearchOption[] {
 }
 
 /** Returns a search option for each page on the site. */
-export function searchOptionsWholeSite(): SearchOption[] {
-  const options = [...searchOptionsStops(), ...searchOptionsLines()];
+export function searchOptionsWholeSite(devMode: boolean): SearchOption[] {
+  const options = [
+    ...searchOptionsStops(devMode),
+    ...searchOptionsLines(devMode),
+  ];
 
   // options.push({
   //   title: "Train map",

@@ -85,10 +85,7 @@ const head = computed(() => {
   return generatePageHead({
     title: data.value.title.long,
     allowIndexing: false,
-    canonicalUrl: getServicePageRoute(
-      data.value.departure,
-      data.value.departure.perspectiveIndex,
-    ),
+    canonicalUrl: getServicePageRoute(data.value.departure),
   });
 });
 useHead(head as UseHeadInput<{}>);

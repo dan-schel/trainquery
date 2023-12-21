@@ -15,6 +15,8 @@ const props = defineProps<{
   statePerspective: boolean;
   isDefaultFeeds: boolean;
   centerSingle: boolean;
+  preserveTime: boolean;
+  replaceOnNavigate: boolean;
 }>();
 
 const loading = ref(true);
@@ -82,6 +84,9 @@ watch(utc, () => {
       :allow-pinning="allowPinning"
       :state-perspective="statePerspective"
       :is-default-feeds="isDefaultFeeds"
+      :time="time"
+      :preserve-time="preserveTime"
+      :replace-on-navigate="replaceOnNavigate"
     ></DepartureFeedVue>
   </div>
 </template>
