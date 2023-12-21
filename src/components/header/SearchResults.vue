@@ -17,7 +17,10 @@ const { settings } = useSettings();
 const developerMode = computed(() => settings.value?.developerMode ?? false);
 
 const results = computed(() => {
-  const results = search(props.query, searchOptionsWholeSite());
+  const results = search(
+    props.query,
+    searchOptionsWholeSite(developerMode.value),
+  );
   emits("topResultChange", { url: results[0]?.url });
   return results;
 });
