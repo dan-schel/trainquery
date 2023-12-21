@@ -10,7 +10,7 @@ import {
   getDisruptionsString,
   getLinesString,
   getTerminusString,
-  getTimeString,
+  getTimeStrings,
   getViaString,
 } from "./helpers/utils";
 import { getStoppingPatternString } from "./helpers/stopping-pattern";
@@ -29,6 +29,7 @@ const { utc } = useNow();
 
 const detail = computed(() => {
   const patternList = continuify(props.departure.departure);
+  const timeStrings = getTimeStrings(props.departure.departure, utc.value);
   return {
     terminus: getTerminusString(props.departure.departure, patternList),
     via: getViaString(props.departure.departure, patternList),
@@ -38,7 +39,8 @@ const detail = computed(() => {
       patternList,
     ),
     lineColor: requireLine(getConfig(), props.departure.departure.line).color,
-    timeString: getTimeString(props.departure.departure, utc.value),
+    primaryTimeString: timeStrings.primary,
+    secondaryTimeString: timeStrings.secondary,
     linesString: getLinesString(props.departure.departure),
     disruptionsString: getDisruptionsString(props.departure.disruptions),
   };
@@ -59,19 +61,24 @@ const detail = computed(() => {
     <div class="primary">
       <OneLineP class="terminus">{{ detail.terminus }}</OneLineP>
       <OneLineP class="via">{{ detail.via ?? "" }}</OneLineP>
-      <OneLineP class="time">{{ detail.timeString }}</OneLineP>
+      <OneLineP class="time">{{ detail.primaryTimeString }}</OneLineP>
     </div>
     <div class="details">
       <OneLineP>{{ detail.stoppingPatternString }}</OneLineP>
 
-      <div v-if="detail.disruptionsString == null" class="extra">
-        <OneLineP class="extra-text">{{ detail.linesString }}</OneLineP>
-      </div>
       <div v-if="detail.disruptionsString != null" class="extra disruption">
         <Icon id="uil:exclamation-circle"></Icon>
         <OneLineP class="extra-text">
           {{ detail.disruptionsString }}
         </OneLineP>
+      </div>
+      <div v-else-if="detail.secondaryTimeString != null" class="extra">
+        <OneLineP class="extra-text">
+          {{ detail.secondaryTimeString }}
+        </OneLineP>
+      </div>
+      <div v-else class="extra">
+        <OneLineP class="extra-text">{{ detail.linesString }}</OneLineP>
       </div>
     </div>
     <div class="platform" v-if="detail.platform != null">
