@@ -19,13 +19,13 @@ export class GtfsData {
     if (feeds.length < 0) {
       throw new Error("Cannot merge, no feeds provided.");
     }
-    if (feeds.length != subfeedIDs.length) {
+    if (feeds.length !== subfeedIDs.length) {
       throw new Error("Mismatch between feed count and subfeed ID count.");
     }
     if (!unique(subfeedIDs)) {
       throw new Error("Subfeed IDs must be unique.");
     }
-    if (!feeds.every((f) => f.configHash == feeds[0].configHash)) {
+    if (!feeds.every((f) => f.configHash === feeds[0].configHash)) {
       throw new Error("Cannot merge feeds created from differing configs.");
     }
 

@@ -143,7 +143,7 @@ export class GtfsTrip {
   }
 
   requireIDPair(gtfsCalendarID: string): GtfsTripIDPair {
-    const pair = this.idPairs.find((p) => p.gtfsCalendarID == gtfsCalendarID);
+    const pair = this.idPairs.find((p) => p.gtfsCalendarID === gtfsCalendarID);
     if (pair == null) {
       throw new Error(
         `Trip did not have an ID under calendar "${gtfsCalendarID}".`,
@@ -165,7 +165,8 @@ export class GtfsTrip {
   hasIDPair(gtfsTripID: string, continuationIndex: number) {
     return this.idPairs.some(
       (p) =>
-        p.gtfsTripID == gtfsTripID && p.continuationIndex == continuationIndex,
+        p.gtfsTripID === gtfsTripID &&
+        p.continuationIndex === continuationIndex,
     );
   }
 
