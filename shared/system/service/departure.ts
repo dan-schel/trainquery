@@ -123,7 +123,7 @@ export class Departure extends Service<
   }
 
   isArrival() {
-    return this.perspectiveIndex == this.pattern.terminus.stopListIndex;
+    return this.perspectiveIndex === this.pattern.terminus.stopListIndex;
   }
 
   static fromService<T extends CompletePattern | KnownPerspectivePattern>(

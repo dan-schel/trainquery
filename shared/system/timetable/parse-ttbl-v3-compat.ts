@@ -35,9 +35,9 @@ export function parseTtblV3Compat(
   const lines = input
     .split("\n")
     .map((l) => l.normalize().toLowerCase().trim())
-    .filter((l) => l.length != 0);
+    .filter((l) => l.length !== 0);
 
-  if (lines[0] != "[timetable]" || lines[1] != "version: 3.5") {
+  if (lines[0] !== "[timetable]" || lines[1] !== "version: 3.5") {
     return error("Unrecognized format.");
   }
 
@@ -86,7 +86,7 @@ function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
     key: s.split(":")[0].trim(),
     value: s.split(":")[1].trim(),
   }));
-  const get = (key: string) => fields.find((m) => m.key == key)?.value;
+  const get = (key: string) => fields.find((m) => m.key === key)?.value;
 
   // Parse timetable ID.
   const timetableIDString = get("id");
@@ -113,13 +113,13 @@ function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
   if (typeString == null) {
     return error("Metadata is missing 'type'.");
   }
-  if (typeString != "main" && typeString != "temporary") {
+  if (typeString !== "main" && typeString !== "temporary") {
     return error(`"${typeString} is not a valid type of timetable.`);
   }
 
   // Parse begins and ends date.
   const wildcardDate = (input: string) => {
-    if (input == "*") {
+    if (input === "*") {
       return null;
     }
     const date = QDate.parse(input);
@@ -133,7 +133,7 @@ function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
     return error("Metadata is missing 'begins'.");
   }
   const begins = wildcardDate(beginsString);
-  if (begins == "INVALID!") {
+  if (begins === "INVALID!") {
     return error(
       `"${beginsString}" is not a ISO8601 compliant date (or a "*").`,
     );
@@ -143,7 +143,7 @@ function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
     return error("Metadata is missing 'ends'.");
   }
   const ends = wildcardDate(endsString);
-  if (ends == "INVALID!") {
+  if (ends === "INVALID!") {
     return error(`"${endsString}" is not a ISO8601 compliant date (or a "*").`);
   }
 
@@ -160,7 +160,7 @@ function parseMetadata(metadataInput: string[], error: ErrorProcedure) {
   return {
     id: timetableID,
     line: lineID,
-    isTemporary: typeString == "temporary",
+    isTemporary: typeString === "temporary",
     begins: begins,
     ends: ends,
     created: created,
@@ -182,7 +182,7 @@ function parseGrid(
     .replace(/\[|\]/g, "")
     .split(",")
     .map((s) => s.trim());
-  if (args.length != 2) {
+  if (args.length !== 2) {
     return error("Expecting two arguments in grid header.");
   }
 
@@ -201,7 +201,7 @@ function parseGrid(
   let rowCount: number | null = null;
   const potentialRows = gridInput.slice(1).map((r) => {
     const terms = r.split(/\s+/g).map((s) => s.trim());
-    if (rowCount != null && terms.length != rowCount) {
+    if (rowCount != null && terms.length !== rowCount) {
       return error(`Rows in the grid have inconsistent numbers of columns.`);
     }
     rowCount = terms.length;
@@ -215,9 +215,9 @@ function parseGrid(
     // Ensure every other term is a timetable time or "-".
     const potentialTimes = terms.slice(2).map((t) => ({
       input: t,
-      time: t == "-" ? null : QTimetableTime.parse(t) ?? ("INVALID!" as const),
+      time: t === "-" ? null : QTimetableTime.parse(t) ?? ("INVALID!" as const),
     }));
-    const badTime = potentialTimes.find((t) => t.time == "INVALID!");
+    const badTime = potentialTimes.find((t) => t.time === "INVALID!");
     if (badTime != null) {
       return error(
         `"${badTime.input}" is not a valid timetable time string (or a "-").`,
@@ -225,7 +225,7 @@ function parseGrid(
     }
     return potentialTimes
       .map((t) => t.time)
-      .filter((t): t is QTimetableTime | null => t != "INVALID!");
+      .filter((t): t is QTimetableTime | null => t !== "INVALID!");
   });
   if (potentialRows.some((r) => r == null)) {
     return null;
@@ -250,32 +250,32 @@ function parseGrid(
 }
 
 function getRouteVariantAndDirection(arg0: string) {
-  if (arg0 == "up") {
+  if (arg0 === "up") {
     return {
       variant: LinearRoute.regularID,
       direction: toDirectionID("up"),
     };
-  } else if (arg0 == "down") {
+  } else if (arg0 === "down") {
     return {
       variant: LinearRoute.regularID,
       direction: toDirectionID("down"),
     };
-  } else if (arg0 == "up-direct") {
+  } else if (arg0 === "up-direct") {
     return {
       variant: HookRoute.directID,
       direction: toDirectionID("up"),
     };
-  } else if (arg0 == "down-direct") {
+  } else if (arg0 === "down-direct") {
     return {
       variant: HookRoute.directID,
       direction: toDirectionID("down"),
     };
-  } else if (arg0 == "up-via-loop") {
+  } else if (arg0 === "up-via-loop") {
     return {
       variant: HookRoute.hookedID,
       direction: toDirectionID("up"),
     };
-  } else if (arg0 == "down-via-loop") {
+  } else if (arg0 === "down-via-loop") {
     return {
       variant: HookRoute.hookedID,
       direction: toDirectionID("down"),

@@ -28,7 +28,7 @@ export abstract class QDateTime<T extends QDateTime<T>> {
   }
 
   equals(other: T) {
-    return this.asDecimal() == other.asDecimal();
+    return this.asDecimal() === other.asDecimal();
   }
   isBefore(other: T) {
     return this.asDecimal() < other.asDecimal();
@@ -119,7 +119,7 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
   /** Parses "2023-09-23T20:30:55Z". Does not check for date/time validity. */
   static parse(input: string): QUtcDateTime | null {
     const components = input.split("T");
-    if (components.length != 2) {
+    if (components.length !== 2) {
       return null;
     }
     if (!components[1].endsWith("Z")) {
@@ -190,7 +190,7 @@ export class QLocalDateTime extends QDateTime<QLocalDateTime> {
       .split("T")
       .map((x) => (x.includes(":") ? x.split(/[+-]/g) : x))
       .flat();
-    if (components.length != 3) {
+    if (components.length !== 3) {
       return null;
     }
 

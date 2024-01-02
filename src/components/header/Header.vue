@@ -22,10 +22,10 @@ const menuItems = ref<MenuItem[]>([
 
 const openExpandable = ref<"none" | "menu" | "search">("none");
 function menuButtonClicked() {
-  openExpandable.value = openExpandable.value == "menu" ? "none" : "menu";
+  openExpandable.value = openExpandable.value === "menu" ? "none" : "menu";
 }
 function searchButtonClicked() {
-  openExpandable.value = openExpandable.value == "search" ? "none" : "search";
+  openExpandable.value = openExpandable.value === "search" ? "none" : "search";
 }
 
 const handleOutsideClick = () => {
@@ -35,11 +35,11 @@ const handleNavigation = () => {
   openExpandable.value = "none";
 };
 function handleEscKey(e: KeyboardEvent) {
-  if (e.code == "KeyK" && e.ctrlKey) {
+  if (e.code === "KeyK" && e.ctrlKey) {
     openExpandable.value = "search";
     e.preventDefault();
   }
-  if (e.code == "Escape") {
+  if (e.code === "Escape") {
     openExpandable.value = "none";
   }
 }
@@ -70,7 +70,7 @@ onUnmounted(() => {
     <div class="expandables">
       <div
         class="expandable-container"
-        :class="{ open: openExpandable == 'menu' }"
+        :class="{ open: openExpandable === 'menu' }"
       >
         <ExpandableMenu
           :items="menuItems"
@@ -79,11 +79,11 @@ onUnmounted(() => {
       </div>
       <div
         class="expandable-container"
-        :class="{ open: openExpandable == 'search' }"
+        :class="{ open: openExpandable === 'search' }"
       >
         <div class="expandable">
           <ExpandableSearch
-            :open="openExpandable == 'search'"
+            :open="openExpandable === 'search'"
             @navigation="handleNavigation"
           ></ExpandableSearch>
         </div>
@@ -91,7 +91,7 @@ onUnmounted(() => {
     </div>
     <div
       class="expandables-cover"
-      v-if="openExpandable != 'none'"
+      v-if="openExpandable !== 'none'"
       @click="handleOutsideClick"
     ></div>
   </header>

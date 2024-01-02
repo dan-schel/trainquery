@@ -36,7 +36,7 @@ export function isPinned(
   filter: DepartureFilter,
 ) {
   return settings.pinnedWidgets.some(
-    (w) => w.stop == stop && w.filter.equals(filter),
+    (w) => w.stop === stop && w.filter.equals(filter),
   );
 }
 
@@ -52,7 +52,7 @@ export function togglePinnedWidget(
   if (isPinned(settings, stop, filter)) {
     return settings.with({
       pinnedWidgets: settings.pinnedWidgets.filter(
-        (w) => w.stop != stop || !w.filter.equals(filter),
+        (w) => w.stop !== stop || !w.filter.equals(filter),
       ),
     });
   } else if (canPin(settings)) {
@@ -80,7 +80,7 @@ export function validatePinnedWidgetsAgainstConfig(
     const removed = pinnedWidgets.length - okFilters.length;
     logger(
       `${removed} ${
-        removed == 1 ? "pinned widget was" : "pinned widgets were"
+        removed === 1 ? "pinned widget was" : "pinned widgets were"
       } removed due to config updates.`,
     );
   }

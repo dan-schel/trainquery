@@ -26,7 +26,7 @@ export class DefaultDepartureFeeds {
     }: { arrivals?: boolean; setDownOnly?: boolean } = {},
   ) {
     const exception = this.exceptions.find((e) =>
-      e.stops.some((s) => s == stop),
+      e.stops.some((s) => s === stop),
     );
     if (exception != null) {
       return exception.feeds.map(

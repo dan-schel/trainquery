@@ -71,7 +71,7 @@ function getForSearchTime(
       direction: l.direction,
       indices: l.stops
         .map((e, i) => ({ stop: e, index: i }))
-        .filter((e) => e.stop == stop)
+        .filter((e) => e.stop === stop)
         .map((e) => e.index),
     }));
 
@@ -112,7 +112,7 @@ function retrieveIndices(
   direction: DirectionID,
 ) {
   const result = stopLists.find(
-    (l) => l.variant == variant && l.direction == direction,
+    (l) => l.variant === variant && l.direction === direction,
   );
   if (result == null) {
     throw badVariantOrDirection(variant, direction);

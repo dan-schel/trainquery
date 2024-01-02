@@ -29,7 +29,7 @@ export function getTerminusString(
 export function getViaString(departure: Departure, patternList: PatternList) {
   const servedStops = patternList
     .slice(1, -1)
-    .filter((x) => x.type == "served");
+    .filter((x) => x.type === "served");
 
   const line = requireLine(getConfig(), departure.line);
   const data: ViaRuleFilteringData = {
@@ -69,7 +69,7 @@ export function getPlatformString(
   }
 
   const name = requirePlatform(getConfig(), perspectiveStop, platform.id).name;
-  return platform.confidence == "low" ? `${name}?` : name;
+  return platform.confidence === "low" ? `${name}?` : name;
 }
 
 export function getTimeStrings(departure: Departure, now: QUtcDateTime) {
@@ -104,17 +104,19 @@ export function getLinesString(departure: Departure) {
   const lineNames = [departure.line, ...departure.associatedLines]
     .map((l) => requireLine(getConfig(), l).name)
     .sort((a, b) => a.localeCompare(b));
-  return `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "lines"}`;
+  return `${listifyAnd(lineNames)} ${
+    lineNames.length === 1 ? "Line" : "lines"
+  }`;
 }
 
 export function getDisruptionsString(
   disruptions: SerializedDisruption[],
 ): string | null {
-  if (disruptions.length == 0) {
+  if (disruptions.length === 0) {
     return null;
   }
 
   return `Possibly affected by ${disruptions.length.toFixed()} ${
-    disruptions.length == 1 ? "disruption" : "disruptions"
+    disruptions.length === 1 ? "disruption" : "disruptions"
   }`;
 }

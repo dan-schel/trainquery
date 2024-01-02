@@ -98,38 +98,38 @@ function matchesClause(clause: string, service: PlatformFilteringData) {
   const absClause = clause.replace("!", "");
 
   if (absClause.startsWith("line-")) {
-    return negate(absClause == `line-${service.line.id.toFixed()}`, negated);
+    return negate(absClause === `line-${service.line.id.toFixed()}`, negated);
   } else if (absClause.startsWith("color-")) {
-    return negate(absClause == `color-${service.color}`, negated);
+    return negate(absClause === `color-${service.color}`, negated);
   } else if (absClause.startsWith("direction-")) {
-    return negate(absClause == `direction-${service.direction}`, negated);
+    return negate(absClause === `direction-${service.direction}`, negated);
   } else if (absClause.startsWith("route-variant-")) {
     return negate(
-      absClause == `route-variant-${service.routeVariant}`,
+      absClause === `route-variant-${service.routeVariant}`,
       negated,
     );
   } else if (absClause.startsWith("service-type-")) {
-    return negate(absClause == `service-type-${service.serviceType}`, negated);
+    return negate(absClause === `service-type-${service.serviceType}`, negated);
   } else if (absClause.startsWith("originates-at-")) {
     return negate(
-      absClause == `originates-at-${service.origin.toFixed()}`,
+      absClause === `originates-at-${service.origin.toFixed()}`,
       negated,
     );
   } else if (absClause.startsWith("stops-at-")) {
     return negate(
-      service.stops.some((s) => absClause == `stops-at-${s.toFixed()}`),
+      service.stops.some((s) => absClause === `stops-at-${s.toFixed()}`),
       negated,
     );
   } else if (absClause.startsWith("terminates-at-")) {
     return negate(
-      absClause == `terminates-at-${service.terminus.toFixed()}`,
+      absClause === `terminates-at-${service.terminus.toFixed()}`,
       negated,
     );
-  } else if (absClause == `weekend`) {
+  } else if (absClause === `weekend`) {
     return negate(service.dayOfWeek.isWeekend(), negated);
-  } else if (absClause == `weekday`) {
+  } else if (absClause === `weekday`) {
     return negate(!service.dayOfWeek.isWeekend(), negated);
-  } else if (clause == "none") {
+  } else if (clause === "none") {
     // "none" cannot be negated.
     return false;
   } else {

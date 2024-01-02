@@ -52,9 +52,9 @@ export class Line {
     return {
       id: this.id,
       name: this.name,
-      color: this.color == "none" ? undefined : this.color,
+      color: this.color === "none" ? undefined : this.color,
       specialEventsOnly: this.specialEventsOnly ? true : undefined,
-      serviceType: this.serviceType == "normal" ? undefined : this.serviceType,
+      serviceType: this.serviceType === "normal" ? undefined : this.serviceType,
       route: routeToJSON(this.route),
     };
   }

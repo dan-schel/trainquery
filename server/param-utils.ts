@@ -16,9 +16,9 @@ export class BadApiCallError extends Error {
   static detect(error: unknown): error is BadApiCallError {
     return (
       error != null &&
-      typeof error == "object" &&
+      typeof error === "object" &&
       "type" in error &&
-      error.type == "bad-api-call"
+      error.type === "bad-api-call"
     );
   }
 }

@@ -11,7 +11,7 @@ export function getTimetableService(
 ) {
   const timetable = ctx
     .getConfig()
-    .server.timetables.find((t) => t.id == id.timetable);
+    .server.timetables.find((t) => t.id === id.timetable);
   if (timetable == null) {
     return null;
   }
@@ -25,7 +25,7 @@ export function getTimetableService(
     return null;
   }
 
-  if (timetable.id != getTimetableForDay(ctx, id.date, timetable.line)?.id) {
+  if (timetable.id !== getTimetableForDay(ctx, id.date, timetable.line)?.id) {
     // TODO: Instead of 404ing the page, we could show a warning that the
     // timetable is outdated.
     return null;
@@ -42,14 +42,14 @@ export function getGtfsService(ctx: TrainQuery, id: GtfsServiceIDComponents) {
   }
 
   const tripsForSubfeed = gtfsData.trips.filter(
-    (t) => t.gtfsSubfeedID == id.subfeedID,
+    (t) => t.gtfsSubfeedID === id.subfeedID,
   );
 
   for (const trip of tripsForSubfeed) {
     const match = trip.idPairs.find(
       (p) =>
-        p.gtfsTripID == id.gtfsTripID &&
-        p.continuationIndex == id.continuationIndex,
+        p.gtfsTripID === id.gtfsTripID &&
+        p.continuationIndex === id.continuationIndex,
     );
 
     if (match == null) {
@@ -58,8 +58,8 @@ export function getGtfsService(ctx: TrainQuery, id: GtfsServiceIDComponents) {
 
     const calendar = gtfsData.calendars.find(
       (c) =>
-        c.gtfsCalendarID == match.gtfsCalendarID &&
-        c.gtfsSubfeedID == id.subfeedID,
+        c.gtfsCalendarID === match.gtfsCalendarID &&
+        c.gtfsSubfeedID === id.subfeedID,
     );
     if (calendar == null || !calendar.appliesOn(id.date)) {
       return null;

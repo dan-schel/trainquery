@@ -45,12 +45,12 @@ export class LintContext {
     ...params: Parameters<typeof pluralize>
   ) {
     const quantifier = params[0];
-    if (typeof quantifier == "number") {
-      if (quantifier == 0) {
+    if (typeof quantifier === "number") {
+      if (quantifier === 0) {
         return;
       }
     } else {
-      if (quantifier.length == 0) {
+      if (quantifier.length === 0) {
         return;
       }
     }
@@ -101,9 +101,9 @@ export function pluralize<T extends string[]>(
   plural: (...data: T) => string,
   ...data: T
 ) {
-  const count = typeof quantifier == "number" ? quantifier : quantifier.length;
+  const count = typeof quantifier === "number" ? quantifier : quantifier.length;
 
-  if (count == 1) {
+  if (count === 1) {
     return singular(...data);
   }
   return plural(...data);

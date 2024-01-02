@@ -12,7 +12,7 @@ export async function callAPI<T extends z.ZodType>(
   }
 
   const raw = await resilientFetch(
-    paramStrings.length == 0
+    paramStrings.length === 0
       ? `/api/${endpoint}`
       : `/api/${endpoint}?${paramStrings.join("&")}`,
   );
@@ -24,7 +24,7 @@ export async function callAPI<T extends z.ZodType>(
     })
     .parse(raw);
 
-  if (getConfig().hash != json.hash) {
+  if (getConfig().hash !== json.hash) {
     // The cached config the client has is outdated, so refresh the page to
     // load the new config!
     window.location.reload();
@@ -44,7 +44,7 @@ export async function resilientFetch(url: string) {
 async function multiFetch(url: string, timeouts: number[]): Promise<Response> {
   // If we're not gonna attempt to retry anyway, don't even bother catching the
   // error.
-  if (timeouts.length == 0) {
+  if (timeouts.length === 0) {
     return await fetch(url);
   }
 

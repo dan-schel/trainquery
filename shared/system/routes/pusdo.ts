@@ -51,7 +51,7 @@ export class PusdoFilter {
       .split(" ")
       .map((x) => x.trim())
       .filter((x) => x.length > 0)) {
-      if (term == "none") {
+      if (term === "none") {
         return PusdoFilter.none;
       } else if (term.startsWith("direction-")) {
         const direction = term.replace("direction-", "");
@@ -64,7 +64,7 @@ export class PusdoFilter {
       }
     }
 
-    return new PusdoFilter(directions.length == 0 ? null : directions, false);
+    return new PusdoFilter(directions.length === 0 ? null : directions, false);
   }
 
   matches(direction: DirectionID) {
@@ -74,7 +74,7 @@ export class PusdoFilter {
 
     if (
       this.directions != null &&
-      !this.directions.some((d) => d == direction)
+      !this.directions.some((d) => d === direction)
     ) {
       return false;
     }

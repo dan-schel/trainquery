@@ -36,7 +36,7 @@ export abstract class QTimeBase<T extends QTimeBase<T>> {
   }
 
   equals(other: T) {
-    return this.asDecimal() == other.asDecimal();
+    return this.asDecimal() === other.asDecimal();
   }
   isBefore(other: T) {
     return this.asDecimal() < other.asDecimal();
@@ -243,6 +243,6 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
   }
 
   toJSON(): z.input<typeof QTimetableTime.json> {
-    return this.toTtblString(this.second != 0);
+    return this.toTtblString(this.second !== 0);
   }
 }

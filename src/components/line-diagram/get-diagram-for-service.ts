@@ -27,13 +27,13 @@ export function getDiagramForService(
 
   const stops = getPatternList(getConfig(), departure);
   const transparentTo = stops.findIndex(
-    (s) => s.stopListIndex == departure.perspectiveIndex,
+    (s) => s.stopListIndex === departure.perspectiveIndex,
   );
 
   return {
     loop: [],
     stops: stops.map((x) => {
-      if (x.type == "served") {
+      if (x.type === "served") {
         return {
           stop: x.stop,
           express: false,

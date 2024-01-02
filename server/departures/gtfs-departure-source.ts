@@ -73,8 +73,8 @@ function getForSearchTime(
       trip.idPairs.find((i) =>
         calendarsThatApply.some(
           (c) =>
-            c.gtfsSubfeedID == trip.gtfsSubfeedID &&
-            c.gtfsCalendarID == i.gtfsCalendarID,
+            c.gtfsSubfeedID === trip.gtfsSubfeedID &&
+            c.gtfsCalendarID === i.gtfsCalendarID,
         ),
       ) ?? null;
 
@@ -84,7 +84,7 @@ function getForSearchTime(
 
     const isVetoed = calendarsThatApply.some(
       (c) =>
-        c.gtfsSubfeedID == trip.gtfsSubfeedID &&
+        c.gtfsSubfeedID === trip.gtfsSubfeedID &&
         trip.vetoedCalendars.has(c.gtfsCalendarID),
     );
 
@@ -111,7 +111,7 @@ function getForSearchTime(
     }
 
     for (let i = 0; i < stopList.stops.length; i++) {
-      if (stopList.stops[i] != stop) {
+      if (stopList.stops[i] !== stop) {
         continue;
       }
       const time = trip.times[i];

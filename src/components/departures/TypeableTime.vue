@@ -17,9 +17,9 @@ function handleTimeInput(_e: Event) {
   // Don't run e.preventDefault(); since it breaks backspacing on Android
   // Chrome :/
 
-  if (e.inputType == "insertText") {
+  if (e.inputType === "insertText") {
     emit("update:modelValue", props.modelValue.type(e.data ?? ""));
-  } else if (e.inputType == "deleteContentBackward") {
+  } else if (e.inputType === "deleteContentBackward") {
     emit("update:modelValue", props.modelValue.backspace());
   }
 
@@ -48,7 +48,7 @@ onMounted(() => {
         modelValue.minute
       }}</strong>
       <strong v-if="modelValue.ampm.length > 0">{{ modelValue.ampm }}</strong>
-      <span v-if="modelValue.ampm.length == 1">m</span>
+      <span v-if="modelValue.ampm.length === 1">m</span>
     </p>
     <div class="preview"></div>
   </div>

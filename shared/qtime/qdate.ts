@@ -18,11 +18,11 @@ const _monthAcronyms = [
 ];
 
 function isLeapYear(year: number): boolean {
-  return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+  return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
 }
 
 function getDaysInMonth(year: number, month: number): number {
-  if (month == 2 && isLeapYear(year)) {
+  if (month === 2 && isLeapYear(year)) {
     return 29;
   }
   return _daysInMonth[month - 1];
@@ -147,7 +147,7 @@ export class QDate {
 
     // By this point we know that "other" occurs before "this" (result will be
     // positive).
-    if (this.year != other.year) {
+    if (this.year !== other.year) {
       const endOfOtherYear = new QDate(other.year, 12, 31);
       const startOfThisYear = new QDate(this.year, 1, 1);
       let daysBetween = 1;
@@ -160,7 +160,7 @@ export class QDate {
     }
 
     // By this point we know the years are the same.
-    if (this.month != other.month) {
+    if (this.month !== other.month) {
       const endOfOtherMonth = new QDate(
         other.year,
         other.month,
@@ -187,7 +187,7 @@ export class QDate {
     return this.addDays(-1);
   }
   equals(other: QDate) {
-    return this.asDecimal() == other.asDecimal();
+    return this.asDecimal() === other.asDecimal();
   }
   isBefore(other: QDate) {
     return this.asDecimal() < other.asDecimal();

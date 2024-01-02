@@ -122,7 +122,7 @@ export function searchOptionsWholeSite(devMode: boolean): SearchOption[] {
 
 /** Returns the options (ranked) which best match the query. */
 export function search(query: string, options: SearchOption[]): SearchOption[] {
-  if (query.length == 0 || query.length > 50) {
+  if (query.length === 0 || query.length > 50) {
     return [];
   }
 
@@ -194,14 +194,14 @@ function textify(str: string): string {
 function similarity(query: string, tag: string): number {
   let mismatch = 0;
   for (let i = 0; i < query.length; i++) {
-    if (query[i] == tag[i]) {
+    if (query[i] === tag[i]) {
       continue;
     }
-    if (query[i] == tag[i - 1] || query[i] == tag[i + 1]) {
+    if (query[i] === tag[i - 1] || query[i] === tag[i + 1]) {
       mismatch += 0.8 * Math.pow(0.95, i);
       continue;
     }
-    if (query[i] == tag[i - 2] || query[i] == tag[i + 2]) {
+    if (query[i] === tag[i - 2] || query[i] === tag[i + 2]) {
       mismatch += 0.9 * Math.pow(0.95, i);
       continue;
     }
@@ -215,9 +215,11 @@ function stopSubtitle(stop: Stop): string {
     ignoreSpecialEventsOnlyLines: true,
     sortAlphabetically: true,
   }).map((l) => l.name);
-  if (lineNames.length == 0) {
+  if (lineNames.length === 0) {
     return "No lines";
   }
 
-  return `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "lines"}`;
+  return `${listifyAnd(lineNames)} ${
+    lineNames.length === 1 ? "Line" : "lines"
+  }`;
 }

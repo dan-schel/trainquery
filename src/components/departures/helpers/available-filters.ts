@@ -48,7 +48,7 @@ export function getAvailableFilters(stop: StopID): AvailableFilters {
 
   const directions = unique(
     lines.map((l) => l.route.getPossibleDirections()).flat(),
-    (a, b) => a == b,
+    (a, b) => a === b,
   );
   const directionFilters =
     directions.length < 2
@@ -108,11 +108,11 @@ export function toggleFilter(
 ): DepartureFilter {
   if ("line" in option) {
     if (current.lines != null && current.lines.includes(option.line)) {
-      const removed = current.lines.filter((l) => l != option.line);
-      return current.with({ lines: removed.length == 0 ? null : removed });
+      const removed = current.lines.filter((l) => l !== option.line);
+      return current.with({ lines: removed.length === 0 ? null : removed });
     } else {
       let list = current.lines ?? [];
-      if (list.length == (available.lines?.length ?? 0) - 1) {
+      if (list.length === (available.lines?.length ?? 0) - 1) {
         list = [];
       }
       return current.with({ lines: [...list, option.line] });
@@ -123,11 +123,13 @@ export function toggleFilter(
       current.directions != null &&
       current.directions.includes(option.direction)
     ) {
-      const removed = current.directions.filter((l) => l != option.direction);
-      return current.with({ directions: removed.length == 0 ? null : removed });
+      const removed = current.directions.filter((l) => l !== option.direction);
+      return current.with({
+        directions: removed.length === 0 ? null : removed,
+      });
     } else {
       let list = current.directions ?? [];
-      if (list.length == (available.directions?.length ?? 0) - 1) {
+      if (list.length === (available.directions?.length ?? 0) - 1) {
         list = [];
       }
       return current.with({ directions: [...list, option.direction] });
@@ -138,11 +140,11 @@ export function toggleFilter(
       current.platforms != null &&
       current.platforms.includes(option.platform)
     ) {
-      const removed = current.platforms.filter((l) => l != option.platform);
-      return current.with({ platforms: removed.length == 0 ? null : removed });
+      const removed = current.platforms.filter((l) => l !== option.platform);
+      return current.with({ platforms: removed.length === 0 ? null : removed });
     } else {
       let list = current.platforms ?? [];
-      if (list.length == (available.platforms?.length ?? 0) - 1) {
+      if (list.length === (available.platforms?.length ?? 0) - 1) {
         list = [];
       }
       return current.with({ platforms: [...list, option.platform] });
@@ -157,7 +159,7 @@ export function isValidFilter(filter: DepartureFilter, stop: StopID) {
     if (lines == null) {
       return false;
     }
-    if (filter.lines.some((l) => lines.every((a) => a.line != l))) {
+    if (filter.lines.some((l) => lines.every((a) => a.line !== l))) {
       return false;
     }
   }
@@ -166,7 +168,7 @@ export function isValidFilter(filter: DepartureFilter, stop: StopID) {
       return false;
     }
     if (
-      filter.directions.some((l) => directions.every((a) => a.direction != l))
+      filter.directions.some((l) => directions.every((a) => a.direction !== l))
     ) {
       return false;
     }
@@ -175,7 +177,9 @@ export function isValidFilter(filter: DepartureFilter, stop: StopID) {
     if (platforms == null) {
       return false;
     }
-    if (filter.platforms.some((l) => platforms.every((a) => a.platform != l))) {
+    if (
+      filter.platforms.some((l) => platforms.every((a) => a.platform !== l))
+    ) {
       return false;
     }
   }

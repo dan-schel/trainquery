@@ -41,21 +41,21 @@ export default viteSSR(
     router.beforeEach(async (to, from, next) => {
       // When applying a filter on the stop page, a full page reload is not
       // required, but I still want to change the URL, ok?
-      if (to.name == "stop" && to.path == from.path) {
+      if (to.name === "stop" && to.path === from.path) {
         return next();
       }
 
       startedNavigating();
 
       // I get several of these calls when loading every page for some reason.
-      if (to.name == "notfound") {
+      if (to.name === "notfound") {
         return next();
       }
 
       // Check if route props are already provided.
       if (
         to.meta.state != null &&
-        typeof to.meta.state == "object" &&
+        typeof to.meta.state === "object" &&
         "route" in to.meta.state
       ) {
         return next();
