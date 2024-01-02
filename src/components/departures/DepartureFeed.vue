@@ -159,7 +159,7 @@ function handlePin() {
 
       <div
         class="empty"
-        v-if="!loading && error == null && departures.length == 0"
+        v-if="!loading && error == null && departures.length === 0"
       >
         <Icon id="uil:calendar-slash"></Icon>
         <p>No trains scheduled</p>

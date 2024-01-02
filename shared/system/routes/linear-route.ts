@@ -44,7 +44,7 @@ export class LinearRoute extends Route {
   }
 
   static detect(route: Route): route is LinearRoute {
-    return route.type == "linear";
+    return route.type === "linear";
   }
 
   getStopLists(): StopList[] {

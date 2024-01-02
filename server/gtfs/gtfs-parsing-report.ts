@@ -64,10 +64,10 @@ export class GtfsParsingReport {
     // array, since duplicate routes tend to occur in a row.
     for (let i = this.unsupportedRoutes.length - 1; i >= 0; i--) {
       const compare = this.unsupportedRoutes[i];
-      if (route.length == compare.length) {
+      if (route.length === compare.length) {
         let match = true;
         for (let j = 0; j < route.length; j++) {
-          if (route[j] != compare[j]) {
+          if (route[j] !== compare[j]) {
             match = false;
             break;
           }
@@ -139,7 +139,7 @@ export class GtfsParsingReport {
     for (const s of this.unsupportedGtfsStopIDs.values()) {
       printer(` -  ${s}`);
     }
-    if (this.unsupportedGtfsStopIDs.size == 0) {
+    if (this.unsupportedGtfsStopIDs.size === 0) {
       printer(`    None!`);
     }
 
@@ -149,7 +149,7 @@ export class GtfsParsingReport {
       const names = r.map((s) => requireStop(ctx.getConfig(), s).name);
       printer(` -  ${names.join(" → ")}`);
     }
-    if (this.unsupportedRoutes.length == 0) {
+    if (this.unsupportedRoutes.length === 0) {
       printer(`    None!`);
     }
   }

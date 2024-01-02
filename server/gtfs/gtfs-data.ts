@@ -29,13 +29,13 @@ export class GtfsData {
     if (feeds.length < 0) {
       throw new Error("Cannot merge, no feeds provided.");
     }
-    if (feeds.length != subfeedIDs.length) {
+    if (feeds.length !== subfeedIDs.length) {
       throw new Error("Mismatch between feed count and subfeed ID count.");
     }
     if (!unique(subfeedIDs)) {
       throw new Error("Subfeed IDs must be unique.");
     }
-    if (!feeds.every((f) => f.configHash == feeds[0].configHash)) {
+    if (!feeds.every((f) => f.configHash === feeds[0].configHash)) {
       throw new Error("Cannot merge feeds created from differing configs.");
     }
 
@@ -267,7 +267,7 @@ export class GtfsTrip {
   }
 
   requireIDPair(gtfsCalendarID: string): GtfsTripIDPair {
-    const pair = this.idPairs.find((p) => p.gtfsCalendarID == gtfsCalendarID);
+    const pair = this.idPairs.find((p) => p.gtfsCalendarID === gtfsCalendarID);
     if (pair == null) {
       throw new Error(
         `Trip did not have an ID under calendar "${gtfsCalendarID}".`,
@@ -289,7 +289,8 @@ export class GtfsTrip {
   hasIDPair(gtfsTripID: string, continuationIndex: number) {
     return this.idPairs.some(
       (p) =>
-        p.gtfsTripID == gtfsTripID && p.continuationIndex == continuationIndex,
+        p.gtfsTripID === gtfsTripID &&
+        p.continuationIndex === continuationIndex,
     );
   }
 

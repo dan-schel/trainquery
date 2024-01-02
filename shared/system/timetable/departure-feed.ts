@@ -24,7 +24,7 @@ export class DepartureFeed {
 
   static parse(input: string): DepartureFeed | null {
     const components = input.split("|");
-    if (components.length != 3) {
+    if (components.length !== 3) {
       return null;
     }
 
@@ -57,7 +57,7 @@ export class DepartureFeed {
       return null;
     }
     const components = decodedString.split("|");
-    if (components.length < 3 || components.length % 3 != 0) {
+    if (components.length < 3 || components.length % 3 !== 0) {
       return null;
     }
 

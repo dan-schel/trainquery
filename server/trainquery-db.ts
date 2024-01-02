@@ -55,7 +55,7 @@ export class TrainQueryDB {
       return null;
     }
     const metadata = GtfsData.metadataJson.parse(metadataDoc);
-    if (metadata.configHash != configHash) {
+    if (metadata.configHash !== configHash) {
       return null;
     }
 

@@ -19,7 +19,7 @@ export class FullConfig extends ServerConfig {
     // so we might need to calculate a hash for everything somehow.
 
     // this.fullHash = calculateFullHash(config);
-    // if (this.fullHash != oldConfig.fullHash) {
+    // if (this.fullHash !== oldConfig.fullHash) {
     //   this.computed = {
     //     offset: new OffsetCalculator(config.shared.timezone)
     //   };

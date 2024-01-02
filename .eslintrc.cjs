@@ -13,6 +13,7 @@ module.exports = {
     "vue/multi-word-component-names": 0,
     semi: "warn",
     "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+    eqeqeq: ["error", "always", { null: "ignore" }],
   },
   parserOptions: {
     ecmaVersion: "latest",

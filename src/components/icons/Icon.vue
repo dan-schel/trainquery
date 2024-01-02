@@ -56,52 +56,52 @@ defineProps<{
 </script>
 
 <template>
-  <MajesticonsPin v-if="id == 'majesticons:pin'" class="icon"></MajesticonsPin>
+  <MajesticonsPin v-if="id === 'majesticons:pin'" class="icon"></MajesticonsPin>
   <MajesticonsPinLine
-    v-else-if="id == 'majesticons:pin-line'"
+    v-else-if="id === 'majesticons:pin-line'"
     class="icon"
   ></MajesticonsPinLine>
-  <UilAngleDown v-else-if="id == 'uil:angle-down'" class="icon"></UilAngleDown>
-  <UilAngleLeft v-else-if="id == 'uil:angle-left'" class="icon"></UilAngleLeft>
+  <UilAngleDown v-else-if="id === 'uil:angle-down'" class="icon"></UilAngleDown>
+  <UilAngleLeft v-else-if="id === 'uil:angle-left'" class="icon"></UilAngleLeft>
   <UilAngleRight
-    v-else-if="id == 'uil:angle-right'"
+    v-else-if="id === 'uil:angle-right'"
     class="icon"
   ></UilAngleRight>
-  <UilAngleUp v-else-if="id == 'uil:angle-up'" class="icon"></UilAngleUp>
-  <UilBars v-else-if="id == 'uil:bars'" class="icon"></UilBars>
+  <UilAngleUp v-else-if="id === 'uil:angle-up'" class="icon"></UilAngleUp>
+  <UilBars v-else-if="id === 'uil:bars'" class="icon"></UilBars>
   <UilCalendarSlash
-    v-else-if="id == 'uil:calendar-slash'"
+    v-else-if="id === 'uil:calendar-slash'"
     class="icon"
   ></UilCalendarSlash>
-  <UilCheck v-else-if="id == 'uil:check'" class="icon"></UilCheck>
-  <UilClock v-else-if="id == 'uil:clock'" class="icon"></UilClock>
+  <UilCheck v-else-if="id === 'uil:check'" class="icon"></UilCheck>
+  <UilClock v-else-if="id === 'uil:clock'" class="icon"></UilClock>
   <UilCodeBranch
-    v-else-if="id == 'uil:code-branch'"
+    v-else-if="id === 'uil:code-branch'"
     class="icon"
   ></UilCodeBranch>
   <UilExclamationCircle
-    v-else-if="id == 'uil:exclamation-circle'"
+    v-else-if="id === 'uil:exclamation-circle'"
     class="icon"
   ></UilExclamationCircle>
   <UilExternalLinkAlt
-    v-else-if="id == 'uil:external-link-alt'"
+    v-else-if="id === 'uil:external-link-alt'"
     class="icon"
   ></UilExternalLinkAlt>
-  <UilFilter v-else-if="id == 'uil:filter'" class="icon"></UilFilter>
-  <UilGithub v-else-if="id == 'uil:github'" class="icon"></UilGithub>
-  <UilHome v-else-if="id == 'uil:home'" class="icon"></UilHome>
+  <UilFilter v-else-if="id === 'uil:filter'" class="icon"></UilFilter>
+  <UilGithub v-else-if="id === 'uil:github'" class="icon"></UilGithub>
+  <UilHome v-else-if="id === 'uil:home'" class="icon"></UilHome>
   <UilInfoCircle
-    v-else-if="id == 'uil:info-circle'"
+    v-else-if="id === 'uil:info-circle'"
     class="icon"
   ></UilInfoCircle>
-  <UilMap v-else-if="id == 'uil:map'" class="icon"></UilMap>
-  <UilMapMarker v-else-if="id == 'uil:map-marker'" class="icon"></UilMapMarker>
-  <UilRedo v-else-if="id == 'uil:redo'" class="icon"></UilRedo>
-  <UilSearch v-else-if="id == 'uil:search'" class="icon"></UilSearch>
-  <UilSetting v-else-if="id == 'uil:setting'" class="icon"></UilSetting>
+  <UilMap v-else-if="id === 'uil:map'" class="icon"></UilMap>
+  <UilMapMarker v-else-if="id === 'uil:map-marker'" class="icon"></UilMapMarker>
+  <UilRedo v-else-if="id === 'uil:redo'" class="icon"></UilRedo>
+  <UilSearch v-else-if="id === 'uil:search'" class="icon"></UilSearch>
+  <UilSetting v-else-if="id === 'uil:setting'" class="icon"></UilSetting>
   <UilSliderHRange
-    v-else-if="id == 'uil:slider-h-range'"
+    v-else-if="id === 'uil:slider-h-range'"
     class="icon"
   ></UilSliderHRange>
-  <UilTimes v-else-if="id == 'uil:times'" class="icon"></UilTimes>
+  <UilTimes v-else-if="id === 'uil:times'" class="icon"></UilTimes>
 </template>

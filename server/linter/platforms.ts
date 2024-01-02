@@ -3,7 +3,7 @@ import { LintContext, examplify } from "./utils";
 export function lintPlatforms(ctx: LintContext) {
   if (ctx.shared.usePlatforms) {
     const stopsWithoutPlatforms = ctx.shared.stops
-      .filter((s) => s.platforms.length == 0)
+      .filter((s) => s.platforms.length === 0)
       .map((s) => s.name);
 
     ctx.logPluralizedError(
@@ -14,7 +14,7 @@ export function lintPlatforms(ctx: LintContext) {
     );
   } else {
     const stopsWithPlatforms = ctx.shared.stops
-      .filter((s) => s.platforms.length != 0)
+      .filter((s) => s.platforms.length !== 0)
       .map((s) => s.name);
 
     ctx.logPluralizedError(

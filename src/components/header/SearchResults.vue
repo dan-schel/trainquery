@@ -28,8 +28,8 @@ const results = computed(() => {
 
 <template>
   <div class="results">
-    <p v-if="query.length == 0" class="message">Results will appear here.</p>
-    <p v-else-if="results.length == 0" class="message">No results.</p>
+    <p v-if="query.length === 0" class="message">Results will appear here.</p>
+    <p v-else-if="results.length === 0" class="message">No results.</p>
 
     <RouterLink
       v-for="result in results"
@@ -47,9 +47,9 @@ const results = computed(() => {
             v-if="
               developerMode &&
               result.data != null &&
-              typeof result.data == 'object' &&
+              typeof result.data === 'object' &&
               'line' in result.data &&
-              typeof result.data.line == 'number'
+              typeof result.data.line === 'number'
             "
           >
             &nbsp;•&nbsp;&nbsp;Line #{{ result.data.line }}
@@ -58,9 +58,9 @@ const results = computed(() => {
             v-if="
               developerMode &&
               result.data != null &&
-              typeof result.data == 'object' &&
+              typeof result.data === 'object' &&
               'stop' in result.data &&
-              typeof result.data.stop == 'number'
+              typeof result.data.stop === 'number'
             "
           >
             &nbsp;•&nbsp;&nbsp;Stop #{{ result.data.stop }}

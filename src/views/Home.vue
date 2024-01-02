@@ -56,7 +56,7 @@ const feeds = computed(() =>
           :replace-on-navigate="false"
         ></DepartureGroup>
         <LoadingSpinner v-if="feeds == null" class="loading"></LoadingSpinner>
-        <p class="empty" v-if="feeds != null && feeds.length == 0">
+        <p class="empty" v-if="feeds != null && feeds.length === 0">
           Click the pin button above a widget on a stop's page to show it here.
         </p>
       </div>

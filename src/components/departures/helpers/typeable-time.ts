@@ -38,17 +38,17 @@ export class TypeableTime {
     // This is awful, sorry :/
 
     const character = _character.toLowerCase();
-    if (character == "a") {
+    if (character === "a") {
       return this.with({ ampm: "a" });
-    } else if (character == "p") {
+    } else if (character === "p") {
       return this.with({ ampm: "p" });
-    } else if (character == "m" && this.ampm.length == 1) {
+    } else if (character === "m" && this.ampm.length === 1) {
       return this.with({ ampm: this.ampm + "m" });
     } else if (
-      (character == ":" || character == ";") &&
+      (character === ":" || character === ";") &&
       !this.explicitlyDivided &&
-      this.hour.length == 0 &&
-      this.minute.length != 0
+      this.hour.length === 0 &&
+      this.minute.length !== 0
     ) {
       return this.with({
         hour: this.minute,
@@ -64,7 +64,7 @@ export class TypeableTime {
         return this.with({
           minute: this.minute + character,
         });
-      } else if (this.minute.length == 2 && this.hour.length < 2) {
+      } else if (this.minute.length === 2 && this.hour.length < 2) {
         return this.with({
           hour: this.hour + this.minute[0],
           minute: this.minute[1] + character,
@@ -85,7 +85,7 @@ export class TypeableTime {
       return this.with({
         minute: this.minute.slice(0, -1),
       });
-    } else if (this.explicitlyDivided && this.minute.length == 0) {
+    } else if (this.explicitlyDivided && this.minute.length === 0) {
       return this.with({
         explicitlyDivided: false,
         minute: this.hour,
@@ -117,7 +117,7 @@ export class TypeableTime {
     ) {
       return null;
     }
-    if (this.ampm.length != 0) {
+    if (this.ampm.length !== 0) {
       if (hour < 1 || hour > 12) {
         return null;
       }

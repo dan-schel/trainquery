@@ -8,7 +8,7 @@ export function getTimetableForDay(ctx: TrainQuery, day: QDate, line: LineID) {
     .getConfig()
     .server.timetables.filter(
       (t) =>
-        t.line == line &&
+        t.line === line &&
         day.isWithin(t.begins, t.ends, { maxInclusive: true }),
     );
 

@@ -31,7 +31,7 @@ export async function getDepartures<A, B>(
   while (
     iteration <= maxIteration &&
     !buckets.every((b) => b.isFull()) &&
-    (iteration == 0 || source.isIterable())
+    (iteration === 0 || source.isIterable())
   ) {
     const possibilities = await source.fetch(time, iteration, reverse);
 

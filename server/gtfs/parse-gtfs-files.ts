@@ -86,12 +86,12 @@ function parseCalendars(
     const end = c.end_date;
     const additionalDates = rawCalendarDates
       .filter(
-        (d) => d.service_id == c.service_id && d.exception_type == "added",
+        (d) => d.service_id === c.service_id && d.exception_type === "added",
       )
       .map((d) => d.date);
     const exceptions = rawCalendarDates
       .filter(
-        (d) => d.service_id == c.service_id && d.exception_type == "removed",
+        (d) => d.service_id === c.service_id && d.exception_type === "removed",
       )
       .map((d) => d.date);
     return new GtfsCalendar(
@@ -134,7 +134,7 @@ function parseTrips(
     const unknownStops = stopTimes
       .filter((e) => e.stop == null)
       .map((s) => s.gtfsStop);
-    if (unknownStops.length != 0) {
+    if (unknownStops.length !== 0) {
       parsingReport.logRejectedStop(...unknownStops);
       parsingReport.logRejectedTrip();
       return null;
@@ -188,9 +188,9 @@ function parseTrips(
 
   for (let i = 0; i < rawStopTimes.length; i++) {
     const thisStopTime = rawStopTimes[i];
-    if (thisStopTime.trip_id != trip.trip_id) {
+    if (thisStopTime.trip_id !== trip.trip_id) {
       tripIndex++;
-      while (rawTrips[tripIndex].trip_id != thisStopTime.trip_id) {
+      while (rawTrips[tripIndex].trip_id !== thisStopTime.trip_id) {
         tripIndex++;
         if (tripIndex >= rawTrips.length) {
           throw new Error(
@@ -266,7 +266,7 @@ function dedupeTrips(
       const b = trips[j];
 
       // No point. These trips are all guaranteed to be from the same subfeed.
-      // if (a.gtfsSubfeedID != b.gtfsSubfeedID) {
+      // if (a.gtfsSubfeedID !== b.gtfsSubfeedID) {
       //   continue;
       // }
 
@@ -358,7 +358,7 @@ function isSubset(
     let matches = true;
     for (let i = 0; i < subset.length; i++) {
       // Check the stopping orders match.
-      if (supersetStops[i + start] != subsetStops[i]) {
+      if (supersetStops[i + start] !== subsetStops[i]) {
         matches = false;
         break;
       }
@@ -366,7 +366,7 @@ function isSubset(
       // Check the stopping times match, except for the last stop (arrival times
       // might not match the continuation's departure time).
       if (
-        i != subset.length - 1 &&
+        i !== subset.length - 1 &&
         !nullableEquals(superset[i + start], subset[i], (a, b) => a.equals(b))
       ) {
         matches = false;
@@ -392,12 +392,12 @@ function mergeSubset(
   // replace it with a trip that only contains those calendars.
   const unaccountedIDPairs = subset.idPairs.filter(
     (p1) =>
-      !superset.idPairs.some((p2) => p1.gtfsCalendarID == p2.gtfsCalendarID),
+      !superset.idPairs.some((p2) => p1.gtfsCalendarID === p2.gtfsCalendarID),
   );
   const vetoedCalendars = superset.idPairs.map((p) => p.gtfsCalendarID);
 
   const splitSubset =
-    unaccountedIDPairs.length == 0
+    unaccountedIDPairs.length === 0
       ? null
       : subset
           .withIDPairs(unaccountedIDPairs)

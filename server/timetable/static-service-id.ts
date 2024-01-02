@@ -33,7 +33,7 @@ export class StaticServiceIDComponents {
   }
   static parse(input: string): StaticServiceIDComponents | null {
     const components = input.split("|");
-    if (components.length != 3) {
+    if (components.length !== 3) {
       return null;
     }
 

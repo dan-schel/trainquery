@@ -45,7 +45,7 @@ export function linesThatStopAt(
 }
 
 export function getLine(config: HasSharedConfig, line: LineID) {
-  return config.shared.lines.find((l) => l.id == line) ?? null;
+  return config.shared.lines.find((l) => l.id === line) ?? null;
 }
 
 export function requireLine(config: HasSharedConfig, line: LineID) {
@@ -57,7 +57,7 @@ export function requireLine(config: HasSharedConfig, line: LineID) {
 }
 
 export function getStop(config: HasSharedConfig, stop: StopID) {
-  return config.shared.stops.find((s) => s.id == stop) ?? null;
+  return config.shared.stops.find((s) => s.id === stop) ?? null;
 }
 
 export function requireStop(config: HasSharedConfig, stop: StopID) {
@@ -77,7 +77,7 @@ export function getPlatform(
   if (stopData == null) {
     return null;
   }
-  return stopData.platforms.find((s) => s.id == platform) ?? null;
+  return stopData.platforms.find((s) => s.id === platform) ?? null;
 }
 
 export function requirePlatform(
@@ -143,13 +143,13 @@ export function getStopFromUrlName(
   param: string,
 ): Stop | null {
   const urlNameMatch = config.shared.stops.find(
-    (s) => config.shared.urlNames.stops.get(s.id) == param,
+    (s) => config.shared.urlNames.stops.get(s.id) === param,
   );
   if (urlNameMatch != null) {
     return urlNameMatch;
   }
 
-  return config.shared.stops.find((s) => s.id.toFixed() == param) ?? null;
+  return config.shared.stops.find((s) => s.id.toFixed() === param) ?? null;
 }
 
 export function requireStopFromUrlName(
@@ -168,13 +168,13 @@ export function getLineFromUrlName(
   param: string,
 ): Line | null {
   const urlNameMatch = config.shared.lines.find(
-    (l) => config.shared.urlNames.lines.get(l.id) == param,
+    (l) => config.shared.urlNames.lines.get(l.id) === param,
   );
   if (urlNameMatch != null) {
     return urlNameMatch;
   }
 
-  return config.shared.lines.find((l) => l.id.toFixed() == param) ?? null;
+  return config.shared.lines.find((l) => l.id.toFixed() === param) ?? null;
 }
 
 export function requireLineFromUrlName(
@@ -206,7 +206,7 @@ export function getStopPageRoute(
       value: filter.asString(),
     });
   }
-  if (params.length == 0) {
+  if (params.length === 0) {
     return base;
   }
   return (
@@ -235,7 +235,7 @@ export function getServicePageRoute(
   const piParam =
     perspectiveIndex == null ? "" : `?from=${perspectiveIndex.toFixed()}`;
 
-  const gtfs = service.sources.find((s) => s.source == "gtfs");
+  const gtfs = service.sources.find((s) => s.source === "gtfs");
   if (gtfs != null) {
     return `/train/gtfs/${gtfs.id}` + piParam;
   } else {
@@ -248,7 +248,7 @@ export function getServiceType(
   config: HasSharedConfig,
   serviceType: ServiceTypeID,
 ) {
-  return config.shared.serviceTypes.find((l) => l.id == serviceType) ?? null;
+  return config.shared.serviceTypes.find((l) => l.id === serviceType) ?? null;
 }
 
 export function requireServiceType(

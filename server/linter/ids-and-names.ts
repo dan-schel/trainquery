@@ -3,11 +3,11 @@ import { LintContext, examplify, listDuplicated } from "./utils";
 export function lintUniqueIDs(ctx: LintContext) {
   const duplicatedStopIDs = listDuplicated(
     ctx.shared.stops.map((s) => s.id),
-    (a, b) => a == b,
+    (a, b) => a === b,
   ).map((s) => s.toFixed());
   const duplicatedLineIDs = listDuplicated(
     ctx.shared.lines.map((s) => s.id),
-    (a, b) => a == b,
+    (a, b) => a === b,
   ).map((l) => l.toFixed());
 
   ctx.logPluralizedError(
@@ -27,11 +27,11 @@ export function lintUniqueIDs(ctx: LintContext) {
 export function lintUniqueNames(ctx: LintContext) {
   const duplicatedStopNames = listDuplicated(
     ctx.shared.stops.map((s) => s.name),
-    (a, b) => a == b,
+    (a, b) => a === b,
   ).map((s) => `"${s}"`);
   const duplicatedLineNames = listDuplicated(
     ctx.shared.lines.map((s) => s.name),
-    (a, b) => a == b,
+    (a, b) => a === b,
   ).map((l) => `"${l}"`);
 
   if (duplicatedStopNames.length > 0) {

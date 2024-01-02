@@ -52,7 +52,7 @@ function handlePointerMove(e: PointerEvent) {
   // dragOffset wouldn't be necessary!)
   const delta = (props.horizontal ? -e.pageX : -e.pageY) - dragOffset.value;
   offset.value +=
-    delta * (e.pointerType == "mouse" ? SENSITIVITY_MOUSE : SENSITIVITY_TOUCH);
+    delta * (e.pointerType === "mouse" ? SENSITIVITY_MOUSE : SENSITIVITY_TOUCH);
   if (dragLength.value != null) {
     dragLength.value += Math.abs(delta);
   }

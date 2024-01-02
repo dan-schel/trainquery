@@ -39,11 +39,11 @@ export function matchToRoute<T>(
     const stoppingPattern: (T | null)[] = [];
     let currInOrder = 0;
     for (const stop of combination.stops) {
-      if (currInOrder == stoppingOrder.length) {
+      if (currInOrder === stoppingOrder.length) {
         stoppingPattern.push(null);
       } else {
         const curr = stoppingOrder[currInOrder];
-        if (stop == curr.stop) {
+        if (stop === curr.stop) {
           stoppingPattern.push(curr.value);
           currInOrder++;
         } else {
@@ -52,7 +52,7 @@ export function matchToRoute<T>(
       }
     }
 
-    if (currInOrder == stoppingOrder.length) {
+    if (currInOrder === stoppingOrder.length) {
       // If we got through every stop in the stopping order, then this stop list
       // has matched!
       matches.push({
@@ -78,7 +78,7 @@ export function matchToRoute<T>(
         combination.direction,
       );
 
-      if (options.length != 0) {
+      if (options.length !== 0) {
         // Attempt to match the future stops to the continuation options we
         // found above. Be sure to include the previous terminus (the
         // continuation's origin) in the stoplist. Because we know it stopped at
@@ -105,13 +105,13 @@ export function matchToRoute<T>(
     }
   }
 
-  if (matches.length == 0) {
+  if (matches.length === 0) {
     return null;
   }
 
   // Sort the matches to find the best one.
   const sortedMatches = matches.sort((a, b) => {
-    if (a.stopCount != b.stopCount) {
+    if (a.stopCount !== b.stopCount) {
       // The best matches match the most stops in the first trip (rely on
       // continuations as little as possible.)
       return -(a.stopCount - b.stopCount);
@@ -123,7 +123,7 @@ export function matchToRoute<T>(
     }
   });
   const bestMatches = sortedMatches.filter(
-    (m) => m.stopCount == sortedMatches[0].stopCount,
+    (m) => m.stopCount === sortedMatches[0].stopCount,
   );
 
   return bestMatches[0];

@@ -62,14 +62,14 @@ function filterAccepts(
   data: AllFilteringData,
 ) {
   // Filter by line.
-  if (filter.lines != null && !filter.lines.some((l) => l == data.line.id)) {
+  if (filter.lines != null && !filter.lines.some((l) => l === data.line.id)) {
     return false;
   }
 
   // Filter by direction.
   if (
     filter.directions != null &&
-    !filter.directions.some((d) => d == data.direction)
+    !filter.directions.some((d) => d === data.direction)
   ) {
     return false;
   }
@@ -78,7 +78,7 @@ function filterAccepts(
   const platform = guessPlatform(ctx, stop, data);
   if (
     filter.platforms != null &&
-    (platform == null || !filter.platforms.some((p) => p == platform.id))
+    (platform == null || !filter.platforms.some((p) => p === platform.id))
   ) {
     return false;
   }
@@ -86,7 +86,7 @@ function filterAccepts(
   // Filter by service type.
   if (
     filter.serviceTypes != null &&
-    !filter.serviceTypes.some((s) => s == data.serviceType)
+    !filter.serviceTypes.some((s) => s === data.serviceType)
   ) {
     return false;
   }

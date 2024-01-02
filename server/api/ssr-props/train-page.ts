@@ -12,17 +12,17 @@ import { GtfsServiceIDComponents } from "../../gtfs/gtfs-service-id";
 
 export function getTrainPageProps(ctx: TrainQuery, path: string) {
   const url = new URL(path, "https://example.com");
-  const pieces = url.pathname.split("/").filter((x) => x.length != 0);
-  if (pieces.length != 3) {
+  const pieces = url.pathname.split("/").filter((x) => x.length !== 0);
+  if (pieces.length !== 3) {
     return {};
   }
 
   const [, source, idStringss] = pieces;
 
   let service: Service<CompletePattern> | null = null;
-  if (source == "ttbl") {
+  if (source === "ttbl") {
     service = getTtblTrain(ctx, idStringss);
-  } else if (source == "gtfs") {
+  } else if (source === "gtfs") {
     service = getGtfsTrain(ctx, idStringss);
   }
 

@@ -68,7 +68,7 @@ export class QDayOfWeek {
     return this.addDays(-1);
   }
   equals(other: QDayOfWeek): boolean {
-    return other.index == this.index;
+    return other.index === this.index;
   }
   isWeekend() {
     return this.equals(QDayOfWeek.sat) || this.equals(QDayOfWeek.sun);

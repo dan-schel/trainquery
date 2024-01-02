@@ -29,7 +29,7 @@ export class GtfsServiceIDComponents {
   }
   static parse(input: string): GtfsServiceIDComponents | null {
     const components = input.split("|");
-    if (components.length != 4) {
+    if (components.length !== 4) {
       return null;
     }
 
@@ -54,7 +54,7 @@ export class GtfsServiceIDComponents {
     return new GtfsServiceIDComponents(
       gtfsTripID,
       continuationIndex,
-      subfeedID == "" ? null : subfeedID,
+      subfeedID === "" ? null : subfeedID,
       date,
     );
   }

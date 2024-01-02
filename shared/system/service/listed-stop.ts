@@ -101,9 +101,9 @@ export function getPatternList(
         i <= pattern.terminus.stopListIndex,
     );
     return trimmed.map((x, i) => {
-      if (i == 0) {
+      if (i === 0) {
         return listedFromServed(pattern.origin);
-      } else if (i == trimmed.length - 1) {
+      } else if (i === trimmed.length - 1) {
         return listedStop(pattern.terminus);
       } else {
         return listedUnknown(x, i + pattern.origin.stopListIndex);
@@ -118,9 +118,9 @@ export function getPatternList(
       (s, i) => i <= pattern.terminus.stopListIndex,
     );
     return trimmed.map((x, i) => {
-      if (i == pattern.perspective.stopListIndex) {
+      if (i === pattern.perspective.stopListIndex) {
         return listedFromServed(pattern.perspective);
-      } else if (i == pattern.terminus.stopListIndex) {
+      } else if (i === pattern.terminus.stopListIndex) {
         return listedStop(pattern.terminus);
       } else {
         // A stop either before the perspective or between it and the terminus.

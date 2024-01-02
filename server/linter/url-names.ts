@@ -30,7 +30,7 @@ export function lintUrlNameSimilarity(ctx: LintContext) {
       if (urlName == null) {
         return false;
       }
-      return urlName != s.name.toLowerCase().replace(/ /g, "");
+      return urlName !== s.name.toLowerCase().replace(/ /g, "");
     })
     .map((s) => `${s.name} (${ctx.shared.urlNames.stops.get(s.id)})`);
   const oddLineUrlNames = ctx.shared.lines
@@ -39,7 +39,7 @@ export function lintUrlNameSimilarity(ctx: LintContext) {
       if (urlName == null) {
         return false;
       }
-      return urlName != l.name.toLowerCase().replace(/ /g, "");
+      return urlName !== l.name.toLowerCase().replace(/ /g, "");
     })
     .map((l) => `${l.name} (${ctx.shared.urlNames.lines.get(l.id)})`);
 
@@ -85,13 +85,13 @@ export function lintUniqueUrlNames(ctx: LintContext) {
     ctx.shared.stops
       .map((s) => ctx.shared.urlNames.stops.get(s.id) ?? null)
       .filter(nonNull),
-    (a, b) => a == b,
+    (a, b) => a === b,
   ).map((s) => `"${s}"`);
   const duplicatedLineUrls = listDuplicated(
     ctx.shared.lines
       .map((l) => ctx.shared.urlNames.lines.get(l.id) ?? null)
       .filter(nonNull),
-    (a, b) => a == b,
+    (a, b) => a === b,
   ).map((l) => `"${l}"`);
 
   ctx.logPluralizedError(

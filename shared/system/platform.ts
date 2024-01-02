@@ -22,19 +22,19 @@ export class Platform {
   toJSON(): z.input<typeof Platform.json> {
     return {
       id: this.id,
-      name: this.name == this.id ? undefined : this.name,
+      name: this.name === this.id ? undefined : this.name,
     };
   }
 }
 
 function fuzzyPlatformID(val: PlatformID | number): PlatformID {
-  if (typeof val == "number") {
+  if (typeof val === "number") {
     return toPlatformID(val.toFixed());
   }
   return val;
 }
 function fuzzyName(val: string | number): string {
-  if (typeof val == "number") {
+  if (typeof val === "number") {
     return val.toFixed();
   }
   return val;

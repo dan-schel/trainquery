@@ -68,9 +68,9 @@ const time = ref(parsed.time);
 
 watch(route, () => {
   // For some reason, this is called even when navigating away from the page!
-  if (route.name == "stop") {
+  if (route.name === "stop") {
     const parsed = parseParams();
-    if (parsed.stop != stop.value) {
+    if (parsed.stop !== stop.value) {
       stop.value = parsed.stop;
     }
     if (!parsed.filter.equals(filter.value)) {

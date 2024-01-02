@@ -33,12 +33,12 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
     :class="{
       'with-icon': content.icon != null,
       'with-text': content.text != null,
-      button: layout == 'traditional',
-      'button-wide': layout == 'traditional-wide',
-      tile: layout == 'tile',
-      'theme-hover': theme == 'hover',
-      'theme-filled': theme == 'filled',
-      'theme-filled-neutral': theme == 'filled-neutral',
+      button: layout === 'traditional',
+      'button-wide': layout === 'traditional-wide',
+      tile: layout === 'tile',
+      'theme-hover': theme === 'hover',
+      'theme-filled': theme === 'filled',
+      'theme-filled-neutral': theme === 'filled-neutral',
     }"
     :title="content.altText"
     :disabled="disabled"
@@ -52,12 +52,12 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
     :class="{
       'with-icon': content.icon != null,
       'with-text': content.text != null,
-      button: layout == 'traditional',
-      'button-wide': layout == 'traditional-wide',
-      tile: layout == 'tile',
-      'theme-hover': theme == 'hover',
-      'theme-filled': theme == 'filled',
-      'theme-filled-neutral': theme == 'filled-neutral',
+      button: layout === 'traditional',
+      'button-wide': layout === 'traditional-wide',
+      tile: layout === 'tile',
+      'theme-hover': theme === 'hover',
+      'theme-filled': theme === 'filled',
+      'theme-filled-neutral': theme === 'filled-neutral',
     }"
     :title="content.altText"
     :disabled="disabled"

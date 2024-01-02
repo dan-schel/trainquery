@@ -26,7 +26,7 @@ export class Stop {
       id: this.id,
       name: this.name,
       platforms:
-        this.platforms.length == 0
+        this.platforms.length === 0
           ? undefined
           : this.platforms.map((p) => p.toJSON()),
     };
