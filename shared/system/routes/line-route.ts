@@ -45,7 +45,7 @@ export abstract class Route {
     }
     return (
       this._stopLists.find(
-        (l) => l.variant == variant && l.direction == direction,
+        (l) => l.variant === variant && l.direction === direction,
       ) ?? null
     );
   }
@@ -72,7 +72,7 @@ export abstract class Route {
     }
     return unique(
       this._stopLists.map((l) => l.direction),
-      (a, b) => a == b,
+      (a, b) => a === b,
     );
   }
 
@@ -152,7 +152,7 @@ export class RouteStop<T extends boolean = boolean> {
     );
 
   toJSON(): z.input<typeof RouteStop.json> {
-    if (this.via == false) {
+    if (this.via === false) {
       return {
         stops: this.stop,
         setsDown: (this as RouteStop<false>).setsDown.toJSON(),

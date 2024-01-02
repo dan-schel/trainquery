@@ -20,7 +20,7 @@ const route = useRoute();
 const params = ref(route.params);
 watch(route, () => {
   // For some reason, this is called even when navigating away from the page!
-  if (route.name == "line") {
+  if (route.name === "line") {
     params.value = route.params;
   }
 });

@@ -4,10 +4,10 @@ import { QDate } from "../../shared/qtime/qdate";
 import { IntStringJson, NumberStringJson } from "../../shared/utils";
 
 const BooleanStringJson = z.string().transform((x, ctx) => {
-  if (x == "1") {
+  if (x === "1") {
     return true;
   }
-  if (x == "0") {
+  if (x === "0") {
     return false;
   }
   ctx.addIssue({

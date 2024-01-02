@@ -11,7 +11,7 @@ export function formatFilter(filter: DepartureFilter, perspective: StopID) {
   if (filter.directions != null) {
     prefix = listifyAnd(
       filter.directions
-        .map((d, i) => formatDirection(d, { capital: i == 0 }))
+        .map((d, i) => formatDirection(d, { capital: i === 0 }))
         .sort((a, b) => a.localeCompare(b)),
     );
   }
@@ -36,7 +36,7 @@ export function formatFilter(filter: DepartureFilter, perspective: StopID) {
     noun = listifyAnd(
       filter.serviceTypes
         .map((s, i) =>
-          formatMode(s, { capital: i == 0 && prefix == null, plural: true }),
+          formatMode(s, { capital: i === 0 && prefix == null, plural: true }),
         )
         .sort((a, b) => a.localeCompare(b)),
     );
@@ -51,7 +51,7 @@ export function formatFilter(filter: DepartureFilter, perspective: StopID) {
         .sort((a, b) => a.localeCompare(b)),
     );
     suffix =
-      filter.platforms.length == 1
+      filter.platforms.length === 1
         ? `on platform ${numbers}`
         : `on platforms ${numbers}`;
   }

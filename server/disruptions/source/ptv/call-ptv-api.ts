@@ -20,7 +20,7 @@ export async function callPtvApi(
   const url = createPtvUrl(api, args, devID, devKey);
   const response = await fetch(url);
 
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw new Error(`PTV API responded with code ${response.status}`);
   }
 

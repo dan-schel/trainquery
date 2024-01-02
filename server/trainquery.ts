@@ -71,16 +71,16 @@ export async function trainQuery(
   gtfs?.init();
 
   await server.start(ctx, async (endpoint: string, params: ServerParams) => {
-    if (endpoint == "ssrAppProps") {
+    if (endpoint === "ssrAppProps") {
       return await ssrAppPropsApi(ctx);
     }
-    if (endpoint == "ssrRouteProps") {
+    if (endpoint === "ssrRouteProps") {
       return await ssrRoutePropsApi(ctx, params);
     }
-    if (endpoint == "config") {
+    if (endpoint === "config") {
       return await configApi(ctx);
     }
-    if (endpoint == "departures") {
+    if (endpoint === "departures") {
       return hashify(ctx, await departuresApi(ctx, params));
     }
     throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);

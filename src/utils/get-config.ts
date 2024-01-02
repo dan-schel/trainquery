@@ -14,7 +14,7 @@ export function getConfig() {
 export async function initConfig(latestHash: string) {
   const existing = getExistingConfig();
 
-  if (existing != null && existing.hash == latestHash) {
+  if (existing != null && existing.hash === latestHash) {
     config = existing;
     return;
   }

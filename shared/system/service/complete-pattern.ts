@@ -41,7 +41,7 @@ export class CompletePattern {
   }
 
   requireServedStop(stopListIndex: number) {
-    const stop = this.stops.find((s) => s.stopListIndex == stopListIndex);
+    const stop = this.stops.find((s) => s.stopListIndex === stopListIndex);
     if (stop == null || stop.express) {
       throw new Error("Stop missing or is express.");
     }
@@ -49,6 +49,6 @@ export class CompletePattern {
   }
 
   getStop(stopListIndex: number): ServedStop | SkippedStop | null {
-    return this.stops.find((s) => s.stopListIndex == stopListIndex) ?? null;
+    return this.stops.find((s) => s.stopListIndex === stopListIndex) ?? null;
   }
 }

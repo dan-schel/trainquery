@@ -39,10 +39,10 @@ export function guessPlatform(
   const platforms = requireStop(ctx.getConfig(), stop).platforms;
 
   // This only really gets interesting if there are at least two platforms.
-  if (platforms.length == 0) {
+  if (platforms.length === 0) {
     return null;
   }
-  if (platforms.length == 1) {
+  if (platforms.length === 1) {
     return {
       confidence: "high",
       id: platforms[0].id,
@@ -67,7 +67,7 @@ export function guessPlatform(
       return rulesForPlatform.some((x) => x.matches(service));
     });
 
-  if (eligiblePlatforms.length == 1) {
+  if (eligiblePlatforms.length === 1) {
     return {
       confidence: rulesForStop.confidence,
       id: eligiblePlatforms[0],

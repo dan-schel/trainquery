@@ -89,7 +89,7 @@ export class YBranchRoute extends Route {
   }
 
   static detect(route: Route): route is YBranchRoute {
-    return route.type == "y-branch";
+    return route.type === "y-branch";
   }
 
   getStopLists(): StopList[] {

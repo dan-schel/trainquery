@@ -42,17 +42,17 @@ export class QWeekdayRange {
 
   static parse(input: string) {
     input = input.toUpperCase();
-    if (input.length != 7) {
+    if (input.length !== 7) {
       return null;
     }
     return new QWeekdayRange(
-      input[0] == "M",
-      input[1] == "T",
-      input[2] == "W",
-      input[3] == "T",
-      input[4] == "F",
-      input[5] == "S",
-      input[6] == "S",
+      input[0] === "M",
+      input[1] === "T",
+      input[2] === "W",
+      input[3] === "T",
+      input[4] === "F",
+      input[5] === "S",
+      input[6] === "S",
     );
   }
 

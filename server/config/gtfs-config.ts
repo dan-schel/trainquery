@@ -126,7 +126,7 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
     if (feed == null) {
       return this.feed;
     } else {
-      return this.subfeeds?.find((f) => f.name == feed) ?? null;
+      return this.subfeeds?.find((f) => f.name === feed) ?? null;
     }
   }
   requireFeedConfig(feed: string | null): GtfsFeedConfig {

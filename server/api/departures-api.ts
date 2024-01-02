@@ -40,7 +40,7 @@ export async function departuresApi(
   );
   const uniqueStops = unique(
     feeds.map((f) => f.stop),
-    (a, b) => a == b,
+    (a, b) => a === b,
   );
 
   if (ctx.gtfs?.data != null) {
@@ -53,7 +53,7 @@ export async function departuresApi(
           new GtfsDepartureSource(ctx, data),
           s,
           time,
-          buckets.filter((b) => b.stop == s),
+          buckets.filter((b) => b.stop === s),
           // (x) => specificizeDeparture(ctx, x.entry, x.date, x.perspectiveIndex),
           (x) =>
             specificizeGtfsDeparture(

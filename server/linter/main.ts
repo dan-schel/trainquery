@@ -8,7 +8,7 @@ import "dotenv/config";
 main();
 
 async function main() {
-  if (process.argv.length != 3) {
+  if (process.argv.length !== 3) {
     console.log("Usage: npm run tqlint -- [url/path to zip]");
     return;
   }
@@ -20,14 +20,14 @@ async function main() {
       throw new Error("URL environment variable not set.");
     }
 
-    if (arg == "online") {
+    if (arg === "online") {
       const configUrl = process.env.CONFIG;
       if (configUrl == null) {
         throw new Error("CONFIG environment variable not set.");
       }
       console.log(`Linting "${configUrl}"...`);
       return new OnlineConfigProvider(configUrl, canonicalUrl);
-    } else if (arg == "offline") {
+    } else if (arg === "offline") {
       const zipOrFolderPath = process.env.CONFIG_OFFLINE;
       if (zipOrFolderPath == null) {
         throw new Error("CONFIG_OFFLINE environment variable not set.");
@@ -44,7 +44,7 @@ async function main() {
     const data = await provider.fetchConfig();
     const results = await lint(data);
 
-    if (results.length == 0) {
+    if (results.length === 0) {
       console.log(`${severityHeader("pass")} Looks good!`);
     } else {
       results.forEach((r) => {

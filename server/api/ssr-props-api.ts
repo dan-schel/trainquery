@@ -13,9 +13,9 @@ export async function ssrRoutePropsApi(
   const page = requireParam(params, "page");
   const path = requireParam(params, "path");
 
-  if (page == "about") {
+  if (page === "about") {
     return getAboutPageProps(ctx);
-  } else if (page == "train") {
+  } else if (page === "train") {
     return getTrainPageProps(ctx, path);
   } else {
     return {};

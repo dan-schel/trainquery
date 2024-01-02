@@ -21,6 +21,7 @@ import {
 } from "@/settings/pinned-widgets";
 import { useSettings } from "@/settings/settings";
 import type { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
+import type { QLocalDateTime } from "shared/qtime/qdatetime";
 
 const props = defineProps<{
   feed: DepartureFeed;
@@ -30,6 +31,9 @@ const props = defineProps<{
   allowPinning: boolean;
   statePerspective: boolean;
   isDefaultFeeds: boolean;
+  time: QLocalDateTime | null;
+  preserveTime: boolean;
+  replaceOnNavigate: boolean;
 }>();
 
 const header = computed(() => {
@@ -37,14 +41,19 @@ const header = computed(() => {
     return {
       title: {
         text: requireStop(getConfig(), props.feed.stop).name,
-        to: getStopPageRoute(getConfig(), props.feed.stop, null, null),
+        to: getStopPageRoute(
+          getConfig(),
+          props.feed.stop,
+          props.preserveTime ? props.time : null,
+          null,
+        ),
       },
       subtitle: {
         text: formatFilter(props.feed.filter, props.feed.stop),
         to: getStopPageRoute(
           getConfig(),
           props.feed.stop,
-          null,
+          props.preserveTime ? props.time : null,
           props.feed.filter,
         ),
       },
@@ -57,7 +66,7 @@ const header = computed(() => {
         to: getStopPageRoute(
           getConfig(),
           props.feed.stop,
-          null,
+          props.preserveTime ? props.time : null,
           props.feed.filter,
         ),
       },
@@ -107,6 +116,7 @@ function handlePin() {
           v-if="header.title.to != null"
           class="link title"
           :to="header.title.to"
+          :replace="replaceOnNavigate"
           >{{ header.title.text }}</RouterLink
         >
         <span v-if="header.title.to == null" class="title">
@@ -119,6 +129,7 @@ function handlePin() {
           v-if="header.subtitle != null && header.subtitle.to != null"
           class="link subtitle"
           :to="header.subtitle.to"
+          :replace="replaceOnNavigate"
           >{{ header.subtitle.text }}</RouterLink
         >
         <span
@@ -148,7 +159,7 @@ function handlePin() {
 
       <div
         class="empty"
-        v-if="!loading && error == null && departures.length == 0"
+        v-if="!loading && error == null && departures.length === 0"
       >
         <Icon id="uil:calendar-slash"></Icon>
         <p>No trains scheduled</p>

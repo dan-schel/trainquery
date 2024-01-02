@@ -68,9 +68,9 @@ const time = ref(parsed.time);
 
 watch(route, () => {
   // For some reason, this is called even when navigating away from the page!
-  if (route.name == "stop") {
+  if (route.name === "stop") {
     const parsed = parseParams();
-    if (parsed.stop != stop.value) {
+    if (parsed.stop !== stop.value) {
       stop.value = parsed.stop;
     }
     if (!parsed.filter.equals(filter.value)) {
@@ -138,7 +138,7 @@ const head = computed(() => {
   }
   return generatePageHead({
     title: stop.value.name,
-    allowIndexing: true,
+    allowIndexing: filter.value.isDefault() && time.value == null,
     canonicalUrl: getStopPageRoute(getConfig(), stop.value.id, null, null),
   });
 });
@@ -174,6 +174,8 @@ useHead(head as UseHeadInput<{}>);
       :state-perspective="false"
       :is-default-feeds="isDefaultFilter"
       :center-single="false"
+      :preserve-time="true"
+      :replace-on-navigate="true"
     ></DepartureGroup>
   </PageContent>
 

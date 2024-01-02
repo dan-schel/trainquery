@@ -11,11 +11,11 @@ import { QWeekdayRange } from "../../qtime/qweekdayrange";
 export function writeTtbl(config: HasSharedConfig, timetable: Timetable) {
   const routeDirectionPairs = unique(
     timetable.entries.map((e) => ({ route: e.route, direction: e.direction })),
-    (a, b) => a.route == b.route && a.direction == b.direction,
+    (a, b) => a.route === b.route && a.direction === b.direction,
   );
 
   const includeSeconds = timetable.entries.some((e) =>
-    e.rows.some((s) => s != null && s.second != 0),
+    e.rows.some((s) => s != null && s.second !== 0),
   );
 
   const grids = routeDirectionPairs
@@ -62,12 +62,12 @@ function writeGrid(
 ): string | null {
   const entries = timetable.entries.filter(
     (e) =>
-      e.route == route &&
-      e.direction == direction &&
+      e.route === route &&
+      e.direction === direction &&
       matchesWdr(e.weekdayRange),
   );
 
-  if (entries.length == 0) {
+  if (entries.length === 0) {
     return null;
   }
 

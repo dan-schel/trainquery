@@ -29,7 +29,7 @@ export function getTerminusString(
 export function getViaString(departure: Departure, patternList: PatternList) {
   const servedStops = patternList
     .slice(1, -1)
-    .filter((x) => x.type == "served");
+    .filter((x) => x.type === "served");
 
   const line = requireLine(getConfig(), departure.line);
   const data: ViaRuleFilteringData = {
@@ -69,40 +69,54 @@ export function getPlatformString(
   }
 
   const name = requirePlatform(getConfig(), perspectiveStop, platform.id).name;
-  return platform.confidence == "low" ? `${name}?` : name;
+  return platform.confidence === "low" ? `${name}?` : name;
 }
 
-export function getTimeString(departure: Departure, now: QUtcDateTime) {
+export function getTimeStrings(departure: Departure, now: QUtcDateTime) {
   // TODO: Use live time when available.
   const time = departure.perspective.scheduledTime;
-  const diff = time.diff(now);
-  if (diff.inMins < 1 && !diff.isNegative) {
-    return "Now";
-  }
-  if (Math.abs(diff.inHrs) <= 2) {
-    return formatDuration(diff);
-  }
 
   const localTime = toLocalDateTimeLuxon(getConfig(), time);
   const nowLocalTime = toLocalDateTimeLuxon(getConfig(), now);
-  return formatRelativeTime(localTime, nowLocalTime);
+  const scheduledTime = formatRelativeTime(localTime, nowLocalTime);
+
+  const diff = time.diff(now);
+  if (diff.inMins < 1 && !diff.isNegative) {
+    return {
+      primary: "Now",
+      secondary: `Scheduled for ${scheduledTime}`,
+    };
+  }
+  if (Math.abs(diff.inHrs) <= 2) {
+    return {
+      primary: formatDuration(diff),
+      secondary: `Scheduled for ${scheduledTime}`,
+    };
+  }
+
+  return {
+    primary: scheduledTime,
+    secondary: null,
+  };
 }
 
 export function getLinesString(departure: Departure) {
   const lineNames = [departure.line, ...departure.associatedLines]
     .map((l) => requireLine(getConfig(), l).name)
     .sort((a, b) => a.localeCompare(b));
-  return `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "lines"}`;
+  return `${listifyAnd(lineNames)} ${
+    lineNames.length === 1 ? "Line" : "lines"
+  }`;
 }
 
 export function getDisruptionsString(
   disruptions: SerializedDisruption[],
 ): string | null {
-  if (disruptions.length == 0) {
+  if (disruptions.length === 0) {
     return null;
   }
 
   return `Possibly affected by ${disruptions.length.toFixed()} ${
-    disruptions.length == 1 ? "disruption" : "disruptions"
+    disruptions.length === 1 ? "disruption" : "disruptions"
   }`;
 }

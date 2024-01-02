@@ -42,8 +42,8 @@ const lines = computed(() => {
       {{ lines.last.name }}
     </RouterLink>
 
-    <span v-if="lines.all.length == 0">No lines</span>
-    <span v-else-if="lines.all.length == 1"> Line</span>
+    <span v-if="lines.all.length === 0">No lines</span>
+    <span v-else-if="lines.all.length === 1"> Line</span>
     <span v-else> lines</span>
   </p>
 </template>

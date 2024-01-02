@@ -140,7 +140,7 @@ async function fetchPtvDisruptions(
       }
       // </TEMP>
 
-      if (d.routes.length != 0) {
+      if (d.routes.length !== 0) {
         const lines = d.routes
           .map((r) => ptvConfig.lines.get(r) ?? null)
           .filter(nonNull);

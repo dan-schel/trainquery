@@ -6,7 +6,7 @@ export function parseMarkdown(markdown: string) {
   const lines = escaped
     .split("\n")
     .map((l) => l.replace(/[\r\t]/, "").trim())
-    .filter((x) => x.length != 0);
+    .filter((x) => x.length !== 0);
 
   let output = "";
   for (const line of lines) {

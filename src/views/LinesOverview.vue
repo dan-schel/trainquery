@@ -15,7 +15,7 @@ const modes = computed(() => {
     .map((s) => ({
       serviceType: s,
       lines: c.lines
-        .filter((l) => l.serviceType == s.id)
+        .filter((l) => l.serviceType === s.id)
         .sort((a, b) => a.name.localeCompare(b.name)),
     }))
     .filter((g) => g.lines.length > 0);

@@ -93,7 +93,7 @@ export class SharedConfig {
       lines: this.lines.map((l) => l.toJSON()),
       urlNames: this.urlNames.toJSON(),
       continuationRules:
-        this.continuationRules.length == 0
+        this.continuationRules.length === 0
           ? undefined
           : this.continuationRules.map((c) => c.toJSON()),
       usePlatforms: this.usePlatforms,

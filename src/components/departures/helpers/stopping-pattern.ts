@@ -20,7 +20,7 @@ export function getStoppingPatternString(
     }
   }
 
-  if (patternList.some((x) => x.type == "unknown")) {
+  if (patternList.some((x) => x.type === "unknown")) {
     return "Unknown stopping pattern";
   }
 
@@ -28,7 +28,7 @@ export function getStoppingPatternString(
   // always be at least two served stops in the list.
   const stops = patternList.map((x, i) => ({
     name: name(x.stop),
-    express: x.type != "served",
+    express: x.type !== "served",
     index: i,
   }));
   const served = stops.slice(1).filter((s) => !s.express);

@@ -16,7 +16,7 @@ import { fetchRealtime } from "./gtfs/realtime/fetch";
 createServer();
 
 async function createServer() {
-  const isProd = process.env.NODE_ENV == "production";
+  const isProd = process.env.NODE_ENV === "production";
   const isOffline = process.argv.includes("offline");
   const useOfflineData =
     process.argv.includes("offline-data") ||

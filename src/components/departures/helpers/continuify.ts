@@ -16,20 +16,20 @@ export function continuify(departure: Departure): PatternList {
     )
     .flat()
     .filter(
-      (e) => e.stint == 0 && e.stopListIndex >= departure.perspectiveIndex,
+      (e) => e.stint === 0 && e.stopListIndex >= departure.perspectiveIndex,
     );
 
   const result: PatternList = [];
   let uncommitted: PatternListElement[] = [];
   const seen = new Set<StopID>();
   for (const entry of lists) {
-    if (seen.has(entry.stop) && entry.type != "express" && entry.stint != 0) {
+    if (seen.has(entry.stop) && entry.type !== "express" && entry.stint !== 0) {
       break;
     }
 
     uncommitted.push(entry);
 
-    if (entry.type == "served") {
+    if (entry.type === "served") {
       seen.add(entry.stop);
       result.push(...uncommitted);
       uncommitted = [];

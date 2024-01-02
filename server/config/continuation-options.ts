@@ -55,7 +55,7 @@ function linear(
 
   // Only services ending at the stop where services continue "from" are
   // relevant.
-  if (thisStopList[thisStopList.length - 1] != group.from) {
+  if (thisStopList[thisStopList.length - 1] !== group.from) {
     return [];
   }
 
@@ -66,7 +66,7 @@ function linear(
     .map((o) => {
       const stopLists = requireLine(config, o).route.getStopLists();
       return stopLists
-        .filter((l) => l.stops[0] == group.from)
+        .filter((l) => l.stops[0] === group.from)
         .map((l) => ({ line: o, route: l.variant, direction: l.direction }));
     })
     .flat();
@@ -83,7 +83,7 @@ function hook(
   }
 
   // Services going in a "down" direction do not have continuations.
-  if (direction == route.reverse.id) {
+  if (direction === route.reverse.id) {
     return [];
   }
 
@@ -92,7 +92,7 @@ function hook(
   return group.lines.map((l) => ({
     line: l,
     route:
-      routeVariant == HookRoute.directID
+      routeVariant === HookRoute.directID
         ? HookRoute.hookedID
         : HookRoute.directID,
     direction: route.reverse.id,

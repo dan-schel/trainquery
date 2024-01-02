@@ -21,15 +21,15 @@ const isSelected = (option: T) => {
   if (props.modelValue == null) {
     return false;
   }
-  return props.keyify(option) == props.modelValue;
+  return props.keyify(option) === props.modelValue;
 };
 </script>
 
 <template>
   <div
     :class="{
-      cupertino: theme == 'cupertino',
-      subtle: theme == 'subtle',
+      cupertino: theme === 'cupertino',
+      subtle: theme === 'subtle',
     }"
   >
     <label v-for="option in options" :key="keyify(option)">

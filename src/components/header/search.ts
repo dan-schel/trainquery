@@ -21,7 +21,7 @@ export type SearchOption = {
 };
 
 /** Returns a search option for each stop. */
-export function searchOptionsStops(): SearchOption[] {
+export function searchOptionsStops(devMode: boolean): SearchOption[] {
   const options: SearchOption[] = [];
 
   options.push(
@@ -31,7 +31,7 @@ export function searchOptionsStops(): SearchOption[] {
         subtitle: stopSubtitle(s),
         icon: "uil:map-marker" as IconID,
         url: getStopPageRoute(getConfig(), s.id, null, null),
-        tags: [],
+        tags: devMode ? [`#${s.id}`] : [],
         data: { stop: s.id },
         boost: 1.2,
       };
@@ -42,7 +42,7 @@ export function searchOptionsStops(): SearchOption[] {
 }
 
 /** Returns a search option for each line. */
-export function searchOptionsLines(): SearchOption[] {
+export function searchOptionsLines(devMode: boolean): SearchOption[] {
   const options: SearchOption[] = [];
 
   options.push(
@@ -52,7 +52,7 @@ export function searchOptionsLines(): SearchOption[] {
         subtitle: formatMode(l.serviceType, { capital: true, line: true }),
         icon: "uil:slider-h-range" as IconID,
         url: getLinePageRoute(getConfig(), l.id),
-        tags: [],
+        tags: devMode ? [`#${l.id}`] : [],
         data: { line: l.id },
         boost: 1,
       };
@@ -62,8 +62,11 @@ export function searchOptionsLines(): SearchOption[] {
 }
 
 /** Returns a search option for each page on the site. */
-export function searchOptionsWholeSite(): SearchOption[] {
-  const options = [...searchOptionsStops(), ...searchOptionsLines()];
+export function searchOptionsWholeSite(devMode: boolean): SearchOption[] {
+  const options = [
+    ...searchOptionsStops(devMode),
+    ...searchOptionsLines(devMode),
+  ];
 
   // options.push({
   //   title: "Train map",
@@ -119,7 +122,7 @@ export function searchOptionsWholeSite(): SearchOption[] {
 
 /** Returns the options (ranked) which best match the query. */
 export function search(query: string, options: SearchOption[]): SearchOption[] {
-  if (query.length == 0 || query.length > 50) {
+  if (query.length === 0 || query.length > 50) {
     return [];
   }
 
@@ -191,14 +194,14 @@ function textify(str: string): string {
 function similarity(query: string, tag: string): number {
   let mismatch = 0;
   for (let i = 0; i < query.length; i++) {
-    if (query[i] == tag[i]) {
+    if (query[i] === tag[i]) {
       continue;
     }
-    if (query[i] == tag[i - 1] || query[i] == tag[i + 1]) {
+    if (query[i] === tag[i - 1] || query[i] === tag[i + 1]) {
       mismatch += 0.8 * Math.pow(0.95, i);
       continue;
     }
-    if (query[i] == tag[i - 2] || query[i] == tag[i + 2]) {
+    if (query[i] === tag[i - 2] || query[i] === tag[i + 2]) {
       mismatch += 0.9 * Math.pow(0.95, i);
       continue;
     }
@@ -212,9 +215,11 @@ function stopSubtitle(stop: Stop): string {
     ignoreSpecialEventsOnlyLines: true,
     sortAlphabetically: true,
   }).map((l) => l.name);
-  if (lineNames.length == 0) {
+  if (lineNames.length === 0) {
     return "No lines";
   }
 
-  return `${listifyAnd(lineNames)} ${lineNames.length == 1 ? "Line" : "lines"}`;
+  return `${listifyAnd(lineNames)} ${
+    lineNames.length === 1 ? "Line" : "lines"
+  }`;
 }

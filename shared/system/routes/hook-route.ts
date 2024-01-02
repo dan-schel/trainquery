@@ -62,7 +62,7 @@ export class HookRoute extends Route {
   }
 
   static detect(route: Route): route is HookRoute {
-    return route.type == "hook";
+    return route.type === "hook";
   }
 
   getStopLists(): StopList[] {

@@ -21,12 +21,12 @@ const stopList = computed(() => {
       express: s.express,
       stopData: s,
       transparent: i < transparentTo,
-      transparentThreshold: i == transparentTo,
-      firstOfType: i == 0,
-      lastOfType: i == stops.length - 1,
+      transparentThreshold: i === transparentTo,
+      firstOfType: i === 0,
+      lastOfType: i === stops.length - 1,
       firstEver: false,
       lastEver: false,
-      indented: type == "loop" || type == "first-branch",
+      indented: type === "loop" || type === "first-branch",
     }));
   }
 
@@ -68,9 +68,9 @@ const stopList = computed(() => {
           class="tick"
           :class="{
             end:
-              (entry.firstEver && entry.type != 'loop') ||
+              (entry.firstEver && entry.type !== 'loop') ||
               entry.lastEver ||
-              (entry.type == 'first-branch' && entry.lastOfType),
+              (entry.type === 'first-branch' && entry.lastOfType),
             express: entry.express,
           }"
         ></div>
@@ -86,7 +86,7 @@ const stopList = computed(() => {
           width="48"
           height="24"
           view-box="0 0 48 24"
-          v-if="entry.type == 'loop' && entry.firstOfType"
+          v-if="entry.type === 'loop' && entry.firstOfType"
           class="loop-cap"
         >
           <path
@@ -103,7 +103,7 @@ const stopList = computed(() => {
           width="48"
           height="24"
           view-box="0 0 48 24"
-          v-if="entry.type == 'loop' && entry.lastOfType"
+          v-if="entry.type === 'loop' && entry.lastOfType"
           class="loop-join"
         >
           <path
@@ -120,7 +120,7 @@ const stopList = computed(() => {
           width="48"
           height="24"
           view-box="0 0 48 24"
-          v-if="entry.type == 'first-branch' && entry.firstOfType"
+          v-if="entry.type === 'first-branch' && entry.firstOfType"
           class="branch-split"
         >
           <path

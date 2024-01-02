@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -12,7 +12,7 @@
   <body>
     <script>
       const theme = localStorage.getItem("trainquery-theme");
-      if (theme == "light" || theme == "dark") {
+      if (theme === "light" || theme === "dark") {
         document.documentElement.classList.add(theme);
       }
     </script>

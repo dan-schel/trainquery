@@ -40,11 +40,11 @@ watch(
 );
 
 function handleTimeButtonClick() {
-  openDropdown.value = openDropdown.value == "time" ? "none" : "time";
+  openDropdown.value = openDropdown.value === "time" ? "none" : "time";
   emit("update:filter", filterElect.value);
 }
 function handleFilterButtonClick() {
-  openDropdown.value = openDropdown.value == "filter" ? "none" : "filter";
+  openDropdown.value = openDropdown.value === "filter" ? "none" : "filter";
   emit("update:filter", filterElect.value);
 }
 function closeDropdown() {
@@ -52,7 +52,7 @@ function closeDropdown() {
   emit("update:filter", filterElect.value);
 }
 function handleKeyDown(e: KeyboardEvent) {
-  if (e.code == "Escape") {
+  if (e.code === "Escape") {
     openDropdown.value = "none";
     emit("update:filter", filterElect.value);
   }
@@ -108,13 +108,13 @@ onUnmounted(() => {
       <div class="time-dropdown-locator">
         <div
           class="time-dropdown-container"
-          :class="{ open: openDropdown == 'time' }"
+          :class="{ open: openDropdown === 'time' }"
         >
           <div class="bg"></div>
           <TimeControls
             class="content"
             :time="time"
-            :is-shown="openDropdown == 'time'"
+            :is-shown="openDropdown === 'time'"
             @submit="handleTimeSubmit"
           ></TimeControls>
         </div>
@@ -122,7 +122,7 @@ onUnmounted(() => {
       <div class="filter-dropdown-locator">
         <div
           class="filter-dropdown-container"
-          :class="{ open: openDropdown == 'filter' }"
+          :class="{ open: openDropdown === 'filter' }"
         >
           <div class="bg"></div>
           <FilterControls
@@ -135,7 +135,7 @@ onUnmounted(() => {
       </div>
       <div
         class="dropdown-cover"
-        v-if="openDropdown != 'none'"
+        v-if="openDropdown !== 'none'"
         @click="closeDropdown"
       ></div>
     </div>

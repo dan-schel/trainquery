@@ -121,7 +121,7 @@ export class DepartureFilter {
     let arrivals = false;
     let setDownOnly = false;
 
-    for (const term of input.split(" ").filter((f) => f.trim().length != 0)) {
+    for (const term of input.split(" ").filter((f) => f.trim().length !== 0)) {
       if (term.startsWith("line-")) {
         const line = parseIntNull(term.replace("line-", ""));
         if (line == null || !isLineID(line)) {
@@ -146,9 +146,9 @@ export class DepartureFilter {
           return null;
         }
         serviceTypes.push(service);
-      } else if (term == "arr") {
+      } else if (term === "arr") {
         arrivals = true;
-      } else if (term == "sdo") {
+      } else if (term === "sdo") {
         setDownOnly = true;
       } else {
         return null;
@@ -156,10 +156,10 @@ export class DepartureFilter {
     }
 
     return new DepartureFilter(
-      lines.length == 0 ? null : lines,
-      directions.length == 0 ? null : directions,
-      platforms.length == 0 ? null : platforms,
-      serviceTypes.length == 0 ? null : serviceTypes,
+      lines.length === 0 ? null : lines,
+      directions.length === 0 ? null : directions,
+      platforms.length === 0 ? null : platforms,
+      serviceTypes.length === 0 ? null : serviceTypes,
       arrivals,
       setDownOnly,
     );
@@ -173,7 +173,7 @@ export class DepartureFilter {
     }: { ignoreArrivals?: boolean; ignoreSetDownOnly?: boolean } = {},
   ) {
     return (
-      this.asString({ ignoreArrivals, ignoreSetDownOnly }) ==
+      this.asString({ ignoreArrivals, ignoreSetDownOnly }) ===
       other.asString({ ignoreArrivals, ignoreSetDownOnly })
     );
   }
