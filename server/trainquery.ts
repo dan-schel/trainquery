@@ -123,6 +123,10 @@ export abstract class Logger {
   abstract logPersistingGtfs(): void;
   abstract logPersistingGtfsSuccess(): void;
   abstract logPersistingGtfsFailure(err: unknown): void;
+  abstract logRefreshingGtfsRealtime(): void;
+  abstract logRefreshingGtfsRealtimeSuccess(): void;
+  abstract logRefreshingGtfsRealtimeFailure(err: unknown): void;
+  abstract logRefreshingGtfsRealtimeCancelled(): void;
 
   abstract logFetchingDisruptions(source: string): void;
   abstract logFetchingDisruptionsSuccess(source: string, count: number): void;

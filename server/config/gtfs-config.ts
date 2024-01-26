@@ -33,11 +33,22 @@ export class GtfsParsingRules {
     );
 }
 
+export class GtfsRealtimeConfig {
+  constructor(readonly refreshSeconds: number) {}
+
+  static readonly json = z
+    .object({
+      refreshSeconds: z.number(),
+    })
+    .transform((x) => new GtfsRealtimeConfig(x.refreshSeconds));
+}
+
 export class GtfsFeedConfig {
   constructor(
     /** Maps the stop IDs used by GTFS to the ones used by TrainQuery. */
     readonly stops: Map<number, StopID>,
     readonly parsing: Map<LineID, GtfsParsingRules>,
+    readonly realtime: GtfsRealtimeConfig | null,
   ) {}
 
   getParsingRulesForLine(line: LineID) {
@@ -47,10 +58,11 @@ export class GtfsFeedConfig {
   static readonly rawJson = z.object({
     stops: mapJson(IntStringJson, StopIDJson),
     parsing: mapJson(LineIDStringJson, GtfsParsingRules.json),
+    realtime: GtfsRealtimeConfig.json.optional(),
   });
 
   static transform(x: z.infer<typeof GtfsFeedConfig.rawJson>) {
-    return new GtfsFeedConfig(x.stops, x.parsing);
+    return new GtfsFeedConfig(x.stops, x.parsing, x.realtime ?? null);
   }
 }
 
@@ -60,8 +72,9 @@ export class GtfsSubfeedConfig extends GtfsFeedConfig {
     readonly path: string,
     stops: Map<number, StopID>,
     parsing: Map<LineID, GtfsParsingRules>,
+    realtime: GtfsRealtimeConfig | null,
   ) {
-    super(stops, parsing);
+    super(stops, parsing, realtime);
   }
 
   static readonly json = GtfsFeedConfig.rawJson
@@ -70,7 +83,14 @@ export class GtfsSubfeedConfig extends GtfsFeedConfig {
       path: z.string(),
     })
     .transform(
-      (x) => new GtfsSubfeedConfig(x.name, x.path, x.stops, x.parsing),
+      (x) =>
+        new GtfsSubfeedConfig(
+          x.name,
+          x.path,
+          x.stops,
+          x.parsing,
+          x.realtime ?? null,
+        ),
     );
 }
 

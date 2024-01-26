@@ -16,6 +16,7 @@ export function applyRealtimeData(
   config: HasSharedConfig,
   schedule: GtfsData,
   realtime: GtfsRealtimeData,
+  gtfsSubfeedID: string | null,
   logError?: ErrorLogger,
 ): GtfsData {
   const timeUpdateError = (message: string) => {
@@ -33,6 +34,9 @@ export function applyRealtimeData(
       return trip;
     };
 
+    if (trip.gtfsSubfeedID !== gtfsSubfeedID) {
+      return trip;
+    }
     const matchingUpdate = getMatchingTripUpdate(trip, realtime);
     if (matchingUpdate == null) {
       return trip;

@@ -51,6 +51,7 @@ async function fetchToFile(
   file: string,
 ): Promise<transit_realtime.FeedMessage> {
   const response = await fetch(
+    // TODO: Shouldn't be hardcoded!
     `https://data-exchange-api.vicroads.vic.gov.au/opendata/v1/gtfsr/metrotrain-${api}`,
     {
       headers: {

@@ -1,19 +1,12 @@
-import path from "path";
-import fsp from "fs/promises";
-import {
-  deleteDataFolder,
-  download,
-  extractZip,
-  generateDataFolderPath,
-} from "../config/download-utils";
 import { TrainQuery } from "../trainquery";
 import { GtfsData } from "./data/gtfs-data";
-import { GtfsConfig } from "../config/gtfs-config";
-import { parseGtfsFiles } from "./parse-gtfs-files";
-import AdmZip from "adm-zip";
+import { GtfsConfig, GtfsFeedConfig } from "../config/gtfs-config";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 import { QTime } from "../../shared/qtime/qtime";
+import { downloadGtfs } from "./fetch";
+import { fetchRealtime } from "./realtime/fetch";
+import { applyRealtimeData } from "./realtime/apply-realtime-data";
 
 // How often to CHECK if the data is outdated. We should check far more often
 // than the refresh interval itself because when the data is pulled from the
@@ -88,7 +81,51 @@ export class GtfsWorker {
       if (this._gtfsConfig.isOnlineSource()) {
         setInterval(refreshIfNeeded, checkOutdatedInterval);
       }
+
+      // Finally, start polling for realtime updates if appropriate.
+      if (!this._ctx.isOffline) {
+        this._initRealtime();
+      }
     })();
+  }
+
+  private _initRealtime() {
+    const init = (feed: GtfsFeedConfig, gtfsSubfeedID: string | null) => {
+      const realtimeConfig = feed.realtime;
+      if (realtimeConfig == null) {
+        return;
+      }
+
+      const refresh = async () => {
+        this._ctx.logger.logRefreshingGtfsRealtime();
+        const schedule = this._data;
+        if (schedule == null) {
+          this._ctx.logger.logRefreshingGtfsRealtimeCancelled();
+          return;
+        }
+
+        try {
+          const realtimeData = await fetchRealtime();
+          this._data = applyRealtimeData(
+            this._ctx.getConfig(),
+            schedule,
+            realtimeData,
+            gtfsSubfeedID,
+          );
+          this._ctx.logger.logRefreshingGtfsRealtimeSuccess();
+        } catch (err) {
+          this._ctx.logger.logRefreshingGtfsRealtimeFailure(err);
+        }
+      };
+      refresh();
+      setInterval(refresh, realtimeConfig.refreshSeconds * 1000);
+    };
+
+    if (this._gtfsConfig.usesSubfeeds) {
+      this._gtfsConfig.subfeeds.forEach((x) => init(x, x.name));
+    } else {
+      init(this._gtfsConfig.feed, null);
+    }
   }
 
   private async _refresh() {
@@ -120,51 +157,5 @@ export class GtfsWorker {
 
   get data() {
     return this._data;
-  }
-}
-
-async function downloadGtfs(
-  ctx: TrainQuery,
-  gtfsConfig: GtfsConfig<true> | GtfsConfig<false>,
-): Promise<GtfsData> {
-  const dataFolder = generateDataFolderPath();
-
-  const zipPath = gtfsConfig.isOnlineSource()
-    ? path.join(dataFolder, "gtfs.zip")
-    : gtfsConfig.staticData;
-
-  await fsp.mkdir(dataFolder);
-
-  if (gtfsConfig.isOnlineSource()) {
-    await download(gtfsConfig.staticData, zipPath);
-  }
-
-  const zip = new AdmZip(zipPath);
-  await extractZip(zip, dataFolder);
-
-  if (gtfsConfig.usesSubfeeds) {
-    const parsedFeeds: GtfsData[] = [];
-    for (const subfeed of gtfsConfig.subfeeds) {
-      const subzipPath = path.join(dataFolder, subfeed.path);
-      const subzip = new AdmZip(subzipPath);
-      const subfeedDirectory = path.join(
-        dataFolder,
-        path.dirname(subfeed.path),
-      );
-      await extractZip(subzip, subfeedDirectory);
-
-      const data = await parseGtfsFiles(ctx, subfeedDirectory, subfeed);
-      parsedFeeds.push(data);
-    }
-
-    await deleteDataFolder(dataFolder);
-    return GtfsData.merge(
-      parsedFeeds,
-      gtfsConfig.subfeeds.map((f) => f.name),
-    );
-  } else {
-    const data = await parseGtfsFiles(ctx, dataFolder, gtfsConfig.feed);
-    await deleteDataFolder(dataFolder);
-    return data;
   }
 }
