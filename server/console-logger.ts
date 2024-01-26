@@ -59,17 +59,17 @@ export class ConsoleLogger extends Logger {
     console.warn("[GTFS] Failed to save GTFS data to database.", err);
   }
   logRefreshingGtfsRealtime(): void {
-    console.log("[GTFS] Refreshing realtime data...");
+    console.log("[GTFS-R] Refreshing realtime data...");
   }
   logRefreshingGtfsRealtimeSuccess(): void {
-    console.log("[GTFS] Successfully refreshed realtime data.");
+    console.log("[GTFS-R] Successfully refreshed realtime data.");
   }
   logRefreshingGtfsRealtimeFailure(err: unknown): void {
-    console.warn("[GTFS] Failed to refresh realtime data.", err);
+    console.warn("[GTFS-R] Failed to refresh realtime data.", err);
   }
   logRefreshingGtfsRealtimeCancelled(): void {
     console.log(
-      "[GTFS] Cancelled refreshing realtime data (no schedule data available yet).",
+      "[GTFS-R] Cancelled refreshing realtime data (no schedule data available yet).",
     );
   }
 

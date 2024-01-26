@@ -181,4 +181,20 @@ export class GtfsTrip {
   ) {
     return trips.some((t) => t.hasIDPair(gtfsTripID, continuationIndex));
   }
+
+  /**
+   * Returns the same trip with the live data removed (if this object was an
+   * instance of GtfsRealtimeTrip).
+   */
+  withoutLiveData() {
+    return new GtfsTrip(
+      this.idPairs,
+      this.gtfsSubfeedID,
+      this.vetoedCalendars,
+      this.line,
+      this.route,
+      this.direction,
+      this.times,
+    );
+  }
 }

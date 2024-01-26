@@ -8,6 +8,7 @@ import { SearchTimeRange, fetchAndSort } from "./search-time-range";
 import { GtfsTrip } from "../gtfs/data/gtfs-trip";
 import { GtfsData } from "../gtfs/data/gtfs-data";
 import { GtfsCalendar } from "../gtfs/data/gtfs-calendar";
+import { GtfsRealtimeTrip } from "../gtfs/data/gtfs-realtime-trip";
 
 export type GtfsPossibility = {
   trip: GtfsTrip;
@@ -116,7 +117,15 @@ function getForSearchTime(
       if (stopList.stops[i] !== stop) {
         continue;
       }
-      const time = trip.times[i];
+
+      let time = trip.times[i];
+      if (
+        GtfsRealtimeTrip.isRealtime(trip) &&
+        trip.liveDate.equals(searchTime.date)
+      ) {
+        time = trip.liveTimes[i];
+      }
+
       if (time == null) {
         continue;
       }

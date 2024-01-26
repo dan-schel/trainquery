@@ -71,4 +71,8 @@ export class GtfsRealtimeTrip extends GtfsTrip {
       isCancelled,
     );
   }
+
+  static isRealtime(x: GtfsTrip): x is GtfsRealtimeTrip {
+    return "liveDate" in x;
+  }
 }

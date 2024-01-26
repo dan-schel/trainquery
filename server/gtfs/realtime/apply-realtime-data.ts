@@ -1,4 +1,4 @@
-import { nonNull, parseIntNull } from "@schel-d/js-utils";
+import { nonNull } from "@schel-d/js-utils";
 import { QDate } from "../../../shared/qtime/qdate";
 import { ErrorLogger } from "../../../shared/utils";
 import { GtfsData } from "../data/gtfs-data";
@@ -10,6 +10,7 @@ import { QTimetableTime } from "../../../shared/qtime/qtime";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { toLocalDateTimeLuxon } from "../../../shared/qtime/luxon-conversions";
 import { HasSharedConfig } from "../../../shared/system/config-utils";
+import Long from "long";
 
 /** Enhance the scheduled GTFS data by enhancing trips with the realtime data. */
 export function applyRealtimeData(
@@ -31,15 +32,15 @@ export function applyRealtimeData(
       if (logError != null) {
         logError(message);
       }
-      return trip;
+      return trip.withoutLiveData();
     };
 
     if (trip.gtfsSubfeedID !== gtfsSubfeedID) {
-      return trip;
+      return trip.withoutLiveData();
     }
     const matchingUpdate = getMatchingTripUpdate(trip, realtime);
     if (matchingUpdate == null) {
-      return trip;
+      return trip.withoutLiveData();
     }
 
     // Parse the date, making sure it's provided, and valid.
@@ -47,7 +48,7 @@ export function applyRealtimeData(
       return tripError("Missing start date in trip update.");
     }
     const liveDate = QDate.parse(matchingUpdate.trip.startDate);
-    if (liveDate == null || liveDate.isValid().valid) {
+    if (liveDate == null || !liveDate.isValid().valid) {
       return tripError("Invalid start date in trip update.");
     }
 
@@ -63,14 +64,13 @@ export function applyRealtimeData(
         }
         const timeEvent =
           transit_realtime.TripUpdate.StopTimeEvent.create(timeEventRaw);
-        const timeString = timeEvent.time;
-        if (typeof timeString !== "string") {
-          return timeUpdateError("Time was not a string as expected.");
-        }
-        const timeUnixSeconds = parseIntNull(timeString);
-        if (timeUnixSeconds == null) {
-          return timeUpdateError("Time string was not parsable to an integer.");
-        }
+        const timeUnixSecondsLong = timeEvent.time as number | Long;
+
+        // TODO: Y2K28 bug here?
+        const timeUnixSeconds =
+          typeof timeUnixSecondsLong === "number"
+            ? timeUnixSecondsLong
+            : timeUnixSecondsLong.toNumber();
 
         const datetime = QUtcDateTime.fromUnixSeconds(timeUnixSeconds);
         const localDateTime = toLocalDateTimeLuxon(config, datetime);

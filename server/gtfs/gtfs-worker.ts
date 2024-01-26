@@ -83,9 +83,11 @@ export class GtfsWorker {
       }
 
       // Finally, start polling for realtime updates if appropriate.
-      if (!this._ctx.isOffline) {
-        this._initRealtime();
-      }
+      // <TEMP - UNCOMMENT>
+      // if (!this._ctx.isOffline) {
+      this._initRealtime();
+      // }
+      // </TEMP - UNCOMMENT>
     })();
   }
 
