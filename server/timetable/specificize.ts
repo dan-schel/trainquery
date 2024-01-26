@@ -16,6 +16,8 @@ import { Departure } from "../../shared/system/service/departure";
 import { GtfsServiceIDComponents } from "../gtfs/gtfs-service-id";
 import { getGtfsService } from "./get-service";
 import { GtfsTrip, GtfsTripIDPair } from "../gtfs/data/gtfs-trip";
+import { GtfsRealtimeTrip } from "../gtfs/data/gtfs-realtime-trip";
+import { itsOk } from "@schel-d/js-utils";
 
 export function specificize(
   ctx: TrainQuery,
@@ -103,6 +105,11 @@ export function specificizeGtfsTrip(
   const stopList = line.route.requireStopList(trip.route, trip.direction);
   const offset = ctx.getConfig().computed.offset.get(date);
 
+  const liveTimes =
+    GtfsRealtimeTrip.isRealtime(trip) && trip.liveDate.equals(date)
+      ? trip.liveTimes
+      : null;
+
   const stoppingPattern = new CompletePattern(
     trip.times.map((r, i) => {
       if (r == null) {
@@ -110,6 +117,10 @@ export function specificizeGtfsTrip(
       }
 
       const time = toUTCDateTime(date, r.time, offset);
+      const liveTime =
+        liveTimes != null && liveTimes[i] != null
+          ? toUTCDateTime(date, itsOk(liveTimes[i]).time, offset)
+          : null;
       const platform = platforms[i];
       const setsDown = stopList.setsDown[i].matches(trip.direction);
       const picksUp = stopList.picksUp[i].matches(trip.direction);
@@ -118,7 +129,7 @@ export function specificizeGtfsTrip(
         stopList.stops[i],
         i,
         time,
-        null,
+        liveTime,
         setsDown,
         picksUp,
         platform,

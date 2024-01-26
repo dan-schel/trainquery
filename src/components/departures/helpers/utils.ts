@@ -73,31 +73,60 @@ export function getPlatformString(
 }
 
 export function getTimeStrings(departure: Departure, now: QUtcDateTime) {
-  // TODO: Use live time when available.
-  const time = departure.perspective.scheduledTime;
+  const scheduledTime = departure.perspective.scheduledTime;
+  const liveTime = departure.perspective.liveTime;
+  const effectiveTime = liveTime ?? scheduledTime;
+  const delayString = getDelayString(liveTime, scheduledTime);
+  const scheduledString = getScheduledString(scheduledTime, now);
 
-  const localTime = toLocalDateTimeLuxon(getConfig(), time);
-  const nowLocalTime = toLocalDateTimeLuxon(getConfig(), now);
-  const scheduledTime = formatRelativeTime(localTime, nowLocalTime);
+  const diff = effectiveTime.diff(now);
 
-  const diff = time.diff(now);
   if (diff.inMins < 1 && !diff.isNegative) {
     return {
       primary: "Now",
-      secondary: `Scheduled for ${scheduledTime}`,
+      secondary:
+        delayString != null
+          ? `${delayString} (scheduled for ${scheduledString})`
+          : `Scheduled for ${scheduledString}`,
     };
   }
   if (Math.abs(diff.inHrs) <= 2) {
     return {
       primary: formatDuration(diff),
-      secondary: `Scheduled for ${scheduledTime}`,
+      secondary:
+        delayString != null
+          ? `${delayString} (scheduled for ${scheduledString})`
+          : `Scheduled for ${scheduledString}`,
     };
   }
 
   return {
-    primary: scheduledTime,
+    primary: scheduledString,
     secondary: null,
   };
+}
+
+function getDelayString(
+  liveTime: QUtcDateTime | null,
+  scheduledTime: QUtcDateTime,
+) {
+  if (liveTime == null) {
+    return null;
+  }
+  const delayMins = liveTime.diff(scheduledTime).inMins;
+  if (delayMins === 0) {
+    return "On time";
+  } else if (delayMins > 0) {
+    return `${delayMins.toFixed()} ${delayMins === 1 ? "min" : "mins"} late`;
+  } else {
+    return `${delayMins.toFixed()} ${delayMins === 1 ? "min" : "mins"} early?`;
+  }
+}
+
+function getScheduledString(scheduledTime: QUtcDateTime, now: QUtcDateTime) {
+  const scheduledLocalTime = toLocalDateTimeLuxon(getConfig(), scheduledTime);
+  const nowLocalTime = toLocalDateTimeLuxon(getConfig(), now);
+  return formatRelativeTime(scheduledLocalTime, nowLocalTime);
 }
 
 export function getLinesString(departure: Departure) {
