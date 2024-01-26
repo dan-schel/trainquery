@@ -22,21 +22,21 @@ export async function fetchRealtime(): Promise<GtfsRealtimeData> {
     key,
     "data-output/trip-updates.txt",
   );
-  const serviceAlerts = await fetchToFile(
-    "servicealerts",
-    key,
-    "data-output/service-alerts.txt",
-  );
-  const vehiclePositions = await fetchToFile(
-    "vehicleposition-updates",
-    key,
-    "data-output/vehicle-positions.txt",
-  );
+  // const serviceAlerts = await fetchToFile(
+  //   "servicealerts",
+  //   key,
+  //   "data-output/service-alerts.txt",
+  // );
+  // const vehiclePositions = await fetchToFile(
+  //   "vehicleposition-updates",
+  //   key,
+  //   "data-output/vehicle-positions.txt",
+  // );
 
   const combined = [
     ...tripUpdates.entity,
-    ...serviceAlerts.entity,
-    ...vehiclePositions.entity,
+    //...serviceAlerts.entity,
+    //...vehiclePositions.entity,
   ];
   return {
     tripUpdates: combined.map((e) => e.tripUpdate ?? null).filter(nonNull),

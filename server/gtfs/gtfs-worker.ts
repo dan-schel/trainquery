@@ -26,6 +26,7 @@ export class GtfsWorker {
 
   constructor(private readonly _ctx: TrainQuery) {
     this._data = null;
+    this._dataNoRealtime = null;
     this._lastAttempt = null;
     const gtfsConfig = this._ctx.getConfig().server.gtfs;
     if (gtfsConfig == null) {
