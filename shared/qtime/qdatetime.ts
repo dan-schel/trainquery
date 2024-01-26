@@ -146,6 +146,22 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
     }
     return result;
   });
+
+  static fromUnixSeconds(unixSeconds: number): QUtcDateTime {
+    const date = new Date(unixSeconds * 1000);
+    return QUtcDateTime.fromJsDate(date);
+  }
+
+  static fromJsDate(date: Date): QUtcDateTime {
+    return new QUtcDateTime(
+      new QDate(
+        date.getUTCFullYear(),
+        date.getUTCMonth() + 1,
+        date.getUTCDate(),
+      ),
+      new QTime(date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()),
+    );
+  }
 }
 export class QLocalDateTime extends QDateTime<QLocalDateTime> {
   constructor(

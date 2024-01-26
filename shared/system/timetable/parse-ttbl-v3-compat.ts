@@ -12,8 +12,7 @@ import { QWeekdayRange } from "../../qtime/qweekdayrange";
 import { QTimetableTime } from "../../qtime/qtime";
 import { LinearRoute } from "../routes/linear-route";
 import { HookRoute } from "../routes/hook-route";
-
-export type ErrorLogger = (error: string) => void;
+import type { ErrorLogger } from "../../utils";
 
 type ErrorProcedure = (error: string) => null;
 

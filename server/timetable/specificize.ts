@@ -13,9 +13,11 @@ import { SkippedStop } from "../../shared/system/service/skipped-stop";
 import { ServedStop } from "../../shared/system/service/served-stop";
 import { Service } from "../../shared/system/service/service";
 import { Departure } from "../../shared/system/service/departure";
-import { GtfsTrip, GtfsTripIDPair } from "../gtfs/gtfs-data";
 import { GtfsServiceIDComponents } from "../gtfs/gtfs-service-id";
-import { getGtfsService } from "./get-service";
+import { getGtfsServiceNoRealtime } from "./get-service";
+import { GtfsTrip, GtfsTripIDPair } from "../gtfs/data/gtfs-trip";
+import { GtfsRealtimeTrip } from "../gtfs/data/gtfs-realtime-trip";
+import { itsOk } from "@schel-d/js-utils";
 
 export function specificize(
   ctx: TrainQuery,
@@ -103,13 +105,22 @@ export function specificizeGtfsTrip(
   const stopList = line.route.requireStopList(trip.route, trip.direction);
   const offset = ctx.getConfig().computed.offset.get(date);
 
+  const liveTimes =
+    GtfsRealtimeTrip.isRealtime(trip) && trip.liveDate.equals(date)
+      ? trip.liveTimes
+      : null;
+
   const stoppingPattern = new CompletePattern(
     trip.times.map((r, i) => {
       if (r == null) {
         return new SkippedStop(stopList.stops[i], i);
       }
 
-      const time = toUTCDateTime(date, r, offset);
+      const time = toUTCDateTime(date, r.time, offset);
+      const liveTime =
+        liveTimes != null && liveTimes[i] != null
+          ? toUTCDateTime(date, itsOk(liveTimes[i]).time, offset)
+          : null;
       const platform = platforms[i];
       const setsDown = stopList.setsDown[i].matches(trip.direction);
       const picksUp = stopList.picksUp[i].matches(trip.direction);
@@ -118,7 +129,7 @@ export function specificizeGtfsTrip(
         stopList.stops[i],
         i,
         time,
-        null,
+        liveTime,
         setsDown,
         picksUp,
         platform,
@@ -170,7 +181,7 @@ function getGtfsTripDebugInfo(
       trip.gtfsSubfeedID,
       date,
     );
-    const originalService = getGtfsService(ctx, originalID);
+    const originalService = getGtfsServiceNoRealtime(ctx, originalID);
 
     if (originalService != null) {
       const url = getServicePageRoute(originalService);

@@ -1,19 +1,16 @@
-import path from "path";
-import fsp from "fs/promises";
-import {
-  deleteDataFolder,
-  download,
-  extractZip,
-  generateDataFolderPath,
-} from "../config/download-utils";
 import { TrainQuery } from "../trainquery";
-import { GtfsData } from "./gtfs-data";
-import { GtfsConfig } from "../config/gtfs-config";
-import { parseGtfsFiles } from "./parse-gtfs-files";
-import AdmZip from "adm-zip";
+import { GtfsData } from "./data/gtfs-data";
+import {
+  GtfsConfig,
+  GtfsFeedConfig,
+  GtfsRealtimeConfig,
+} from "../config/gtfs-config";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 import { QTime } from "../../shared/qtime/qtime";
+import { downloadGtfs } from "./fetch";
+import { GtfsRealtimeData, fetchRealtime } from "./realtime/fetch";
+import { applyRealtimeData } from "./realtime/apply-realtime-data";
 
 // How often to CHECK if the data is outdated. We should check far more often
 // than the refresh interval itself because when the data is pulled from the
@@ -22,17 +19,36 @@ const checkOutdatedInterval = 10 * 60 * 1000;
 
 export class GtfsWorker {
   private _data: GtfsData | null;
+  private _dataNoRealtime: GtfsData | null;
   private readonly _gtfsConfig: GtfsConfig<true> | GtfsConfig<false>;
   private _lastAttempt: QUtcDateTime | null;
+  private _realtimeWorkers: GtfsRealtimeWorker[];
 
   constructor(private readonly _ctx: TrainQuery) {
     this._data = null;
+    this._dataNoRealtime = null;
     this._lastAttempt = null;
     const gtfsConfig = this._ctx.getConfig().server.gtfs;
     if (gtfsConfig == null) {
       throw new Error("Cannot create GTFS worker. No GTFS config provided.");
     }
     this._gtfsConfig = gtfsConfig;
+
+    // Create the realtime workers for each subfeed.
+    const subworker = (x: GtfsFeedConfig, name: string | null) =>
+      new GtfsRealtimeWorker(
+        _ctx,
+        x.realtime,
+        () => this._applyRealtimeData(),
+        name,
+      );
+    if (this._gtfsConfig.usesSubfeeds) {
+      this._realtimeWorkers = this._gtfsConfig.subfeeds.map((x) =>
+        subworker(x, x.name),
+      );
+    } else {
+      this._realtimeWorkers = [subworker(this._gtfsConfig.feed, null)];
+    }
   }
 
   init() {
@@ -44,6 +60,7 @@ export class GtfsWorker {
           this._data = await this._ctx.database.fetchGtfs(
             this._ctx.getConfig().hash,
           );
+          this._applyRealtimeData();
 
           if (this._data != null) {
             this._lastAttempt = this._data.age;
@@ -99,6 +116,7 @@ export class GtfsWorker {
       const data = await downloadGtfs(this._ctx, this._gtfsConfig);
       this._data = data;
       this._ctx.logger.logRefreshingGtfsSuccess();
+      this._applyRealtimeData();
     } catch (err) {
       this._ctx.logger.logRefreshingGtfsFailure(err);
     }
@@ -118,53 +136,106 @@ export class GtfsWorker {
     }
   }
 
-  get data() {
+  private _applyRealtimeData() {
+    if (this._data == null) {
+      return;
+    }
+    let data = this._data.withoutLiveData();
+    this._dataNoRealtime = data;
+    for (const worker of this._realtimeWorkers) {
+      const realtime = worker.getRealtimeData();
+      if (realtime != null) {
+        data = applyRealtimeData(
+          this._ctx.getConfig(),
+          this._data,
+          realtime,
+          worker.gtfsSubfeedID,
+        );
+      }
+    }
+    this._data = data;
+  }
+
+  async getData(): Promise<GtfsData | null> {
+    await Promise.all(this._realtimeWorkers.map((w) => w.prep()));
     return this._data;
+  }
+
+  getDataNoRealtime() {
+    return this._dataNoRealtime;
   }
 }
 
-async function downloadGtfs(
-  ctx: TrainQuery,
-  gtfsConfig: GtfsConfig<true> | GtfsConfig<false>,
-): Promise<GtfsData> {
-  const dataFolder = generateDataFolderPath();
+class GtfsRealtimeWorker {
+  private _realtimeData: GtfsRealtimeData | null;
+  private _dataAge: QUtcDateTime | null;
+  private _pollTimer: NodeJS.Timeout | null;
+  private _inactivityTimer: NodeJS.Timeout | null;
 
-  const zipPath = gtfsConfig.isOnlineSource()
-    ? path.join(dataFolder, "gtfs.zip")
-    : gtfsConfig.staticData;
-
-  await fsp.mkdir(dataFolder);
-
-  if (gtfsConfig.isOnlineSource()) {
-    await download(gtfsConfig.staticData, zipPath);
+  constructor(
+    private readonly _ctx: TrainQuery,
+    readonly config: GtfsRealtimeConfig | null,
+    private readonly _realtimeDataChanged: () => void,
+    readonly gtfsSubfeedID: string | null,
+  ) {
+    this._realtimeData = null;
+    this._dataAge = null;
+    this._pollTimer = null;
+    this._inactivityTimer = null;
   }
 
-  const zip = new AdmZip(zipPath);
-  await extractZip(zip, dataFolder);
+  getRealtimeData(): GtfsRealtimeData | null {
+    return this._realtimeData;
+  }
 
-  if (gtfsConfig.usesSubfeeds) {
-    const parsedFeeds: GtfsData[] = [];
-    for (const subfeed of gtfsConfig.subfeeds) {
-      const subzipPath = path.join(dataFolder, subfeed.path);
-      const subzip = new AdmZip(subzipPath);
-      const subfeedDirectory = path.join(
-        dataFolder,
-        path.dirname(subfeed.path),
-      );
-      await extractZip(subzip, subfeedDirectory);
-
-      const data = await parseGtfsFiles(ctx, subfeedDirectory, subfeed);
-      parsedFeeds.push(data);
+  async prep() {
+    if (this.config == null) {
+      return;
     }
 
-    await deleteDataFolder(dataFolder);
-    return GtfsData.merge(
-      parsedFeeds,
-      gtfsConfig.subfeeds.map((f) => f.name),
-    );
-  } else {
-    const data = await parseGtfsFiles(ctx, dataFolder, gtfsConfig.feed);
-    await deleteDataFolder(dataFolder);
-    return data;
+    if (
+      this._realtimeData == null ||
+      this._dataAge == null ||
+      nowUTCLuxon().diff(this._dataAge).inSecs > this.config.staleAfter
+    ) {
+      await this._refresh();
+    }
+
+    if (this._pollTimer == null) {
+      this._pollTimer = setInterval(
+        () => this._refresh(),
+        this.config.refreshInterval * 1000,
+      );
+    }
+
+    if (this._inactivityTimer != null) {
+      clearTimeout(this._inactivityTimer);
+    }
+    this._inactivityTimer = setTimeout(() => {
+      if (this._pollTimer != null) {
+        clearInterval(this._pollTimer);
+      }
+      this._pollTimer = null;
+    }, this.config.inactivityTimeout * 1000);
+  }
+
+  private async _refresh() {
+    if (this.config == null) {
+      return;
+    }
+
+    this._ctx.logger.logRefreshingGtfsRealtime(this.gtfsSubfeedID);
+
+    try {
+      this._realtimeData = await fetchRealtime();
+      this._dataAge = nowUTCLuxon();
+      this._realtimeDataChanged();
+      this._ctx.logger.logRefreshingGtfsRealtimeSuccess(this.gtfsSubfeedID);
+    } catch (err) {
+      this._ctx.logger.logRefreshingGtfsRealtimeFailure(
+        this.gtfsSubfeedID,
+        err,
+      );
+    }
   }
 }

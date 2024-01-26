@@ -10,7 +10,7 @@ import { CompletePattern } from "../../../shared/system/service/complete-pattern
 import { Service } from "../../../shared/system/service/service";
 import { GtfsServiceIDComponents } from "../../gtfs/gtfs-service-id";
 
-export function getTrainPageProps(ctx: TrainQuery, path: string) {
+export async function getTrainPageProps(ctx: TrainQuery, path: string) {
   const url = new URL(path, "https://example.com");
   const pieces = url.pathname.split("/").filter((x) => x.length !== 0);
   if (pieces.length !== 3) {
@@ -23,7 +23,7 @@ export function getTrainPageProps(ctx: TrainQuery, path: string) {
   if (source === "ttbl") {
     service = getTtblTrain(ctx, idStringss);
   } else if (source === "gtfs") {
-    service = getGtfsTrain(ctx, idStringss);
+    service = await getGtfsTrain(ctx, idStringss);
   }
 
   if (service == null) {
@@ -76,10 +76,10 @@ function getTtblTrain(
   return getTimetableService(ctx, id);
 }
 
-function getGtfsTrain(
+async function getGtfsTrain(
   ctx: TrainQuery,
   idString: string,
-): Service<CompletePattern> | null {
+): Promise<Service<CompletePattern> | null> {
   // Parse the service ID.
   const id = GtfsServiceIDComponents.decode(idString);
   if (id == null) {
@@ -87,5 +87,5 @@ function getGtfsTrain(
   }
 
   // Fetch the service from the GTFS data.
-  return getGtfsService(ctx, id);
+  return await getGtfsService(ctx, id);
 }

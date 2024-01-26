@@ -16,7 +16,7 @@ export async function ssrRoutePropsApi(
   if (page === "about") {
     return getAboutPageProps(ctx);
   } else if (page === "train") {
-    return getTrainPageProps(ctx, path);
+    return await getTrainPageProps(ctx, path);
   } else {
     return {};
   }

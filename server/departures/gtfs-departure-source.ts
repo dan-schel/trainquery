@@ -2,10 +2,13 @@ import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { getLine, linesThatStopAt } from "../../shared/system/config-utils";
 import { StopID } from "../../shared/system/ids";
-import { GtfsCalendar, GtfsData, GtfsTrip } from "../gtfs/gtfs-data";
 import { TrainQuery } from "../trainquery";
 import { DepartureSource } from "./departure-source";
 import { SearchTimeRange, fetchAndSort } from "./search-time-range";
+import { GtfsTrip } from "../gtfs/data/gtfs-trip";
+import { GtfsData } from "../gtfs/data/gtfs-data";
+import { GtfsCalendar } from "../gtfs/data/gtfs-calendar";
+import { GtfsRealtimeTrip } from "../gtfs/data/gtfs-realtime-trip";
 
 export type GtfsPossibility = {
   trip: GtfsTrip;
@@ -114,16 +117,24 @@ function getForSearchTime(
       if (stopList.stops[i] !== stop) {
         continue;
       }
-      const time = trip.times[i];
+
+      let time = trip.times[i];
+      if (
+        GtfsRealtimeTrip.isRealtime(trip) &&
+        trip.liveDate.equals(searchTime.date)
+      ) {
+        time = trip.liveTimes[i];
+      }
+
       if (time == null) {
         continue;
       }
-      if (time.isWithin(searchTime.min, searchTime.max)) {
+      if (time.time.isWithin(searchTime.min, searchTime.max)) {
         result.push({
           trip: trip,
           date: searchTime.date,
           gtfsCalendarID: applicableCalendar.gtfsCalendarID,
-          sortTime: searchTime.getSortTime(time),
+          sortTime: searchTime.getSortTime(time.time),
           perspectiveIndex: i,
         });
       }

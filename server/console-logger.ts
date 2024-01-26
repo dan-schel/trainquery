@@ -5,9 +5,9 @@ import { Logger, Server } from "./trainquery";
 export class ConsoleLogger extends Logger {
   logServerListening(server: Server): void {
     if (server instanceof ExpressServer) {
-      console.log(`Server listening on port ${server.port}.`);
+      console.log(`[WEB] Server listening on port ${server.port}.`);
     } else {
-      console.log("Server ready.");
+      console.log("[WEB] Server ready.");
     }
   }
 
@@ -17,55 +17,69 @@ export class ConsoleLogger extends Logger {
     const hash = config.hash;
     const verb = initial ? "Loaded" : "Refreshed";
     console.log(
-      `${verb} config "${hash}" (${stopCount} stop(s), ${lineCount} line(s)).`,
+      `[CONFIG] ${verb} config "${hash}" (${stopCount} stop(s), ${lineCount} line(s)).`,
     );
   }
   logConfigRefreshFailure(err: unknown): void {
-    console.log("Failed to refresh config.", err);
+    console.log("[CONFIG] Failed to refresh config.", err);
   }
 
   logTimetableLoadFail(path: string): void {
-    console.log(`Failed to load timetable "${path}".`);
+    console.log(`[CONFIG] Failed to load timetable "${path}".`);
   }
 
   logRecallingGtfs(): void {
-    console.log("Retrieving GTFS data from database...");
+    console.log("[GTFS] Retrieving GTFS data from database...");
   }
   logRecallingGtfsSuccess(): void {
-    console.log("Successfully retrieved GTFS data from database.");
+    console.log("[GTFS] Successfully retrieved GTFS data from database.");
   }
   logRecallingGtfsEmpty(): void {
-    console.log("No GTFS data was found in the database.");
+    console.log("[GTFS] No GTFS data was found in the database.");
   }
   logRecallingGtfsFailure(err: unknown): void {
-    console.warn("Failed to retrieve GTFS data from database.", err);
+    console.warn("[GTFS] Failed to retrieve GTFS data from database.", err);
   }
   logRefreshingGtfs(): void {
-    console.log("Refreshing/parsing GTFS data...");
+    console.log("[GTFS] Refreshing/parsing GTFS data...");
   }
   logRefreshingGtfsSuccess(): void {
-    console.log("Successfully refreshed/parsed GTFS data.");
+    console.log("[GTFS] Successfully refreshed/parsed GTFS data.");
   }
   logRefreshingGtfsFailure(err: unknown): void {
-    console.warn("Failed to refresh/parse GTFS data.", err);
+    console.warn("[GTFS] Failed to refresh/parse GTFS data.", err);
   }
   logPersistingGtfs(): void {
-    console.log("Saving GTFS to database...");
+    console.log("[GTFS] Saving GTFS to database...");
   }
   logPersistingGtfsSuccess(): void {
-    console.log("Successfully saved GTFS data to database.");
+    console.log("[GTFS] Successfully saved GTFS data to database.");
   }
   logPersistingGtfsFailure(err: unknown): void {
-    console.warn("Failed to save GTFS data to database.", err);
+    console.warn("[GTFS] Failed to save GTFS data to database.", err);
+  }
+  logRefreshingGtfsRealtime(): void {
+    // console.log("[GTFS-R] Refreshing realtime data...");
+  }
+  logRefreshingGtfsRealtimeSuccess(): void {
+    console.log("[GTFS-R] Successfully refreshed realtime data.");
+  }
+  logRefreshingGtfsRealtimeFailure(err: unknown): void {
+    console.warn("[GTFS-R] Failed to refresh realtime data.", err);
   }
 
   logFetchingDisruptions(source: string): void {
-    console.log(`Fetching disruptions from "${source}"...`);
+    console.log(`[DISRUPTIONS] Fetching disruptions from "${source}"...`);
   }
   logFetchingDisruptionsSuccess(source: string, count: number): void {
-    console.log(`Successfully fetched ${count} disruptions from "${source}".`);
+    console.log(
+      `[DISRUPTIONS] Successfully fetched ${count} disruptions from "${source}".`,
+    );
   }
   logFetchingDisruptionsFailure(source: string, err: unknown): void {
-    console.warn(`Failed to fetch disruptions from "${source}".`, err);
+    console.warn(
+      `[DISRUPTIONS] Failed to fetch disruptions from "${source}".`,
+      err,
+    );
   }
 }

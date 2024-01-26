@@ -10,8 +10,7 @@ import {
 import { QDate } from "../../qtime/qdate";
 import { QWeekdayRange } from "../../qtime/qweekdayrange";
 import { QTimetableTime } from "../../qtime/qtime";
-
-export type ErrorLogger = (error: string) => void;
+import type { ErrorLogger } from "../../utils";
 
 type ErrorProcedure = (error: string) => null;
 

@@ -43,29 +43,31 @@ export async function departuresApi(
     (a, b) => a === b,
   );
 
-  if (ctx.gtfs?.data != null) {
-    const data = ctx.gtfs.data;
-    await Promise.all(
-      uniqueStops.map((s) =>
-        // getDepartures<TimetablePossibility, Departure>(
-        getDepartures<GtfsPossibility, Departure>(
-          // new TimetableDepartureSource(ctx),
-          new GtfsDepartureSource(ctx, data),
-          s,
-          time,
-          buckets.filter((b) => b.stop === s),
-          // (x) => specificizeDeparture(ctx, x.entry, x.date, x.perspectiveIndex),
-          (x) =>
-            specificizeGtfsDeparture(
-              ctx,
-              x.trip,
-              x.gtfsCalendarID,
-              x.date,
-              x.perspectiveIndex,
-            ),
+  if (ctx.gtfs != null) {
+    const data = await ctx.gtfs.getData();
+    if (data != null) {
+      await Promise.all(
+        uniqueStops.map((s) =>
+          // getDepartures<TimetablePossibility, Departure>(
+          getDepartures<GtfsPossibility, Departure>(
+            // new TimetableDepartureSource(ctx),
+            new GtfsDepartureSource(ctx, data),
+            s,
+            time,
+            buckets.filter((b) => b.stop === s),
+            // (x) => specificizeDeparture(ctx, x.entry, x.date, x.perspectiveIndex),
+            (x) =>
+              specificizeGtfsDeparture(
+                ctx,
+                x.trip,
+                x.gtfsCalendarID,
+                x.date,
+                x.perspectiveIndex,
+              ),
+          ),
         ),
-      ),
-    );
+      );
+    }
   } else {
     console.log("Departures empty since GTFS is not loaded yet.");
   }
