@@ -91,4 +91,18 @@ export class GtfsData {
       this.age,
     );
   }
+
+  /**
+   * Returns the same data, but with the realtime trips stripped of their live
+   * data.
+   */
+  withoutLiveData() {
+    return new GtfsData(
+      this.calendars,
+      this.trips.map((t) => t.withoutLiveData()),
+      this.configHash,
+      this.parsingReport,
+      this.age,
+    );
+  }
 }

@@ -14,7 +14,7 @@ import { ServedStop } from "../../shared/system/service/served-stop";
 import { Service } from "../../shared/system/service/service";
 import { Departure } from "../../shared/system/service/departure";
 import { GtfsServiceIDComponents } from "../gtfs/gtfs-service-id";
-import { getGtfsService } from "./get-service";
+import { getGtfsServiceNoRealtime } from "./get-service";
 import { GtfsTrip, GtfsTripIDPair } from "../gtfs/data/gtfs-trip";
 import { GtfsRealtimeTrip } from "../gtfs/data/gtfs-realtime-trip";
 import { itsOk } from "@schel-d/js-utils";
@@ -181,7 +181,7 @@ function getGtfsTripDebugInfo(
       trip.gtfsSubfeedID,
       date,
     );
-    const originalService = getGtfsService(ctx, originalID);
+    const originalService = getGtfsServiceNoRealtime(ctx, originalID);
 
     if (originalService != null) {
       const url = getServicePageRoute(originalService);

@@ -34,13 +34,26 @@ export class GtfsParsingRules {
 }
 
 export class GtfsRealtimeConfig {
-  constructor(readonly refreshSeconds: number) {}
+  constructor(
+    readonly refreshInterval: number,
+    readonly inactivityTimeout: number,
+    readonly staleAfter: number,
+  ) {}
 
   static readonly json = z
     .object({
-      refreshSeconds: z.number(),
+      refreshInterval: z.number(),
+      inactivityTimeout: z.number(),
+      staleAfter: z.number(),
     })
-    .transform((x) => new GtfsRealtimeConfig(x.refreshSeconds));
+    .transform(
+      (x) =>
+        new GtfsRealtimeConfig(
+          x.refreshInterval,
+          x.inactivityTimeout,
+          x.staleAfter,
+        ),
+    );
 }
 
 export class GtfsFeedConfig {

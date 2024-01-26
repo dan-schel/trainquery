@@ -32,15 +32,25 @@ export function applyRealtimeData(
       if (logError != null) {
         logError(message);
       }
-      return trip.withoutLiveData();
+
+      // Note: Leave the trip as is (do not strip live data), because if we have
+      // multiple subfeed, they'll each have their realtime data applied
+      // one-by-one and we want it all to remain.
+      return trip;
     };
 
     if (trip.gtfsSubfeedID !== gtfsSubfeedID) {
-      return trip.withoutLiveData();
+      // Note: Leave the trip as is (do not strip live data), because if we have
+      // multiple subfeed, they'll each have their realtime data applied
+      // one-by-one and we want it all to remain.
+      return trip;
     }
     const matchingUpdate = getMatchingTripUpdate(trip, realtime);
     if (matchingUpdate == null) {
-      return trip.withoutLiveData();
+      // Note: Leave the trip as is (do not strip live data), because if we have
+      // multiple subfeed, they'll each have their realtime data applied
+      // one-by-one and we want it all to remain.
+      return trip;
     }
 
     // Parse the date, making sure it's provided, and valid.

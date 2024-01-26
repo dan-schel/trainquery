@@ -1,4 +1,5 @@
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
+import { GtfsData } from "../gtfs/data/gtfs-data";
 import { GtfsServiceIDComponents } from "../gtfs/gtfs-service-id";
 import { TrainQuery } from "../trainquery";
 import { getTimetableForDay } from "./get-timetables-for-day";
@@ -35,8 +36,31 @@ export function getTimetableService(
   return service;
 }
 
-export function getGtfsService(ctx: TrainQuery, id: GtfsServiceIDComponents) {
-  const gtfsData = ctx.gtfs?.data;
+export async function getGtfsService(
+  ctx: TrainQuery,
+  id: GtfsServiceIDComponents,
+) {
+  if (ctx.gtfs == null) {
+    return null;
+  }
+  return _getGtfsService(ctx, id, await ctx.gtfs.getData());
+}
+
+export function getGtfsServiceNoRealtime(
+  ctx: TrainQuery,
+  id: GtfsServiceIDComponents,
+) {
+  if (ctx.gtfs == null) {
+    return null;
+  }
+  return _getGtfsService(ctx, id, ctx.gtfs.getDataNoRealtime());
+}
+
+function _getGtfsService(
+  ctx: TrainQuery,
+  id: GtfsServiceIDComponents,
+  gtfsData: GtfsData | null,
+) {
   if (gtfsData == null) {
     return null;
   }
