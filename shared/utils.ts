@@ -73,3 +73,5 @@ export const NumberRangeJson = z.string().transform((x, ctx) => {
   }
   return result;
 });
+
+export type ErrorLogger = (error: string) => void;

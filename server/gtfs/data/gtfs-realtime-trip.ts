@@ -14,6 +14,11 @@ export class GtfsRealtimeTrip extends GtfsTrip {
     line: LineID,
     route: RouteVariantID,
     direction: DirectionID,
+
+    // Note that the scheduled times are still provided, not just the live
+    // times. This is firstly because we want to be able to compare them ("how
+    // many minutes delayed is the service?"), but secondly because when cast as
+    // a GtfsTrip, the realtime data should be completely stripped away.
     times: (TimeWithSequenceNumber | null)[],
 
     /**
@@ -33,6 +38,37 @@ export class GtfsRealtimeTrip extends GtfsTrip {
       route,
       direction,
       times,
+    );
+  }
+
+  /** Enhance a {@link GtfsTrip} with realtime data. */
+  static enhance(
+    trip: GtfsTrip,
+    liveDate: QDate,
+    liveTimes: TimeWithSequenceNumber[],
+    isCancelled: boolean,
+  ): GtfsRealtimeTrip {
+    // Start with the scheduled times, and replace those that have live times
+    // provided, leaving the rest as is.
+    const completeLiveTimes = trip.times.map((t) => {
+      if (t == null) {
+        return null;
+      }
+      const liveTime = liveTimes.find((lt) => lt.sequence === t.sequence);
+      return liveTime ?? t;
+    });
+
+    return new GtfsRealtimeTrip(
+      trip.idPairs,
+      trip.gtfsSubfeedID,
+      trip.vetoedCalendars,
+      trip.line,
+      trip.route,
+      trip.direction,
+      trip.times,
+      liveDate,
+      completeLiveTimes,
+      isCancelled,
     );
   }
 }

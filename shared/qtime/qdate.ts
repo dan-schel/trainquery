@@ -42,6 +42,8 @@ export class QDate {
     readonly month: number,
     readonly day: number,
   ) {}
+
+  // TODO: Rename getValidity()?
   isValid(): { valid: true } | { valid: false; issue: string } {
     const invalid = (issue: string) => ({ valid: false, issue: issue });
 

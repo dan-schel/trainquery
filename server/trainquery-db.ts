@@ -51,6 +51,7 @@ export class TrainQueryDB {
     return this._dbs;
   }
 
+  /** Fetches the GTFS schedule data (not realtime) from the database. */
   async fetchGtfs(configHash: string): Promise<GtfsData | null> {
     const metadataDoc = await this.dbs.gtfs.metadata.findOne();
     if (metadataDoc == null) {
@@ -64,7 +65,11 @@ export class TrainQueryDB {
     const calendarDocs = await this.dbs.gtfs.calendars.find().toArray();
     const tripDocs = await this.dbs.gtfs.trips.find().toArray();
     const calendars = GtfsCalendar.json.array().parse(calendarDocs);
+
+    // Intentionally parses every trip as a GtfsTrip, not a GtfsRealtimeTrip,
+    // because realtime data is not - and should not - be saved to the database.
     const trips = GtfsTrip.json.array().parse(tripDocs);
+
     return new GtfsData(
       calendars,
       trips,
@@ -74,6 +79,10 @@ export class TrainQueryDB {
     );
   }
 
+  /**
+   * Writes the GTFS schedule data (excluding realtime enchancements) to the
+   * database.
+   */
   async writeGtfs(gtfsData: GtfsData) {
     await this.dbs.gtfs.metadata.deleteMany();
     await this.dbs.gtfs.calendars.deleteMany();
@@ -83,6 +92,9 @@ export class TrainQueryDB {
     await this.dbs.gtfs.calendars.insertMany(
       gtfsData.calendars.map((c) => c.toJSON()),
     );
+
+    // Intentionally uses the base GtfsTrip type, not GtfsRealtimeTrip, because
+    // we do not wish to write the realtime data to the database.
     await this.dbs.gtfs.trips.insertMany(gtfsData.trips.map((t) => t.toJSON()));
   }
 }

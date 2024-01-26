@@ -1,6 +1,8 @@
 import { parseIntThrow, posMod } from "@schel-d/js-utils";
 import { type InformalDuration, QDuration } from "./qduration";
 import { z } from "zod";
+import { QDate } from "./qdate";
+import { QLocalDateTime } from "./qdatetime";
 
 export abstract class QTimeBase<T extends QTimeBase<T>> {
   constructor(
@@ -219,6 +221,26 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
       time.hour + (input.startsWith(">") ? 24 : 0),
       time.minute,
       time.second,
+    );
+  }
+
+  /**
+   * Creates a timetable time by considering the duration of a given datetime
+   * from a particular date. Returns null if the datetie occurs before the date,
+   * since timetable times cannot be negative.
+   */
+  static fromDateTime(
+    date: QDate,
+    dateTime: QLocalDateTime,
+  ): QTimetableTime | null {
+    if (dateTime.date.isBefore(date)) {
+      return null;
+    }
+    const days = dateTime.date.diff(date);
+    return new QTimetableTime(
+      dateTime.time.hour + days * 24,
+      dateTime.time.minute,
+      dateTime.time.second,
     );
   }
 

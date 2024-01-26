@@ -32,6 +32,10 @@ export class GtfsTrip {
     readonly line: LineID,
     readonly route: RouteVariantID,
     readonly direction: DirectionID,
+    /**
+     * The scheduled times for this trip. Note that this object might also
+     * provide a liveTimes array if it is a GtfsRealtimeTrip (a derived class).
+     */
     readonly times: (TimeWithSequenceNumber | null)[],
   ) {}
 

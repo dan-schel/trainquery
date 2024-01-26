@@ -6,9 +6,17 @@ import { unique } from "@schel-d/js-utils";
 import { z } from "zod";
 import { nowUTCLuxon } from "../../../shared/qtime/luxon-conversions";
 
+/**
+ * The calendars and trips parsed from the GTFS feeds. If realtime data is
+ * available, it is also stored within this object ({@link liveTrips}).
+ */
 export class GtfsData {
   constructor(
     readonly calendars: GtfsCalendar[],
+    /**
+     * The trips, which may or may not contain realtime data, as
+     * GtfsRealtimeTrip extends GtfsTrip.
+     */
     readonly trips: GtfsTrip[],
     readonly configHash: string,
     readonly parsingReport: GtfsParsingReport,
@@ -68,5 +76,19 @@ export class GtfsData {
 
   isOld(refreshSeconds: number) {
     return this.age.isBeforeOrEqual(nowUTCLuxon().add({ s: -refreshSeconds }));
+  }
+
+  /**
+   * Creates a new GtfsData object, replacing the trips field (designed to be
+   * used to replace some trips with realtime trips).
+   */
+  withTrips(liveTrips: GtfsTrip[]) {
+    return new GtfsData(
+      this.calendars,
+      liveTrips,
+      this.configHash,
+      this.parsingReport,
+      this.age,
+    );
   }
 }
