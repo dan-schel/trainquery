@@ -18,6 +18,7 @@ import type { StopID } from "shared/system/ids";
 import { continuify } from "./helpers/continuify";
 import { useNow } from "@/utils/now-provider";
 import type { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
+import LiveIcon from "./LiveIcon.vue";
 
 const props = defineProps<{
   departure: DepartureWithDisruptions;
@@ -40,7 +41,10 @@ const detail = computed(() => {
     ),
     lineColor: requireLine(getConfig(), props.departure.departure.line).color,
     primaryTimeString: timeStrings.primary,
-    secondaryTimeString: timeStrings.secondary,
+    struckoutTimeString: timeStrings.struckout,
+    scheduleTimeString: timeStrings.schedule,
+    delayTimeString: timeStrings.delay?.text,
+    delayTimeType: timeStrings.delay?.type ?? "neutral",
     linesString: getLinesString(props.departure.departure),
     disruptionsString: getDisruptionsString(props.departure.disruptions),
   };
@@ -61,7 +65,18 @@ const detail = computed(() => {
     <div class="primary">
       <OneLineP class="terminus">{{ detail.terminus }}</OneLineP>
       <OneLineP class="via">{{ detail.via ?? "" }}</OneLineP>
-      <OneLineP class="time">{{ detail.primaryTimeString }}</OneLineP>
+      <div class="time">
+        <OneLineP
+          class="struckout-time"
+          v-if="detail.struckoutTimeString != null"
+          >{{ detail.struckoutTimeString }}</OneLineP
+        >
+        <OneLineP class="primary-time">{{ detail.primaryTimeString }}</OneLineP>
+        <LiveIcon
+          class="icon live-icon"
+          v-if="detail.delayTimeString != null"
+        ></LiveIcon>
+      </div>
     </div>
     <div class="details">
       <OneLineP>{{ detail.stoppingPatternString }}</OneLineP>
@@ -72,12 +87,32 @@ const detail = computed(() => {
           {{ detail.disruptionsString }}
         </OneLineP>
       </div>
-      <div v-else-if="detail.secondaryTimeString != null" class="extra">
+      <div
+        v-else-if="
+          detail.scheduleTimeString != null && detail.delayTimeString != null
+        "
+        class="extra"
+      >
+        <OneLineP
+          class="extra-text delay"
+          :class="{
+            positive: detail.delayTimeType === 'positive',
+            negative: detail.delayTimeType === 'negative',
+          }"
+        >
+          {{ detail.delayTimeString }}
+        </OneLineP>
+        <p>•</p>
         <OneLineP class="extra-text">
-          {{ detail.secondaryTimeString }}
+          {{ detail.scheduleTimeString }}
         </OneLineP>
       </div>
-      <div v-else class="extra">
+      <div v-else-if="detail.scheduleTimeString != null" class="extra">
+        <OneLineP class="extra-text">
+          {{ detail.scheduleTimeString }}
+        </OneLineP>
+      </div>
+      <div v-else class="extra line">
         <OneLineP class="extra-text">{{ detail.linesString }}</OneLineP>
       </div>
     </div>
@@ -109,14 +144,15 @@ const detail = computed(() => {
   row-gap: 0.5rem;
 }
 
-.primary :deep(p) {
-  color: var(--color-accent);
-}
 .terminus :deep(p),
-.time :deep(p),
+.primary-time :deep(p),
 .platform-number {
   font-size: 1rem;
   font-weight: bold;
+}
+
+.struckout-time :deep(p) {
+  font-size: 1rem;
 }
 .via :deep(p),
 .details :deep(p) {
@@ -128,23 +164,55 @@ const detail = computed(() => {
   grid-area: primary;
   flex-direction: row;
   align-items: baseline;
-}
-.via {
-  flex-grow: 1;
-  flex-shrink: 1;
-  min-width: 0;
 
-  margin-left: 0.25rem;
-  margin-right: 1rem;
+  .via {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+
+    margin-left: 0.25rem;
+    margin-right: 1rem;
+  }
+  .terminus {
+    min-width: 0;
+    max-width: 10rem;
+  }
+  .time {
+    min-width: 0;
+    max-width: 10rem;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.25rem;
+
+    // For the "live" icon.
+    position: relative;
+
+    .struckout-time :deep(p) {
+      text-decoration: line-through;
+      color: var(--color-ink-50-on-paper-20);
+    }
+    .struckout-time,
+    .primary-time {
+      min-width: 0;
+      flex-shrink: 1;
+    }
+
+    .live-icon {
+      position: absolute;
+      right: -0.5rem;
+      top: -0.2rem;
+      font-size: 0.6rem;
+    }
+  }
+
+  .terminus :deep(p),
+  .primary-time :deep(p),
+  .via :deep(p),
+  .live-icon {
+    color: var(--color-accent);
+  }
 }
-.terminus {
-  min-width: 0;
-  max-width: 10rem;
-}
-.time {
-  min-width: 0;
-  max-width: 10rem;
-}
+
 .details {
   grid-area: details;
   min-width: 0;
@@ -164,8 +232,18 @@ const detail = computed(() => {
       flex-shrink: 1;
     }
 
-    &:deep(p),
-    .icon {
+    .extra-text.delay {
+      font-weight: bold;
+      &.positive :deep(p) {
+        color: var(--color-success);
+      }
+      &.negative :deep(p) {
+        color: var(--color-error);
+      }
+    }
+
+    &.line :deep(p),
+    &.line .icon {
       color: var(--color-accent);
     }
 

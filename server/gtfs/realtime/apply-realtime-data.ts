@@ -76,7 +76,7 @@ export function applyRealtimeData(
           transit_realtime.TripUpdate.StopTimeEvent.create(timeEventRaw);
         const timeUnixSecondsLong = timeEvent.time as number | Long;
 
-        // TODO: Y2K28 bug here?
+        // TODO: Y2K38 bug here?
         const timeUnixSeconds =
           typeof timeUnixSecondsLong === "number"
             ? timeUnixSecondsLong

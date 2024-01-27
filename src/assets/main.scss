@@ -37,6 +37,10 @@
       "light": #dc0f0f,
       "dark": #ff5252,
     ),
+    "success": (
+      "light": #1bae0e,
+      "dark": #32cf25,
+    ),
     "navbar-glint": (
       "light": transparent,
 
@@ -55,6 +59,12 @@
       "light": #bac3d2,
       "dark": #2f3644,
     ),
+    // Used for struckout text, to avoid layering semi-transparent colors.
+    "ink-50-on-paper-20":
+      (
+        "light": #7a8497,
+        "dark": #727d92,
+      ),
   )
 );
 
