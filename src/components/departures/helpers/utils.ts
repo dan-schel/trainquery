@@ -14,6 +14,7 @@ import type { PlatformID, StopID } from "shared/system/ids";
 import type { ConfidenceLevel } from "shared/system/enums";
 import type { ViaRuleFilteringData } from "shared/system/via-rule";
 import type { SerializedDisruption } from "shared/disruptions/serialized-disruption";
+import type { QDuration } from "shared/qtime/qduration";
 
 export function getTerminusString(
   departure: Departure,
@@ -80,29 +81,27 @@ export function getTimeStrings(departure: Departure, now: QUtcDateTime) {
   const scheduledString = getScheduledString(scheduledTime, now);
 
   const diff = effectiveTime.diff(now);
+  const scheduledDiff = scheduledTime.diff(now);
 
-  if (diff.inMins < 1 && !diff.isNegative) {
+  const formatDiff = (diff: QDuration) =>
+    diff.inMins < 1 && !diff.isNegative ? "Now" : formatDuration(diff);
+
+  if (Math.abs(scheduledDiff.inHrs) <= 2) {
+    const primary = formatDiff(diff);
+    const struckout = formatDiff(scheduledDiff);
     return {
-      primary: "Now",
-      secondary:
-        delayString != null
-          ? `${delayString} (scheduled for ${scheduledString})`
-          : `Scheduled for ${scheduledString}`,
-    };
-  }
-  if (Math.abs(diff.inHrs) <= 2) {
-    return {
-      primary: formatDuration(diff),
-      secondary:
-        delayString != null
-          ? `${delayString} (scheduled for ${scheduledString})`
-          : `Scheduled for ${scheduledString}`,
+      primary: primary,
+      struckout: struckout !== primary ? struckout : null,
+      delay: delayString,
+      schedule: `Scheduled for ${scheduledString}`,
     };
   }
 
   return {
     primary: scheduledString,
-    secondary: null,
+    struckout: null,
+    delay: null,
+    schedule: null,
   };
 }
 
@@ -115,11 +114,22 @@ function getDelayString(
   }
   const delayMins = liveTime.diff(scheduledTime).inMins;
   if (delayMins === 0) {
-    return "On time";
+    return {
+      text: "On time",
+      type: "positive" as const,
+    };
   } else if (delayMins > 0) {
-    return `${delayMins.toFixed()} ${delayMins === 1 ? "min" : "mins"} late`;
+    return {
+      text: `${delayMins.toFixed()} ${delayMins === 1 ? "min" : "mins"} late`,
+      type: "negative" as const,
+    };
   } else {
-    return `${delayMins.toFixed()} ${delayMins === 1 ? "min" : "mins"} early?`;
+    return {
+      text: `${(-delayMins).toFixed()} ${
+        delayMins === -1 ? "min" : "mins"
+      } early?`,
+      type: "neutral" as const,
+    };
   }
 }
 
