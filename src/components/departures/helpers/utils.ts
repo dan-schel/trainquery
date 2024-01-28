@@ -121,7 +121,12 @@ function getDelayString(
   } else if (delayMins > 0) {
     return {
       text: `${delayMins.toFixed()} ${delayMins === 1 ? "min" : "mins"} late`,
-      type: "negative" as const,
+      type:
+        delayMins < 2
+          ? ("positive" as const)
+          : delayMins < 5
+          ? ("medium" as const)
+          : ("negative" as const),
     };
   } else {
     return {

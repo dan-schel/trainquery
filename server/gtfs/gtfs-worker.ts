@@ -35,19 +35,23 @@ export class GtfsWorker {
     this._gtfsConfig = gtfsConfig;
 
     // Create the realtime workers for each subfeed.
-    const subworker = (x: GtfsFeedConfig, name: string | null) =>
-      new GtfsRealtimeWorker(
-        _ctx,
-        x.realtime,
-        () => this._applyRealtimeData(),
-        name,
-      );
-    if (this._gtfsConfig.usesSubfeeds) {
-      this._realtimeWorkers = this._gtfsConfig.subfeeds.map((x) =>
-        subworker(x, x.name),
-      );
+    if (!_ctx.isOffline) {
+      const subworker = (x: GtfsFeedConfig, name: string | null) =>
+        new GtfsRealtimeWorker(
+          _ctx,
+          x.realtime,
+          () => this._applyRealtimeData(),
+          name,
+        );
+      if (this._gtfsConfig.usesSubfeeds) {
+        this._realtimeWorkers = this._gtfsConfig.subfeeds.map((x) =>
+          subworker(x, x.name),
+        );
+      } else {
+        this._realtimeWorkers = [subworker(this._gtfsConfig.feed, null)];
+      }
     } else {
-      this._realtimeWorkers = [subworker(this._gtfsConfig.feed, null)];
+      this._realtimeWorkers = [];
     }
   }
 
@@ -194,9 +198,10 @@ class GtfsRealtimeWorker {
     }
 
     if (
-      this._realtimeData == null ||
-      this._dataAge == null ||
-      nowUTCLuxon().diff(this._dataAge).inSecs > this.config.staleAfter
+      (this._realtimeData == null ||
+        this._dataAge == null ||
+        nowUTCLuxon().diff(this._dataAge).inSecs > this.config.staleAfter) &&
+      this._pollTimer == null
     ) {
       await this._refresh();
     }
@@ -227,7 +232,7 @@ class GtfsRealtimeWorker {
     this._ctx.logger.logRefreshingGtfsRealtime(this.gtfsSubfeedID);
 
     try {
-      this._realtimeData = await fetchRealtime();
+      this._realtimeData = await fetchRealtime(this.config);
       this._dataAge = nowUTCLuxon();
       this._realtimeDataChanged();
       this._ctx.logger.logRefreshingGtfsRealtimeSuccess(this.gtfsSubfeedID);

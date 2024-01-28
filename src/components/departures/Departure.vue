@@ -97,6 +97,7 @@ const detail = computed(() => {
           class="extra-text delay"
           :class="{
             positive: detail.delayTimeType === 'positive',
+            medium: detail.delayTimeType === 'medium',
             negative: detail.delayTimeType === 'negative',
           }"
         >
@@ -236,6 +237,9 @@ const detail = computed(() => {
       font-weight: bold;
       &.positive :deep(p) {
         color: var(--color-success);
+      }
+      &.medium :deep(p) {
+        color: var(--color-warning);
       }
       &.negative :deep(p) {
         color: var(--color-error);
