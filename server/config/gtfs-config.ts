@@ -33,8 +33,17 @@ export class GtfsParsingRules {
     );
 }
 
+/** All supported authentication methods potentially required by GTFS-R API(s). */
+export const GtfsRealtimeAuthMethods = ["none", "melbourne"] as const;
+/** Which authentication method is required by the GTFS-R API(s). */
+export type GtfsRealtimeAuthMethod = (typeof GtfsRealtimeAuthMethods)[number];
+/** Matches a value in {@link GtfsRealtimeAuthMethods}. */
+export const GtfsRealtimeAuthMethodJson = z.enum(GtfsRealtimeAuthMethods);
+
 export class GtfsRealtimeConfig {
   constructor(
+    readonly apis: string[],
+    readonly apiAuth: GtfsRealtimeAuthMethod,
     readonly refreshInterval: number,
     readonly inactivityTimeout: number,
     readonly staleAfter: number,
@@ -42,6 +51,8 @@ export class GtfsRealtimeConfig {
 
   static readonly json = z
     .object({
+      api: z.union([z.string(), z.string().array()]),
+      apiAuth: GtfsRealtimeAuthMethodJson,
       refreshInterval: z.number(),
       inactivityTimeout: z.number(),
       staleAfter: z.number(),
@@ -49,6 +60,8 @@ export class GtfsRealtimeConfig {
     .transform(
       (x) =>
         new GtfsRealtimeConfig(
+          typeof x.api === "string" ? [x.api] : x.api,
+          x.apiAuth,
           x.refreshInterval,
           x.inactivityTimeout,
           x.staleAfter,

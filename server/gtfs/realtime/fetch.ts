@@ -1,8 +1,10 @@
-import fetch from "node-fetch";
+import fetch, { Response } from "node-fetch";
 import { transit_realtime } from "./proto";
-import fsp from "fs/promises";
-import path from "path";
 import { nonNull } from "@schel-d/js-utils";
+import {
+  GtfsRealtimeAuthMethod,
+  GtfsRealtimeConfig,
+} from "../../config/gtfs-config";
 
 export type GtfsRealtimeData = {
   tripUpdates: transit_realtime.ITripUpdate[];
@@ -10,34 +12,14 @@ export type GtfsRealtimeData = {
   vehiclePositions: transit_realtime.IVehiclePosition[];
 };
 
-export async function fetchRealtime(): Promise<GtfsRealtimeData> {
-  const key = process.env.GTFS_REALTIME_KEY;
-
-  if (key == null) {
-    throw new Error("GTFS_REALTIME_KEY environment variable not set.");
-  }
-
-  const tripUpdates = await fetchToFile(
-    "tripupdates",
-    key,
-    "data-output/trip-updates.txt",
+export async function fetchRealtime(
+  config: GtfsRealtimeConfig,
+): Promise<GtfsRealtimeData> {
+  const results = await Promise.all(
+    config.apis.map((api) => fetchToFile(api, config.apiAuth)),
   );
-  // const serviceAlerts = await fetchToFile(
-  //   "servicealerts",
-  //   key,
-  //   "data-output/service-alerts.txt",
-  // );
-  // const vehiclePositions = await fetchToFile(
-  //   "vehicleposition-updates",
-  //   key,
-  //   "data-output/vehicle-positions.txt",
-  // );
 
-  const combined = [
-    ...tripUpdates.entity,
-    //...serviceAlerts.entity,
-    //...vehiclePositions.entity,
-  ];
+  const combined = results.map((e) => e.entity).flat();
   return {
     tripUpdates: combined.map((e) => e.tripUpdate ?? null).filter(nonNull),
     serviceAlerts: combined.map((e) => e.alert ?? null).filter(nonNull),
@@ -47,25 +29,34 @@ export async function fetchRealtime(): Promise<GtfsRealtimeData> {
 
 async function fetchToFile(
   api: string,
-  subscriptionKey: string,
-  file: string,
+  apiAuth: GtfsRealtimeAuthMethod,
 ): Promise<transit_realtime.FeedMessage> {
-  const response = await fetch(
-    // TODO: Shouldn't be hardcoded!
-    `https://data-exchange-api.vicroads.vic.gov.au/opendata/v1/gtfsr/metrotrain-${api}`,
-    {
-      headers: {
-        "Ocp-Apim-Subscription-Key": subscriptionKey,
-      },
-    },
-  );
-
+  const response = await buildRequest(api, apiAuth);
   const buffer = await response.arrayBuffer();
   const bytes = new Uint8Array(buffer);
   const message = transit_realtime.FeedMessage.decode(bytes);
-
-  await fsp.mkdir(path.dirname(file), { recursive: true });
-  await fsp.writeFile(file, JSON.stringify(message.toJSON(), null, 2));
-
   return message;
+}
+
+function buildRequest(
+  api: string,
+  apiAuth: GtfsRealtimeAuthMethod,
+): Promise<Response> {
+  if (apiAuth === "none") {
+    return fetch(api);
+  } else if (apiAuth === "melbourne") {
+    const key = process.env.GTFS_REALTIME_KEY;
+    if (key == null) {
+      throw new Error("GTFS_REALTIME_KEY environment variable not set.");
+    }
+    return fetch(api, {
+      headers: {
+        "Ocp-Apim-Subscription-Key": key,
+      },
+    });
+  } else {
+    throw new Error(
+      `GTFS-R API authentication method "${apiAuth}" is not supported.`,
+    );
+  }
 }
