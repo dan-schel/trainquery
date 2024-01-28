@@ -36,6 +36,10 @@ An unofficial guide to help you navigate Melbourne's train network, built on Vue
     # the API (optional).
     PTV_DEV_ID = "..."
     PTV_DEV_KEY = "..."
+
+    # If using "melbourne" style authentication for a GTFS-R API, the
+    # authentication key (optional).
+    GTFS_REALTIME_KEY = "..."
     ```
 
 4.  Run `npm run dev` (or `npm run build` and `npm run start`)!
