@@ -5,22 +5,22 @@ import { ConfigProvider, TrainQuery, trainQuery } from "./trainquery";
 import { OnlineConfigProvider } from "./config/online-config-provider";
 import { ExpressServer } from "./express-server";
 import { ConsoleLogger } from "./console-logger";
-import { parseIntThrow } from "@schel-d/js-utils";
 import "dotenv/config";
 import { OfflineConfigProvider } from "./config/offline-config-provider";
 import { ssrAppPropsApi } from "./api/ssr-props-api";
 import { TrainQueryDB } from "./trainquery-db";
 import { createSitemapXml } from "./sitemap-xml";
+import { EnvironmentVariables } from "./environment-variables";
 
 createServer();
 
 async function createServer() {
-  const isProd = process.env.NODE_ENV === "production";
+  const isProd = EnvironmentVariables.get().isProduction();
   const isOffline = process.argv.includes("offline");
   const useOfflineData =
     process.argv.includes("offline-data") ||
     process.argv.includes("data-offline");
-  const port = process.env.PORT ?? "3000";
+  const port = EnvironmentVariables.get().port;
 
   const serveFrontend = async (ctx: TrainQuery, app: Express) => {
     if (isProd) {
@@ -31,7 +31,7 @@ async function createServer() {
   };
 
   await trainQuery(
-    () => new ExpressServer(parseIntThrow(port), serveFrontend),
+    () => new ExpressServer(port, serveFrontend),
     getConfigProvider(isOffline || useOfflineData),
     getDatabase(isOffline),
     new ConsoleLogger(),
@@ -41,12 +41,12 @@ async function createServer() {
 }
 
 function getConfigProvider(useOfflineData: boolean): ConfigProvider {
-  const canonicalUrl = requireEnv("URL");
+  const canonicalUrl = EnvironmentVariables.get().url;
   if (useOfflineData) {
-    const zipOrFolderPath = requireEnv("CONFIG_OFFLINE");
+    const zipOrFolderPath = EnvironmentVariables.get().requireConfigOffline();
     return new OfflineConfigProvider(zipOrFolderPath, canonicalUrl);
   } else {
-    const configUrl = requireEnv("CONFIG");
+    const configUrl = EnvironmentVariables.get().config;
     return new OnlineConfigProvider(configUrl, canonicalUrl);
   }
 }
@@ -56,13 +56,11 @@ function getDatabase(isOffline: boolean): TrainQueryDB | null {
     return null;
   }
 
-  const domain = process.env.MONGO_DOMAIN;
-  if (domain == null) {
+  const mongo = EnvironmentVariables.get().mongo;
+  if (mongo == null) {
     return null;
   }
-  const username = requireEnv("MONGO_USERNAME");
-  const password = requireEnv("MONGO_PASSWORD");
-  return new TrainQueryDB(domain, username, password);
+  return new TrainQueryDB(mongo.domain, mongo.username, mongo.password);
 }
 
 async function setupDevServer(ctx: TrainQuery, app: Express) {
@@ -107,14 +105,6 @@ async function setupProdServer(ctx: TrainQuery, app: Express) {
     res.writeHead(status || 200, statusText || headers, headers);
     res.end(html);
   });
-}
-
-function requireEnv(variable: string): string {
-  const value = process.env[variable];
-  if (value == null) {
-    throw new Error(`"${variable}" environment variable not provided.`);
-  }
-  return value;
 }
 
 function serveSitemapXml(app: Express, ctx: TrainQuery) {
