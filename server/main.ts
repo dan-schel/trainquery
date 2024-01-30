@@ -1,17 +1,17 @@
 import express, { Express } from "express";
 import path from "path";
 import { createSsrServer } from "vite-ssr/dev";
-import { ConfigProvider, TrainQuery, trainQuery } from "./trainquery";
+import { ConfigProvider, TrainQuery, trainQuery } from "./ctx/trainquery";
 import { OnlineConfigProvider } from "./config/online-config-provider";
-import { ExpressServer } from "./express-server";
-import { ConsoleLogger } from "./console-logger";
+import { ExpressServer } from "./ctx/express-server";
+import { ConsoleLogger } from "./ctx/console-logger";
 import "dotenv/config";
 import { OfflineConfigProvider } from "./config/offline-config-provider";
 import { ssrAppPropsApi } from "./api/ssr-props-api";
-import { TrainQueryDB } from "./trainquery-db";
+import { TrainQueryDB } from "./ctx/trainquery-db";
 import { createSitemapXml } from "./sitemap-xml";
-import { EnvironmentVariables } from "./environment-variables";
-import { EnvironmentOptions } from "./environment-options";
+import { EnvironmentVariables } from "./ctx/environment-variables";
+import { EnvironmentOptions } from "./ctx/environment-options";
 
 createServer();
 

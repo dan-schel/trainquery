@@ -4,7 +4,7 @@ import { OnlineConfigProvider } from "../config/online-config-provider";
 import { lint } from "./lint";
 import chalk from "chalk";
 import "dotenv/config";
-import { EnvironmentVariables } from "../environment-variables";
+import { EnvironmentVariables } from "../ctx/environment-variables";
 
 main();
 

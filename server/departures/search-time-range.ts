@@ -1,7 +1,7 @@
 import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime, toUTCDateTime } from "../../shared/qtime/qdatetime";
 import { QTime, QTimetableTime } from "../../shared/qtime/qtime";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 
 const iterationSizeHours = 24;
 

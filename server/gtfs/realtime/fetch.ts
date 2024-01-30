@@ -5,7 +5,7 @@ import {
   GtfsRealtimeAuthMethod,
   GtfsRealtimeConfig,
 } from "../../config/gtfs-config";
-import { EnvironmentVariables } from "../../environment-variables";
+import { EnvironmentVariables } from "../../ctx/environment-variables";
 
 export type GtfsRealtimeData = {
   tripUpdates: transit_realtime.ITripUpdate[];

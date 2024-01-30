@@ -1,6 +1,6 @@
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { StopID } from "../../shared/system/ids";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 
 export abstract class DepartureSource<T> {
   constructor(protected readonly _ctx: TrainQuery) {}

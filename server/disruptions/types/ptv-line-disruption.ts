@@ -4,7 +4,7 @@ import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { LineID, StopID } from "../../../shared/system/ids";
 import { CompletePattern } from "../../../shared/system/service/complete-pattern";
 import { Service } from "../../../shared/system/service/service";
-import { TrainQuery } from "../../trainquery";
+import { TrainQuery } from "../../ctx/trainquery";
 import { Disruption } from "../disruption";
 
 export type PtvLineDisruptionCategory =

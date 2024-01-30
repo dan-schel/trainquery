@@ -11,7 +11,7 @@ import {
 import { badVariantOrDirection } from "../../shared/system/routes/line-route";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { getTimetablesForDay } from "../timetable/get-timetables-for-day";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 import { DepartureSource } from "./departure-source";
 import { SearchTimeRange, fetchAndSort } from "./search-time-range";
 

@@ -1,7 +1,7 @@
 import { nonNull } from "@schel-d/js-utils";
 import { QDate } from "../../shared/qtime/qdate";
 import { LineID } from "../../shared/system/ids";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 
 export function getTimetableForDay(ctx: TrainQuery, day: QDate, line: LineID) {
   const timetables = ctx

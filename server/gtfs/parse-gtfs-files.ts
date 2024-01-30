@@ -15,7 +15,7 @@ import {
   matchToRoute,
 } from "./find-match";
 import { StopID } from "../../shared/system/ids";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 import { QTimetableTime } from "../../shared/qtime/qtime";
 import { GtfsParsingReport } from "./gtfs-parsing-report";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";

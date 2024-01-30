@@ -1,5 +1,5 @@
 import { Departure } from "../../shared/system/service/departure";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 import { Disruption } from "./disruption";
 import { DisruptionSource } from "./source/disruption-source";
 import { PtvDisruptionSource } from "./source/ptv/ptv-disruption-source";

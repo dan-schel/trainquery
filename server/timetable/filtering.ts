@@ -8,7 +8,7 @@ import {
 } from "../../shared/system/ids";
 import { GtfsPossibility } from "../departures/gtfs-departure-source";
 import { TimetablePossibility } from "../departures/timetable-departure-source";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
 import { LineColor } from "../../shared/system/enums";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";

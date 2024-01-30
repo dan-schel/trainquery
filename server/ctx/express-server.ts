@@ -1,4 +1,4 @@
-import { BadApiCallError } from "./param-utils";
+import { BadApiCallError } from "../param-utils";
 import { Server, ServerParams, TrainQuery } from "./trainquery";
 import express, { Express } from "express";
 

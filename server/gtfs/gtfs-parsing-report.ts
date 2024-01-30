@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { requireStop } from "../../shared/system/config-utils";
 import { StopID, StopIDJson } from "../../shared/system/ids";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 
 export class GtfsParsingReport {
   constructor(

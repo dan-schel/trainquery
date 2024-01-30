@@ -1,12 +1,12 @@
-import { configApi } from "./api/config-api";
-import { departuresApi } from "./api/departures-api";
-import { ssrAppPropsApi, ssrRoutePropsApi } from "./api/ssr-props-api";
-import { FullConfig } from "./config/computed-config";
-import { ServerConfig } from "./config/server-config";
-import { Disruptions } from "./disruptions/disruptions";
+import { configApi } from "../api/config-api";
+import { departuresApi } from "../api/departures-api";
+import { ssrAppPropsApi, ssrRoutePropsApi } from "../api/ssr-props-api";
+import { FullConfig } from "../config/computed-config";
+import { ServerConfig } from "../config/server-config";
+import { Disruptions } from "../disruptions/disruptions";
 import { EnvironmentOptions } from "./environment-options";
-import { GtfsWorker } from "./gtfs/gtfs-worker";
-import { BadApiCallError } from "./param-utils";
+import { GtfsWorker } from "../gtfs/gtfs-worker";
+import { BadApiCallError } from "../param-utils";
 import { TrainQueryDB } from "./trainquery-db";
 
 export type ServerBuilder = () => Server;
