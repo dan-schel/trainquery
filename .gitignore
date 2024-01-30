@@ -3,3 +3,4 @@ node_modules/
 /offline*/
 /data-*/
 .env
+.env-options.json

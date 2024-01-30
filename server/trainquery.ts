@@ -4,6 +4,7 @@ import { ssrAppPropsApi, ssrRoutePropsApi } from "./api/ssr-props-api";
 import { FullConfig } from "./config/computed-config";
 import { ServerConfig } from "./config/server-config";
 import { Disruptions } from "./disruptions/disruptions";
+import { EnvironmentOptions } from "./environment-options";
 import { GtfsWorker } from "./gtfs/gtfs-worker";
 import { BadApiCallError } from "./param-utils";
 import { TrainQueryDB } from "./trainquery-db";
@@ -112,6 +113,7 @@ export abstract class Logger {
   abstract logConfigRefresh(config: FullConfig, initial: boolean): void;
   abstract logConfigRefreshFailure(err: unknown): void;
   abstract logTimetableLoadFail(path: string): void;
+  abstract logEnvOptions(envOptions: EnvironmentOptions): void;
 
   abstract logRecallingGtfs(): void;
   abstract logRecallingGtfsSuccess(): void;

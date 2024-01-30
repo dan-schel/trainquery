@@ -11,11 +11,21 @@ import { ssrAppPropsApi } from "./api/ssr-props-api";
 import { TrainQueryDB } from "./trainquery-db";
 import { createSitemapXml } from "./sitemap-xml";
 import { EnvironmentVariables } from "./environment-variables";
+import { EnvironmentOptions } from "./environment-options";
 
 createServer();
 
 async function createServer() {
   const isProd = EnvironmentVariables.get().isProduction();
+  const envOptions = await getEnvironmentOptions(isProd);
+
+  const logger = new ConsoleLogger();
+  logger.logEnvOptions(envOptions);
+
+  // <TEMP>
+  console.log("NOTE THAT ENVIRONMENT OPTIONS ARE NOT CURRENTLY USED!");
+  // </TEMP>
+
   const isOffline = process.argv.includes("offline");
   const useOfflineData =
     process.argv.includes("offline-data") ||
@@ -34,10 +44,40 @@ async function createServer() {
     () => new ExpressServer(port, serveFrontend),
     getConfigProvider(isOffline || useOfflineData),
     getDatabase(isOffline),
-    new ConsoleLogger(),
+    logger,
     isOffline,
     isProd,
   );
+}
+
+async function getEnvironmentOptions(isProd: boolean) {
+  const index = process.argv.findIndex((x) => x === "--env");
+  if (index === -1) {
+    return EnvironmentOptions.default(isProd);
+  }
+
+  let name = process.argv.length >= index + 2 ? process.argv[index + 1] : null;
+  if (name === null) {
+    throw new Error(`Missing environment name after "--env".`);
+  }
+
+  if (name === "file") {
+    name = ".env-options.json";
+  }
+
+  if (name.endsWith(".json")) {
+    try {
+      return await EnvironmentOptions.loadFromFile(name);
+    } catch {
+      throw new Error(`Failed to load environment from file "${name}".`);
+    }
+  } else {
+    const env = EnvironmentOptions.loadFromName(name);
+    if (env == null) {
+      throw new Error(`Unknown environment name "${name}".`);
+    }
+    return env;
+  }
 }
 
 function getConfigProvider(useOfflineData: boolean): ConfigProvider {
