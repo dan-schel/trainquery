@@ -1,4 +1,4 @@
-import { nonNull, unique } from "@schel-d/js-utils";
+import { nonNull, unique } from "@dan-schel/js-utils";
 import {
   type HasSharedConfig,
   requireLine,

@@ -1,4 +1,4 @@
-import { listifyAnd, nonNull } from "@schel-d/js-utils";
+import { listifyAnd, nonNull } from "@dan-schel/js-utils";
 import type { DirectionID, StopID } from "shared/system/ids";
 import type { DepartureFilter } from "shared/system/timetable/departure-filter";
 import { formatMode } from "./format-mode";

@@ -7,7 +7,7 @@ import {
   StopIDJson,
   type RouteVariantID,
 } from "../ids";
-import { unique } from "@schel-d/js-utils";
+import { unique } from "@dan-schel/js-utils";
 import { PusdoFilter } from "./pusdo";
 
 export type StopList = {

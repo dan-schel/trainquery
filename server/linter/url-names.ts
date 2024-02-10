@@ -1,4 +1,4 @@
-import { nonNull } from "@schel-d/js-utils";
+import { nonNull } from "@dan-schel/js-utils";
 import { LintContext, examplify, listDuplicated } from "./utils";
 
 export function lintMissingUrlNames(ctx: LintContext) {

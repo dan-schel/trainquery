@@ -1,4 +1,4 @@
-import { posMod } from "@schel-d/js-utils";
+import { posMod } from "@dan-schel/js-utils";
 import { QCache } from "./qcache";
 import { QDate } from "./qdate";
 

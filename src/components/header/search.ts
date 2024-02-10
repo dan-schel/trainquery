@@ -6,7 +6,7 @@ import {
   linesThatStopAt,
 } from "shared/system/config-utils";
 import type { Stop } from "shared/system/stop";
-import { listifyAnd } from "@schel-d/js-utils";
+import { listifyAnd } from "@dan-schel/js-utils";
 import { formatMode } from "@/utils/format-mode";
 
 /** An entry in a list of searchable pages. */

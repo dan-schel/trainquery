@@ -7,7 +7,7 @@ import {
   type ServiceTypeID,
   type PlatformID,
 } from "./ids";
-import { parseIntNull } from "@schel-d/js-utils";
+import { parseIntNull } from "@dan-schel/js-utils";
 import type { Line } from "./line";
 import { Service } from "./service/service";
 import { SharedConfig } from "./config/shared-config";

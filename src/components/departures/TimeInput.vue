@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import NumberWheel from "../common/NumberWheel.vue";
-import { hour12To24, hour24To12, posMod } from "@schel-d/js-utils";
+import { hour12To24, hour24To12, posMod } from "@dan-schel/js-utils";
 import Picker from "../common/Picker.vue";
 import { QTime } from "shared/qtime/qtime";
 import Icon from "../icons/Icon.vue";

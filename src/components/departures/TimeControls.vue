@@ -8,7 +8,7 @@ import { formatDate } from "@/utils/format-qtime";
 import { QLocalDateTime } from "shared/qtime/qdatetime";
 import { useNow } from "@/utils/now-provider";
 import TimeInput from "./TimeInput.vue";
-import { nullableEquals } from "@schel-d/js-utils";
+import { nullableEquals } from "@dan-schel/js-utils";
 
 const props = defineProps<{
   time: QLocalDateTime | null;

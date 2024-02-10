@@ -1,4 +1,4 @@
-import { parseIntNull, parseIntThrow } from "@schel-d/js-utils";
+import { parseIntNull, parseIntThrow } from "@dan-schel/js-utils";
 import { z } from "zod";
 
 declare const StopIDBrand: unique symbol;

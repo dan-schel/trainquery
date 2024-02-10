@@ -1,7 +1,7 @@
-import { NumberRange, parseIntNull } from "@schel-d/js-utils";
+import { NumberRange, parseIntNull } from "@dan-schel/js-utils";
 import { z } from "zod";
 
-// NOTE: While I'd love to move this stuff to @schel-d/js-utils, the zod stuff
+// NOTE: While I'd love to move this stuff to @dan-schel/js-utils, the zod stuff
 // can't go (at least the mapJson function) because zod uses instanceof in some
 // places, which doesn't work with multiple instances of the same package!
 //

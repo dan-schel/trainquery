@@ -1,4 +1,4 @@
-import { nonNull } from "@schel-d/js-utils";
+import { nonNull } from "@dan-schel/js-utils";
 import { QDate } from "../../../shared/qtime/qdate";
 import { ErrorLogger } from "../../../shared/utils";
 import { GtfsData } from "../data/gtfs-data";

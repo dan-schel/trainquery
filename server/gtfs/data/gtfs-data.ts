@@ -2,7 +2,7 @@ import { GtfsCalendar } from "./gtfs-calendar";
 import { GtfsTrip } from "./gtfs-trip";
 import { GtfsParsingReport } from "../gtfs-parsing-report";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
-import { unique } from "@schel-d/js-utils";
+import { unique } from "@dan-schel/js-utils";
 import { z } from "zod";
 import { nowUTCLuxon } from "../../../shared/qtime/luxon-conversions";
 

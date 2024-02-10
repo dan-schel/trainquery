@@ -1,4 +1,4 @@
-import { nonNull } from "@schel-d/js-utils";
+import { nonNull } from "@dan-schel/js-utils";
 import { requireLine } from "../../shared/system/config-utils";
 import {
   DirectionID,

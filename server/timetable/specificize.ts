@@ -17,7 +17,7 @@ import { GtfsServiceIDComponents } from "../gtfs/gtfs-service-id";
 import { getGtfsServiceNoRealtime } from "./get-service";
 import { GtfsTrip, GtfsTripIDPair } from "../gtfs/data/gtfs-trip";
 import { GtfsRealtimeTrip } from "../gtfs/data/gtfs-realtime-trip";
-import { itsOk } from "@schel-d/js-utils";
+import { itsOk } from "@dan-schel/js-utils";
 
 export function specificize(
   ctx: TrainQuery,

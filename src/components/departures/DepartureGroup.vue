@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 import DepartureFeedVue from "./DepartureFeed.vue";
-import { repeat } from "@schel-d/js-utils";
+import { repeat } from "@dan-schel/js-utils";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { callAPI } from "@/utils/call-api";
 import { useNow } from "@/utils/now-provider";

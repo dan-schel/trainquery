@@ -1,6 +1,6 @@
 import { formatDirection } from "@/utils/format-filter";
 import { getConfig } from "@/utils/get-config";
-import { unique } from "@schel-d/js-utils";
+import { unique } from "@dan-schel/js-utils";
 import { linesThatStopAt, requireStop } from "shared/system/config-utils";
 import type {
   DirectionID,

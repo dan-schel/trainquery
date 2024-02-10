@@ -1,4 +1,4 @@
-import { nonNull, parseIntNull } from "@schel-d/js-utils";
+import { nonNull, parseIntNull } from "@dan-schel/js-utils";
 import { Timetable, TimetableEntry } from "./timetable";
 import {
   isDirectionID,

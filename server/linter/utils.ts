@@ -1,4 +1,4 @@
-import { listifyAnd } from "@schel-d/js-utils";
+import { listifyAnd } from "@dan-schel/js-utils";
 import { ServerConfig } from "../config/server-config";
 
 export type LintMessage = {

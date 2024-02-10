@@ -1,6 +1,6 @@
 import fetch, { Response } from "node-fetch";
 import { transit_realtime } from "./proto";
-import { nonNull } from "@schel-d/js-utils";
+import { nonNull } from "@dan-schel/js-utils";
 import {
   GtfsRealtimeAuthMethod,
   GtfsRealtimeConfig,
