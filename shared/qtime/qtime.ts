@@ -1,4 +1,4 @@
-import { parseIntThrow, posMod } from "@schel-d/js-utils";
+import { parseIntThrow, posMod } from "@dan-schel/js-utils";
 import { type InformalDuration, QDuration } from "./qduration";
 import { z } from "zod";
 import { QDate } from "./qdate";

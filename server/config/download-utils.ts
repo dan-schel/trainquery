@@ -1,4 +1,4 @@
-import { uuid } from "@schel-d/js-utils";
+import { uuid } from "@dan-schel/js-utils";
 import fetch from "node-fetch";
 import fs from "fs";
 import fsp from "fs/promises";

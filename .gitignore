@@ -2,5 +2,4 @@ node_modules/
 /dist/
 /offline*/
 /data-*/
-.env
-.env-options.json
+.env*

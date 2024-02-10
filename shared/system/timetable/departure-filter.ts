@@ -1,4 +1,4 @@
-import { parseIntNull } from "@schel-d/js-utils";
+import { parseIntNull } from "@dan-schel/js-utils";
 import {
   type DirectionID,
   type LineID,

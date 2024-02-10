@@ -1,4 +1,4 @@
-import { hour12To24, parseIntNull } from "@schel-d/js-utils";
+import { hour12To24, parseIntNull } from "@dan-schel/js-utils";
 import { QTime } from "shared/qtime/qtime";
 
 const digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];

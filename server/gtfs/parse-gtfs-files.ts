@@ -20,7 +20,7 @@ import { QTimetableTime } from "../../shared/qtime/qtime";
 import { GtfsParsingReport } from "./gtfs-parsing-report";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 import { HasSharedConfig, requireLine } from "../../shared/system/config-utils";
-import { nullableEquals } from "@schel-d/js-utils";
+import { nullableEquals } from "@dan-schel/js-utils";
 import { GtfsFeedConfig } from "../config/gtfs-config";
 import { GtfsCalendar } from "./data/gtfs-calendar";
 import { GtfsData } from "./data/gtfs-data";

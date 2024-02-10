@@ -1,7 +1,7 @@
 import { requireStop } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
 import type { StopID } from "shared/system/ids";
-import { listifyAnd } from "@schel-d/js-utils";
+import { listifyAnd } from "@dan-schel/js-utils";
 import type { Departure } from "shared/system/service/departure";
 import type { PatternList } from "shared/system/service/listed-stop";
 import { CompletePattern } from "shared/system/service/complete-pattern";

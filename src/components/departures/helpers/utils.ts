@@ -7,7 +7,7 @@ import { getConfig } from "@/utils/get-config";
 import { formatDuration, formatRelativeTime } from "@/utils/format-qtime";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import type { QUtcDateTime } from "shared/qtime/qdatetime";
-import { listifyAnd } from "@schel-d/js-utils";
+import { listifyAnd } from "@dan-schel/js-utils";
 import type { PatternList } from "shared/system/service/listed-stop";
 import type { Departure } from "shared/system/service/departure";
 import type { PlatformID, StopID } from "shared/system/ids";

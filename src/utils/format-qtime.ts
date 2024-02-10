@@ -1,4 +1,4 @@
-import { hour24To12 } from "@schel-d/js-utils";
+import { hour24To12 } from "@dan-schel/js-utils";
 import { getMonthAcronym, type QDate } from "shared/qtime/qdate";
 import type { QLocalDateTime } from "shared/qtime/qdatetime";
 import { QDayOfWeek } from "shared/qtime/qdayofweek";

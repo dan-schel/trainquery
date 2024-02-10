@@ -1,4 +1,4 @@
-import { parseIntThrow } from "@schel-d/js-utils";
+import { parseIntThrow } from "@dan-schel/js-utils";
 import { z } from "zod";
 
 const _daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];

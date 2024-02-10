@@ -6,7 +6,7 @@ import {
   parseIntNull,
   reencode,
   tryReencode,
-} from "@schel-d/js-utils";
+} from "@dan-schel/js-utils";
 import { DepartureFilter } from "./departure-filter";
 
 const encodedAlpha = alpha + decimal + "- |";

@@ -36,7 +36,7 @@ useHead(
   <PageContent :title="null">
     <div class="markdown" v-html="innerHTML"></div>
     <div class="see-also">
-      <a href="https://github.com/schel-d/trainquery">
+      <a href="https://github.com/dan-schel/trainquery">
         <Icon id="uil:github"></Icon>
         <p>Check out TrainQuery on GitHub</p>
       </a>

@@ -6,7 +6,7 @@ An unofficial guide to help you navigate Melbourne's train network, built on Vue
 
 ## Getting started
 
-1.  Clone the repo with submodules. Either run `git clone --recursive https://github.com/schel-d/trainquery.git`, or run `git submodule update --init --recursive` after cloning the repository.
+1.  Clone the repo with submodules. Either run `git clone --recursive https://github.com/dan-schel/trainquery.git`, or run `git submodule update --init --recursive` after cloning the repository.
 2.  Run `npm i` to install dependencies.
 3.  Create a `.env` file, as described below:
 

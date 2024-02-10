@@ -7,7 +7,7 @@ import { ServerParams, TrainQuery } from "../ctx/trainquery";
 import { DepartureFeed } from "../../shared/system/timetable/departure-feed";
 import { getDepartures } from "../timetable/get-departures";
 import { specificizeGtfsDeparture } from "../timetable/specificize";
-import { unique } from "@schel-d/js-utils";
+import { unique } from "@dan-schel/js-utils";
 import {
   GtfsDepartureSource,
   GtfsPossibility,

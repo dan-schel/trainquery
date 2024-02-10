@@ -18,7 +18,7 @@ import { QLocalDateTime } from "shared/qtime/qdatetime";
 import { requiredParam, unparam } from "@/utils/param-utils";
 import { isValidFilter } from "@/components/departures/helpers/available-filters";
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
-import { nullableEquals, itsOk } from "@schel-d/js-utils";
+import { nullableEquals, itsOk } from "@dan-schel/js-utils";
 import { generatePageHead, generatePageHeadNotFound } from "@/utils/head";
 import { useSettings } from "@/settings/settings";
 

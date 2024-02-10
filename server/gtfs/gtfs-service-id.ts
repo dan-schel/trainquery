@@ -3,7 +3,7 @@ import {
   parseIntNull,
   reencode,
   tryReencode,
-} from "@schel-d/js-utils";
+} from "@dan-schel/js-utils";
 import { QDate } from "../../shared/qtime/qdate";
 
 const encodedAlpha = "0123456789abcdef|";

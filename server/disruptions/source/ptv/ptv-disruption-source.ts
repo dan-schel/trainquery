@@ -6,7 +6,7 @@ import { DisruptionSource, NewDisruptionsHandler } from "../disruption-source";
 import { callPtvApi } from "./call-ptv-api";
 import { QUtcDateTime } from "../../../../shared/qtime/qdatetime";
 import { PtvLineDisruption } from "../../types/ptv-line-disruption";
-import { nonNull } from "@schel-d/js-utils";
+import { nonNull } from "@dan-schel/js-utils";
 import { EnvironmentVariables } from "../../../ctx/environment-variables";
 
 // Refresh disruptions from the PTV API every 5 minutes.

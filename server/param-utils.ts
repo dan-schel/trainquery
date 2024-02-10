@@ -1,4 +1,4 @@
-import { parseIntNull } from "@schel-d/js-utils";
+import { parseIntNull } from "@dan-schel/js-utils";
 import { getStop } from "../shared/system/config-utils";
 import { StopID, isStopID } from "../shared/system/ids";
 import { Stop } from "../shared/system/stop";

@@ -23,7 +23,7 @@
     "tqlint": "node dist/lint.js"
   },
   "dependencies": {
-    "@schel-d/js-utils": "^2.0.0",
+    "@dan-schel/js-utils": "^3.0.2",
     "@types/crypto-js": "^4.2.1",
     "@vueuse/head": "^0.9.8",
     "adm-zip": "^0.5.10",
