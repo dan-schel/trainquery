@@ -18,6 +18,8 @@ export async function callPtvApi(
   devKey: string,
 ): Promise<unknown> {
   const url = createPtvUrl(api, args, devID, devKey);
+  console.log(url);
+
   const response = await fetch(url);
 
   if (response.status !== 200) {
