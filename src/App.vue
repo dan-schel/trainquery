@@ -5,7 +5,7 @@ import Footer from "./components/Footer.vue";
 import { useHead } from "@vueuse/head";
 import { getConfig } from "./utils/get-config";
 import { Settings, settingsInjectionKey } from "./settings/settings";
-import { onMounted, provide, ref, onUnmounted } from "vue";
+import { onMounted, provide, ref, onUnmounted, computed } from "vue";
 import { readSettings, writeSettings } from "./settings/persist-settings";
 import {
   nowUTCLuxon,
@@ -14,8 +14,17 @@ import {
 import { nowInjectionKey } from "./utils/now-provider";
 import LoadingSpinner from "./components/common/LoadingSpinner.vue";
 import { useNavigating } from "./utils/navigating-provider";
+import { parseInlineMarkdown } from "./utils/parse-markdown";
 
 const navigating = useNavigating();
+
+// TODO: Extract to its own component.
+const bannerHtml = computed(() => {
+  // TODO: This shouldn't be hardcoded!
+  return parseInlineMarkdown(
+    "**Warning:** TrainQuery is currently having issues accessing the PTV API. Visit [ptv.vic.gov.au](https://www.ptv.vic.gov.au/) to check if your train line is impacted by a disruption.",
+  );
+});
 
 const settings = ref<Settings | null>(null);
 const nowUtc = ref(nowUTCLuxon().startOfMinute());
@@ -65,6 +74,14 @@ useHead({
     <p>Skip to content</p>
   </a>
   <Header></Header>
+
+  <!-- TODO: Extract to its own component. -->
+  <div class="banner">
+    <div class="banner-content">
+      <p v-html="bannerHtml"></p>
+    </div>
+  </div>
+
   <div class="page" id="content" :class="{ navigating: navigating }">
     <RouterView />
   </div>
@@ -75,9 +92,28 @@ useHead({
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
 @use "@/assets/utils" as utils;
+
+// TODO: Extract to its own component.
+.banner {
+  @include template.page-centerer;
+  @include utils.shadow;
+  background-color: var(--color-banner-bg);
+  padding-top: 3rem;
+  .banner-content {
+    padding: 0.5rem 1rem;
+    p {
+      color: var(--color-banner-text);
+      :deep(a) {
+        font-weight: bold;
+        --color-accent: var(--color-banner-text);
+      }
+    }
+  }
+}
+
 .page {
   flex-grow: 1;
-  margin-top: 3rem;
+  // margin-top: 3rem;
 }
 .skip {
   // Navbar is 9999 ;)

@@ -1,9 +1,5 @@
 export function parseMarkdown(markdown: string) {
-  const escaped = markdown
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-  const lines = escaped
+  const lines = escapeHtml(markdown)
     .split("\n")
     .map((l) => l.replace(/[\r\t]/, "").trim())
     .filter((x) => x.length !== 0);
@@ -11,18 +7,18 @@ export function parseMarkdown(markdown: string) {
   let output = "";
   for (const line of lines) {
     if (/^# (.+)$/g.test(line)) {
-      output += `<h1>${inlineMarkup(line.replace("# ", ""))}</h1>`;
+      output += `<h1>${parseInlineMarkdown(line.replace("# ", ""))}</h1>`;
     } else if (/^## (.+)$/g.test(line)) {
-      output += `<h2>${inlineMarkup(line.replace("## ", ""))}</h2>`;
+      output += `<h2>${parseInlineMarkdown(line.replace("## ", ""))}</h2>`;
     } else {
-      output += `<p>${inlineMarkup(line)}</p>`;
+      output += `<p>${parseInlineMarkdown(line)}</p>`;
     }
   }
 
   return output;
 }
 
-function inlineMarkup(line: string) {
+export function parseInlineMarkdown(line: string) {
   return line
     .replace(/\[([^[\]]+)\]\(([^()]+)\)/g, '<a class="link" href="$2">$1</a>')
     .replace(/\*\*(.*)\*\*/g, "<b>$1</b>")
@@ -32,4 +28,11 @@ function inlineMarkup(line: string) {
       /\{ERROR\}(.*)\{\/ERROR\}/g,
       '<span style="color: var(--color-error)">$1</span>',
     );
+}
+
+function escapeHtml(input: string) {
+  return input
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
