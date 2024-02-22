@@ -18,7 +18,7 @@ export async function callPtvApi(
   devKey: string,
 ): Promise<unknown> {
   const url = createPtvUrl(api, args, devID, devKey);
-  console.log(url);
+  console.log(url.href);
 
   const response = await fetch(url);
 
