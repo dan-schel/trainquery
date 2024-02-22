@@ -22,7 +22,8 @@ export async function callPtvApi(
 
   if (response.status !== 200) {
     throw new Error(
-      `PTV API responded with code ${response.status}. ` + response.text(),
+      `PTV API responded with code ${response.status}. ` +
+        (await response.text()),
     );
   }
 
