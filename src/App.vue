@@ -14,16 +14,18 @@ import {
 import { nowInjectionKey } from "./utils/now-provider";
 import LoadingSpinner from "./components/common/LoadingSpinner.vue";
 import { useNavigating } from "./utils/navigating-provider";
-import { parseInlineMarkdown } from "./utils/parse-markdown";
+// import { parseInlineMarkdown } from "./utils/parse-markdown";
 
 const navigating = useNavigating();
 
 // TODO: Extract to its own component.
 const bannerHtml = computed(() => {
-  // TODO: This shouldn't be hardcoded!
-  return parseInlineMarkdown(
-    "**Warning:** TrainQuery is currently having issues accessing the PTV API. Visit [ptv.vic.gov.au](https://www.ptv.vic.gov.au/) to check if your train line is impacted by a disruption.",
-  );
+  return null;
+
+  // // TODO: This shouldn't be hardcoded!
+  // return parseInlineMarkdown(
+  //   "**Warning:** TrainQuery is currently having issues accessing the PTV API. Visit [ptv.vic.gov.au](https://www.ptv.vic.gov.au/) to check if your train line is impacted by a disruption.",
+  // );
 });
 
 const settings = ref<Settings | null>(null);
@@ -76,13 +78,17 @@ useHead({
   <Header></Header>
 
   <!-- TODO: Extract to its own component. -->
-  <div class="banner">
+  <div class="banner" v-if="bannerHtml != null">
     <div class="banner-content">
       <p v-html="bannerHtml"></p>
     </div>
   </div>
 
-  <div class="page" id="content" :class="{ navigating: navigating }">
+  <div
+    class="page"
+    id="content"
+    :class="{ navigating: navigating, 'no-banner': bannerHtml == null }"
+  >
     <RouterView />
   </div>
   <Footer :class="{ navigating: navigating }"></Footer>
@@ -113,7 +119,9 @@ useHead({
 
 .page {
   flex-grow: 1;
-  // margin-top: 3rem;
+  &.no-banner {
+    margin-top: 3rem;
+  }
 }
 .skip {
   // Navbar is 9999 ;)
