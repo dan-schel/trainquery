@@ -1,26 +1,36 @@
 import express, { Express } from "express";
 import path from "path";
 import { createSsrServer } from "vite-ssr/dev";
-import { ConfigProvider, TrainQuery, trainQuery } from "./trainquery";
+import { ConfigProvider, TrainQuery, trainQuery } from "./ctx/trainquery";
 import { OnlineConfigProvider } from "./config/online-config-provider";
-import { ExpressServer } from "./express-server";
-import { ConsoleLogger } from "./console-logger";
-import { parseIntThrow } from "@dan-schel/js-utils";
+import { ExpressServer } from "./ctx/express-server";
+import { ConsoleLogger } from "./ctx/console-logger";
 import "dotenv/config";
 import { OfflineConfigProvider } from "./config/offline-config-provider";
 import { ssrAppPropsApi } from "./api/ssr-props-api";
-import { TrainQueryDB } from "./trainquery-db";
+import { TrainQueryDB } from "./ctx/trainquery-db";
 import { createSitemapXml } from "./sitemap-xml";
+import { EnvironmentVariables } from "./ctx/environment-variables";
+import { EnvironmentOptions } from "./ctx/environment-options";
 
 createServer();
 
 async function createServer() {
-  const isProd = process.env.NODE_ENV === "production";
+  const isProd = EnvironmentVariables.get().isProduction();
+  const envOptions = await getEnvironmentOptions(isProd);
+
+  const logger = new ConsoleLogger();
+  logger.logEnvOptions(envOptions);
+
+  // <TEMP>
+  console.log("NOTE THAT ENVIRONMENT OPTIONS ARE NOT CURRENTLY USED!");
+  // </TEMP>
+
   const isOffline = process.argv.includes("offline");
   const useOfflineData =
     process.argv.includes("offline-data") ||
     process.argv.includes("data-offline");
-  const port = process.env.PORT ?? "3000";
+  const port = EnvironmentVariables.get().port;
 
   const serveFrontend = async (ctx: TrainQuery, app: Express) => {
     if (isProd) {
@@ -31,22 +41,52 @@ async function createServer() {
   };
 
   await trainQuery(
-    () => new ExpressServer(parseIntThrow(port), serveFrontend),
+    () => new ExpressServer(port, serveFrontend),
     getConfigProvider(isOffline || useOfflineData),
     getDatabase(isOffline),
-    new ConsoleLogger(),
+    logger,
     isOffline,
     isProd,
   );
 }
 
+async function getEnvironmentOptions(isProd: boolean) {
+  const index = process.argv.findIndex((x) => x === "--env");
+  if (index === -1) {
+    return EnvironmentOptions.default(isProd);
+  }
+
+  let name = process.argv.length >= index + 2 ? process.argv[index + 1] : null;
+  if (name === null) {
+    throw new Error(`Missing environment name after "--env".`);
+  }
+
+  if (name === "file") {
+    name = ".env-options.json";
+  }
+
+  if (name.endsWith(".json")) {
+    try {
+      return await EnvironmentOptions.loadFromFile(name);
+    } catch {
+      throw new Error(`Failed to load environment from file "${name}".`);
+    }
+  } else {
+    const env = EnvironmentOptions.loadFromName(name);
+    if (env == null) {
+      throw new Error(`Unknown environment name "${name}".`);
+    }
+    return env;
+  }
+}
+
 function getConfigProvider(useOfflineData: boolean): ConfigProvider {
-  const canonicalUrl = requireEnv("URL");
+  const canonicalUrl = EnvironmentVariables.get().url;
   if (useOfflineData) {
-    const zipOrFolderPath = requireEnv("CONFIG_OFFLINE");
+    const zipOrFolderPath = EnvironmentVariables.get().requireConfigOffline();
     return new OfflineConfigProvider(zipOrFolderPath, canonicalUrl);
   } else {
-    const configUrl = requireEnv("CONFIG");
+    const configUrl = EnvironmentVariables.get().config;
     return new OnlineConfigProvider(configUrl, canonicalUrl);
   }
 }
@@ -56,13 +96,11 @@ function getDatabase(isOffline: boolean): TrainQueryDB | null {
     return null;
   }
 
-  const domain = process.env.MONGO_DOMAIN;
-  if (domain == null) {
+  const mongo = EnvironmentVariables.get().mongo;
+  if (mongo == null) {
     return null;
   }
-  const username = requireEnv("MONGO_USERNAME");
-  const password = requireEnv("MONGO_PASSWORD");
-  return new TrainQueryDB(domain, username, password);
+  return new TrainQueryDB(mongo.domain, mongo.username, mongo.password);
 }
 
 async function setupDevServer(ctx: TrainQuery, app: Express) {
@@ -107,14 +145,6 @@ async function setupProdServer(ctx: TrainQuery, app: Express) {
     res.writeHead(status || 200, statusText || headers, headers);
     res.end(html);
   });
-}
-
-function requireEnv(variable: string): string {
-  const value = process.env[variable];
-  if (value == null) {
-    throw new Error(`"${variable}" environment variable not provided.`);
-  }
-  return value;
 }
 
 function serveSitemapXml(app: Express, ctx: TrainQuery) {

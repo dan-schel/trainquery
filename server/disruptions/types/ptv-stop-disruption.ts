@@ -3,7 +3,7 @@ import { QDate } from "../../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { LineID, StopID } from "../../../shared/system/ids";
 import { Service } from "../../../shared/system/service/service";
-import { TrainQuery } from "../../trainquery";
+import { TrainQuery } from "../../ctx/trainquery";
 import { Disruption } from "../disruption";
 
 export class PtvStopDisruption extends Disruption<"ptv-stop"> {

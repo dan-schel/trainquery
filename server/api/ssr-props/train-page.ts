@@ -5,7 +5,7 @@ import {
   getTimetableService,
 } from "../../timetable/get-service";
 import { StaticServiceIDComponents } from "../../timetable/static-service-id";
-import { TrainQuery } from "../../trainquery";
+import { TrainQuery } from "../../ctx/trainquery";
 import { CompletePattern } from "../../../shared/system/service/complete-pattern";
 import { Service } from "../../../shared/system/service/service";
 import { GtfsServiceIDComponents } from "../../gtfs/gtfs-service-id";

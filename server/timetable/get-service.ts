@@ -1,7 +1,7 @@
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
 import { GtfsData } from "../gtfs/data/gtfs-data";
 import { GtfsServiceIDComponents } from "../gtfs/gtfs-service-id";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 import { getTimetableForDay } from "./get-timetables-for-day";
 import { specificize, specificizeGtfsTrip } from "./specificize";
 import { StaticServiceIDComponents } from "./static-service-id";

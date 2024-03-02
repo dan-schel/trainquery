@@ -3,7 +3,7 @@ import {
   requireDateTimeParam,
   requireParam,
 } from "../param-utils";
-import { ServerParams, TrainQuery } from "../trainquery";
+import { ServerParams, TrainQuery } from "../ctx/trainquery";
 import { DepartureFeed } from "../../shared/system/timetable/departure-feed";
 import { getDepartures } from "../timetable/get-departures";
 import { specificizeGtfsDeparture } from "../timetable/specificize";

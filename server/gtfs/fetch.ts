@@ -8,7 +8,7 @@ import {
   deleteDataFolder,
 } from "../config/download-utils";
 import { GtfsConfig } from "../config/gtfs-config";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 import { GtfsData } from "./data/gtfs-data";
 import { parseGtfsFiles } from "./parse-gtfs-files";
 

@@ -3,7 +3,7 @@ import { DepartureFilter } from "../../shared/system/timetable/departure-filter"
 import { AllFilteringData, getAllFilteringData } from "../timetable/filtering";
 import { Bucket } from "../timetable/get-departures";
 import { guessPlatform } from "../timetable/guess-platform";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 import { GtfsPossibility } from "./gtfs-departure-source";
 import { TimetablePossibility } from "./timetable-departure-source";
 

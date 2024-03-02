@@ -2,7 +2,7 @@ import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { getLine, linesThatStopAt } from "../../shared/system/config-utils";
 import { StopID } from "../../shared/system/ids";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 import { DepartureSource } from "./departure-source";
 import { SearchTimeRange, fetchAndSort } from "./search-time-range";
 import { GtfsTrip } from "../gtfs/data/gtfs-trip";

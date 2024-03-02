@@ -1,4 +1,5 @@
-import { FullConfig } from "./config/computed-config";
+import { FullConfig } from "../config/computed-config";
+import { EnvironmentOptions } from "./environment-options";
 import { ExpressServer } from "./express-server";
 import { Logger, Server } from "./trainquery";
 
@@ -10,7 +11,6 @@ export class ConsoleLogger extends Logger {
       console.log("[WEB] Server ready.");
     }
   }
-
   logConfigRefresh(config: FullConfig, initial: boolean): void {
     const stopCount = config.shared.stops.length;
     const lineCount = config.shared.lines.length;
@@ -23,9 +23,11 @@ export class ConsoleLogger extends Logger {
   logConfigRefreshFailure(err: unknown): void {
     console.log("[CONFIG] Failed to refresh config.", err);
   }
-
   logTimetableLoadFail(path: string): void {
     console.log(`[CONFIG] Failed to load timetable "${path}".`);
+  }
+  logEnvOptions(envOptions: EnvironmentOptions): void {
+    envOptions.log((x) => console.log(x));
   }
 
   logRecallingGtfs(): void {

@@ -5,7 +5,7 @@ import {
   requireLine,
 } from "../../shared/system/config-utils";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 import { guessPlatformsOfEntry, guessPlatformsOfTrip } from "./guess-platform";
 import { StaticServiceIDComponents } from "./static-service-id";
 import { CompletePattern } from "../../shared/system/service/complete-pattern";

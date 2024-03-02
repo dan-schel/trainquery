@@ -1,4 +1,4 @@
-import { ConfigProvider, Logger } from "../trainquery";
+import { ConfigProvider, Logger } from "../ctx/trainquery";
 import fsp from "fs/promises";
 import { loadConfigFromFiles } from "./config-zip";
 import { ServerConfig } from "./server-config";

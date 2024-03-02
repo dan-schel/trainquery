@@ -5,6 +5,7 @@ import {
   GtfsRealtimeAuthMethod,
   GtfsRealtimeConfig,
 } from "../../config/gtfs-config";
+import { EnvironmentVariables } from "../../ctx/environment-variables";
 
 export type GtfsRealtimeData = {
   tripUpdates: transit_realtime.ITripUpdate[];
@@ -45,10 +46,7 @@ function buildRequest(
   if (apiAuth === "none") {
     return fetch(api);
   } else if (apiAuth === "melbourne") {
-    const key = process.env.GTFS_REALTIME_KEY;
-    if (key == null) {
-      throw new Error("GTFS_REALTIME_KEY environment variable not set.");
-    }
+    const key = EnvironmentVariables.get().requireGtfsRealtimeKey();
     return fetch(api, {
       headers: {
         "Ocp-Apim-Subscription-Key": key,

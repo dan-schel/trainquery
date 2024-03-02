@@ -2,7 +2,7 @@ import { parseIntNull } from "@dan-schel/js-utils";
 import { getStop } from "../shared/system/config-utils";
 import { StopID, isStopID } from "../shared/system/ids";
 import { Stop } from "../shared/system/stop";
-import { ServerParams, TrainQuery } from "./trainquery";
+import { ServerParams, TrainQuery } from "./ctx/trainquery";
 import { QUtcDateTime } from "../shared/qtime/qdatetime";
 
 export class BadApiCallError extends Error {

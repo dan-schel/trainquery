@@ -1,6 +1,6 @@
 import { requireStop } from "../../shared/system/config-utils";
 import { PlatformID, StopID } from "../../shared/system/ids";
-import { TrainQuery } from "../trainquery";
+import { TrainQuery } from "../ctx/trainquery";
 import { FullTimetableEntry } from "../../shared/system/timetable/timetable";
 import { QDate } from "../../shared/qtime/qdate";
 import { ConfidenceLevel } from "../../shared/system/enums";

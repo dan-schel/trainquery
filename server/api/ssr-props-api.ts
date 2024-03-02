@@ -1,5 +1,5 @@
 import { requireParam } from "../param-utils";
-import { ServerParams, TrainQuery } from "../trainquery";
+import { ServerParams, TrainQuery } from "../ctx/trainquery";
 import { getTrainPageProps } from "./ssr-props/train-page";
 
 export async function ssrAppPropsApi(ctx: TrainQuery): Promise<object> {
