@@ -11,6 +11,8 @@ import {
   provideNavigating,
   startedNavigating,
 } from "./utils/navigating-provider";
+import { provideBanners, setBanners } from "./utils/banners-provider";
+import { Banner } from "shared/banner";
 
 export default viteSSR(
   App,
@@ -34,7 +36,19 @@ export default viteSSR(
     const head = createHead();
     app.use(head);
 
+    if (import.meta.env.SSR) {
+      const res = await fetch(`${baseUrl}/api/config`);
+      const json = await res.json();
+      provideConfig(FrontendConfig.json.parse(json));
+    } else {
+      await initConfig(initialState.app.configHash);
+    }
+
     provideNavigating(app);
+    provideBanners(app);
+    setBanners(
+      initialState.app.banners.map((x: unknown) => Banner.json.parse(x)),
+    );
 
     // Download route props when navigating pages (the first route's props are
     // downloaded with this code too, but on the server during SSR).
@@ -77,14 +91,6 @@ export default viteSSR(
     router.afterEach(() => {
       finishedNavigating();
     });
-
-    if (import.meta.env.SSR) {
-      const res = await fetch(`${baseUrl}/api/config`);
-      const json = await res.json();
-      provideConfig(FrontendConfig.json.parse(json));
-    } else {
-      await initConfig(initialState.app.configHash);
-    }
 
     return { head };
   },

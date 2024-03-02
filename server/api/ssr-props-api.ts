@@ -1,9 +1,13 @@
 import { requireParam } from "../param-utils";
 import { ServerParams, TrainQuery } from "../ctx/trainquery";
 import { getTrainPageProps } from "./ssr-props/train-page";
+import { getAboutPageProps } from "./ssr-props/about-page";
 
 export async function ssrAppPropsApi(ctx: TrainQuery): Promise<object> {
-  return { configHash: ctx.getConfig().hash };
+  return {
+    configHash: ctx.getConfig().hash,
+    banners: ctx.banners.getBanners().map((x) => x.toJSON()),
+  };
 }
 
 export async function ssrRoutePropsApi(
@@ -20,10 +24,4 @@ export async function ssrRoutePropsApi(
   } else {
     return {};
   }
-}
-
-function getAboutPageProps(ctx: TrainQuery) {
-  return {
-    aboutMarkdown: ctx.getConfig().server.aboutMarkdown,
-  };
 }
