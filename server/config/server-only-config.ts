@@ -1,5 +1,6 @@
 import { LinterRules } from "../../shared/system/linter-rules";
 import { Timetable } from "../../shared/system/timetable/timetable";
+import { BannersConfig } from "./banners-config";
 import { GtfsConfig } from "./gtfs-config";
 import { PlatformRules } from "./platform-rules";
 import { PtvConfig } from "./ptv-config";
@@ -15,6 +16,8 @@ export class ServerOnlyConfig {
     readonly gtfs: GtfsConfig<true> | GtfsConfig<false> | null,
     /** Configuration for a PTV API data source, if applicable. */
     readonly ptv: PtvConfig | null,
+    /** Configuration for banners. */
+    readonly banners: BannersConfig,
     /** Rules for the linter. */
     readonly linter: LinterRules,
     /**

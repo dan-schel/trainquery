@@ -17,6 +17,7 @@ import { PlatformRules } from "./platform-rules";
 import { GtfsConfig } from "./gtfs-config";
 import { extractZip } from "./download-utils";
 import { PtvConfig } from "./ptv-config";
+import { BannersConfig } from "./banners-config";
 
 export async function loadConfigFromFiles(
   dataFolder: string,
@@ -90,6 +91,7 @@ async function loadServer(
       platformRules: z.string(),
       gtfs: z.string().optional(),
       ptv: z.string().optional(),
+      banners: z.string().optional(),
       linter: z.string(),
       about: z.string(),
     })
@@ -112,6 +114,12 @@ async function loadServer(
     server.ptv != null
       ? PtvConfig.json.parse(await loadYml(dataFolder, server.ptv, z.any()))
       : null;
+  const banners =
+    server.banners != null
+      ? BannersConfig.json.parse(
+          await loadYml(dataFolder, server.banners, z.any()),
+        )
+      : BannersConfig.default;
   const linter = LinterRules.json.parse(
     await loadYml(dataFolder, server.linter, z.any()),
   );
@@ -122,6 +130,7 @@ async function loadServer(
     platformRules,
     gtfs,
     ptv,
+    banners,
     linter,
     about,
   );

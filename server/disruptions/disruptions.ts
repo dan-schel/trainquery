@@ -56,7 +56,7 @@ export class Disruptions {
 
   isStale(): boolean {
     if (this._lastUpdated == null) {
-      return false;
+      return true;
     }
 
     const expiry = this._lastUpdated.add({

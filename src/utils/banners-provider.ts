@@ -11,6 +11,5 @@ export function useBanners() {
   return inject(bannersInjectionKey, banners);
 }
 export function setBanners(newBanners: Banner[]) {
-  console.log(newBanners);
   banners.value = newBanners;
 }

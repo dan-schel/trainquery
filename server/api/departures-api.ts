@@ -67,9 +67,9 @@ export async function departuresApi(
           ),
         ),
       );
+    } else {
+      console.log("Departures empty since GTFS is not loaded yet.");
     }
-  } else {
-    console.log("Departures empty since GTFS is not loaded yet.");
   }
 
   return buckets.map((b) =>
