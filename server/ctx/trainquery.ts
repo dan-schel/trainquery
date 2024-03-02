@@ -8,6 +8,7 @@ import { EnvironmentOptions } from "./environment-options";
 import { GtfsWorker } from "../gtfs/gtfs-worker";
 import { BadApiCallError } from "../param-utils";
 import { TrainQueryDB } from "./trainquery-db";
+import { Banners } from "./banners";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -17,6 +18,7 @@ export type TrainQuery = {
   readonly server: Server;
   readonly database: TrainQueryDB | null;
   readonly disruptions: Disruptions;
+  readonly banners: Banners;
   gtfs: GtfsWorker | null;
   readonly logger: Logger;
 };
@@ -50,22 +52,24 @@ export async function trainQuery(
   refreshConfig(true);
 
   const server = serverBuilder();
-
   const disruptions = new Disruptions();
+  const banners = new Banners();
 
   const ctx: TrainQuery = {
+    isOffline,
+    isProduction,
     getConfig: () => config,
     server,
     database,
-    logger,
-    gtfs: null,
     disruptions,
-    isOffline,
-    isProduction,
+    banners,
+    gtfs: null,
+    logger,
   };
 
   await database?.init();
   await disruptions.init(ctx);
+  banners.init(ctx);
 
   const gtfs = ctx.getConfig().server.gtfs != null ? new GtfsWorker(ctx) : null;
   ctx.gtfs = gtfs;
