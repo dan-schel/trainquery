@@ -1,5 +1,6 @@
 import HmacSha1 from "crypto-js/hmac-sha1";
 import fetch from "node-fetch";
+import { networkInterfaces } from "os";
 
 /** The origin for the PTV API. */
 const ptvOrigin = "https://timetableapi.ptv.vic.gov.au";
@@ -20,8 +21,19 @@ export async function callPtvApi(
   const url = createPtvUrl(api, args, devID, devKey);
   const response = await fetch(url);
 
+  console.log(networkInterfaces());
+  async function myip() {
+    const res = await fetch("https://ipecho.io/json");
+    const data = (await res.json()) as any;
+    return data.ip;
+  }
+
+  const ip = await myip();
+  console.log(ip);
+  console.log(url.href);
+
   if (response.status !== 200) {
-    throw new Error(`PTV API responded with code ${response.status}`);
+    throw new Error(`PTV API responded with code ${response.status}.`);
   }
 
   return await response.json();
