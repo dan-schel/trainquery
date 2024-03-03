@@ -6,7 +6,7 @@ import { getStop } from "shared/system/config-utils";
 import { isValidFilter } from "@/components/departures/helpers/available-filters";
 import { getConfig } from "@/utils/get-config";
 
-const maxPinnedWidgets = 6;
+export const maxPinnedWidgets = 6;
 
 export class PinnedWidget {
   constructor(
@@ -28,6 +28,10 @@ export class PinnedWidget {
       filter: this.filter.toJSON(),
     };
   }
+
+  equals(other: PinnedWidget) {
+    return this.stop === other.stop && this.filter.equals(other.filter);
+  }
 }
 
 export function isPinned(
@@ -44,17 +48,41 @@ export function canPin(settings: Settings) {
   return settings.pinnedWidgets.length < maxPinnedWidgets;
 }
 
+export function unpinWidget(settings: Settings, widget: PinnedWidget) {
+  return settings.with({
+    pinnedWidgets: settings.pinnedWidgets.filter((w) => !w.equals(widget)),
+  });
+}
+
+export function moveWidgetUp(settings: Settings, widget: PinnedWidget) {
+  const index = settings.pinnedWidgets.findIndex((w) => w.equals(widget));
+  if (index === -1 || index === 0) {
+    return settings;
+  }
+  const newWidgets = [...settings.pinnedWidgets];
+  newWidgets.splice(index, 1);
+  newWidgets.splice(index - 1, 0, widget);
+  return settings.with({ pinnedWidgets: newWidgets });
+}
+
+export function moveWidgetDown(settings: Settings, widget: PinnedWidget) {
+  const index = settings.pinnedWidgets.findIndex((w) => w.equals(widget));
+  if (index === -1 || index === settings.pinnedWidgets.length - 1) {
+    return settings;
+  }
+  const newWidgets = [...settings.pinnedWidgets];
+  newWidgets.splice(index, 1);
+  newWidgets.splice(index + 1, 0, widget);
+  return settings.with({ pinnedWidgets: newWidgets });
+}
+
 export function togglePinnedWidget(
   settings: Settings,
   stop: StopID,
   filter: DepartureFilter,
 ): Settings {
   if (isPinned(settings, stop, filter)) {
-    return settings.with({
-      pinnedWidgets: settings.pinnedWidgets.filter(
-        (w) => w.stop !== stop || !w.filter.equals(filter),
-      ),
-    });
+    return unpinWidget(settings, new PinnedWidget(stop, filter));
   } else if (canPin(settings)) {
     return settings.with({
       pinnedWidgets: [
