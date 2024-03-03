@@ -20,6 +20,10 @@ export function getStoppingPatternString(
     }
   }
 
+  if (!departure.perspective.picksUp) {
+    return "Do not board - Not taking additional passengers";
+  }
+
   if (patternList.some((x) => x.type === "unknown")) {
     return "Unknown stopping pattern";
   }
