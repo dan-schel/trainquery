@@ -23,6 +23,7 @@ import UilSearch from "./UilSearch.vue";
 import UilSetting from "./UilSetting.vue";
 import UilSliderHRange from "./UilSliderHRange.vue";
 import UilTimes from "./UilTimes.vue";
+import UilTrashAlt from "./UilTrashAlt.vue";
 
 export type IconID =
   | "majesticons:pin"
@@ -48,7 +49,8 @@ export type IconID =
   | "uil:search"
   | "uil:setting"
   | "uil:slider-h-range"
-  | "uil:times";
+  | "uil:times"
+  | "uil:trash-alt";
 
 defineProps<{
   id: IconID;
@@ -104,4 +106,5 @@ defineProps<{
     class="icon"
   ></UilSliderHRange>
   <UilTimes v-else-if="id === 'uil:times'" class="icon"></UilTimes>
+  <UilTrashAlt v-else-if="id === 'uil:trash-alt'" class="icon"></UilTrashAlt>
 </template>

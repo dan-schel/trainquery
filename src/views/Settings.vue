@@ -9,6 +9,7 @@ import { generatePageHead } from "@/utils/head";
 import Switch from "@/components/common/Switch.vue";
 import { useSettings } from "@/settings/settings";
 import type { Settings } from "@/settings/settings";
+import PinnedWidgetsSettings from "@/components/settings/PinnedWidgetsSettings.vue";
 
 useHead(
   generatePageHead({
@@ -66,6 +67,10 @@ function handleReset() {
           <p>{{ slotProps.data.name }}</p>
         </template>
       </Picker>
+    </div>
+    <div class="section">
+      <h2>Pinned widgets</h2>
+      <PinnedWidgetsSettings />
     </div>
     <div class="section">
       <h2>Miscellaneous</h2>
