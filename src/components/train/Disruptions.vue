@@ -45,6 +45,7 @@ defineProps<{
   justify-self: center;
 }
 .icon {
+  grid-area: icon;
   font-size: 1.2rem;
 }
 .disruption > p {

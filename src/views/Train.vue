@@ -18,6 +18,7 @@ import Disruptions from "@/components/train/Disruptions.vue";
 import { DepartureWithDisruptions } from "../../shared/disruptions/departure-with-disruptions";
 import { generatePageHead, generatePageHeadNotFound } from "@/utils/head";
 import { useSettings } from "@/settings/settings";
+import LiveStatus from "@/components/train/LiveStatus.vue";
 
 const { local } = useNow();
 
@@ -100,6 +101,13 @@ useHead(head as UseHeadInput<{}>);
   >
     <p class="subtitle">{{ data.departureText }}</p>
     <LineList class="line-list" :lines="data.lines"></LineList>
+    <LiveStatus
+      class="live-data"
+      :departure="data.departure"
+      :class="{
+        'above-disruptions': data.disruptions.length > 0,
+      }"
+    ></LiveStatus>
     <Disruptions
       class="disruptions"
       v-if="data.disruptions.length > 0"
@@ -151,11 +159,17 @@ useHead(head as UseHeadInput<{}>);
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
 @use "@/assets/utils" as utils;
+.subtitle {
+  margin-bottom: 1rem;
+}
 .line-list {
   margin-bottom: 1rem;
 }
-.subtitle {
+.live-data {
   margin-bottom: 1rem;
+  &.above-disruptions {
+    margin-bottom: 0.5rem;
+  }
 }
 .disruptions {
   margin-bottom: 1rem;

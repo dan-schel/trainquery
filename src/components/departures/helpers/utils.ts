@@ -105,9 +105,10 @@ export function getTimeStrings(departure: Departure, now: QUtcDateTime) {
   };
 }
 
-function getDelayString(
+export function getDelayString(
   liveTime: QUtcDateTime | null,
   scheduledTime: QUtcDateTime,
+  { capitalize = true }: { capitalize?: boolean } = {},
 ) {
   if (liveTime == null) {
     return null;
@@ -115,7 +116,7 @@ function getDelayString(
   const delayMins = liveTime.diff(scheduledTime).inMins;
   if (delayMins === 0) {
     return {
-      text: "On time",
+      text: capitalize ? "On time" : "on time",
       type: "positive" as const,
     };
   } else if (delayMins > 0) {
