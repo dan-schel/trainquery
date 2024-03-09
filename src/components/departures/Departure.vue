@@ -270,7 +270,7 @@ const detail = computed(() => {
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 2.3rem;
-  padding: 0.2rem 0.4rem;
+  padding: 0.25rem 0.4rem 0.15rem 0.4rem;
   justify-items: center;
 
   border: 2px solid var(--color-ink-20);

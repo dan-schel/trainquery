@@ -41,6 +41,9 @@ const platformString = computed(() => {
         >{{ stopData.express ? "Skips " : "" }}{{ stop.name }}</RouterLink
       >
     </OneLineP>
+    <div class="platform" v-if="platformString != null">
+      <p class="platform-number">{{ platformString }}</p>
+    </div>
     <p v-if="time != null">&ensp;•&ensp;</p>
     <OneLineP v-if="time != null" class="time">
       <RouterLink
@@ -51,10 +54,6 @@ const platformString = computed(() => {
         }}</RouterLink
       >
     </OneLineP>
-    <div class="platform" v-if="platformString != null">
-      <p>Plat.&nbsp;</p>
-      <p class="platform-number">{{ platformString }}</p>
-    </div>
   </div>
 </template>
 
@@ -86,26 +85,28 @@ const platformString = computed(() => {
 }
 .platform {
   flex-direction: row;
-  align-items: baseline;
-  margin-left: 1rem;
+  align-items: center;
+  justify-content: center;
+
+  margin-left: 0.5rem;
+  height: 1.2rem;
+  min-width: 1.2rem;
 
   // Slightly arbitrary, but this is just to stop platform labels impacting the
   // height of the row.
   margin-top: -0.5rem;
   margin-bottom: -0.5rem;
+  padding: 0 0.2rem;
 
-  padding: 0.2rem 0.4rem;
-  justify-items: center;
-
-  border: 2px solid var(--color-ink-20);
+  //background-color: var(--color-ink-80);
+  border: 2px solid var(--color-ink-30);
   border-radius: 0.25rem;
 
-  :nth-child(1) {
-    font-size: 0.6rem;
-    font-stretch: semi-condensed;
-  }
-  .platform-number {
+  p {
+    //color: var(--color-paper-20);
+    font-size: 0.8rem;
     font-weight: bold;
+    text-align: center;
   }
 }
 </style>
