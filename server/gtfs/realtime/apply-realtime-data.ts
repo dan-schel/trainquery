@@ -62,6 +62,9 @@ export function applyRealtimeData(
       return tripError("Invalid start date in trip update.");
     }
 
+    // Start date is the date of the first stop, so for services which
+    // originate with a "next-day" time we need to subtract a day to find the
+    // timetabled date.
     const scheduledOriginTime = trip.times.filter(nonNull)[0].time;
     const liveDate = startDate.addDays(scheduledOriginTime.day);
 

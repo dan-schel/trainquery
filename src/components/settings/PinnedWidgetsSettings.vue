@@ -59,9 +59,8 @@ function handleMoveDown(widget: PinnedWidget) {
     <template v-else>
       <div class="widget" v-for="widget in pinnedWidgets" :key="widget.id">
         <OneLineP class="text">
-          <span class="stop-name">{{ widget.stopName }}</span>
-          <span class="dot">•</span>
-          <span>{{ widget.filterString }}</span>
+          <span class="stop-name">{{ widget.stopName }}</span
+          >&ensp;•&ensp;{{ widget.filterString }}
         </OneLineP>
         <SimpleButton
           class="control"
@@ -126,9 +125,6 @@ function handleMoveDown(widget: PinnedWidget) {
   font-weight: bold;
   color: var(--color-ink-100);
   margin-left: 0.5rem;
-}
-.dot {
-  margin: 0 0.4rem;
 }
 .status {
   margin: 0.5rem;

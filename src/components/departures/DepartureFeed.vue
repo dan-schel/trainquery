@@ -123,7 +123,7 @@ function handlePin() {
           {{ header.title.text }}
         </span>
 
-        <span class="dot" v-if="header.subtitle != null">•</span>
+        <span class="dot" v-if="header.subtitle != null">&ensp;•&ensp;</span>
 
         <RouterLink
           v-if="header.subtitle != null && header.subtitle.to != null"
@@ -208,7 +208,6 @@ function handlePin() {
 }
 .dot {
   @include template.no-select;
-  margin: 0 0.4rem;
 }
 .subtitle {
   --color-accent: var(--color-ink-80);

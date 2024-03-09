@@ -1,8 +1,27 @@
 <script setup lang="ts">
 import PageContent from "@/components/common/PageContent.vue";
+import { getConfig } from "@/utils/get-config";
 import { generatePageHead } from "@/utils/head";
 import { useHead } from "@vueuse/head";
+import { LegalConfig } from "shared/system/config/legal-config";
 import { computed } from "vue";
+import { useRoute } from "vue-router";
+import { z } from "zod";
+
+const route = useRoute();
+
+const additionalMessages = computed(() => {
+  const metaSchema = z.object({
+    state: z.object({
+      route: z.object({
+        additionalMessages: LegalConfig.json,
+      }),
+    }),
+  });
+
+  const meta = metaSchema.parse(route.meta);
+  return meta.state.route.additionalMessages;
+});
 
 const packages = computed(() =>
   [
@@ -71,17 +90,40 @@ useHead(
 
 <template>
   <PageContent title="Licences and attribution">
+    <template v-if="additionalMessages.timetableData.length !== 0">
+      <h2>Timetable data</h2>
+      <p>
+        The timetable data used by {{ getConfig().frontend.appName }} is
+        provided by:
+      </p>
+      <div
+        class="license-attribution"
+        v-for="m in additionalMessages.timetableData"
+        :key="m.title"
+      >
+        <h3>{{ m.title }}</h3>
+        <p class="license">
+          {{ m.message }}
+        </p>
+        <p>
+          <template v-for="(l, i) in m.links" :key="l.url">
+            <span class="dot" v-if="i !== 0">&ensp;•&ensp;</span>
+            <a :href="l.url" class="link">{{ l.text }}</a>
+          </template>
+        </p>
+      </div>
+    </template>
     <h2>Third party packages</h2>
     <p>
-      TrainQuery distributes portions of several third-party packages, which
-      each have their own licences.
+      {{ getConfig().frontend.appName }} distributes portions of several
+      third-party packages, under the following licences:
     </p>
-    <div class="third-party" v-for="p in packages" :key="p.name">
+    <div class="license-attribution" v-for="p in packages" :key="p.name">
       <h3>{{ p.name }}</h3>
       <p class="license">{{ p.copyright }}</p>
       <p>
         <a :href="p.url" class="link">Project website</a>
-        <span class="dot">•</span>
+        <span class="dot">&ensp;•&ensp;</span>
         <a :href="p.licenseUrl" class="link">View licence</a>
       </p>
     </div>
@@ -103,14 +145,14 @@ h3 {
 p {
   margin-bottom: 1rem;
 }
-.third-party {
+.license-attribution {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
   &:last-child {
     margin-bottom: 1.5rem;
   }
 }
-.third-party p {
+.license-attribution p {
   margin-bottom: 0.5rem;
 }
 .license {
@@ -118,6 +160,5 @@ p {
 }
 .dot {
   @include template.no-select;
-  margin: 0 0.4rem;
 }
 </style>
