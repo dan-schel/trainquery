@@ -176,6 +176,11 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
     return QTimetableTime.getNumOfHours();
   }
 
+  /** Returns 0 if `hour < 24` and 1 otherwise. */
+  get day() {
+    return Math.floor(this.hour / 24);
+  }
+
   static readonly json = z.string().transform((x, ctx) => {
     const result = QTimetableTime.parse(x);
     if (result == null) {
@@ -226,7 +231,7 @@ export class QTimetableTime extends QTimeBase<QTimetableTime> {
 
   /**
    * Creates a timetable time by considering the duration of a given datetime
-   * from a particular date. Returns null if the datetie occurs before the date,
+   * from a particular date. Returns null if the datetime occurs before the date,
    * since timetable times cannot be negative.
    */
   static fromDateTime(

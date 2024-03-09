@@ -2,6 +2,7 @@ import { LinterRules } from "../../shared/system/linter-rules";
 import { Timetable } from "../../shared/system/timetable/timetable";
 import { BannersConfig } from "./banners-config";
 import { GtfsConfig } from "./gtfs-config";
+import { LegalConfig } from "../../shared/system/config/legal-config";
 import { PlatformRules } from "./platform-rules";
 import { PtvConfig } from "./ptv-config";
 
@@ -25,5 +26,7 @@ export class ServerOnlyConfig {
      * only sent to the client when the about page is requested.
      */
     readonly aboutMarkdown: string,
+    /** Additional messages for the '/about/legal' page. */
+    readonly legal: LegalConfig,
   ) {}
 }

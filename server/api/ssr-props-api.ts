@@ -2,6 +2,7 @@ import { requireParam } from "../param-utils";
 import { ServerParams, TrainQuery } from "../ctx/trainquery";
 import { getTrainPageProps } from "./ssr-props/train-page";
 import { getAboutPageProps } from "./ssr-props/about-page";
+import { getAboutLegalPageProps } from "./ssr-props/about-legal-page";
 
 export async function ssrAppPropsApi(ctx: TrainQuery): Promise<object> {
   return {
@@ -19,6 +20,8 @@ export async function ssrRoutePropsApi(
 
   if (page === "about") {
     return getAboutPageProps(ctx);
+  } else if (page === "about-legal") {
+    return getAboutLegalPageProps(ctx);
   } else if (page === "train") {
     return await getTrainPageProps(ctx, path);
   } else {

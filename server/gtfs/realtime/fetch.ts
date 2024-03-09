@@ -17,7 +17,7 @@ export async function fetchRealtime(
   config: GtfsRealtimeConfig,
 ): Promise<GtfsRealtimeData> {
   const results = await Promise.all(
-    config.apis.map((api) => fetchToFile(api, config.apiAuth)),
+    config.apis.map((api) => fetchRealtimeApi(api, config.apiAuth)),
   );
 
   const combined = results.map((e) => e.entity).flat();
@@ -28,7 +28,7 @@ export async function fetchRealtime(
   };
 }
 
-async function fetchToFile(
+async function fetchRealtimeApi(
   api: string,
   apiAuth: GtfsRealtimeAuthMethod,
 ): Promise<transit_realtime.FeedMessage> {

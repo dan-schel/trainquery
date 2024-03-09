@@ -18,6 +18,7 @@ import { GtfsConfig } from "./gtfs-config";
 import { extractZip } from "./download-utils";
 import { PtvConfig } from "./ptv-config";
 import { BannersConfig } from "./banners-config";
+import { LegalConfig } from "../../shared/system/config/legal-config";
 
 export async function loadConfigFromFiles(
   dataFolder: string,
@@ -94,6 +95,7 @@ async function loadServer(
       banners: z.string().optional(),
       linter: z.string(),
       about: z.string(),
+      legal: z.string().optional(),
     })
     .passthrough();
 
@@ -124,6 +126,10 @@ async function loadServer(
     await loadYml(dataFolder, server.linter, z.any()),
   );
   const about = await loadText(dataFolder, server.about);
+  const legal =
+    server.legal != null
+      ? LegalConfig.json.parse(await loadYml(dataFolder, server.legal, z.any()))
+      : LegalConfig.default;
 
   return new ServerOnlyConfig(
     timetables,
@@ -133,6 +139,7 @@ async function loadServer(
     banners,
     linter,
     about,
+    legal,
   );
 }
 

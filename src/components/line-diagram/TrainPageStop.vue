@@ -41,7 +41,7 @@ const platformString = computed(() => {
         >{{ stopData.express ? "Skips " : "" }}{{ stop.name }}</RouterLink
       >
     </OneLineP>
-    <p v-if="time != null" class="dot">•</p>
+    <p v-if="time != null">&ensp;•&ensp;</p>
     <OneLineP v-if="time != null" class="time">
       <RouterLink
         class="link"
@@ -72,9 +72,6 @@ const platformString = computed(() => {
       font-size: 0.8rem;
     }
   }
-}
-.dot {
-  margin: 0 0.4rem;
 }
 .time {
   --color-accent: var(--color-ink-80);

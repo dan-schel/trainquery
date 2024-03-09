@@ -48,7 +48,7 @@ export function applyRealtimeData(
     const matchingUpdate = getMatchingTripUpdate(trip, realtime);
     if (matchingUpdate == null) {
       // Note: Leave the trip as is (do not strip live data), because if we have
-      // multiple subfeed, they'll each have their realtime data applied
+      // multiple subfeeds, they'll each have their realtime data applied
       // one-by-one and we want it all to remain.
       return trip;
     }
@@ -57,10 +57,16 @@ export function applyRealtimeData(
     if (matchingUpdate.trip.startDate == null) {
       return tripError("Missing start date in trip update.");
     }
-    const liveDate = QDate.parse(matchingUpdate.trip.startDate);
-    if (liveDate == null || !liveDate.isValid().valid) {
+    const startDate = QDate.parse(matchingUpdate.trip.startDate);
+    if (startDate == null || !startDate.isValid().valid) {
       return tripError("Invalid start date in trip update.");
     }
+
+    // Start date is the date of the first stop, so for services which
+    // originate with a "next-day" time we need to subtract a day to find the
+    // timetabled date.
+    const scheduledOriginTime = trip.times.filter(nonNull)[0].time;
+    const liveDate = startDate.addDays(scheduledOriginTime.day);
 
     const liveTimes: TimeWithSequenceNumber[] = matchingUpdate.stopTimeUpdate
       .map((timeUpdateRaw) => {
