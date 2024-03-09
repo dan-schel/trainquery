@@ -32,25 +32,25 @@
 <style scoped lang="scss">
 .outer {
   animation: pulse 2s linear 0.25s infinite;
-  opacity: 0%;
+  stroke-opacity: 0%;
 }
 .inner {
   animation: pulse 2s linear 0s infinite;
-  opacity: 0%;
+  stroke-opacity: 0%;
 }
 
 @keyframes pulse {
   0% {
-    opacity: 0%;
+    stroke-opacity: 0%;
   }
   20% {
-    opacity: 100%;
+    stroke-opacity: 100%;
   }
   40% {
-    opacity: 0%;
+    stroke-opacity: 0%;
   }
   100% {
-    opacity: 0%;
+    stroke-opacity: 0%;
   }
 }
 </style>

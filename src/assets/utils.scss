@@ -20,11 +20,15 @@
   box-shadow: 0 0.1rem 0.2rem var(--color-shadow-10);
 }
 
-@mixin raised-surface {
-  @include shadow;
+@mixin raised-surface-no-shadow {
   overflow: hidden;
   background-color: var(--color-paper-20);
   border: 1px solid var(--color-ink-10);
+}
+
+@mixin raised-surface {
+  @include shadow;
+  @include raised-surface-no-shadow;
 }
 
 @mixin dropdown-bg {
