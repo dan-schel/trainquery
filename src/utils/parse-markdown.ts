@@ -19,7 +19,7 @@ export function parseMarkdown(markdown: string) {
 }
 
 export function parseInlineMarkdown(line: string) {
-  return line
+  return escapeHtml(line)
     .replace(/\[([^[\]]+)\]\(([^()]+)\)/g, '<a class="link" href="$2">$1</a>')
     .replace(/\*\*(.*)\*\*/g, "<b>$1</b>")
     .replace(/\*(.*)\*/g, "<i>$1</i>")

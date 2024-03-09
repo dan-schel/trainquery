@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { parseInlineMarkdown } from "@/utils/parse-markdown";
 import Wordmark from "./Wordmark.vue";
 import { getConfig } from "@/utils/get-config";
+
+const disclaimerHtml = parseInlineMarkdown(getConfig().frontend.footerMarkdown);
 </script>
 
 <template>
@@ -8,7 +11,7 @@ import { getConfig } from "@/utils/get-config";
     <div class="content">
       <div class="divider"></div>
       <Wordmark class="wordmark"></Wordmark>
-      <p class="disclaimer" v-html="getConfig().frontend.footer"></p>
+      <p class="disclaimer" v-html="disclaimerHtml"></p>
       <p>
         <RouterLink :to="{ name: 'about' }" class="link">
           About {{ getConfig().frontend.appName }}
