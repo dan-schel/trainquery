@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { type LineColor, LineColorJson } from "./enums";
+import {
+  type LineColor,
+  LineColorJson,
+  LineVisibility,
+  LineVisibilityJson,
+} from "./enums";
 import {
   type LineID,
   LineIDJson,
@@ -20,7 +25,7 @@ export class Line {
     /** Color used on the frontend, e.g. 'green'. */
     readonly color: LineColor,
     /** True if the line only runs occasionally. */
-    readonly specialEventsOnly: boolean,
+    readonly visibility: LineVisibility,
     /** Type of service on this line, e.g. 'suburban' or 'regional'. */
     readonly serviceType: ServiceTypeID,
     /** Describes the stops and route this line takes. */
@@ -32,20 +37,13 @@ export class Line {
       id: LineIDJson,
       name: z.string(),
       color: LineColorJson.default("none"),
-      specialEventsOnly: z.boolean().default(false),
+      visibility: LineVisibilityJson.default("regular"),
       serviceType: ServiceTypeIDJson.default(toServiceTypeID("normal")),
       route: RouteJson,
     })
     .transform(
       (x) =>
-        new Line(
-          x.id,
-          x.name,
-          x.color,
-          x.specialEventsOnly,
-          x.serviceType,
-          x.route,
-        ),
+        new Line(x.id, x.name, x.color, x.visibility, x.serviceType, x.route),
     );
 
   toJSON(): z.input<typeof Line.json> {
@@ -53,7 +51,7 @@ export class Line {
       id: this.id,
       name: this.name,
       color: this.color === "none" ? undefined : this.color,
-      specialEventsOnly: this.specialEventsOnly ? true : undefined,
+      visibility: this.visibility === "regular" ? undefined : this.visibility,
       serviceType: this.serviceType === "normal" ? undefined : this.serviceType,
       route: routeToJSON(this.route),
     };

@@ -24,19 +24,16 @@ export function linesThatStopAt(
   config: HasSharedConfig,
   stop: StopID,
   {
-    ignoreSpecialEventsOnlyLines = false,
+    ignoreInvisibleLines = false,
     sortAlphabetically = false,
   }: {
-    ignoreSpecialEventsOnlyLines?: boolean;
+    ignoreInvisibleLines?: boolean;
     sortAlphabetically?: boolean;
   } = {},
 ) {
   let lines = config.shared.lines.filter((l) => l.route.stopsAt(stop));
-  if (
-    ignoreSpecialEventsOnlyLines &&
-    !lines.every((l) => l.specialEventsOnly)
-  ) {
-    lines = lines.filter((l) => !l.specialEventsOnly);
+  if (ignoreInvisibleLines && !lines.every((l) => l.visibility !== "regular")) {
+    lines = lines.filter((l) => l.visibility === "regular");
   }
   if (sortAlphabetically) {
     lines.sort((a, b) => a.name.localeCompare(b.name));
