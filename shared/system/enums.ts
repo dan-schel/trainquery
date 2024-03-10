@@ -17,6 +17,12 @@ export const LineRouteTypes = ["linear", "y-branch", "hook"] as const;
 export const ServiceModes = ["suburban-train", "regional-train"] as const;
 /** All supported confidence levels. */
 export const ConfidenceLevels = ["low", "medium", "high"] as const;
+/** All supported line visibility values. */
+export const LineVisibilityValues = [
+  "regular",
+  "special-events-only",
+  "hidden",
+] as const;
 
 /** One of a list of pre-defined color options. */
 export type LineColor = (typeof LineColors)[number];
@@ -24,8 +30,10 @@ export type LineColor = (typeof LineColors)[number];
 export type LineRouteType = (typeof LineRouteTypes)[number];
 /** E.g. 'suburban-train', 'regional-train', etc. */
 export type ServiceMode = (typeof ServiceModes)[number];
-/** E.g. 'low' or 'high'. */
+/** E.g. 'low', or 'high'. */
 export type ConfidenceLevel = (typeof ConfidenceLevels)[number];
+/** E.g. 'special-events-only' or 'hidden'. */
+export type LineVisibility = (typeof LineVisibilityValues)[number];
 
 /** Matches a value in {@link LineColors}. */
 export const LineColorJson = z.enum(LineColors);
@@ -35,3 +43,5 @@ export const LineRouteTypeJson = z.enum(LineRouteTypes);
 export const ServiceModeJson = z.enum(ServiceModes);
 /** Matches a value in {@link ConfidenceLevels}. */
 export const ConfidenceLevelJson = z.enum(ConfidenceLevels);
+/** Matches a value in {@link LineVisibilityValues}. */
+export const LineVisibilityJson = z.enum(LineVisibilityValues);

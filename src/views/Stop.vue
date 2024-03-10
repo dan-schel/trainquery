@@ -125,7 +125,7 @@ const lines = computed(() => {
   }
 
   return linesThatStopAt(getConfig(), stop.value.id, {
-    ignoreSpecialEventsOnlyLines: true,
+    ignoreInvisibleLines: true,
   }).map((l) => l.id);
 });
 

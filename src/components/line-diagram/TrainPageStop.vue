@@ -99,7 +99,7 @@ const platformString = computed(() => {
   padding: 0 0.2rem;
 
   //background-color: var(--color-ink-80);
-  border: 2px solid var(--color-ink-30);
+  border: 2px solid var(--color-ink-20);
   border-radius: 0.25rem;
 
   p {

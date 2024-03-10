@@ -148,7 +148,12 @@ function parseTrips(
       feedConfig,
       trip.route_id,
     );
-    const match = matchToRoute(config, stopTimes as AllGood, combinations);
+    const match = matchToRoute(
+      config,
+      stopTimes as AllGood,
+      combinations,
+      feedConfig,
+    );
 
     if (match == null) {
       parsingReport.logRejectedRoute((stopTimes as AllGood).map((x) => x.stop));

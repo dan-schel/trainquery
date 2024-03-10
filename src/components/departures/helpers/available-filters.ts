@@ -51,6 +51,7 @@ export function getAvailableFilters(stop: StopID): AvailableFilters {
     (a, b) => a === b,
   );
   const directionFilters =
+    getConfig().frontend.departureFeeds.isDirectionFilteringDisabled(stop) ||
     directions.length < 2
       ? null
       : directions.map((d) => ({

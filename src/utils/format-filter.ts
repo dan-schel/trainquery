@@ -11,8 +11,8 @@ export function formatFilter(filter: DepartureFilter, perspective: StopID) {
   if (filter.directions != null) {
     prefix = listifyAnd(
       filter.directions
-        .map((d, i) => formatDirection(d, { capital: i === 0 }))
-        .sort((a, b) => a.localeCompare(b)),
+        .sort((a, b) => formatDirection(a).localeCompare(formatDirection(b)))
+        .map((d, i) => formatDirection(d, { capital: i === 0 })),
     );
   }
 

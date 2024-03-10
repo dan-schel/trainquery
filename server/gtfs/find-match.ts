@@ -31,18 +31,28 @@ export function matchToRoute<T>(
   config: HasSharedConfig,
   stoppingOrder: { stop: StopID; value: T }[],
   combinations: RouteOption[],
+  feedConfig: GtfsFeedConfig,
 ): MatchedRoute<T> | null {
   const matches: MatchedRoute<T>[] = [];
   for (const combination of combinations) {
+    // Filter out stops that the parsing rules say we can ignore for this
+    // combination's line, e.g. Southern Cross on the Sandringham line.
+    const effectiveStoppingOrder = stoppingOrder.filter(
+      (s) =>
+        !feedConfig
+          .getParsingRulesForLine(combination.line)
+          .ignoreStops.includes(s.stop),
+    );
+
     // Build the stopping pattern by slotting in the stops in the stopping order
     // as soon as possible.
     const stoppingPattern: (T | null)[] = [];
     let currInOrder = 0;
     for (const stop of combination.stops) {
-      if (currInOrder === stoppingOrder.length) {
+      if (currInOrder === effectiveStoppingOrder.length) {
         stoppingPattern.push(null);
       } else {
-        const curr = stoppingOrder[currInOrder];
+        const curr = effectiveStoppingOrder[currInOrder];
         if (stop === curr.stop) {
           stoppingPattern.push(curr.value);
           currInOrder++;
@@ -52,7 +62,7 @@ export function matchToRoute<T>(
       }
     }
 
-    if (currInOrder === stoppingOrder.length) {
+    if (currInOrder === effectiveStoppingOrder.length) {
       // If we got through every stop in the stopping order, then this stop list
       // has matched!
       matches.push({
@@ -83,12 +93,15 @@ export function matchToRoute<T>(
         // found above. Be sure to include the previous terminus (the
         // continuation's origin) in the stoplist. Because we know it stopped at
         // the first service's terminus, currInOrder will always be at least 1.
-        const futureStoppingOrder = stoppingOrder.slice(currInOrder - 1);
+        const futureStoppingOrder = effectiveStoppingOrder.slice(
+          currInOrder - 1,
+        );
         const continuationCombinations = mapWithStopLists(config, options);
         const continuation = matchToRoute(
           config,
           futureStoppingOrder,
           continuationCombinations,
+          feedConfig,
         );
 
         if (continuation != null) {

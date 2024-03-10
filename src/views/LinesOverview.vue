@@ -15,7 +15,7 @@ const modes = computed(() => {
     .map((s) => ({
       serviceType: s,
       lines: c.lines
-        .filter((l) => l.serviceType === s.id)
+        .filter((l) => l.serviceType === s.id && l.visibility !== "hidden")
         .sort((a, b) => a.name.localeCompare(b.name)),
     }))
     .filter((g) => g.lines.length > 0);
@@ -50,7 +50,11 @@ useHead(
               :to="getLinePageRoute(getConfig(), line.id)"
               >{{ line.name }}</RouterLink
             >
-            {{ line.specialEventsOnly ? " (special events only)" : "" }}
+            {{
+              line.visibility === "special-events-only"
+                ? " (special events only)"
+                : ""
+            }}
           </p>
         </li>
       </ul>

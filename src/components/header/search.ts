@@ -212,7 +212,7 @@ function similarity(query: string, tag: string): number {
 
 function stopSubtitle(stop: Stop): string {
   const lineNames = linesThatStopAt(getConfig(), stop.id, {
-    ignoreSpecialEventsOnlyLines: true,
+    ignoreInvisibleLines: true,
     sortAlphabetically: true,
   }).map((l) => l.name);
   if (lineNames.length === 0) {
