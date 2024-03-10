@@ -10,6 +10,7 @@ type PartialDepartureFeed = {
 type FeedException = {
   stops: StopID[];
   feeds: PartialDepartureFeed[];
+  disableDirectionFiltering: boolean;
 };
 
 export class DefaultDepartureFeeds {
@@ -48,6 +49,13 @@ export class DefaultDepartureFeeds {
     );
   }
 
+  isDirectionFilteringDisabled(stop: StopID) {
+    const exception = this.exceptions.find((e) =>
+      e.stops.some((s) => s === stop),
+    );
+    return exception != null && exception.disableDirectionFiltering;
+  }
+
   static readonly json = z
     .object({
       default: z
@@ -65,6 +73,7 @@ export class DefaultDepartureFeeds {
               count: z.number().default(5),
             })
             .array(),
+          disableDirectionFiltering: z.boolean().default(false),
         })
         .array(),
     })
@@ -82,6 +91,9 @@ export class DefaultDepartureFeeds {
           filter: f.filter.toJSON(),
           count: f.count,
         })),
+        disableDirectionFiltering: e.disableDirectionFiltering
+          ? true
+          : undefined,
       })),
     };
   }
