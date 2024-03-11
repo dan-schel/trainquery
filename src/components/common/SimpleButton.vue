@@ -15,11 +15,13 @@ export interface Props {
   layout?: ButtonLayout;
   theme?: ButtonTheme;
   disabled?: boolean;
+  submit?: boolean;
 }
 withDefaults(defineProps<Props>(), {
   layout: "traditional",
   theme: "hover",
   disabled: false,
+  submit: false,
 });
 
 defineEmits<{ (e: "click", payload: MouseEvent): void }>();
@@ -61,6 +63,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
     }"
     :title="content.altText"
     :disabled="disabled ? true : undefined"
+    :type="submit ? 'submit' : undefined"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>

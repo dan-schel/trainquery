@@ -1,14 +1,11 @@
 import { EnvironmentVariables } from "../ctx/environment-variables";
 import { ServerParams } from "../ctx/trainquery";
 import { BadApiCallError } from "../param-utils";
-
-export type Role = "superadmin" | "any";
-
-export type Session = {
-  username: string;
-  roles: Role[];
-  token: string;
-};
+import {
+  Session,
+  Role,
+  applyRoleInheritance,
+} from "../../shared/admin/session";
 
 export class AdminAuth {
   private _sessions: Session[] = [];
@@ -54,7 +51,7 @@ export class AdminAuth {
     const session = this.getSession(token);
     if (
       session == null ||
-      !this._inheritedRoles(session.roles).includes(role)
+      !applyRoleInheritance(session.roles).includes(role)
     ) {
       throw new BadApiCallError("Invalid admin token.", 403);
     }
@@ -62,21 +59,8 @@ export class AdminAuth {
     return session;
   }
 
-  private _inheritedRoles(roles: Role[]): Role[] {
-    const result = [...roles];
-    if (result.length > 1) {
-      result.push("any");
-    }
-    return result;
-  }
-
   private _createSession(username: string, roles: Role[]): Session {
-    const session = {
-      username,
-      roles: roles,
-      token: generateRandomToken(),
-    };
-
+    const session = new Session(username, roles, generateRandomToken());
     this._sessions = this._sessions.filter((s) => s.username !== username);
     this._sessions.push(session);
     return session;

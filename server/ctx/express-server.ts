@@ -28,8 +28,8 @@ export class ExpressServer extends Server {
 
       try {
         const params: ServerParams = {
-          query: req.query as Record<string, string>,
-          body: req.body as Record<string, string>,
+          query: paramify(req.query),
+          body: paramify(req.body),
           header: {
             adminToken: req.header("admin-token") ?? null,
           },
@@ -50,4 +50,19 @@ export class ExpressServer extends Server {
 
     await new Promise<void>((resolve) => app.listen(this.port, resolve));
   }
+}
+
+function paramify(obj: { [index: string]: any }): Record<string, string> {
+  if (typeof obj !== "object" || obj == null) {
+    return {};
+  }
+
+  const result: Record<string, string> = {};
+  for (const key in obj) {
+    const value = obj[key];
+    if (typeof value === "string") {
+      result[key] = value;
+    }
+  }
+  return result;
 }
