@@ -24,7 +24,7 @@ export class BadApiCallError extends Error {
 }
 
 export function requireParam(params: ServerParams, name: string): string {
-  const value = params[name];
+  const value = params.query[name];
   if (value == null) {
     throw new BadApiCallError(`"${name}" param is required.`);
   }
@@ -78,4 +78,12 @@ export function requireDateTimeParam(
     );
   }
   return date;
+}
+
+export function requireBodyParam(params: ServerParams, name: string): string {
+  const value = params.body[name] as string;
+  if (value == null) {
+    throw new BadApiCallError(`"${name}" param is required.`);
+  }
+  return value;
 }

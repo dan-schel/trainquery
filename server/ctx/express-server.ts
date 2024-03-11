@@ -21,12 +21,20 @@ export class ExpressServer extends Server {
     ) => Promise<object>,
   ): Promise<void> {
     const app = express();
+    app.use(express.json());
 
-    app.get("/api/*", async (req, res) => {
+    app.all("/api/*", async (req, res) => {
       const path = req.path.replace(/^\/api\//, "");
 
       try {
-        const data = await requestListener(path, req.query as ServerParams);
+        const params: ServerParams = {
+          query: req.query as Record<string, string>,
+          body: req.body as Record<string, string>,
+          header: {
+            adminToken: req.header("admin-token") ?? null,
+          },
+        };
+        const data = await requestListener(path, params);
         res.json(data);
       } catch (e) {
         if (BadApiCallError.detect(e)) {

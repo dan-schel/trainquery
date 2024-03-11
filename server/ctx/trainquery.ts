@@ -9,6 +9,9 @@ import { GtfsWorker } from "../gtfs/gtfs-worker";
 import { BadApiCallError } from "../param-utils";
 import { TrainQueryDB } from "./trainquery-db";
 import { Banners } from "./banners";
+import { loginApi } from "../api/admin/login-api";
+import { AdminAuth } from "../admin/auth";
+import { logoutApi } from "../api/admin/logout-api";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -17,6 +20,7 @@ export type TrainQuery = {
   readonly getConfig: () => FullConfig;
   readonly server: Server;
   readonly database: TrainQueryDB | null;
+  readonly adminAuth: AdminAuth;
   readonly disruptions: Disruptions;
   readonly banners: Banners;
   gtfs: GtfsWorker | null;
@@ -53,6 +57,7 @@ export async function trainQuery(
 
   const server = serverBuilder();
   const disruptions = new Disruptions();
+  const adminAuth = new AdminAuth();
   const banners = new Banners();
 
   const ctx: TrainQuery = {
@@ -61,6 +66,7 @@ export async function trainQuery(
     getConfig: () => config,
     server,
     database,
+    adminAuth,
     disruptions,
     banners,
     gtfs: null,
@@ -88,6 +94,12 @@ export async function trainQuery(
     if (endpoint === "departures") {
       return hashify(ctx, await departuresApi(ctx, params));
     }
+    if (endpoint === "admin/login") {
+      return await loginApi(ctx, params);
+    }
+    if (endpoint === "admin/logout") {
+      return await logoutApi(ctx, params);
+    }
     throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
   });
   logger.logServerListening(server);
@@ -95,7 +107,13 @@ export async function trainQuery(
   return ctx;
 }
 
-export type ServerParams = Record<string, string>;
+export type ServerParams = {
+  query: Record<string, string>;
+  body: Record<string, string>;
+  header: {
+    adminToken: string | null;
+  };
+};
 
 export abstract class Server {
   abstract start(

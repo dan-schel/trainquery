@@ -1,4 +1,4 @@
-import HmacSha1 from "crypto-js/hmac-sha1";
+import { createHmac } from "crypto";
 import fetch from "node-fetch";
 
 /** The origin for the PTV API. */
@@ -77,7 +77,9 @@ function signUrlPtv(devID: string, devKey: string, url: URL): URL {
   url.searchParams.append("devid", devID);
 
   const urlExceptOrigin = url.pathname + url.search;
-  const signature = HmacSha1(urlExceptOrigin, devKey).toString().toUpperCase();
+  const hmac = createHmac("sha1", devKey);
+  hmac.write(urlExceptOrigin, "utf8");
+  const signature = hmac.digest("hex");
   url.searchParams.append("signature", signature);
 
   return url;

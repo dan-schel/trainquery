@@ -39,7 +39,15 @@ type SuperadminVars = {
 
 /** The environment variables. Use `EnvironmentVariables.get()` to access. */
 export class EnvironmentVariables {
-  private static instance: EnvironmentVariables | null = null;
+  private static _instance: EnvironmentVariables | null = null;
+
+  /** Get/create the singleton environment variables object. */
+  static get() {
+    if (this._instance == null) {
+      this._instance = this._read();
+    }
+    return this._instance;
+  }
 
   private constructor(
     readonly nodeEnv: string,
@@ -79,14 +87,6 @@ export class EnvironmentVariables {
       throw notSet(names.gtfsRealtimeKey);
     }
     return this.gtfsRealtimeKey;
-  }
-
-  /** Get/create the singleton environment variables object. */
-  static get() {
-    if (this.instance == null) {
-      this.instance = this._read();
-    }
-    return this.instance;
   }
 
   /** Parses the environment variables from `process.env`. */
