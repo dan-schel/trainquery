@@ -49,11 +49,12 @@ export class AdminAuth {
     }
 
     const session = this.getSession(token);
-    if (
-      session == null ||
-      !applyRoleInheritance(session.roles).includes(role)
-    ) {
-      throw new BadApiCallError("Invalid admin token.", 403);
+    if (session == null) {
+      throw new BadApiCallError("Admin token invalid/expired.", 401);
+    }
+
+    if (!applyRoleInheritance(session.roles).includes(role)) {
+      throw new BadApiCallError("Access denied - Inadequate permissions.", 403);
     }
 
     return session;
