@@ -12,6 +12,8 @@ const names = {
   ptvDevId: "PTV_DEV_ID",
   ptvDevKey: "PTV_DEV_KEY",
   gtfsRealtimeKey: "GTFS_REALTIME_KEY",
+  superadminUsername: "SUPERADMIN_USERNAME",
+  superadminPassword: "SUPERADMIN_PASSWORD",
 };
 
 const defaults = {
@@ -30,6 +32,11 @@ type PtvVars = {
   devKey: string;
 };
 
+type SuperadminVars = {
+  username: string;
+  password: string;
+};
+
 /** The environment variables. Use `EnvironmentVariables.get()` to access. */
 export class EnvironmentVariables {
   private static instance: EnvironmentVariables | null = null;
@@ -43,6 +50,7 @@ export class EnvironmentVariables {
     readonly mongo: MongoVars | null,
     readonly ptv: PtvVars | null,
     readonly gtfsRealtimeKey: string | null,
+    readonly superadmin: SuperadminVars | null,
   ) {}
 
   isProduction() {
@@ -154,6 +162,23 @@ export class EnvironmentVariables {
     // GTFS_REALTIME_KEY.
     const gtfsRealtimeKey = process.env[names.gtfsRealtimeKey] ?? null;
 
+    // SUPERADMIN_USERNAME and SUPERADMIN_PASSWORD.
+    const superadminUsername = process.env[names.superadminUsername] ?? null;
+    const superadminPassword = process.env[names.superadminPassword] ?? null;
+    let superadmin: SuperadminVars | null = null;
+    if (superadminUsername != null || superadminPassword != null) {
+      if (superadminUsername == null) {
+        throw notSet(names.superadminUsername);
+      }
+      if (superadminPassword == null) {
+        throw notSet(names.superadminPassword);
+      }
+      superadmin = {
+        username: superadminUsername,
+        password: superadminPassword,
+      };
+    }
+
     return new EnvironmentVariables(
       nodeEnv,
       port,
@@ -163,6 +188,7 @@ export class EnvironmentVariables {
       mongo,
       ptv,
       gtfsRealtimeKey,
+      superadmin,
     );
   }
 }
