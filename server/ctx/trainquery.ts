@@ -101,7 +101,7 @@ export async function trainQuery(
     if (endpoint === "admin/logout") {
       return await logoutApi(ctx, params);
     }
-    if (endpoint === "admin/test-secret") {
+    if (endpoint === "admin/testSecret") {
       return await testSecretApi(ctx, params);
     }
     throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
