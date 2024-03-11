@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import ExpandableMenu from "./ExpandableMenu.vue";
 import ExpandableSearch from "./ExpandableSearch.vue";
 import Navbar from "./Navbar.vue";
 import type { IconID } from "../icons/Icon.vue";
 import { useRoute } from "vue-router";
+import { useSettings } from "@/settings/settings";
 
 export type MenuItem = {
   icon: IconID;
@@ -13,12 +14,26 @@ export type MenuItem = {
   hideOnDesktop?: boolean;
 };
 
-const menuItems = ref<MenuItem[]>([
-  { icon: "uil:home", title: "Home", routeName: "home", hideOnDesktop: true },
-  // { icon: "uil:map", title: "Train map", routeName: "map" },
-  { icon: "uil:code-branch", title: "Lines", routeName: "lines-overview" },
-  { icon: "uil:info-circle", title: "About", routeName: "about" },
-]);
+const { settings } = useSettings();
+
+const menuItems = computed(() => {
+  const items: MenuItem[] = [
+    { icon: "uil:home", title: "Home", routeName: "home", hideOnDesktop: true },
+    // { icon: "uil:map", title: "Train map", routeName: "map" },
+    { icon: "uil:code-branch", title: "Lines", routeName: "lines-overview" },
+    { icon: "uil:info-circle", title: "About", routeName: "about" },
+  ];
+
+  if (settings.value?.developerMode === true) {
+    items.push({
+      icon: "uil:wrench",
+      title: "Admin dashboard",
+      routeName: "admin",
+    });
+  }
+
+  return items;
+});
 
 const openExpandable = ref<"none" | "menu" | "search">("none");
 function menuButtonClicked() {

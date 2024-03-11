@@ -24,6 +24,7 @@ import UilSetting from "./UilSetting.vue";
 import UilSliderHRange from "./UilSliderHRange.vue";
 import UilTimes from "./UilTimes.vue";
 import UilTrashAlt from "./UilTrashAlt.vue";
+import UilWrench from "./UilWrench.vue";
 
 export type IconID =
   | "majesticons:pin"
@@ -50,7 +51,8 @@ export type IconID =
   | "uil:setting"
   | "uil:slider-h-range"
   | "uil:times"
-  | "uil:trash-alt";
+  | "uil:trash-alt"
+  | "uil:wrench";
 
 defineProps<{
   id: IconID;
@@ -107,4 +109,5 @@ defineProps<{
   ></UilSliderHRange>
   <UilTimes v-else-if="id === 'uil:times'" class="icon"></UilTimes>
   <UilTrashAlt v-else-if="id === 'uil:trash-alt'" class="icon"></UilTrashAlt>
+  <UilWrench v-else-if="id === 'uil:wrench'" class="icon"></UilWrench>
 </template>

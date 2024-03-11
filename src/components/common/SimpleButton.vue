@@ -41,7 +41,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       'theme-filled-neutral': theme === 'filled-neutral',
     }"
     :title="content.altText"
-    :disabled="disabled"
+    :disabled="disabled ? true : undefined"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>
@@ -60,7 +60,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       'theme-filled-neutral': theme === 'filled-neutral',
     }"
     :title="content.altText"
-    :disabled="disabled"
+    :disabled="disabled ? true : undefined"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>

@@ -117,7 +117,11 @@ function handleCloseTimeEditor() {
       <button type="button" title="Cancel" @click="handleCloseTimeEditor">
         <Icon id="uil:times"></Icon>
       </button>
-      <button type="submit" title="Set time" :disabled="!typeableSubmitEnabled">
+      <button
+        type="submit"
+        title="Set time"
+        :disabled="!typeableSubmitEnabled ? true : undefined"
+      >
         <Icon id="uil:check"></Icon>
       </button>
     </form>
