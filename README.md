@@ -40,6 +40,11 @@ An unofficial guide to help you navigate Melbourne's train network, built on Vue
     # If using "melbourne" style authentication for a GTFS-R API, the
     # authentication key (optional).
     GTFS_REALTIME_KEY = "..."
+
+    # If using the admin dashboard, the superadmin's username and password
+    # (optional).
+    SUPERADMIN_USERNAME = "..."
+    SUPERADMIN_PASSWORD = "..."
     ```
 
 4.  Run `npm run dev` (or `npm run build` and `npm run start`)!

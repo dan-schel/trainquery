@@ -45,6 +45,11 @@ export default [
     component: () => import("../views/Settings.vue"),
   },
   {
+    path: "/admin",
+    name: "admin",
+    component: () => import("../views/Admin.vue"),
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "notfound",
     component: () => import("../views/NotFound.vue"),

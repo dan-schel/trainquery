@@ -21,12 +21,20 @@ export class ExpressServer extends Server {
     ) => Promise<object>,
   ): Promise<void> {
     const app = express();
+    app.use(express.json());
 
-    app.get("/api/*", async (req, res) => {
+    app.all("/api/*", async (req, res) => {
       const path = req.path.replace(/^\/api\//, "");
 
       try {
-        const data = await requestListener(path, req.query as ServerParams);
+        const params: ServerParams = {
+          query: paramify(req.query),
+          body: paramify(req.body),
+          header: {
+            adminToken: req.header("admin-token") ?? null,
+          },
+        };
+        const data = await requestListener(path, params);
         res.json(data);
       } catch (e) {
         if (BadApiCallError.detect(e)) {
@@ -42,4 +50,19 @@ export class ExpressServer extends Server {
 
     await new Promise<void>((resolve) => app.listen(this.port, resolve));
   }
+}
+
+function paramify(obj: { [index: string]: any }): Record<string, string> {
+  if (typeof obj !== "object" || obj == null) {
+    return {};
+  }
+
+  const result: Record<string, string> = {};
+  for (const key in obj) {
+    const value = obj[key];
+    if (typeof value === "string") {
+      result[key] = value;
+    }
+  }
+  return result;
 }
