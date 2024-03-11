@@ -6,6 +6,10 @@ import {
   Role,
   applyRoleInheritance,
 } from "../../shared/admin/session";
+import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
+
+/** Disregard admin tokens that were created over 30 mins ago. */
+const tokenLifespanMins = 30;
 
 export class AdminAuth {
   private _sessions: Session[] = [];
@@ -39,7 +43,12 @@ export class AdminAuth {
   }
 
   getSession(token: string): Session | null {
-    return this._sessions.find((s) => s.token === token) ?? null;
+    const oldestAcceptedToken = nowUTCLuxon().add({ m: -tokenLifespanMins });
+    return (
+      this._sessions.find(
+        (s) => s.token === token && s.begun.isAfter(oldestAcceptedToken),
+      ) ?? null
+    );
   }
 
   throwUnlessAuthenticated(params: ServerParams, role: Role): Session {
@@ -62,7 +71,12 @@ export class AdminAuth {
   }
 
   private _createSession(username: string, roles: Role[]): Session {
-    const session = new Session(username, roles, generateRandomToken());
+    const session = new Session(
+      username,
+      roles,
+      generateRandomToken(),
+      nowUTCLuxon(),
+    );
     this._sessions = this._sessions.filter((s) => s.username !== username);
     this._sessions.push(session);
     return session;
