@@ -8,11 +8,13 @@ export type Role = (typeof Roles)[number];
 export const RoleJson = z.enum(Roles);
 
 export function applyRoleInheritance(roles: Role[]): Role[] {
-  const result = [...roles];
-  if (result.length > 1) {
-    result.push("any");
+  if (roles.length === 0) {
+    throw new Error("User has no roles.");
   }
-  return result;
+
+  const result = new Set(roles);
+  result.add("any");
+  return Array.from(result);
 }
 
 export class Session {

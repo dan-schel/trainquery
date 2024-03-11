@@ -2,8 +2,7 @@
 import Wordmark from "@/components/Wordmark.vue";
 import SimpleButton from "../common/SimpleButton.vue";
 import { computed, ref } from "vue";
-import { Session } from "shared/admin/session";
-import { z } from "zod";
+import { useAdminAuth } from "@/utils/admin-auth-provider";
 
 const username = ref("");
 const password = ref("");
@@ -13,55 +12,21 @@ const buttonDisabled = computed(
   () => loading.value || username.value.length < 1 || password.value.length < 1,
 );
 
-const emit = defineEmits<{
-  (e: "logged-in", session: Session): void;
-}>();
+const { login } = useAdminAuth();
 
 async function handleFormSubmit(e: Event) {
   e.preventDefault();
 
-  if (username.value.length < 1 || password.value.length < 1) {
-    error.value = "Username and password required.";
-    return;
+  try {
+    loading.value = true;
+    await login(username.value, password.value);
+  } catch (e) {
+    if (e instanceof Error) {
+      error.value = e.message;
+    }
+  } finally {
+    loading.value = false;
   }
-
-  loading.value = true;
-  const response = await fetch("/api/admin/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username: username.value,
-      password: password.value,
-    }),
-  });
-  loading.value = false;
-  password.value = "";
-
-  if (response.status === 429) {
-    error.value = "Too many login attempts. Please try again later.";
-    return;
-  }
-
-  if (!response.ok) {
-    error.value = "Something went wrong during login.";
-    return;
-  }
-
-  const json = await response.json();
-  const schema = z.object({
-    session: Session.json.nullable(),
-  });
-  const { session } = schema.parse(json);
-
-  if (session == null) {
-    error.value = "Incorrect username or password.";
-    return;
-  }
-
-  error.value = null;
-  emit("logged-in", session);
 }
 </script>
 

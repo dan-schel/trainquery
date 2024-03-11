@@ -1,13 +1,8 @@
 <script setup lang="ts">
-import PageContent from "@/components/common/PageContent.vue";
 import { generatePageHead } from "@/utils/head";
 import { useHead } from "@vueuse/head";
-import AdminLogin from "@/components/admin/AdminLogin.vue";
-import type { Session } from "shared/admin/session";
-
-function handleLoggedIn(session: Session) {
-  console.log(session);
-}
+import AdminAuthProtected from "@/components/admin/AdminAuthProtected.vue";
+import AdminTestContent from "@/components/admin/AdminTestContent.vue";
 
 useHead(
   generatePageHead({
@@ -19,9 +14,9 @@ useHead(
 </script>
 
 <template>
-  <PageContent :title="null">
-    <AdminLogin @logged-in="handleLoggedIn" />
-  </PageContent>
+  <AdminAuthProtected>
+    <AdminTestContent></AdminTestContent>
+  </AdminAuthProtected>
 </template>
 
 <style scoped lang="scss">
