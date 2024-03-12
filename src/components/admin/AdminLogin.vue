@@ -79,9 +79,10 @@ label p {
   margin-bottom: 0.5rem;
 }
 input {
-  @include template.input-filled-neutral;
-  height: 2rem;
+  @include template.input-outlined;
+  height: 2.5rem;
   padding: 0rem 0.75rem;
+  font-weight: bold;
 }
 .notice {
   font-size: 0.8rem;

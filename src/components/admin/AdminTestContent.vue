@@ -6,7 +6,7 @@ import PageContent from "@/components/common/PageContent.vue";
 
 const { callAdminApi, logout } = useAdminAuth();
 
-const testSecret = ref<string | null>(null);
+const testSecret = ref<string>("Loading...");
 
 async function handleLogout() {
   await logout();
