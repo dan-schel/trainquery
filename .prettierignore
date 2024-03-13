@@ -1,5 +1,7 @@
-node_modules/
-dist/
-offline/
-data-*/
-src/assets/css-template/
+/node_modules/
+/dist/
+/offline/
+/offline-*/
+/data-*/
+/coverage/
+/src/assets/css-template/

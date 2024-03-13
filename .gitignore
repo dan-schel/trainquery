@@ -1,5 +1,7 @@
-node_modules/
+/node_modules/
 /dist/
-/offline*/
+/offline/
+/offline-*/
 /data-*/
-.env*
+/coverage/
+/.env*
