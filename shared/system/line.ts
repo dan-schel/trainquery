@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
   type LineColor,
   LineColorJson,
-  LineVisibility,
+  type LineVisibility,
   LineVisibilityJson,
 } from "./enums";
 import {
