@@ -44,10 +44,11 @@ onMounted(() => {
 <template>
   <PageContent title="Disruptions" title-margin="2rem">
     <LoadingSpinner class="spinner" v-if="state === 'loading'" />
-    <h2 v-if="currentDisruptions.length > 1">
+    <p class="error" v-if="state === 'error'">Something went wrong.</p>
+    <h2 v-if="currentDisruptions.length > 0">
       Current disruptions ({{ currentDisruptions.length }})
     </h2>
-    <div class="disruptions" v-if="currentDisruptions.length > 1">
+    <div class="disruptions" v-if="currentDisruptions.length > 0">
       <div
         v-for="(disruption, i) in currentDisruptions"
         :key="i"
@@ -68,10 +69,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <h2 v-if="nonCurrentDisruptions.length > 1">
+    <h2 v-if="nonCurrentDisruptions.length > 0">
       Past/future disruptions ({{ nonCurrentDisruptions.length }})
     </h2>
-    <div class="disruptions" v-if="nonCurrentDisruptions.length > 1">
+    <div class="disruptions" v-if="nonCurrentDisruptions.length > 0">
       <div
         v-for="(disruption, i) in nonCurrentDisruptions"
         :key="i"
@@ -98,17 +99,23 @@ onMounted(() => {
 @use "@/assets/css-template/import" as template;
 @use "@/assets/utils" as utils;
 
-.disruptions {
-  flex-grow: 1;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
+.spinner {
+  margin: auto;
 }
+.error {
+  font-weight: bold;
+  color: var(--color-error);
+  margin-top: -1rem;
+}
+
 h2 {
   @include utils.h2;
   margin-bottom: 1rem;
 }
-.spinner {
-  margin: auto;
+.disruptions {
+  flex-grow: 1;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
 }
 .disruption {
   @include utils.raised-surface;
