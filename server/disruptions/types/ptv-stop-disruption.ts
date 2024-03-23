@@ -21,8 +21,8 @@ export class PtvStopDisruption extends Disruption<"ptv-stop"> {
     return false;
   }
 
-  affectsStop(_ctx: TrainQuery, stop: StopID, time: QUtcDateTime): boolean {
-    return this.stops.includes(stop) && time.isWithin(this.starts, this.ends);
+  affectsStop(ctx: TrainQuery, stop: StopID, time: QUtcDateTime): boolean {
+    return this.stops.includes(stop) && this.occursAt(ctx, time);
   }
 
   affectsLine(_ctx: TrainQuery, _line: LineID, _time: QUtcDateTime): boolean {
@@ -31,6 +31,10 @@ export class PtvStopDisruption extends Disruption<"ptv-stop"> {
 
   affectsDate(_ctx: TrainQuery, _date: QDate): boolean {
     return false;
+  }
+
+  occursAt(_ctx: TrainQuery, time: QUtcDateTime): boolean {
+    return time.isWithin(this.starts, this.ends);
   }
 
   toJSON(_ctx: TrainQuery): SerializedDisruption<"ptv-stop"> {

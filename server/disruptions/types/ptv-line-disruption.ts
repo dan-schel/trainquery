@@ -52,12 +52,16 @@ export class PtvLineDisruption extends Disruption<"ptv-line"> {
     return false;
   }
 
-  affectsLine(_ctx: TrainQuery, line: LineID, time: QUtcDateTime): boolean {
-    return this.lines.includes(line) && time.isWithin(this.starts, this.ends);
+  affectsLine(ctx: TrainQuery, line: LineID, time: QUtcDateTime): boolean {
+    return this.lines.includes(line) && this.occursAt(ctx, time);
   }
 
   affectsDate(_ctx: TrainQuery, _date: QDate): boolean {
     return false;
+  }
+
+  occursAt(_ctx: TrainQuery, time: QUtcDateTime): boolean {
+    return time.isWithin(this.starts, this.ends);
   }
 
   toJSON(_ctx: TrainQuery): SerializedDisruption<"ptv-line"> {

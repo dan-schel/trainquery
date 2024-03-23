@@ -6,6 +6,7 @@ import {
   readAdminAuth,
   writeAdminAuth,
 } from "@/utils/admin-auth-provider";
+import { throwUnlessOk } from "@/utils/call-api";
 import { Session } from "shared/admin/session";
 import { onMounted, provide, ref } from "vue";
 import { z } from "zod";
@@ -44,6 +45,7 @@ async function callAdminApi(
     url.searchParams.set(k, v);
   }
 
+  // TODO: Use resiliant call function in "@/utils/call-api".
   const response = await fetch(url.href, {
     headers: {
       "admin-token": session.value.token,
@@ -56,6 +58,8 @@ async function callAdminApi(
     console.warn("Admin token invalid or expired. You have been logged out.");
     setSession(null, true);
   }
+
+  throwUnlessOk(response);
 
   return response;
 }

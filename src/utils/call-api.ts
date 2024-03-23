@@ -35,9 +35,7 @@ export async function callAPI<T extends z.ZodType>(
 
 export async function resilientFetch(url: string) {
   const response = await multiFetch(url, [500, 2000]);
-  if (!response.ok) {
-    throw new Error(`Status code ${response.status} when fetching "${url}".`);
-  }
+  throwUnlessOk(response);
   return await response.json();
 }
 
@@ -55,5 +53,13 @@ async function multiFetch(url: string, timeouts: number[]): Promise<Response> {
   } catch {
     await new Promise((resolve) => setTimeout(resolve, timeouts[0]));
     return await multiFetch(url, timeouts.slice(1));
+  }
+}
+
+export function throwUnlessOk(response: Response) {
+  if (!response.ok) {
+    throw new Error(
+      `Status code ${response.status} when fetching "${response.url}".`,
+    );
   }
 }

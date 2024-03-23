@@ -8,6 +8,7 @@ import { QUtcDateTime } from "../../../../shared/qtime/qdatetime";
 import { PtvLineDisruption } from "../../types/ptv-line-disruption";
 import { nonNull } from "@dan-schel/js-utils";
 import { EnvironmentVariables } from "../../../ctx/environment-variables";
+import { PtvStopDisruption } from "../../types/ptv-stop-disruption";
 
 // Refresh disruptions from the PTV API every 5 minutes.
 const refreshInterval = 5 * 60 * 1000;
@@ -126,14 +127,9 @@ async function fetchPtvDisruptions(
 
   const parsed = rawList
     .map((d) => {
-      // TODO: Remove this code and do it properly!
-      // <TEMP>
-      if (/^.{3,30}( line)? stations?:.{10}/gi.test(d.title)) {
-        return [];
-      }
-      // </TEMP>
+      const hasStopVibes = /^.{3,30}( line)? stations?:.{10}/gi.test(d.title);
 
-      if (d.routes.length !== 0) {
+      if (d.routes.length !== 0 && !hasStopVibes) {
         const lines = d.routes
           .map((r) => ptvConfig.lines.get(r) ?? null)
           .filter(nonNull);
@@ -141,7 +137,6 @@ async function fetchPtvDisruptions(
         if (lines.length == null) {
           return [];
         }
-
         return [
           new PtvLineDisruption(
             lines,
@@ -151,6 +146,17 @@ async function fetchPtvDisruptions(
             d.from_date,
             d.to_date,
           ),
+        ];
+      } else if (d.stops.length !== 0) {
+        const stops = d.stops
+          .map((r) => ptvConfig.stops.get(r) ?? null)
+          .filter(nonNull);
+
+        if (stops.length == null) {
+          return [];
+        }
+        return [
+          new PtvStopDisruption(stops, d.title, d.url, d.from_date, d.to_date),
         ];
       } else {
         return [];

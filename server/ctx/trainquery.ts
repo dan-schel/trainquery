@@ -12,7 +12,7 @@ import { Banners } from "./banners";
 import { loginApi } from "../api/admin/login-api";
 import { AdminAuth } from "../admin/auth";
 import { logoutApi } from "../api/admin/logout-api";
-import { testSecretApi } from "../api/admin/test-secret-api";
+import { disruptionsApi } from "../api/admin/disruptions-api";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -101,8 +101,8 @@ export async function trainQuery(
     if (endpoint === "admin/logout") {
       return await logoutApi(ctx, params);
     }
-    if (endpoint === "admin/testSecret") {
-      return await testSecretApi(ctx, params);
+    if (endpoint === "admin/disruptions") {
+      return await disruptionsApi(ctx, params);
     }
     throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
   });
