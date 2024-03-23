@@ -47,7 +47,32 @@ export default [
   {
     path: "/admin",
     name: "admin",
-    component: () => import("../views/Admin.vue"),
+    component: () => import("../views/admin/Admin.vue"),
+  },
+  {
+    path: "/admin/status",
+    name: "admin-status",
+    component: () => import("../views/admin/AdminStatus.vue"),
+  },
+  {
+    path: "/admin/disruptions",
+    name: "admin-disruptions",
+    component: () => import("../views/admin/AdminDisruptions.vue"),
+  },
+  {
+    path: "/admin/gtfs",
+    name: "admin-gtfs",
+    component: () => import("../views/admin/AdminGtfs.vue"),
+  },
+  {
+    path: "/admin/auditing",
+    name: "admin-auditing",
+    component: () => import("../views/admin/AdminAuditing.vue"),
+  },
+  {
+    path: "/admin/logs",
+    name: "admin-logs",
+    component: () => import("../views/admin/AdminLogs.vue"),
   },
   {
     path: "/:pathMatch(.*)*",

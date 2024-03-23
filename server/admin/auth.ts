@@ -8,8 +8,8 @@ import {
 } from "../../shared/admin/session";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 
-/** Disregard admin tokens that were created over 30 mins ago. */
-const tokenLifespanMins = 30;
+/** Disregard admin tokens that were created over 2 hours ago. */
+const tokenLifespanMins = 60 * 2;
 
 export class AdminAuth {
   private _sessions: Session[] = [];

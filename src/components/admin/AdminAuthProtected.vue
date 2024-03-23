@@ -20,12 +20,23 @@ function setSession(newSession: Session | null, write: boolean) {
   }
 }
 
+function requireSession() {
+  if (session.value == null) {
+    throw new Error(
+      "Unauthenticated - do not call requireSession() outside of an admin-protected route!",
+    );
+  }
+  return session.value;
+}
+
 async function callAdminApi(
   apiPath: string,
   params: Record<string, string>,
 ): Promise<Response> {
   if (session.value == null) {
-    throw new Error("Unauthenticated.");
+    throw new Error(
+      "Unauthenticated - do not call callAdminApi() outside of an admin-protected route!",
+    );
   }
 
   const url = new URL(apiPath, window.location.origin);
@@ -94,6 +105,7 @@ async function logout() {
 
 provide(adminAuthInjectionKey, {
   session: session,
+  requireSession,
   login,
   logout,
   callAdminApi,

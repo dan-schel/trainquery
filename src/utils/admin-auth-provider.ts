@@ -5,6 +5,7 @@ const lsKey = "trainquery-admin-auth";
 
 export const adminAuthInjectionKey = Symbol() as InjectionKey<{
   session: Ref<Session | null>;
+  requireSession: () => Session;
   login: (username: string, password: string) => Promise<Session>;
   logout: () => Promise<void>;
   callAdminApi: (
@@ -16,6 +17,9 @@ export const adminAuthInjectionKey = Symbol() as InjectionKey<{
 export function useAdminAuth() {
   return inject(adminAuthInjectionKey, {
     session: ref(null),
+    requireSession: () => {
+      throw new Error("Admin auth not injected correctly.");
+    },
     login: () => {
       throw new Error("Admin auth not injected correctly.");
     },

@@ -2,20 +2,20 @@
 import { generatePageHead } from "@/utils/head";
 import { useHead } from "@vueuse/head";
 import AdminAuthProtected from "@/components/admin/AdminAuthProtected.vue";
-import AdminTestContent from "@/components/admin/AdminTestContent.vue";
+import AdminAuditing from "@/components/admin/auditing/AdminAuditing.vue";
 
 useHead(
   generatePageHead({
-    title: "Admin dashboard",
+    title: "Auditing",
     allowIndexing: false,
-    canonicalUrl: "/admin",
+    canonicalUrl: "/admin/auditing",
   }),
 );
 </script>
 
 <template>
   <AdminAuthProtected>
-    <AdminTestContent></AdminTestContent>
+    <AdminAuditing></AdminAuditing>
   </AdminAuthProtected>
 </template>
 
