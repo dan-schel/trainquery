@@ -43,7 +43,7 @@ async function handleLogout() {
       ></AdminDashboardApp>
       <AdminDashboardApp
         to="admin-gtfs"
-        title="GTFS Parsing"
+        title="GTFS parsing"
         description="Monitor GTFS parsing results and filter services"
         icon="uil:calendar"
         color="blue"
@@ -61,6 +61,13 @@ async function handleLogout() {
         description="View web server logs"
         icon="uil:align-left"
         color="purple"
+      ></AdminDashboardApp>
+      <AdminDashboardApp
+        to="admin-users"
+        title="Users"
+        description="Manage admin user accounts and roles"
+        icon="uil:user"
+        color="cyan"
       ></AdminDashboardApp>
     </div>
   </PageContent>

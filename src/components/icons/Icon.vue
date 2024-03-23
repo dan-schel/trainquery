@@ -28,6 +28,7 @@ import UilStethoscopeAlt from "./UilStethoscopeAlt.vue";
 import UilTimes from "./UilTimes.vue";
 import UilTimesCircle from "./UilTimesCircle.vue";
 import UilTrashAlt from "./UilTrashAlt.vue";
+import UilUser from "./UilUser.vue";
 import UilWrench from "./UilWrench.vue";
 
 export type IconID =
@@ -60,6 +61,7 @@ export type IconID =
   | "uil:times"
   | "uil:times-circle"
   | "uil:trash-alt"
+  | "uil:user"
   | "uil:wrench";
 
 defineProps<{
@@ -127,5 +129,6 @@ defineProps<{
     class="icon"
   ></UilTimesCircle>
   <UilTrashAlt v-else-if="id === 'uil:trash-alt'" class="icon"></UilTrashAlt>
+  <UilUser v-else-if="id === 'uil:user'" class="icon"></UilUser>
   <UilWrench v-else-if="id === 'uil:wrench'" class="icon"></UilWrench>
 </template>

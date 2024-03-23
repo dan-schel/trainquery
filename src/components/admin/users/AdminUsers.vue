@@ -19,8 +19,8 @@ import PageContent from "@/components/common/PageContent.vue";
 </script>
 
 <template>
-  <PageContent title="GTFS parsing" title-margin="1rem">
-    <p>GTFS admin tools are not implemented yet!</p>
+  <PageContent title="Users" title-margin="1rem">
+    <p>User management features are not implemented yet!</p>
   </PageContent>
 </template>
 

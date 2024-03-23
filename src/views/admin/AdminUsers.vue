@@ -2,20 +2,20 @@
 import { generatePageHead } from "@/utils/head";
 import { useHead } from "@vueuse/head";
 import AdminAuthProtected from "@/components/admin/AdminAuthProtected.vue";
-import AdminGtfs from "@/components/admin/gtfs/AdminGtfs.vue";
+import AdminUsers from "@/components/admin/users/AdminUsers.vue";
 
 useHead(
   generatePageHead({
-    title: "GTFS parsing",
+    title: "Users",
     allowIndexing: false,
-    canonicalUrl: "/admin/gtfs",
+    canonicalUrl: "/admin/users",
   }),
 );
 </script>
 
 <template>
   <AdminAuthProtected>
-    <AdminGtfs></AdminGtfs>
+    <AdminUsers></AdminUsers>
   </AdminAuthProtected>
 </template>
 

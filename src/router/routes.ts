@@ -75,6 +75,11 @@ export default [
     component: () => import("../views/admin/AdminLogs.vue"),
   },
   {
+    path: "/admin/users",
+    name: "admin-users",
+    component: () => import("../views/admin/AdminUsers.vue"),
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "notfound",
     component: () => import("../views/NotFound.vue"),
