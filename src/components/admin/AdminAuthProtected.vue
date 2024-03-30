@@ -6,6 +6,7 @@ import {
   readAdminAuth,
   writeAdminAuth,
 } from "@/utils/admin-auth-provider";
+import { throwUnlessOk } from "@/utils/call-api";
 import { Session } from "shared/admin/session";
 import { onMounted, provide, ref } from "vue";
 import { z } from "zod";
@@ -20,12 +21,23 @@ function setSession(newSession: Session | null, write: boolean) {
   }
 }
 
+function requireSession() {
+  if (session.value == null) {
+    throw new Error(
+      "Unauthenticated - do not call requireSession() outside of an admin-protected route!",
+    );
+  }
+  return session.value;
+}
+
 async function callAdminApi(
   apiPath: string,
   params: Record<string, string>,
 ): Promise<Response> {
   if (session.value == null) {
-    throw new Error("Unauthenticated.");
+    throw new Error(
+      "Unauthenticated - do not call callAdminApi() outside of an admin-protected route!",
+    );
   }
 
   const url = new URL(apiPath, window.location.origin);
@@ -33,6 +45,7 @@ async function callAdminApi(
     url.searchParams.set(k, v);
   }
 
+  // TODO: Use resiliant call function in "@/utils/call-api".
   const response = await fetch(url.href, {
     headers: {
       "admin-token": session.value.token,
@@ -45,6 +58,8 @@ async function callAdminApi(
     console.warn("Admin token invalid or expired. You have been logged out.");
     setSession(null, true);
   }
+
+  throwUnlessOk(response);
 
   return response;
 }
@@ -94,6 +109,7 @@ async function logout() {
 
 provide(adminAuthInjectionKey, {
   session: session,
+  requireSession,
   login,
   logout,
   callAdminApi,

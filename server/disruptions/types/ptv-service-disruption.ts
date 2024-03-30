@@ -35,6 +35,10 @@ export class PtvServiceDisruption extends Disruption<"ptv-service"> {
     return false;
   }
 
+  occursAt(_ctx: TrainQuery, _time: QUtcDateTime): boolean {
+    return false;
+  }
+
   toJSON(_ctx: TrainQuery): SerializedDisruption<"ptv-service"> {
     return {
       type: "ptv-service",

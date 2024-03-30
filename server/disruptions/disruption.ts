@@ -22,5 +22,7 @@ export abstract class Disruption<Type extends string = string> {
 
   abstract affectsDate(ctx: TrainQuery, date: QDate): boolean;
 
+  abstract occursAt(ctx: TrainQuery, time: QUtcDateTime): boolean;
+
   abstract toJSON(ctx: TrainQuery): SerializedDisruption<Type>;
 }

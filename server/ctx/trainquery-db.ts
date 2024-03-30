@@ -4,11 +4,11 @@ import { GtfsCalendar } from "../gtfs/data/gtfs-calendar";
 import { GtfsTrip } from "../gtfs/data/gtfs-trip";
 
 type DBs = {
-  gtfs: {
-    metadata: Collection<Document>;
-    trips: Collection<Document>;
-    calendars: Collection<Document>;
-  };
+  gtfsMetadata: Collection<Document>;
+  gtfsTrips: Collection<Document>;
+  gtfsCalendars: Collection<Document>;
+  disruptionsProcessed: Collection<Document>;
+  disruptionsRawHandled: Collection<Document>;
 };
 
 export class TrainQueryDB {
@@ -32,13 +32,13 @@ export class TrainQueryDB {
     this._client = new MongoClient(url);
     await this._client.connect();
 
-    const gtfsDb = this._client.db("trainquery-gtfs-v1");
+    const gtfsDb = this._client.db("trainquery");
     this._dbs = {
-      gtfs: {
-        metadata: gtfsDb.collection("metadata"),
-        trips: gtfsDb.collection("trips"),
-        calendars: gtfsDb.collection("calendars"),
-      },
+      gtfsMetadata: gtfsDb.collection("gtfs-metadata-v1"),
+      gtfsTrips: gtfsDb.collection("gtfs-trips-v1"),
+      gtfsCalendars: gtfsDb.collection("gtfs-calendars-v1"),
+      disruptionsProcessed: gtfsDb.collection("disruptions-processed-v1"),
+      disruptionsRawHandled: gtfsDb.collection("disruptions-raw-handled-v1"),
     };
   }
 
@@ -53,7 +53,7 @@ export class TrainQueryDB {
 
   /** Fetches the GTFS schedule data (not realtime) from the database. */
   async fetchGtfs(configHash: string): Promise<GtfsData | null> {
-    const metadataDoc = await this.dbs.gtfs.metadata.findOne();
+    const metadataDoc = await this.dbs.gtfsMetadata.findOne();
     if (metadataDoc == null) {
       return null;
     }
@@ -62,8 +62,8 @@ export class TrainQueryDB {
       return null;
     }
 
-    const calendarDocs = await this.dbs.gtfs.calendars.find().toArray();
-    const tripDocs = await this.dbs.gtfs.trips.find().toArray();
+    const calendarDocs = await this.dbs.gtfsCalendars.find().toArray();
+    const tripDocs = await this.dbs.gtfsTrips.find().toArray();
     const calendars = GtfsCalendar.json.array().parse(calendarDocs);
 
     // Intentionally parses every trip as a GtfsTrip, not a GtfsRealtimeTrip,
@@ -84,17 +84,17 @@ export class TrainQueryDB {
    * database.
    */
   async writeGtfs(gtfsData: GtfsData) {
-    await this.dbs.gtfs.metadata.deleteMany();
-    await this.dbs.gtfs.calendars.deleteMany();
-    await this.dbs.gtfs.trips.deleteMany();
+    await this.dbs.gtfsMetadata.deleteMany();
+    await this.dbs.gtfsCalendars.deleteMany();
+    await this.dbs.gtfsTrips.deleteMany();
 
-    await this.dbs.gtfs.metadata.insertOne(gtfsData.metadataToJSON());
-    await this.dbs.gtfs.calendars.insertMany(
+    await this.dbs.gtfsMetadata.insertOne(gtfsData.metadataToJSON());
+    await this.dbs.gtfsCalendars.insertMany(
       gtfsData.calendars.map((c) => c.toJSON()),
     );
 
     // Intentionally uses the base GtfsTrip type, not GtfsRealtimeTrip, because
     // we do not wish to write the realtime data to the database.
-    await this.dbs.gtfs.trips.insertMany(gtfsData.trips.map((t) => t.toJSON()));
+    await this.dbs.gtfsTrips.insertMany(gtfsData.trips.map((t) => t.toJSON()));
   }
 }

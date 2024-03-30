@@ -12,7 +12,8 @@ import { Banners } from "./banners";
 import { loginApi } from "../api/admin/login-api";
 import { AdminAuth } from "../admin/auth";
 import { logoutApi } from "../api/admin/logout-api";
-import { testSecretApi } from "../api/admin/test-secret-api";
+import { disruptionsApi } from "../api/admin/disruptions-api";
+import { gtfsApi } from "../api/admin/gtfs-api";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -85,26 +86,23 @@ export async function trainQuery(
   await server.start(ctx, async (endpoint: string, params: ServerParams) => {
     if (endpoint === "ssrAppProps") {
       return await ssrAppPropsApi(ctx);
-    }
-    if (endpoint === "ssrRouteProps") {
+    } else if (endpoint === "ssrRouteProps") {
       return await ssrRoutePropsApi(ctx, params);
-    }
-    if (endpoint === "config") {
+    } else if (endpoint === "config") {
       return await configApi(ctx);
-    }
-    if (endpoint === "departures") {
+    } else if (endpoint === "departures") {
       return hashify(ctx, await departuresApi(ctx, params));
-    }
-    if (endpoint === "admin/login") {
+    } else if (endpoint === "admin/login") {
       return await loginApi(ctx, params);
-    }
-    if (endpoint === "admin/logout") {
+    } else if (endpoint === "admin/logout") {
       return await logoutApi(ctx, params);
+    } else if (endpoint === "admin/disruptions") {
+      return await disruptionsApi(ctx, params);
+    } else if (endpoint === "admin/gtfs") {
+      return await gtfsApi(ctx, params);
+    } else {
+      throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
     }
-    if (endpoint === "admin/testSecret") {
-      return await testSecretApi(ctx, params);
-    }
-    throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
   });
   logger.logServerListening(server);
 
