@@ -26,3 +26,11 @@ export abstract class Disruption<Type extends string = string> {
 
   abstract toJSON(ctx: TrainQuery): SerializedDisruption<Type>;
 }
+
+export abstract class RawDisruption<
+  Type extends string = string,
+> extends Disruption<Type> {}
+
+export abstract class ProcessedDisruption<
+  Type extends string = string,
+> extends Disruption<Type> {}

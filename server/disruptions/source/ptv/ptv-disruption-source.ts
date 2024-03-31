@@ -5,10 +5,9 @@ import { Disruption } from "../../disruption";
 import { DisruptionSource, NewDisruptionsHandler } from "../disruption-source";
 import { callPtvApi } from "./call-ptv-api";
 import { QUtcDateTime } from "../../../../shared/qtime/qdatetime";
-import { PtvLineDisruption } from "../../types/ptv-line-disruption";
 import { nonNull } from "@dan-schel/js-utils";
 import { EnvironmentVariables } from "../../../ctx/environment-variables";
-import { PtvStopDisruption } from "../../types/ptv-stop-disruption";
+import { PtvRawDisruption } from "../../types/ptv-raw-disruptions";
 
 // Refresh disruptions from the PTV API every 5 minutes.
 const refreshInterval = 5 * 60 * 1000;
@@ -138,10 +137,12 @@ async function fetchPtvDisruptions(
           return [];
         }
         return [
-          new PtvLineDisruption(
+          new PtvRawDisruption(
             lines,
+            [],
             "unknown",
             d.title,
+            null,
             d.url,
             d.from_date,
             d.to_date,
@@ -152,11 +153,20 @@ async function fetchPtvDisruptions(
           .map((r) => ptvConfig.stops.get(r) ?? null)
           .filter(nonNull);
 
-        if (stops.length == null) {
+        if (stops.length === 0) {
           return [];
         }
         return [
-          new PtvStopDisruption(stops, d.title, d.url, d.from_date, d.to_date),
+          new PtvRawDisruption(
+            [],
+            stops,
+            "unknown",
+            d.title,
+            null,
+            d.url,
+            d.from_date,
+            d.to_date,
+          ),
         ];
       } else {
         return [];
