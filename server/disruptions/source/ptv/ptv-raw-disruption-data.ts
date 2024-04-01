@@ -58,11 +58,15 @@ export class PtvRawDisruptionData {
           : "N/A",
       Starts:
         this.starts != null
-          ? formatDateTime(toLocalDateTimeLuxon(ctx.getConfig(), this.starts))
+          ? formatDateTime(toLocalDateTimeLuxon(ctx.getConfig(), this.starts), {
+              includeYear: true,
+            })
           : "N/A",
       Ends:
         this.ends != null
-          ? formatDateTime(toLocalDateTimeLuxon(ctx.getConfig(), this.ends))
+          ? formatDateTime(toLocalDateTimeLuxon(ctx.getConfig(), this.ends), {
+              includeYear: true,
+            })
           : "N/A",
     };
 

@@ -45,10 +45,15 @@ export function formatDuration(
   return components.join(", ") + (duration.isNegative ? " ago" : "");
 }
 
-export function formatDate(date: QDate) {
+export function formatDate(
+  date: QDate,
+  { includeYear = false }: { includeYear?: boolean } = {},
+) {
   const dow = QDayOfWeek.fromDate(date).toAcronym();
   const month = getMonthAcronym(date.month);
-  return `${dow}, ${date.day.toFixed()} ${month}`;
+  return `${dow}, ${date.day.toFixed()} ${month}${
+    includeYear ? ` ${date.year.toFixed()}` : ""
+  }`;
 }
 
 export function formatRelativeTime(
@@ -78,6 +83,14 @@ export function formatRelativeTime(
   }
 }
 
-export function formatDateTime(dateTime: QLocalDateTime) {
-  return `${formatDate(dateTime.date)} at ${formatTime(dateTime.time)}`;
+export function formatDateTime(
+  dateTime: QLocalDateTime,
+  {
+    includeSeconds = false,
+    includeYear = false,
+  }: { includeSeconds?: boolean; includeYear?: boolean } = {},
+) {
+  return `${formatDate(dateTime.date, {
+    includeYear: includeYear,
+  })} at ${formatTime(dateTime.time, { includeSeconds: includeSeconds })}`;
 }
