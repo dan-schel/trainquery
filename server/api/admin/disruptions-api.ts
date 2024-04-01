@@ -1,5 +1,6 @@
-import { nowUTCLuxon } from "../../../shared/qtime/luxon-conversions";
+import { RawDisruptionIDComponents } from "../../disruptions/raw-disruption-id-components";
 import { ServerParams, TrainQuery } from "../../ctx/trainquery";
+import { requireParam } from "../../param-utils";
 
 export async function disruptionsApi(
   ctx: TrainQuery,
@@ -7,14 +8,39 @@ export async function disruptionsApi(
 ): Promise<object> {
   ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
 
-  const current = ctx.disruptions.all.filter((x) =>
-    x.occursAt(ctx, nowUTCLuxon()),
-  );
-  const nonCurrent = ctx.disruptions.all.filter(
-    (x) => !x.occursAt(ctx, nowUTCLuxon()),
-  );
   return {
-    current: current.map((x) => x.toJSON(ctx)),
-    nonCurrent: nonCurrent.map((x) => x.toJSON(ctx)),
+    raw: ctx.disruptions.getRaw().map((x) => x.toJSON(ctx)),
+  };
+}
+
+export async function disruptionsRawApi(
+  ctx: TrainQuery,
+  params: ServerParams,
+): Promise<object> {
+  ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+
+  const encodedDisruptionID = requireParam(params, "id");
+  const decoded = RawDisruptionIDComponents.decode(encodedDisruptionID);
+  if (decoded == null) {
+    return {
+      disruption: null,
+    };
+  }
+
+  const disruption = ctx.disruptions.getRawDisruption(
+    decoded.source,
+    decoded.id,
+  );
+
+  if (disruption == null) {
+    return {
+      disruption: null,
+    };
+  }
+
+  return {
+    disruption: {
+      markdown: disruption.createInfoMarkdown(ctx),
+    },
   };
 }

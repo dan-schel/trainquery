@@ -10,6 +10,7 @@ import UilBars from "./UilBars.vue";
 import UilCalendar from "./UilCalendar.vue";
 import UilCalendarSlash from "./UilCalendarSlash.vue";
 import UilCheck from "./UilCheck.vue";
+import UilCheckCircle from "./UilCheckCircle.vue";
 import UilClock from "./UilClock.vue";
 import UilCodeBranch from "./UilCodeBranch.vue";
 import UilExclamationCircle from "./UilExclamationCircle.vue";
@@ -43,6 +44,7 @@ export type IconID =
   | "uil:calendar"
   | "uil:calendar-slash"
   | "uil:check"
+  | "uil:check-circle"
   | "uil:clock"
   | "uil:code-branch"
   | "uil:exclamation-circle"
@@ -90,6 +92,10 @@ defineProps<{
     class="icon"
   ></UilCalendarSlash>
   <UilCheck v-else-if="id === 'uil:check'" class="icon"></UilCheck>
+  <UilCheckCircle
+    v-else-if="id === 'uil:check-circle'"
+    class="icon"
+  ></UilCheckCircle>
   <UilClock v-else-if="id === 'uil:clock'" class="icon"></UilClock>
   <UilCodeBranch
     v-else-if="id === 'uil:code-branch'"

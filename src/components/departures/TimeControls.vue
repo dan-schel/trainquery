@@ -4,7 +4,7 @@ import NumberWheel from "../common/NumberWheel.vue";
 import SimpleButton from "../common/SimpleButton.vue";
 import { buildLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import { getConfig } from "@/utils/get-config";
-import { formatDate } from "@/utils/format-qtime";
+import { formatDate } from "shared/qtime/format";
 import { QLocalDateTime } from "shared/qtime/qdatetime";
 import { useNow } from "@/utils/now-provider";
 import TimeInput from "./TimeInput.vue";

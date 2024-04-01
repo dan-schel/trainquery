@@ -4,6 +4,7 @@ import { StopID, isStopID } from "../shared/system/ids";
 import { Stop } from "../shared/system/stop";
 import { ServerParams, TrainQuery } from "./ctx/trainquery";
 import { QUtcDateTime } from "../shared/qtime/qdatetime";
+import { ZodSchema } from "zod";
 
 export class BadApiCallError extends Error {
   readonly type = "bad-api-call";
@@ -42,6 +43,19 @@ export function requireParamThat<T>(
     throw new BadApiCallError(`"${name}" param is invalid.`);
   }
   return result;
+}
+
+export function requireParamOfSchema<T>(
+  params: ServerParams,
+  name: string,
+  schema: ZodSchema<T>,
+): T {
+  const value = requireParam(params, name);
+  const result = schema.safeParse(value);
+  if (!result.success) {
+    throw new BadApiCallError(`"${name}" param is invalid.`);
+  }
+  return result.data;
 }
 
 export function requireStopIDParam(params: ServerParams, name: string): StopID {

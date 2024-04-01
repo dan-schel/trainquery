@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 import PageContent from "@/components/common/PageContent.vue";
 import { useAdminAuth } from "@/utils/admin-auth-provider";
 import { onMounted, ref } from "vue";
@@ -7,6 +6,7 @@ import { z } from "zod";
 import { StopIDJson, type StopID } from "shared/system/ids";
 import { getConfig } from "@/utils/get-config";
 import { requireStop } from "shared/system/config-utils";
+import AdminRequestState from "@/components/admin/AdminRequestState.vue";
 
 const { callAdminApi } = useAdminAuth();
 
@@ -54,12 +54,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <PageContent title="GTFS parsing" title-margin="2rem">
-    <LoadingSpinner class="spinner" v-if="state === 'loading'" />
-    <p class="status error" v-if="state === 'error'">Something went wrong.</p>
-    <p class="status" v-if="state === 'success' && reportData == null">
-      No GTFS data loaded.
-    </p>
+  <PageContent
+    v-if="state === 'success'"
+    title="GTFS parsing"
+    title-margin="2rem"
+    v-bind="$attrs"
+  >
     <p
       class="status"
       v-if="
@@ -113,23 +113,17 @@ onMounted(() => {
       </ul>
     </template>
   </PageContent>
+  <AdminRequestState v-else title="Disruptions" :state="state" v-bind="$attrs">
+  </AdminRequestState>
 </template>
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
 @use "@/assets/utils" as utils;
 
-.spinner {
-  margin: auto;
-}
-.error {
-  font-weight: bold;
-  color: var(--color-error);
-}
 .status {
   margin-top: -1rem;
 }
-
 h2 {
   @include utils.h2;
   margin-bottom: 1rem;

@@ -12,7 +12,10 @@ import { Banners } from "./banners";
 import { loginApi } from "../api/admin/login-api";
 import { AdminAuth } from "../admin/auth";
 import { logoutApi } from "../api/admin/logout-api";
-import { disruptionsApi } from "../api/admin/disruptions-api";
+import {
+  disruptionsApi,
+  disruptionsRawApi,
+} from "../api/admin/disruptions-api";
 import { gtfsApi } from "../api/admin/gtfs-api";
 
 export type ServerBuilder = () => Server;
@@ -98,6 +101,8 @@ export async function trainQuery(
       return await logoutApi(ctx, params);
     } else if (endpoint === "admin/disruptions") {
       return await disruptionsApi(ctx, params);
+    } else if (endpoint === "admin/disruptions/raw") {
+      return await disruptionsRawApi(ctx, params);
     } else if (endpoint === "admin/gtfs") {
       return await gtfsApi(ctx, params);
     } else {

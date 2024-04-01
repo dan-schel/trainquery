@@ -69,16 +69,21 @@ async function login(username: string, password: string) {
     throw new Error("Username and password required.");
   }
 
-  const response = await fetch("/api/admin/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username: username,
-      password: password,
-    }),
-  });
+  let response;
+  try {
+    response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+      }),
+    });
+  } catch (e) {
+    throw new Error("Something went wrong during login.");
+  }
 
   if (response.status === 429) {
     throw new Error("Too many login attempts. Please try again later.");

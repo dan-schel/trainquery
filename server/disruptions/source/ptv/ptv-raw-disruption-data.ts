@@ -7,6 +7,8 @@ import {
 import { hashString } from "../../../../shared/system/cyrb53";
 import { LineID, StopID } from "../../../../shared/system/ids";
 import { TrainQuery } from "../../../ctx/trainquery";
+import { formatDateTime } from "../../../../shared/qtime/format";
+import { toLocalDateTimeLuxon } from "../../../../shared/qtime/luxon-conversions";
 
 export class PtvRawDisruptionData {
   readonly hash: string;
@@ -37,15 +39,31 @@ export class PtvRawDisruptionData {
   createInfoMarkdown(ctx: TrainQuery): string {
     const keyValue: Record<string, string | null> = {
       ID: this.id.toFixed(),
-      URL: this.url,
-      "Affected lines": listifyAnd(
-        this.affectedLines.map((x) => requireLine(ctx.getConfig(), x).name),
-      ),
-      "Affected stops": listifyAnd(
-        this.affectedStops.map((x) => requireStop(ctx.getConfig(), x).name),
-      ),
-      Starts: this.starts?.toJSON() ?? "N/A",
-      Ends: this.ends?.toJSON() ?? "N/A",
+      URL: this.url != null ? `[${this.url}](${this.url})` : "N/A",
+      "Affected lines":
+        this.affectedLines.length !== 0
+          ? listifyAnd(
+              this.affectedLines.map(
+                (x) => requireLine(ctx.getConfig(), x).name,
+              ),
+            )
+          : "N/A",
+      "Affected stops":
+        this.affectedStops.length !== 0
+          ? listifyAnd(
+              this.affectedStops.map(
+                (x) => requireStop(ctx.getConfig(), x).name,
+              ),
+            )
+          : "N/A",
+      Starts:
+        this.starts != null
+          ? formatDateTime(toLocalDateTimeLuxon(ctx.getConfig(), this.starts))
+          : "N/A",
+      Ends:
+        this.ends != null
+          ? formatDateTime(toLocalDateTimeLuxon(ctx.getConfig(), this.ends))
+          : "N/A",
     };
 
     return `

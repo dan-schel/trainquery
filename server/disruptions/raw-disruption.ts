@@ -1,13 +1,13 @@
-import { z } from "zod";
 import { Disruption } from "./disruption";
 import { TrainQuery } from "../ctx/trainquery";
-
-export const DisruptionSources = ["ptv"] as const;
-export type DisruptionSource = (typeof DisruptionSources)[number];
-export const DisruptionSourceJson = z.enum(DisruptionSources);
+import {
+  DisruptionSourceID,
+  RawDisruptionIDComponents,
+} from "./raw-disruption-id-components";
+import { SerializedRawDisruption } from "../../shared/disruptions/serialized-disruption";
 
 export type RawDisruptionSourceData = {
-  source: DisruptionSource;
+  source: DisruptionSourceID;
   id: string;
   hash: string;
 };
@@ -16,12 +16,27 @@ export abstract class RawDisruption<
   Type extends string = string,
 > extends Disruption<Type> {
   constructor(
-    readonly source: DisruptionSource,
+    type: Type,
+    readonly source: DisruptionSourceID,
     readonly id: string,
     readonly hash: string,
   ) {
-    super();
+    super(type);
   }
 
   abstract createInfoMarkdown(ctx: TrainQuery): string;
+
+  toJSON(ctx: TrainQuery): SerializedRawDisruption<Type> {
+    const custom = this.getCustomJSON(ctx);
+    return {
+      type: this.type,
+      rawData: {
+        source: this.source,
+        id: this.id,
+        markdown: this.createInfoMarkdown(ctx),
+        encodedID: new RawDisruptionIDComponents(this.source, this.id).encode(),
+      },
+      ...custom,
+    };
+  }
 }

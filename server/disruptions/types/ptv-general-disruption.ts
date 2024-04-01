@@ -1,10 +1,10 @@
-import { SerializedDisruption } from "../../../shared/disruptions/serialized-disruption";
 import { QDate } from "../../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { LineID, StopID } from "../../../shared/system/ids";
 import { CompletePattern } from "../../../shared/system/service/complete-pattern";
 import { Service } from "../../../shared/system/service/service";
 import { TrainQuery } from "../../ctx/trainquery";
+import { DisruptionCustomJson } from "../disruption";
 import { PtvRawDisruption } from "../source/ptv/ptv-raw-disruption";
 import { PtvRawDisruptionData } from "../source/ptv/ptv-raw-disruption-data";
 
@@ -14,7 +14,7 @@ export class PtvGeneralDisruption extends PtvRawDisruption<"ptv-general"> {
     readonly lines: LineID[],
     readonly stops: StopID[],
   ) {
-    super(ptvData);
+    super("ptv-general", ptvData);
   }
 
   affectsService(_ctx: TrainQuery, service: Service): boolean {
@@ -56,9 +56,8 @@ export class PtvGeneralDisruption extends PtvRawDisruption<"ptv-general"> {
     return time.isWithin(this.ptvData.starts, this.ptvData.ends);
   }
 
-  toJSON(_ctx: TrainQuery): SerializedDisruption<"ptv-general"> {
+  getCustomJSON(_ctx: TrainQuery): DisruptionCustomJson {
     return {
-      type: "ptv-general",
       message: this.ptvData.title,
       url: this.ptvData.url,
     };

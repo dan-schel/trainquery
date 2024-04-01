@@ -1,9 +1,9 @@
 import { hour24To12 } from "@dan-schel/js-utils";
-import { getMonthAcronym, type QDate } from "shared/qtime/qdate";
-import type { QLocalDateTime } from "shared/qtime/qdatetime";
-import { QDayOfWeek } from "shared/qtime/qdayofweek";
-import type { QDuration } from "shared/qtime/qduration";
-import type { QTime } from "shared/qtime/qtime";
+import { getMonthAcronym, type QDate } from "./qdate";
+import type { QLocalDateTime } from "./qdatetime";
+import { QDayOfWeek } from "./qdayofweek";
+import type { QDuration } from "./qduration";
+import type { QTime } from "./qtime";
 
 export function formatTime(
   time: QTime,
@@ -76,4 +76,8 @@ export function formatRelativeTime(
   } else {
     return `${timeString} (${formatDate(time.date)})`;
   }
+}
+
+export function formatDateTime(dateTime: QLocalDateTime) {
+  return `${formatDate(dateTime.date)} at ${formatTime(dateTime.time)}`;
 }

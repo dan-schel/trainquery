@@ -10,7 +10,7 @@ import LineDiagram from "@/components/line-diagram/LineDiagram.vue";
 import NotFoundLayout from "@/components/NotFoundLayout.vue";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import { getConfig } from "@/utils/get-config";
-import { formatRelativeTime, formatTime } from "@/utils/format-qtime";
+import { formatRelativeTime, formatTime } from "shared/qtime/format";
 import { getServicePageRoute, requireStop } from "shared/system/config-utils";
 import TrainPageStop from "@/components/line-diagram/TrainPageStop.vue";
 import { useNow } from "@/utils/now-provider";

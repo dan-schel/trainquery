@@ -1,9 +1,12 @@
 import { z } from "zod";
-import { DisruptionSource, DisruptionSourceJson } from "./raw-disruption";
+import {
+  DisruptionSourceID,
+  DisruptionSourceIDJson,
+} from "./raw-disruption-id-components";
 
 export class RawHandledDisruption {
   constructor(
-    readonly source: DisruptionSource,
+    readonly source: DisruptionSourceID,
     readonly id: string,
     readonly hash: string,
     readonly infoMarkdown: string,
@@ -11,7 +14,7 @@ export class RawHandledDisruption {
 
   static readonly json = z
     .object({
-      source: DisruptionSourceJson,
+      source: DisruptionSourceIDJson,
       id: z.string(),
       hash: z.string(),
       infoMarkdown: z.string(),

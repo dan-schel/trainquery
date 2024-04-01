@@ -57,7 +57,13 @@ export default [
   {
     path: "/admin/disruptions",
     name: "admin-disruptions",
-    component: () => import("../views/admin/AdminDisruptions.vue"),
+    component: () => import("../views/admin/disruptions/AdminDisruptions.vue"),
+  },
+  {
+    path: "/admin/disruptions/raw/:id",
+    name: "admin-disruptions-raw",
+    component: () =>
+      import("../views/admin/disruptions/AdminDisruptionsRaw.vue"),
   },
   {
     path: "/admin/gtfs",

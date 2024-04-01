@@ -8,7 +8,7 @@ import { DepartureFilter } from "shared/system/timetable/departure-filter";
 import { formatFilter } from "@/utils/format-filter";
 import type { StopID } from "shared/system/ids";
 import type { QLocalDateTime } from "shared/qtime/qdatetime";
-import { formatRelativeTime } from "@/utils/format-qtime";
+import { formatRelativeTime } from "shared/qtime/format";
 import { useNow } from "@/utils/now-provider";
 
 const props = defineProps<{
