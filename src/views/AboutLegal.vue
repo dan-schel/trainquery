@@ -89,7 +89,7 @@ useHead(
 </script>
 
 <template>
-  <PageContent title="Licences and attribution">
+  <PageContent title="Licences and attribution" title-margin="1rem">
     <template v-if="additionalMessages.timetableData.length !== 0">
       <h2>Timetable data</h2>
       <p>
