@@ -1,28 +1,20 @@
-import { SerializedDisruption } from "../../../shared/disruptions/serialized-disruption";
 import { QDate } from "../../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { LineID, StopID } from "../../../shared/system/ids";
 import { CompletePattern } from "../../../shared/system/service/complete-pattern";
 import { Service } from "../../../shared/system/service/service";
 import { TrainQuery } from "../../ctx/trainquery";
-import { Disruption } from "../disruption";
+import { DisruptionCustomJson } from "../disruption";
+import { PtvRawDisruption } from "../source/ptv/ptv-raw-disruption";
+import { PtvRawDisruptionData } from "../source/ptv/ptv-raw-disruption-data";
 
-export type PtvLineDisruptionCategory =
-  | "buses"
-  | "no-city-loop"
-  | "service-changes"
-  | "unknown";
-
-export class PtvLineDisruption extends Disruption<"ptv-line"> {
+export class PtvGeneralDisruption extends PtvRawDisruption<"ptv-general"> {
   constructor(
+    ptvData: PtvRawDisruptionData,
     readonly lines: LineID[],
-    readonly category: PtvLineDisruptionCategory,
-    readonly message: string,
-    readonly url: string | null,
-    readonly starts: QUtcDateTime | null,
-    readonly ends: QUtcDateTime | null,
+    readonly stops: StopID[],
   ) {
-    super();
+    super("ptv-general", ptvData);
   }
 
   affectsService(_ctx: TrainQuery, service: Service): boolean {
@@ -38,8 +30,8 @@ export class PtvLineDisruption extends Disruption<"ptv-line"> {
       return QUtcDateTime.rangesIntersect(
         origin,
         terminus,
-        this.starts,
-        this.ends,
+        this.ptvData.starts,
+        this.ptvData.ends,
       );
     }
 
@@ -48,8 +40,8 @@ export class PtvLineDisruption extends Disruption<"ptv-line"> {
     return true;
   }
 
-  affectsStop(_ctx: TrainQuery, _stop: StopID, _time: QUtcDateTime): boolean {
-    return false;
+  affectsStop(ctx: TrainQuery, stop: StopID, time: QUtcDateTime): boolean {
+    return this.stops.includes(stop) && this.occursAt(ctx, time);
   }
 
   affectsLine(ctx: TrainQuery, line: LineID, time: QUtcDateTime): boolean {
@@ -61,15 +53,13 @@ export class PtvLineDisruption extends Disruption<"ptv-line"> {
   }
 
   occursAt(_ctx: TrainQuery, time: QUtcDateTime): boolean {
-    return time.isWithin(this.starts, this.ends);
+    return time.isWithin(this.ptvData.starts, this.ptvData.ends);
   }
 
-  toJSON(_ctx: TrainQuery): SerializedDisruption<"ptv-line"> {
+  getCustomJSON(_ctx: TrainQuery): DisruptionCustomJson {
     return {
-      type: "ptv-line",
-      message: this.message,
-      url: this.url,
-      category: this.category,
+      message: this.ptvData.title,
+      url: this.ptvData.url,
     };
   }
 }

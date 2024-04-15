@@ -1,9 +1,9 @@
 import { hour24To12 } from "@dan-schel/js-utils";
-import { getMonthAcronym, type QDate } from "shared/qtime/qdate";
-import type { QLocalDateTime } from "shared/qtime/qdatetime";
-import { QDayOfWeek } from "shared/qtime/qdayofweek";
-import type { QDuration } from "shared/qtime/qduration";
-import type { QTime } from "shared/qtime/qtime";
+import { getMonthAcronym, type QDate } from "./qdate";
+import type { QLocalDateTime } from "./qdatetime";
+import { QDayOfWeek } from "./qdayofweek";
+import type { QDuration } from "./qduration";
+import type { QTime } from "./qtime";
 
 export function formatTime(
   time: QTime,
@@ -45,10 +45,15 @@ export function formatDuration(
   return components.join(", ") + (duration.isNegative ? " ago" : "");
 }
 
-export function formatDate(date: QDate) {
+export function formatDate(
+  date: QDate,
+  { includeYear = false }: { includeYear?: boolean } = {},
+) {
   const dow = QDayOfWeek.fromDate(date).toAcronym();
   const month = getMonthAcronym(date.month);
-  return `${dow}, ${date.day.toFixed()} ${month}`;
+  return `${dow}, ${date.day.toFixed()} ${month}${
+    includeYear ? ` ${date.year.toFixed()}` : ""
+  }`;
 }
 
 export function formatRelativeTime(
@@ -76,4 +81,16 @@ export function formatRelativeTime(
   } else {
     return `${timeString} (${formatDate(time.date)})`;
   }
+}
+
+export function formatDateTime(
+  dateTime: QLocalDateTime,
+  {
+    includeSeconds = false,
+    includeYear = false,
+  }: { includeSeconds?: boolean; includeYear?: boolean } = {},
+) {
+  return `${formatDate(dateTime.date, {
+    includeYear: includeYear,
+  })} at ${formatTime(dateTime.time, { includeSeconds: includeSeconds })}`;
 }

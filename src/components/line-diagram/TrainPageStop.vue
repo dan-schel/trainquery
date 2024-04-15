@@ -5,7 +5,7 @@ import { computed } from "vue";
 import { getStopPageRoute } from "shared/system/config-utils";
 import type { AdditionalServedData } from "./get-diagram-for-service";
 import { type LineDiagramStop } from "shared/system/routes/line-routes";
-import { formatRelativeTime } from "@/utils/format-qtime";
+import { formatRelativeTime } from "shared/qtime/format";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import OneLineP from "../common/OneLineP.vue";
 import { getPlatformString } from "../departures/helpers/utils";

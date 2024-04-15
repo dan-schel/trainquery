@@ -5,10 +5,10 @@ import { Disruption } from "../../disruption";
 import { DisruptionSource, NewDisruptionsHandler } from "../disruption-source";
 import { callPtvApi } from "./call-ptv-api";
 import { QUtcDateTime } from "../../../../shared/qtime/qdatetime";
-import { PtvLineDisruption } from "../../types/ptv-line-disruption";
 import { nonNull } from "@dan-schel/js-utils";
 import { EnvironmentVariables } from "../../../ctx/environment-variables";
-import { PtvStopDisruption } from "../../types/ptv-stop-disruption";
+import { PtvGeneralDisruption } from "../../types/ptv-general-disruption";
+import { PtvRawDisruptionData } from "./ptv-raw-disruption-data";
 
 // Refresh disruptions from the PTV API every 5 minutes.
 const refreshInterval = 5 * 60 * 1000;
@@ -103,7 +103,6 @@ const PtvDisruptionsSchema = z.object({
     regional_train: PtvDisruptionSchema.array(),
   }),
 });
-export type PtvRawDisruptionData = z.infer<typeof PtvDisruptionSchema>;
 
 async function fetchPtvDisruptions(
   ptvConfig: PtvConfig,
@@ -127,37 +126,29 @@ async function fetchPtvDisruptions(
 
   const parsed = rawList
     .map((d) => {
+      const lines = d.routes
+        .map((r) => ptvConfig.lines.get(r) ?? null)
+        .filter(nonNull);
+      const stops = d.stops
+        .map((r) => ptvConfig.stops.get(r) ?? null)
+        .filter(nonNull);
+      const ptvData = new PtvRawDisruptionData(
+        d.disruption_id,
+        d.title,
+        d.description,
+        lines,
+        stops,
+        d.url,
+        d.from_date,
+        d.to_date,
+      );
+
       const hasStopVibes = /^.{3,30}( line)? stations?:.{10}/gi.test(d.title);
 
-      if (d.routes.length !== 0 && !hasStopVibes) {
-        const lines = d.routes
-          .map((r) => ptvConfig.lines.get(r) ?? null)
-          .filter(nonNull);
-
-        if (lines.length == null) {
-          return [];
-        }
-        return [
-          new PtvLineDisruption(
-            lines,
-            "unknown",
-            d.title,
-            d.url,
-            d.from_date,
-            d.to_date,
-          ),
-        ];
-      } else if (d.stops.length !== 0) {
-        const stops = d.stops
-          .map((r) => ptvConfig.stops.get(r) ?? null)
-          .filter(nonNull);
-
-        if (stops.length == null) {
-          return [];
-        }
-        return [
-          new PtvStopDisruption(stops, d.title, d.url, d.from_date, d.to_date),
-        ];
+      if (lines.length !== 0 && !hasStopVibes) {
+        return [new PtvGeneralDisruption(ptvData, lines, [])];
+      } else if (stops.length !== 0) {
+        return [new PtvGeneralDisruption(ptvData, [], stops)];
       } else {
         return [];
       }

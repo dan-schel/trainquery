@@ -4,7 +4,7 @@ import {
   requireStop,
 } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
-import { formatDuration, formatRelativeTime } from "@/utils/format-qtime";
+import { formatDuration, formatRelativeTime } from "shared/qtime/format";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import type { QUtcDateTime } from "shared/qtime/qdatetime";
 import { listifyAnd } from "@dan-schel/js-utils";

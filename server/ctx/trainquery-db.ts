@@ -3,6 +3,7 @@ import { GtfsData } from "../gtfs/data/gtfs-data";
 import { GtfsCalendar } from "../gtfs/data/gtfs-calendar";
 import { GtfsTrip } from "../gtfs/data/gtfs-trip";
 import { Session } from "../../shared/admin/session";
+import { RawHandledDisruption } from "../disruptions/raw-handled-disruption";
 
 type DBs = {
   gtfsMetadata: Collection<Document>;
@@ -67,11 +68,11 @@ export class TrainQueryDB {
 
     const calendarDocs = await this.dbs.gtfsCalendars.find().toArray();
     const tripDocs = await this.dbs.gtfsTrips.find().toArray();
-    const calendars = GtfsCalendar.json.array().parse(calendarDocs);
+    const calendars = calendarDocs.map((c) => GtfsCalendar.json.parse(c));
 
     // Intentionally parses every trip as a GtfsTrip, not a GtfsRealtimeTrip,
     // because realtime data is not - and should not - be saved to the database.
-    const trips = GtfsTrip.json.array().parse(tripDocs);
+    const trips = tripDocs.map((t) => GtfsTrip.json.parse(t));
 
     return new GtfsData(
       calendars,
@@ -118,5 +119,14 @@ export class TrainQueryDB {
   /** Deletes a session from the database. */
   async deleteAdminAuthSession(token: string) {
     await this.dbs.adminAuth.deleteOne({ token });
+  }
+
+  async fetchRawHandledDisruptions(): Promise<RawHandledDisruption[]> {
+    const docs = await this.dbs.disruptionsRawHandled.find().toArray();
+    return docs.map((d) => RawHandledDisruption.json.parse(d));
+  }
+
+  async writeRawHandledDisruption(disruption: RawHandledDisruption) {
+    await this.dbs.disruptionsRawHandled.insertOne(disruption.toJSON());
   }
 }

@@ -6,6 +6,8 @@ import { PtvDisruptionSource } from "./source/ptv/ptv-disruption-source";
 import { DepartureWithDisruptions } from "../../shared/disruptions/departure-with-disruptions";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
+import { RawDisruption } from "./raw-disruption";
+import { DisruptionSourceID } from "./raw-disruption-id-components";
 
 const disruptionsConsideredFreshMinutes = 15;
 
@@ -34,8 +36,13 @@ export class Disruptions {
     }
   }
 
-  get all(): Disruption[] {
+  getAll(): Disruption[] {
     return this._disruptions;
+  }
+  getRaw(): RawDisruption[] {
+    return this._disruptions.filter(
+      (x): x is RawDisruption => x instanceof RawDisruption,
+    );
   }
 
   handleNewDisruptions(disruptions: Disruption[]) {
@@ -63,6 +70,15 @@ export class Disruptions {
       m: disruptionsConsideredFreshMinutes,
     });
     return nowUTCLuxon().isAfter(expiry);
+  }
+
+  getRawDisruption(
+    source: DisruptionSourceID,
+    id: string,
+  ): RawDisruption | null {
+    return (
+      this.getRaw().find((x) => x.source === source && x.id === id) ?? null
+    );
   }
 
   private _requireCtx(): TrainQuery {

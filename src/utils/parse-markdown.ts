@@ -1,15 +1,35 @@
-export function parseMarkdown(markdown: string) {
+export function parseMarkdown(
+  markdown: string,
+  {
+    useClassesOverSemanticHtml = false,
+  }: { useClassesOverSemanticHtml?: boolean } = {},
+) {
   const lines = escapeHtml(markdown)
     .split("\n")
     .map((l) => l.replace(/[\r\t]/, "").trim())
     .filter((x) => x.length !== 0);
 
+  const h1Start = useClassesOverSemanticHtml ? '<p class="h1">' : "<h1>";
+  const h1End = useClassesOverSemanticHtml ? "</p>" : "</h1>";
+  const h2Start = useClassesOverSemanticHtml ? '<p class="h2">' : "<h2>";
+  const h2End = useClassesOverSemanticHtml ? "</p>" : "</h2>";
+  const h3Start = useClassesOverSemanticHtml ? '<p class="h3">' : "<h3>";
+  const h3End = useClassesOverSemanticHtml ? "</p>" : "</h3>";
+
   let output = "";
   for (const line of lines) {
     if (/^# (.+)$/g.test(line)) {
-      output += `<h1>${parseInlineMarkdown(line.replace("# ", ""))}</h1>`;
+      output += `${h1Start}${parseInlineMarkdown(
+        line.replace("# ", ""),
+      )}${h1End}`;
     } else if (/^## (.+)$/g.test(line)) {
-      output += `<h2>${parseInlineMarkdown(line.replace("## ", ""))}</h2>`;
+      output += `${h2Start}${parseInlineMarkdown(
+        line.replace("## ", ""),
+      )}${h2End}`;
+    } else if (/^### (.+)$/g.test(line)) {
+      output += `${h3Start}${parseInlineMarkdown(
+        line.replace("### ", ""),
+      )}${h3End}`;
     } else {
       output += `<p>${parseInlineMarkdown(line)}</p>`;
     }
