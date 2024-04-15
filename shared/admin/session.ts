@@ -23,7 +23,7 @@ export class Session {
     readonly username: string,
     readonly roles: Role[],
     readonly token: string,
-    readonly begun: QUtcDateTime,
+    readonly expiry: QUtcDateTime,
   ) {}
 
   static readonly json = z
@@ -31,16 +31,16 @@ export class Session {
       username: z.string(),
       roles: RoleJson.array(),
       token: z.string(),
-      begun: QUtcDateTime.json,
+      expiry: QUtcDateTime.json,
     })
-    .transform((x) => new Session(x.username, x.roles, x.token, x.begun));
+    .transform((x) => new Session(x.username, x.roles, x.token, x.expiry));
 
   toJSON(): z.input<typeof Session.json> {
     return {
       username: this.username,
       roles: this.roles,
       token: this.token,
-      begun: this.begun.toJSON(),
+      expiry: this.expiry.toJSON(),
     };
   }
 }

@@ -2,6 +2,7 @@ import { Collection, MongoClient, Document } from "mongodb";
 import { GtfsData } from "../gtfs/data/gtfs-data";
 import { GtfsCalendar } from "../gtfs/data/gtfs-calendar";
 import { GtfsTrip } from "../gtfs/data/gtfs-trip";
+import { Session } from "../../shared/admin/session";
 import { RawHandledDisruption } from "../disruptions/raw-handled-disruption";
 
 type DBs = {
@@ -10,6 +11,7 @@ type DBs = {
   gtfsCalendars: Collection<Document>;
   disruptionsProcessed: Collection<Document>;
   disruptionsRawHandled: Collection<Document>;
+  adminAuth: Collection<Document>;
 };
 
 export class TrainQueryDB {
@@ -40,6 +42,7 @@ export class TrainQueryDB {
       gtfsCalendars: gtfsDb.collection("gtfs-calendars-v1"),
       disruptionsProcessed: gtfsDb.collection("disruptions-processed-v1"),
       disruptionsRawHandled: gtfsDb.collection("disruptions-raw-handled-v1"),
+      adminAuth: gtfsDb.collection("admin-auth-v1"),
     };
   }
 
@@ -97,6 +100,25 @@ export class TrainQueryDB {
     // Intentionally uses the base GtfsTrip type, not GtfsRealtimeTrip, because
     // we do not wish to write the realtime data to the database.
     await this.dbs.gtfsTrips.insertMany(gtfsData.trips.map((t) => t.toJSON()));
+  }
+
+  /** Retrieve all admin auth tokens from the database. */
+  async fetchAdminAuthSession(token: string): Promise<Session | null> {
+    const doc = await this.dbs.adminAuth.findOne({ token });
+    if (doc == null) {
+      return doc;
+    }
+    return Session.json.parse(doc);
+  }
+
+  /** Writes a session to the database. */
+  async writeAdminAuthSession(session: Session) {
+    await this.dbs.adminAuth.insertOne(session.toJSON());
+  }
+
+  /** Deletes a session from the database. */
+  async deleteAdminAuthSession(token: string) {
+    await this.dbs.adminAuth.deleteOne({ token });
   }
 
   async fetchRawHandledDisruptions(): Promise<RawHandledDisruption[]> {

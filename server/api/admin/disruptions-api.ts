@@ -6,7 +6,7 @@ export async function disruptionsApi(
   ctx: TrainQuery,
   params: ServerParams,
 ): Promise<object> {
-  ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+  await ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
 
   return {
     raw: ctx.disruptions.getRaw().map((x) => x.toJSON(ctx)),
