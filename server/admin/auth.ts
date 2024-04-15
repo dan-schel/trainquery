@@ -9,7 +9,7 @@ import {
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 
 /** Disregard admin tokens that were created over 2 hours ago. */
-const tokenLifespanMins = 1;
+const tokenLifespanMins = 60 * 2;
 
 interface AdminAuthDB {
   fetchAdminAuthSession(token: string): Promise<Session | null>;
