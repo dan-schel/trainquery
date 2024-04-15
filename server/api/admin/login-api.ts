@@ -21,6 +21,6 @@ export async function loginApi(
 
   const username = requireBodyParam(params, "username");
   const password = requireBodyParam(params, "password");
-  const session = ctx.adminAuth.login(username, password);
+  const session = await ctx.adminAuth.login(username, password);
   return { session };
 }

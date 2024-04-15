@@ -9,12 +9,32 @@ import {
 import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
 
 /** Disregard admin tokens that were created over 2 hours ago. */
-const tokenLifespanMins = 60 * 2;
+const tokenLifespanMins = 1;
 
-export class AdminAuth {
+interface AdminAuthDB {
+  fetchAdminAuthSession(token: string): Promise<Session | null>;
+  writeAdminAuthSession(session: Session): Promise<void>;
+  deleteAdminAuthSession(token: string): Promise<void>;
+}
+
+export class LocalAdminAuthDB implements AdminAuthDB {
   private _sessions: Session[] = [];
 
-  login(username: string, password: string): Session | null {
+  async fetchAdminAuthSession(token: string): Promise<Session | null> {
+    return this._sessions.find((s) => s.token === token) ?? null;
+  }
+  async writeAdminAuthSession(session: Session): Promise<void> {
+    this._sessions.push(session);
+  }
+  async deleteAdminAuthSession(token: string): Promise<void> {
+    this._sessions = this._sessions.filter((s) => s.token !== token);
+  }
+}
+
+export class AdminAuth {
+  constructor(private readonly _db: AdminAuthDB) {}
+
+  async login(username: string, password: string): Promise<Session | null> {
     const superadmin = EnvironmentVariables.get().superadmin;
 
     // If there's no superadmin, then the admin dashboard is disabled
@@ -24,7 +44,7 @@ export class AdminAuth {
     }
 
     if (username === superadmin.username && password === superadmin.password) {
-      return this._createSession(username, ["superadmin"]);
+      return await this._createSession(username, ["superadmin"]);
     }
 
     // TODO: Check database for users other than the singular superadmin.
@@ -32,32 +52,34 @@ export class AdminAuth {
     return null;
   }
 
-  logout(token: string) {
-    const session = this.getSession(token);
+  async logout(token: string) {
+    await this._db.deleteAdminAuthSession(token);
+  }
+
+  async getSession(token: string): Promise<Session | null> {
+    const session = await this._db.fetchAdminAuthSession(token);
     if (session == null) {
-      return;
+      return null;
     }
-    this._sessions = this._sessions.filter(
-      (s) => s.username !== session.username,
-    );
+
+    if (nowUTCLuxon().isAfter(session.expiry)) {
+      await this._db.deleteAdminAuthSession(token);
+      return null;
+    }
+
+    return session;
   }
 
-  getSession(token: string): Session | null {
-    const oldestAcceptedToken = nowUTCLuxon().add({ m: -tokenLifespanMins });
-    return (
-      this._sessions.find(
-        (s) => s.token === token && s.begun.isAfter(oldestAcceptedToken),
-      ) ?? null
-    );
-  }
-
-  throwUnlessAuthenticated(params: ServerParams, role: Role): Session {
+  async throwUnlessAuthenticated(
+    params: ServerParams,
+    role: Role,
+  ): Promise<Session> {
     const token = params.header.adminToken;
     if (token == null) {
       throw new BadApiCallError("No admin token provided.", 401);
     }
 
-    const session = this.getSession(token);
+    const session = await this.getSession(token);
     if (session == null) {
       throw new BadApiCallError("Admin token invalid/expired.", 401);
     }
@@ -70,15 +92,17 @@ export class AdminAuth {
     return session;
   }
 
-  private _createSession(username: string, roles: Role[]): Session {
+  private async _createSession(
+    username: string,
+    roles: Role[],
+  ): Promise<Session> {
     const session = new Session(
       username,
       roles,
       generateRandomToken(),
-      nowUTCLuxon(),
+      nowUTCLuxon().add({ m: tokenLifespanMins }),
     );
-    this._sessions = this._sessions.filter((s) => s.username !== username);
-    this._sessions.push(session);
+    await this._db.writeAdminAuthSession(session);
     return session;
   }
 }
