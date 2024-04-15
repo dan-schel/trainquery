@@ -32,39 +32,42 @@ import UilTrashAlt from "./UilTrashAlt.vue";
 import UilUser from "./UilUser.vue";
 import UilWrench from "./UilWrench.vue";
 
-export type IconID =
-  | "majesticons:pin"
-  | "majesticons:pin-line"
-  | "uil:align-left"
-  | "uil:angle-down"
-  | "uil:angle-left"
-  | "uil:angle-right"
-  | "uil:angle-up"
-  | "uil:bars"
-  | "uil:calendar"
-  | "uil:calendar-slash"
-  | "uil:check"
-  | "uil:check-circle"
-  | "uil:clock"
-  | "uil:code-branch"
-  | "uil:exclamation-circle"
-  | "uil:external-link-alt"
-  | "uil:filter"
-  | "uil:github"
-  | "uil:home"
-  | "uil:info-circle"
-  | "uil:map"
-  | "uil:map-marker"
-  | "uil:redo"
-  | "uil:search"
-  | "uil:setting"
-  | "uil:slider-h-range"
-  | "uil:stethoscope-alt"
-  | "uil:times"
-  | "uil:times-circle"
-  | "uil:trash-alt"
-  | "uil:user"
-  | "uil:wrench";
+const Icons = {
+  "majesticons:pin": MajesticonsPin,
+  "majesticons:pin-line": MajesticonsPinLine,
+  "uil:align-left": UilAlignLeft,
+  "uil:angle-down": UilAngleDown,
+  "uil:angle-left": UilAngleLeft,
+  "uil:angle-right": UilAngleRight,
+  "uil:angle-up": UilAngleUp,
+  "uil:bars": UilBars,
+  "uil:calendar": UilCalendar,
+  "uil:calendar-slash": UilCalendarSlash,
+  "uil:check": UilCheck,
+  "uil:check-circle": UilCheckCircle,
+  "uil:clock": UilClock,
+  "uil:code-branch": UilCodeBranch,
+  "uil:exclamation-circle": UilExclamationCircle,
+  "uil:external-link-alt": UilExternalLinkAlt,
+  "uil:filter": UilFilter,
+  "uil:github": UilGithub,
+  "uil:home": UilHome,
+  "uil:info-circle": UilInfoCircle,
+  "uil:map": UilMap,
+  "uil:map-marker": UilMapMarker,
+  "uil:redo": UilRedo,
+  "uil:search": UilSearch,
+  "uil:setting": UilSetting,
+  "uil:slider-h-range": UilSliderHRange,
+  "uil:stethoscope-alt": UilStethoscopeAlt,
+  "uil:times": UilTimes,
+  "uil:times-circle": UilTimesCircle,
+  "uil:trash-alt": UilTrashAlt,
+  "uil:user": UilUser,
+  "uil:wrench": UilWrench,
+};
+
+export type IconID = keyof typeof Icons;
 
 defineProps<{
   id: IconID;
@@ -72,69 +75,5 @@ defineProps<{
 </script>
 
 <template>
-  <MajesticonsPin v-if="id === 'majesticons:pin'" class="icon"></MajesticonsPin>
-  <MajesticonsPinLine
-    v-else-if="id === 'majesticons:pin-line'"
-    class="icon"
-  ></MajesticonsPinLine>
-  <UilAlignLeft v-else-if="id === 'uil:align-left'" class="icon"></UilAlignLeft>
-  <UilAngleDown v-else-if="id === 'uil:angle-down'" class="icon"></UilAngleDown>
-  <UilAngleLeft v-else-if="id === 'uil:angle-left'" class="icon"></UilAngleLeft>
-  <UilAngleRight
-    v-else-if="id === 'uil:angle-right'"
-    class="icon"
-  ></UilAngleRight>
-  <UilAngleUp v-else-if="id === 'uil:angle-up'" class="icon"></UilAngleUp>
-  <UilBars v-else-if="id === 'uil:bars'" class="icon"></UilBars>
-  <UilCalendar v-else-if="id === 'uil:calendar'" class="icon"></UilCalendar>
-  <UilCalendarSlash
-    v-else-if="id === 'uil:calendar-slash'"
-    class="icon"
-  ></UilCalendarSlash>
-  <UilCheck v-else-if="id === 'uil:check'" class="icon"></UilCheck>
-  <UilCheckCircle
-    v-else-if="id === 'uil:check-circle'"
-    class="icon"
-  ></UilCheckCircle>
-  <UilClock v-else-if="id === 'uil:clock'" class="icon"></UilClock>
-  <UilCodeBranch
-    v-else-if="id === 'uil:code-branch'"
-    class="icon"
-  ></UilCodeBranch>
-  <UilExclamationCircle
-    v-else-if="id === 'uil:exclamation-circle'"
-    class="icon"
-  ></UilExclamationCircle>
-  <UilExternalLinkAlt
-    v-else-if="id === 'uil:external-link-alt'"
-    class="icon"
-  ></UilExternalLinkAlt>
-  <UilFilter v-else-if="id === 'uil:filter'" class="icon"></UilFilter>
-  <UilGithub v-else-if="id === 'uil:github'" class="icon"></UilGithub>
-  <UilHome v-else-if="id === 'uil:home'" class="icon"></UilHome>
-  <UilInfoCircle
-    v-else-if="id === 'uil:info-circle'"
-    class="icon"
-  ></UilInfoCircle>
-  <UilMap v-else-if="id === 'uil:map'" class="icon"></UilMap>
-  <UilMapMarker v-else-if="id === 'uil:map-marker'" class="icon"></UilMapMarker>
-  <UilRedo v-else-if="id === 'uil:redo'" class="icon"></UilRedo>
-  <UilSearch v-else-if="id === 'uil:search'" class="icon"></UilSearch>
-  <UilSetting v-else-if="id === 'uil:setting'" class="icon"></UilSetting>
-  <UilSliderHRange
-    v-else-if="id === 'uil:slider-h-range'"
-    class="icon"
-  ></UilSliderHRange>
-  <UilStethoscopeAlt
-    v-else-if="id === 'uil:stethoscope-alt'"
-    class="icon"
-  ></UilStethoscopeAlt>
-  <UilTimes v-else-if="id === 'uil:times'" class="icon"></UilTimes>
-  <UilTimesCircle
-    v-else-if="id === 'uil:times-circle'"
-    class="icon"
-  ></UilTimesCircle>
-  <UilTrashAlt v-else-if="id === 'uil:trash-alt'" class="icon"></UilTrashAlt>
-  <UilUser v-else-if="id === 'uil:user'" class="icon"></UilUser>
-  <UilWrench v-else-if="id === 'uil:wrench'" class="icon"></UilWrench>
+  <component class="icon" :is="Icons[id]"></component>
 </template>
