@@ -13,9 +13,15 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       workbox: {
-        globPatterns: ["**/*.{js,css}"]
+        globPatterns: ["**/*.{js,css}"],
       },
-      includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
+      includeAssets: [
+        "favicon.ico",
+        "favicon.svg",
+        "apple-touch-icon.png",
+        "mask-icon.svg",
+        "mona-sans.woff2",
+      ],
       manifest: {
         name: "TrainQuery",
         short_name: "TrainQuery",
@@ -27,28 +33,28 @@ export default defineConfig({
             src: "favicon-circle-192.png",
             sizes: "192x192",
             type: "image/png",
-            purpose: "any"
+            purpose: "any",
           },
           {
             src: "favicon-circle-512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any"
+            purpose: "any",
           },
           {
             src: "favicon-maskable-192.png",
             sizes: "192x192",
             type: "image/png",
-            purpose: "maskable"
+            purpose: "maskable",
           },
           {
             src: "favicon-maskable-512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "maskable"
-          }
-        ]
-      }
+            purpose: "maskable",
+          },
+        ],
+      },
     }),
     viteSSR(),
     vue(),
@@ -57,7 +63,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
-      "shared": fileURLToPath(new URL("./shared", import.meta.url))
-    }
-  }
+      shared: fileURLToPath(new URL("./shared", import.meta.url)),
+    },
+  },
 });

@@ -10,7 +10,7 @@ import { BadApiCallError } from "../param-utils";
 import { TrainQueryDB } from "./trainquery-db";
 import { Banners } from "./banners";
 import { loginApi } from "../api/admin/login-api";
-import { AdminAuth } from "../admin/auth";
+import { AdminAuth, LocalAdminAuthDB } from "../admin/auth";
 import { logoutApi } from "../api/admin/logout-api";
 import { disruptionsApi } from "../api/admin/disruptions-api";
 import { gtfsApi } from "../api/admin/gtfs-api";
@@ -59,7 +59,7 @@ export async function trainQuery(
 
   const server = serverBuilder();
   const disruptions = new Disruptions();
-  const adminAuth = new AdminAuth();
+  const adminAuth = new AdminAuth(database ?? new LocalAdminAuthDB());
   const banners = new Banners();
 
   const ctx: TrainQuery = {
