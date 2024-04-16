@@ -1,6 +1,6 @@
 import { QCache } from "../../shared/qtime/qcache";
 import { QDate } from "../../shared/qtime/qdate";
-import { getOffset } from "../../shared/qtime/luxon-conversions";
+import { getOffsetLuxon } from "../../shared/qtime/luxon-conversions";
 import { TimezoneConfig } from "../../shared/system/config/shared-config";
 
 export class OffsetCalculator {
@@ -14,7 +14,7 @@ export class OffsetCalculator {
     } else {
       this._calculator = new QCache<QDate, number>(
         (d) => {
-          return getOffset(d, config.id, config.offsetCheckHour);
+          return getOffsetLuxon(d, config.id, config.offsetCheckHour);
         },
         (d) => d.toISO(),
         100,

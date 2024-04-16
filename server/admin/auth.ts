@@ -6,7 +6,7 @@ import {
   Role,
   applyRoleInheritance,
 } from "../../shared/admin/session";
-import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
+import { nowUTC } from "../../shared/qtime/luxon-conversions";
 
 /** Disregard admin tokens that were created over 2 hours ago. */
 const tokenLifespanMins = 60 * 2;
@@ -62,7 +62,7 @@ export class AdminAuth {
       return null;
     }
 
-    if (nowUTCLuxon().isAfter(session.expiry)) {
+    if (nowUTC().isAfter(session.expiry)) {
       await this._db.deleteAdminAuthSession(token);
       return null;
     }
@@ -100,7 +100,7 @@ export class AdminAuth {
       username,
       roles,
       generateRandomToken(),
-      nowUTCLuxon().add({ m: tokenLifespanMins }),
+      nowUTC().add({ m: tokenLifespanMins }),
     );
     await this._db.writeAdminAuthSession(session);
     return session;
