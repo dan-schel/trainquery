@@ -14,6 +14,8 @@ export class PinnedWidget {
     readonly filter: DepartureFilter,
   ) {}
 
+  // WARNING: This cannot change without breaking settings v1, so I probably
+  // need a better solution (e.g. versioning this object too?) for this one day!
   static readonly json = z
     .object({
       // The "as any" is there to stop a weird error... I tried!

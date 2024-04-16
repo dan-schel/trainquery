@@ -9,7 +9,7 @@ export function readSettings() {
   }
 
   try {
-    return Settings.json.parse(JSON.parse(existing));
+    return Settings.parse(JSON.parse(existing));
   } catch {
     console.warn("Failed to parse user settings, using default settings.");
     return Settings.default;
