@@ -5,7 +5,7 @@ import { DisruptionSource } from "./source/disruption-source";
 import { PtvDisruptionSource } from "./source/ptv/ptv-disruption-source";
 import { DepartureWithDisruptions } from "../../shared/disruptions/departure-with-disruptions";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
-import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
+import { nowUTC } from "../../shared/qtime/luxon-conversions";
 import { RawDisruption } from "./raw-disruption";
 import { DisruptionSourceID } from "./raw-disruption-id-components";
 
@@ -47,7 +47,7 @@ export class Disruptions {
 
   handleNewDisruptions(disruptions: Disruption[]) {
     this._disruptions = disruptions;
-    this._lastUpdated = nowUTCLuxon();
+    this._lastUpdated = nowUTC();
   }
 
   determineDisruptions(departure: Departure): DepartureWithDisruptions {
@@ -69,7 +69,7 @@ export class Disruptions {
     const expiry = this._lastUpdated.add({
       m: disruptionsConsideredFreshMinutes,
     });
-    return nowUTCLuxon().isAfter(expiry);
+    return nowUTC().isAfter(expiry);
   }
 
   getRawDisruption(

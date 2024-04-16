@@ -5,41 +5,13 @@ import {
 } from "./pinned-widgets";
 import { type InjectionKey, inject, type Ref, ref } from "vue";
 import { SignificantStop } from "./significant-stops";
+import { anySettingsVersion } from "./versions/any";
+import { parseOrMigrateToSettingsV2, settingsV2 } from "./versions/v2";
 
-const settingsV1 = z.object({
-  // Note that theme is not stored here. It is a separate localStorage entry so
-  // a lightweight script can load it fast.
-  version: z.literal("v1"),
-  pinnedWidgets: PinnedWidget.json.array(),
-  significantStops: SignificantStop.json.array(),
-  enableContinuations: z.boolean(),
-  limitMapFPS: z.boolean(),
-});
-
-const settingsV2 = z.object({
-  // Note that theme is not stored here. It is a separate localStorage entry so
-  // a lightweight script can load it fast.
-  version: z.literal("v2"),
-  pinnedWidgets: PinnedWidget.json.array(),
-  significantStops: SignificantStop.json.array(),
-  enableContinuations: z.boolean(),
-  limitMapFPS: z.boolean(),
-  developerMode: z.boolean(),
-});
-
-function migrateToV2(
-  s: z.infer<typeof settingsV1>,
-): z.infer<typeof settingsV2> {
-  return {
-    version: "v2",
-    pinnedWidgets: s.pinnedWidgets,
-    significantStops: s.significantStops,
-    enableContinuations: s.enableContinuations,
-    limitMapFPS: s.limitMapFPS,
-    developerMode: false,
-  };
-}
-
+/**
+ * The latest (non-versioned) settings object. See the `./versions` folder for
+ * the versioned parsing logic.
+ */
 export class Settings {
   constructor(
     readonly pinnedWidgets: PinnedWidget[],
@@ -47,22 +19,27 @@ export class Settings {
     readonly enableContinuations: boolean,
     readonly limitMapFPS: boolean,
     readonly developerMode: boolean,
+    readonly showAdminDashboardShortcut: boolean,
   ) {}
 
-  static default = new Settings([], [], false, false, false);
+  static default = new Settings([], [], false, false, false, false);
 
-  static json = z
-    .union([settingsV1.transform((s) => migrateToV2(s)), settingsV2])
-    .transform(
-      (x) =>
-        new Settings(
-          x.pinnedWidgets,
-          x.significantStops,
-          x.enableContinuations,
-          x.limitMapFPS,
-          x.developerMode,
-        ),
+  static parse(obj: unknown): Settings {
+    const potentiallyOldSettings = anySettingsVersion.parse(obj);
+
+    // Regardless of the version of obj, this function will migrate it to the
+    // latest version (as long as it was/is valid!).
+    const settings = parseOrMigrateToSettingsV2(potentiallyOldSettings);
+
+    return new Settings(
+      settings.pinnedWidgets,
+      settings.significantStops,
+      settings.enableContinuations,
+      settings.limitMapFPS,
+      settings.developerMode,
+      settings.showAdminDashboardShortcut,
     );
+  }
 
   toJSON(): z.input<typeof settingsV2> {
     return {
@@ -72,6 +49,7 @@ export class Settings {
       enableContinuations: this.enableContinuations,
       limitMapFPS: this.limitMapFPS,
       developerMode: this.developerMode,
+      showAdminDashboardShortcut: this.showAdminDashboardShortcut,
     };
   }
 
@@ -81,12 +59,14 @@ export class Settings {
     enableContinuations,
     limitMapFPS,
     developerMode,
+    showAdminDashboardShortcut,
   }: {
     pinnedWidgets?: PinnedWidget[];
     significantStops?: SignificantStop[];
     enableContinuations?: boolean;
     limitMapFPS?: boolean;
     developerMode?: boolean;
+    showAdminDashboardShortcut?: boolean;
   }) {
     return new Settings(
       pinnedWidgets ?? this.pinnedWidgets,
@@ -94,6 +74,7 @@ export class Settings {
       enableContinuations ?? this.enableContinuations,
       limitMapFPS ?? this.limitMapFPS,
       developerMode ?? this.developerMode,
+      showAdminDashboardShortcut ?? this.showAdminDashboardShortcut,
     );
   }
 

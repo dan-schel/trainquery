@@ -7,10 +7,7 @@ import { getConfig } from "./utils/get-config";
 import { Settings, settingsInjectionKey } from "./settings/settings";
 import { onMounted, provide, ref, onUnmounted } from "vue";
 import { readSettings, writeSettings } from "./settings/persist-settings";
-import {
-  nowUTCLuxon,
-  toLocalDateTimeLuxon,
-} from "shared/qtime/luxon-conversions";
+import { nowUTC, toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import { nowInjectionKey } from "./utils/now-provider";
 import LoadingSpinner from "./components/common/LoadingSpinner.vue";
 import { useNavigating } from "./utils/navigating-provider";
@@ -19,7 +16,7 @@ import Banners from "./components/common/Banners.vue";
 const navigating = useNavigating();
 
 const settings = ref<Settings | null>(null);
-const nowUtc = ref(nowUTCLuxon().startOfMinute());
+const nowUtc = ref(nowUTC().startOfMinute());
 const nowLocal = ref(toLocalDateTimeLuxon(getConfig(), nowUtc.value));
 
 // setInterval thinks its a NodeJS.Timer, but vue-tsc thinks it shouldn't be...
@@ -45,7 +42,7 @@ provide(nowInjectionKey, {
 onMounted(() => {
   settings.value = readSettings().validateAgainstConfig((s) => console.warn(s));
   timeout = setInterval(() => {
-    const utc = nowUTCLuxon().startOfMinute();
+    const utc = nowUTC().startOfMinute();
     if (!utc.equals(nowUtc.value)) {
       nowUtc.value = utc;
       nowLocal.value = toLocalDateTimeLuxon(getConfig(), utc);

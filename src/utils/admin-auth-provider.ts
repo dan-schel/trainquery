@@ -1,5 +1,5 @@
 import { Session } from "shared/admin/session";
-import { nowUTCLuxon } from "shared/qtime/luxon-conversions";
+import { nowUTC } from "shared/qtime/luxon-conversions";
 import { ref, type InjectionKey, inject, type Ref } from "vue";
 
 const lsKey = "trainquery-admin-auth";
@@ -46,7 +46,7 @@ export function readAdminAuth(): Session | null {
     // they first open the admin dashboard, rather than the first time they make
     // an actual API call (where the server, as the source of truth, will
     // actually tell us when to delete the token).
-    if (nowUTCLuxon().isAfter(session.expiry)) {
+    if (nowUTC().isAfter(session.expiry)) {
       writeAdminAuth(null);
       return null;
     }

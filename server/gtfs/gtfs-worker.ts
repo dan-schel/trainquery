@@ -6,7 +6,7 @@ import {
   GtfsRealtimeConfig,
 } from "../config/gtfs-config";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
-import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
+import { nowUTC } from "../../shared/qtime/luxon-conversions";
 import { QTime } from "../../shared/qtime/qtime";
 import { downloadGtfs } from "./fetch";
 import { GtfsRealtimeData, fetchRealtime } from "./realtime/fetch";
@@ -90,7 +90,7 @@ export class GtfsWorker {
           return;
         }
 
-        const now = nowUTCLuxon();
+        const now = nowUTC();
         const thresholdToday = new QUtcDateTime(now.date, refreshTime);
         const thresholdYesterday = new QUtcDateTime(
           now.date.addDays(-1),
@@ -113,7 +113,7 @@ export class GtfsWorker {
   }
 
   private async _refresh() {
-    this._lastAttempt = nowUTCLuxon();
+    this._lastAttempt = nowUTC();
 
     try {
       this._ctx.logger.logRefreshingGtfs();
@@ -200,7 +200,7 @@ class GtfsRealtimeWorker {
     if (
       (this._realtimeData == null ||
         this._dataAge == null ||
-        nowUTCLuxon().diff(this._dataAge).inSecs > this.config.staleAfter) &&
+        nowUTC().diff(this._dataAge).inSecs > this.config.staleAfter) &&
       this._pollTimer == null
     ) {
       await this._refresh();
@@ -233,7 +233,7 @@ class GtfsRealtimeWorker {
 
     try {
       this._realtimeData = await fetchRealtime(this.config);
-      this._dataAge = nowUTCLuxon();
+      this._dataAge = nowUTC();
       this._realtimeDataChanged();
       this._ctx.logger.logRefreshingGtfsRealtimeSuccess(this.gtfsSubfeedID);
     } catch (err) {

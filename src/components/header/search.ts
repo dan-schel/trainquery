@@ -117,17 +117,17 @@ export function searchOptionsWholeSite(devMode: boolean): SearchOption[] {
     boost: 0.6,
   });
 
-  if (devMode) {
-    options.push({
-      title: "Admin dashboard",
-      subtitle: null,
-      icon: "uil:wrench",
-      url: "/admin",
-      tags: [],
-      data: null,
-      boost: 0.6,
-    });
-  }
+  options.push({
+    title: "Admin dashboard",
+    subtitle: null,
+    icon: "uil:wrench",
+    url: "/admin",
+    tags: [],
+    data: null,
+    boost: 0.6,
+    // TODO: Only show admin dashboard when the user exactly types "admin"?
+    // requiresExactMatch: true,
+  });
 
   return options;
 }

@@ -4,7 +4,7 @@ import { type HasSharedConfig } from "../system/config-utils";
 import { QLocalDateTime, QUtcDateTime } from "./qdatetime";
 import { QTime } from "./qtime";
 
-export function getOffset(
+export function getOffsetLuxon(
   date: QDate,
   zoneID: string,
   offsetCheckHour: number,
@@ -64,16 +64,16 @@ export function toLocalDateTimeLuxon(
   return new QLocalDateTime(convertedDate, convertedTime, offset);
 }
 
-export function nowUTCLuxon(): QUtcDateTime {
-  const now = DateTime.utc();
+export function nowUTC(): QUtcDateTime {
+  const now = new Date();
   return new QUtcDateTime(
-    new QDate(now.year, now.month, now.day),
-    new QTime(now.hour, now.minute, now.second),
+    new QDate(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate()),
+    new QTime(now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()),
   );
 }
 
 export function nowLocalLuxon(config: HasSharedConfig): QLocalDateTime {
-  return toLocalDateTimeLuxon(config, nowUTCLuxon());
+  return toLocalDateTimeLuxon(config, nowUTC());
 }
 
 export function buildLocalDateTimeLuxon(

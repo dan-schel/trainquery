@@ -18,7 +18,7 @@ import { StopID } from "../../shared/system/ids";
 import { TrainQuery } from "../ctx/trainquery";
 import { QTimetableTime } from "../../shared/qtime/qtime";
 import { GtfsParsingReport } from "./gtfs-parsing-report";
-import { nowUTCLuxon } from "../../shared/qtime/luxon-conversions";
+import { nowUTC } from "../../shared/qtime/luxon-conversions";
 import { HasSharedConfig, requireLine } from "../../shared/system/config-utils";
 import { nullableEquals } from "@dan-schel/js-utils";
 import { GtfsFeedConfig } from "../config/gtfs-config";
@@ -60,13 +60,7 @@ export async function parseGtfsFiles(
     parsingReport,
   );
 
-  return new GtfsData(
-    calendars,
-    trips,
-    config.hash,
-    parsingReport,
-    nowUTCLuxon(),
-  );
+  return new GtfsData(calendars, trips, config.hash, parsingReport, nowUTC());
 }
 
 function parseCalendars(

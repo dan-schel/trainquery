@@ -4,7 +4,7 @@ import { GtfsParsingReport } from "../gtfs-parsing-report";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { unique } from "@dan-schel/js-utils";
 import { z } from "zod";
-import { nowUTCLuxon } from "../../../shared/qtime/luxon-conversions";
+import { nowUTC } from "../../../shared/qtime/luxon-conversions";
 
 /**
  * The calendars and trips parsed from the GTFS feeds. If realtime data is
@@ -75,7 +75,7 @@ export class GtfsData {
   }
 
   isOld(refreshSeconds: number) {
-    return this.age.isBeforeOrEqual(nowUTCLuxon().add({ s: -refreshSeconds }));
+    return this.age.isBeforeOrEqual(nowUTC().add({ s: -refreshSeconds }));
   }
 
   /**
