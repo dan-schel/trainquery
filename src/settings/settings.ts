@@ -19,7 +19,7 @@ export class Settings {
     readonly enableContinuations: boolean,
     readonly limitMapFPS: boolean,
     readonly developerMode: boolean,
-    readonly showAdminDashboard: boolean,
+    readonly showAdminDashboardShortcut: boolean,
   ) {}
 
   static default = new Settings([], [], false, false, false, false);
@@ -37,7 +37,7 @@ export class Settings {
       settings.enableContinuations,
       settings.limitMapFPS,
       settings.developerMode,
-      settings.showAdminDashboard,
+      settings.showAdminDashboardShortcut,
     );
   }
 
@@ -49,7 +49,7 @@ export class Settings {
       enableContinuations: this.enableContinuations,
       limitMapFPS: this.limitMapFPS,
       developerMode: this.developerMode,
-      showAdminDashboard: this.showAdminDashboard,
+      showAdminDashboardShortcut: this.showAdminDashboardShortcut,
     };
   }
 
@@ -59,14 +59,14 @@ export class Settings {
     enableContinuations,
     limitMapFPS,
     developerMode,
-    showAdminDashboard,
+    showAdminDashboardShortcut,
   }: {
     pinnedWidgets?: PinnedWidget[];
     significantStops?: SignificantStop[];
     enableContinuations?: boolean;
     limitMapFPS?: boolean;
     developerMode?: boolean;
-    showAdminDashboard?: boolean;
+    showAdminDashboardShortcut?: boolean;
   }) {
     return new Settings(
       pinnedWidgets ?? this.pinnedWidgets,
@@ -74,7 +74,7 @@ export class Settings {
       enableContinuations ?? this.enableContinuations,
       limitMapFPS ?? this.limitMapFPS,
       developerMode ?? this.developerMode,
-      showAdminDashboard ?? this.showAdminDashboard,
+      showAdminDashboardShortcut ?? this.showAdminDashboardShortcut,
     );
   }
 

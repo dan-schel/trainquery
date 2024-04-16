@@ -20,7 +20,7 @@ export const settingsV2 = z.object({
   // The default value can be removed for v3, since parseOrMigrateToSettingsV2
   // will always return a value for it. Even when the settings was v2 and didn't
   // contain it, using default() here means zod will fill it!
-  showAdminDashboard: z.boolean().default(false),
+  showAdminDashboardShortcut: z.boolean().default(false),
 });
 
 export function parseOrMigrateToSettingsV2(
@@ -40,7 +40,7 @@ export function parseOrMigrateToSettingsV2(
       enableContinuations: oldSettings.enableContinuations,
       limitMapFPS: oldSettings.limitMapFPS,
       developerMode: false,
-      showAdminDashboard: false,
+      showAdminDashboardShortcut: false,
     };
   }
 }

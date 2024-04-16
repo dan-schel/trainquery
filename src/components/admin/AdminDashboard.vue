@@ -4,11 +4,20 @@ import SimpleButton from "@/components/common/SimpleButton.vue";
 import PageContent from "@/components/common/PageContent.vue";
 import { listifyAnd } from "@dan-schel/js-utils";
 import AdminDashboardApp from "@/components/admin/AdminDashboardApp.vue";
+import Switch from "@/components/common/Switch.vue";
+import { Settings, useSettings } from "@/settings/settings";
 
 const { logout, requireSession } = useAdminAuth();
+const { settings, updateSettings } = useSettings();
 
 async function handleLogout() {
   await logout();
+}
+
+function handleSettingsChange(newSettings: Settings | undefined) {
+  if (newSettings != null) {
+    updateSettings(newSettings);
+  }
 }
 </script>
 
@@ -70,6 +79,16 @@ async function handleLogout() {
         color="cyan"
       ></AdminDashboardApp>
     </div>
+    <Switch
+      :model-value="settings?.showAdminDashboardShortcut"
+      @update:model-value="
+        handleSettingsChange(
+          settings?.with({ showAdminDashboardShortcut: $event }),
+        )
+      "
+      class="switch"
+      ><p>Add admin dashboard shortcut to top navigation</p></Switch
+    >
   </PageContent>
 </template>
 
@@ -92,6 +111,14 @@ h2 {
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
   gap: 0.5rem;
   border-top: 1px solid var(--color-ink-20);
+  border-bottom: 1px solid var(--color-ink-20);
   padding: 1rem 0rem;
+  margin-bottom: 1rem;
+}
+.switch {
+  margin-bottom: 1rem;
+  p {
+    margin-left: 1rem;
+  }
 }
 </style>

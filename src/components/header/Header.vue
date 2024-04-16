@@ -24,7 +24,7 @@ const menuItems = computed(() => {
     { icon: "uil:info-circle", title: "About", routeName: "about" },
   ];
 
-  if (settings.value?.developerMode === true) {
+  if (settings.value?.showAdminDashboardShortcut === true) {
     items.push({
       icon: "uil:wrench",
       title: "Admin dashboard",
