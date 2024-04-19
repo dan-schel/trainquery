@@ -4,7 +4,6 @@ import { createSsrServer } from "vite-ssr/dev";
 import { ConfigProvider, TrainQuery, trainQuery } from "./ctx/trainquery";
 import { OnlineConfigProvider } from "./config/online-config-provider";
 import { ExpressServer } from "./ctx/express-server";
-import { ConsoleLogger } from "./ctx/console-logger";
 import "dotenv/config";
 import { OfflineConfigProvider } from "./config/offline-config-provider";
 import { ssrAppPropsApi } from "./api/ssr-props-api";
@@ -12,19 +11,19 @@ import { TrainQueryDB } from "./ctx/trainquery-db";
 import { createSitemapXml } from "./sitemap-xml";
 import { EnvironmentVariables } from "./ctx/environment-variables";
 import { EnvironmentOptions } from "./ctx/environment-options";
+import { AdminLogger } from "./ctx/admin-logger";
 
 createServer();
 
 async function createServer() {
+  const instanceID = generateInstanceID();
+
   const isProd = EnvironmentVariables.get().isProduction();
   const envOptions = await getEnvironmentOptions(isProd);
 
-  const logger = new ConsoleLogger();
+  const logger = new AdminLogger(instanceID, envOptions.logging);
+  logger.logInstanceStarting(instanceID);
   logger.logEnvOptions(envOptions);
-
-  // <TEMP>
-  console.log("NOTE THAT ENVIRONMENT OPTIONS ARE NOT CURRENTLY USED!");
-  // </TEMP>
 
   const isOffline = process.argv.includes("offline");
   const useOfflineData =
@@ -41,6 +40,7 @@ async function createServer() {
   };
 
   await trainQuery(
+    instanceID,
     () => new ExpressServer(port, serveFrontend),
     getConfigProvider(isOffline || useOfflineData),
     getDatabase(isOffline),
@@ -152,4 +152,10 @@ function serveSitemapXml(app: Express, ctx: TrainQuery) {
     const xml = createSitemapXml(ctx.getConfig());
     res.set("Content-Type", "text/xml").send(xml);
   });
+}
+
+function generateInstanceID(): string {
+  return crypto
+    .getRandomValues(new Uint8Array(4))
+    .reduce((str, x) => str + x.toString(16).padStart(2, "0"), "");
 }

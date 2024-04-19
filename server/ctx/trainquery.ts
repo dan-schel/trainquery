@@ -20,6 +20,7 @@ import { gtfsApi } from "../api/admin/gtfs-api";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
+  readonly instanceID: string;
   readonly isOffline: boolean;
   readonly isProduction: boolean;
   readonly getConfig: () => FullConfig;
@@ -33,6 +34,7 @@ export type TrainQuery = {
 };
 
 export async function trainQuery(
+  instanceID: string,
   serverBuilder: ServerBuilder,
   configProvider: ConfigProvider,
   database: TrainQueryDB | null,
@@ -66,6 +68,7 @@ export async function trainQuery(
   const banners = new Banners();
 
   const ctx: TrainQuery = {
+    instanceID,
     isOffline,
     isProduction,
     getConfig: () => config,
@@ -78,7 +81,9 @@ export async function trainQuery(
     logger,
   };
 
+  // TODO: Do some of these things in parallel?
   await database?.init();
+  await logger.init(ctx);
   await disruptions.init(ctx);
   await adminAuth.init();
   banners.init(ctx);
@@ -139,11 +144,15 @@ export abstract class ConfigProvider {
 }
 
 export abstract class Logger {
+  abstract init(ctx: TrainQuery): Promise<void>;
+
+  abstract logInstanceStarting(instanceID: string): void;
   abstract logServerListening(server: Server): void;
+  abstract logEnvOptions(envOptions: EnvironmentOptions): void;
+
   abstract logConfigRefresh(config: FullConfig, initial: boolean): void;
   abstract logConfigRefreshFailure(err: unknown): void;
   abstract logTimetableLoadFail(path: string): void;
-  abstract logEnvOptions(envOptions: EnvironmentOptions): void;
 
   abstract logRecallingGtfs(): void;
   abstract logRecallingGtfsSuccess(): void;
