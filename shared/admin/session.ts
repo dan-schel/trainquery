@@ -35,12 +35,30 @@ export class Session {
     })
     .transform((x) => new Session(x.username, x.roles, x.token, x.expiry));
 
+  static readonly mongo = z
+    .object({
+      username: z.string(),
+      roles: RoleJson.array(),
+      token: z.string(),
+      expiry: QUtcDateTime.mongo,
+    })
+    .transform((x) => new Session(x.username, x.roles, x.token, x.expiry));
+
   toJSON(): z.input<typeof Session.json> {
     return {
       username: this.username,
       roles: this.roles,
       token: this.token,
       expiry: this.expiry.toJSON(),
+    };
+  }
+
+  toMongo(): z.input<typeof Session.mongo> {
+    return {
+      username: this.username,
+      roles: this.roles,
+      token: this.token,
+      expiry: this.expiry.toMongo(),
     };
   }
 }

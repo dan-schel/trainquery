@@ -4,6 +4,7 @@ import { GtfsCalendar } from "../gtfs/data/gtfs-calendar";
 import { GtfsTrip } from "../gtfs/data/gtfs-trip";
 import { Session } from "../../shared/admin/session";
 import { RawHandledDisruption } from "../disruptions/raw-handled-disruption";
+import { nowUTC } from "../../shared/qtime/luxon-conversions";
 
 type DBs = {
   gtfsMetadata: Collection<Document>;
@@ -108,17 +109,24 @@ export class TrainQueryDB {
     if (doc == null) {
       return doc;
     }
-    return Session.json.parse(doc);
+    return Session.mongo.parse(doc);
   }
 
   /** Writes a session to the database. */
   async writeAdminAuthSession(session: Session) {
-    await this.dbs.adminAuth.insertOne(session.toJSON());
+    await this.dbs.adminAuth.insertOne(session.toMongo());
   }
 
   /** Deletes a session from the database. */
   async deleteAdminAuthSession(token: string) {
     await this.dbs.adminAuth.deleteOne({ token });
+  }
+
+  /** Deletes every expired session from the database. */
+  async cleanupExpiredAdminAuthSessions() {
+    await this.dbs.adminAuth.deleteMany({
+      expiry: { $lt: nowUTC().toMongo() },
+    });
   }
 
   async fetchRawHandledDisruptions(): Promise<RawHandledDisruption[]> {
