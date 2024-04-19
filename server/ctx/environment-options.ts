@@ -1,5 +1,6 @@
 import fsp from "fs/promises";
 import { z } from "zod";
+import { AdminLogService, AdminLoggingOptions } from "./admin-logger";
 
 const ConfigModes = ["local", "online"] as const;
 const GtfsModes = [
@@ -19,6 +20,7 @@ type DisruptionsMode = (typeof DisruptionsModes)[number];
 export class EnvironmentOptions {
   static production = EnvironmentOptions.fromObj({
     name: "production",
+    logging: new AdminLoggingOptions("all", "all"),
     config: "online",
     gtfs: "parse-online",
     persistGtfs: "prod-db",
@@ -26,6 +28,7 @@ export class EnvironmentOptions {
   });
   static development = EnvironmentOptions.fromObj({
     name: "development",
+    logging: new AdminLoggingOptions([], "all"),
     config: "online",
     gtfs: "clone-prod-db",
     persistGtfs: "off",
@@ -33,6 +36,7 @@ export class EnvironmentOptions {
   });
   static offline = EnvironmentOptions.fromObj({
     name: "offline",
+    logging: new AdminLoggingOptions([], "all"),
     config: "local",
     gtfs: "parse-local",
     persistGtfs: "local-db",
@@ -47,6 +51,7 @@ export class EnvironmentOptions {
 
   constructor(
     readonly name: string,
+    readonly logging: AdminLoggingOptions,
     readonly config: ConfigMode,
     readonly gtfs: GtfsMode,
     readonly persistGtfs: PersistGtfsMode,
@@ -54,11 +59,22 @@ export class EnvironmentOptions {
   ) {}
 
   log(logger: (msg: string) => void) {
+    const printLoggingArray = (array: AdminLogService[] | "all") => {
+      if (array === "all") {
+        return '"all"';
+      }
+      return "[" + array.map((x) => '"' + x + '"').join(", ") + "]";
+    };
+
     logger(`Environment (${this.name}):`);
+    logger(`  logging:`);
+    logger(`    info: ${printLoggingArray(this.logging.info)}`);
+    logger(`    warn: ${printLoggingArray(this.logging.warn)}`);
     logger(`  config: "${this.config}"`);
     logger(`  gtfs: "${this.gtfs}"`);
     logger(`  persistGtfs: "${this.persistGtfs}"`);
     logger(`  disruptions: "${this.disruptions}"`);
+    logger("NOTE THAT ENVIRONMENT OPTIONS ARE NOT* CURRENTLY USED!");
   }
 
   static loadFromName(name: string) {
@@ -72,6 +88,7 @@ export class EnvironmentOptions {
   static json = z
     .object({
       name: z.string(),
+      logging: AdminLoggingOptions.json,
       config: z.enum(ConfigModes),
       gtfs: z.enum(GtfsModes),
       persistGtfs: z.enum(PersistGtfsModes),
@@ -93,6 +110,7 @@ export class EnvironmentOptions {
 
   static fromObj(obj: {
     name: string;
+    logging: AdminLoggingOptions;
     config: ConfigMode;
     gtfs: GtfsMode;
     persistGtfs: PersistGtfsMode;
@@ -100,6 +118,7 @@ export class EnvironmentOptions {
   }) {
     return new EnvironmentOptions(
       obj.name,
+      obj.logging,
       obj.config,
       obj.gtfs,
       obj.persistGtfs,
