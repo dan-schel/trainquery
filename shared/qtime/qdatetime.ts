@@ -162,6 +162,25 @@ export class QUtcDateTime extends QDateTime<QUtcDateTime> {
       new QTime(date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()),
     );
   }
+
+  toJsDate() {
+    return new Date(
+      Date.UTC(
+        this.date.year,
+        this.date.month - 1,
+        this.date.day,
+        this.time.hour,
+        this.time.minute,
+        this.time.second,
+      ),
+    );
+  }
+
+  static readonly mongo = z.date().transform((x) => QUtcDateTime.fromJsDate(x));
+
+  toMongo() {
+    return this.toJsDate();
+  }
 }
 export class QLocalDateTime extends QDateTime<QLocalDateTime> {
   constructor(

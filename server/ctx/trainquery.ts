@@ -80,6 +80,7 @@ export async function trainQuery(
 
   await database?.init();
   await disruptions.init(ctx);
+  await adminAuth.init();
   banners.init(ctx);
 
   const gtfs = ctx.getConfig().server.gtfs != null ? new GtfsWorker(ctx) : null;

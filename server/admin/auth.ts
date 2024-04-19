@@ -9,12 +9,16 @@ import {
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
 
 /** Disregard admin tokens that were created over 2 hours ago. */
-const tokenLifespanMins = 60 * 2;
+const tokenLifespanMins = 2 * 60;
+
+/** Run a job to cleanup expired tokens every 60 minutes. */
+const cleanupIntervalMillis = 60 * 60 * 1000;
 
 interface AdminAuthDB {
   fetchAdminAuthSession(token: string): Promise<Session | null>;
   writeAdminAuthSession(session: Session): Promise<void>;
   deleteAdminAuthSession(token: string): Promise<void>;
+  cleanupExpiredAdminAuthSessions(): Promise<void>;
 }
 
 export class LocalAdminAuthDB implements AdminAuthDB {
@@ -29,10 +33,22 @@ export class LocalAdminAuthDB implements AdminAuthDB {
   async deleteAdminAuthSession(token: string): Promise<void> {
     this._sessions = this._sessions.filter((s) => s.token !== token);
   }
+  async cleanupExpiredAdminAuthSessions(): Promise<void> {
+    const now = nowUTC();
+    this._sessions = this._sessions.filter((s) => now.isBefore(s.expiry));
+  }
 }
 
 export class AdminAuth {
   constructor(private readonly _db: AdminAuthDB) {}
+
+  async init() {
+    this._db.cleanupExpiredAdminAuthSessions();
+
+    setInterval(() => {
+      this._db.cleanupExpiredAdminAuthSessions();
+    }, cleanupIntervalMillis);
+  }
 
   async login(username: string, password: string): Promise<Session | null> {
     const superadmin = EnvironmentVariables.get().superadmin;
