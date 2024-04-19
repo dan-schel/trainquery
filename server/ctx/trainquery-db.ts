@@ -5,6 +5,7 @@ import { GtfsTrip } from "../gtfs/data/gtfs-trip";
 import { Session } from "../../shared/admin/session";
 import { RawHandledDisruption } from "../disruptions/raw-handled-disruption";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
+import { AdminLog } from "./admin-logger";
 
 type DBs = {
   gtfsMetadata: Collection<Document>;
@@ -126,6 +127,18 @@ export class TrainQueryDB {
   async cleanupExpiredAdminAuthSessions() {
     await this.dbs.adminAuth.deleteMany({
       expiry: { $lt: nowUTC().toMongo() },
+    });
+  }
+
+  /** Inserts a collection of logs into the database. */
+  async writeLogs(logs: AdminLog[]) {
+    await this.dbs.adminAuth.insertMany(logs.map((l) => l.toMongo()));
+  }
+
+  /** Deletes logs that are over `daysOld` days old. */
+  async cleanupOldLogs(daysOld: number) {
+    await this.dbs.adminAuth.deleteMany({
+      timestamp: { $lt: nowUTC().add({ d: -daysOld }).toMongo() },
     });
   }
 

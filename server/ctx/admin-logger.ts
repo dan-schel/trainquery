@@ -6,6 +6,7 @@ import { ExpressServer } from "./express-server";
 import chalk from "chalk";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
+import { TrainQueryDB } from "./trainquery-db";
 
 export const AdminLogLevels = ["info", "warn"] as const;
 export type AdminLogLevel = (typeof AdminLogLevels)[number];
@@ -56,6 +57,14 @@ export class AdminLog {
     level: AdminLogLevelsJson,
     service: AdminLogServicesJson.nullable(),
     message: z.string(),
+    timestamp: QUtcDateTime.json,
+  });
+
+  static readonly mongo = z.object({
+    level: AdminLogLevelsJson,
+    service: AdminLogServicesJson.nullable(),
+    message: z.string(),
+    timestamp: QUtcDateTime.mongo,
   });
 
   toJSON(): z.input<typeof AdminLog.json> {
@@ -63,9 +72,28 @@ export class AdminLog {
       level: this.level,
       service: this.service,
       message: this.message,
+      timestamp: this.timestamp.toJSON(),
+    };
+  }
+
+  toMongo(): z.input<typeof AdminLog.mongo> {
+    return {
+      level: this.level,
+      service: this.service,
+      message: this.message,
+      timestamp: this.timestamp.toMongo(),
     };
   }
 }
+
+/** Flush logs out to database every 10 seconds. */
+const flushIntervalMillis = 10 * 1000;
+
+/** Cleanup logs over 7 days old every 24 hours. */
+const cleanupIntervalMillis = 24 * 60 * 60 * 1000;
+
+/** Cleanup logs over 7 days old. */
+const cleanupOlderThanDays = 7;
 
 export class AdminLogger extends Logger {
   private _buffer: AdminLog[] = [];
@@ -83,6 +111,30 @@ export class AdminLogger extends Logger {
   } = {}) {
     super();
     this.options = { info, warn };
+  }
+
+  async init(db: TrainQueryDB | null) {
+    if (db == null) {
+      return;
+    }
+
+    await this._cleanup(db);
+    setInterval(() => this._cleanup(db), cleanupIntervalMillis);
+    await this._flush(db);
+    setInterval(() => this._flush(db), flushIntervalMillis);
+  }
+
+  private async _flush(db: TrainQueryDB) {
+    if (this._buffer.length === 0) {
+      return;
+    }
+
+    await db.writeLogs(this._buffer);
+    this._buffer = [];
+  }
+
+  private async _cleanup(db: TrainQueryDB) {
+    await db.cleanupOldLogs(cleanupOlderThanDays);
   }
 
   private _log(

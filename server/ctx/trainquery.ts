@@ -17,6 +17,7 @@ import {
   disruptionsRawApi,
 } from "../api/admin/disruptions-api";
 import { gtfsApi } from "../api/admin/gtfs-api";
+import { AdminLogger } from "./admin-logger";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -81,10 +82,14 @@ export async function trainQuery(
     logger,
   };
 
+  // TODO: Do some of these things in parallel?
   await database?.init();
   await disruptions.init(ctx);
   await adminAuth.init();
   banners.init(ctx);
+  if (logger instanceof AdminLogger) {
+    await logger.init(database);
+  }
 
   const gtfs = ctx.getConfig().server.gtfs != null ? new GtfsWorker(ctx) : null;
   ctx.gtfs = gtfs;
