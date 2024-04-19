@@ -21,7 +21,7 @@ async function createServer() {
   const isProd = EnvironmentVariables.get().isProduction();
   const envOptions = await getEnvironmentOptions(isProd);
 
-  const logger = new AdminLogger(envOptions.logging);
+  const logger = new AdminLogger(instanceID, envOptions.logging);
   logger.logInstanceStarting(instanceID);
   logger.logEnvOptions(envOptions);
 

@@ -14,6 +14,7 @@ type DBs = {
   disruptionsProcessed: Collection<Document>;
   disruptionsRawHandled: Collection<Document>;
   adminAuth: Collection<Document>;
+  logs: Collection<Document>;
 };
 
 export class TrainQueryDB {
@@ -45,7 +46,13 @@ export class TrainQueryDB {
       disruptionsProcessed: gtfsDb.collection("disruptions-processed-v1"),
       disruptionsRawHandled: gtfsDb.collection("disruptions-raw-handled-v1"),
       adminAuth: gtfsDb.collection("admin-auth-v1"),
+      logs: gtfsDb.collection("logs-v1"),
     };
+
+    // TODO: Might want to find a better place for this?
+    // It seems as though MongoDB is smart enough not to duplicate the index,
+    // even though this is being called every time the server starts.
+    this._dbs.logs.createIndex({ timestamp: 1 });
   }
 
   get dbs(): DBs {
@@ -132,12 +139,12 @@ export class TrainQueryDB {
 
   /** Inserts a collection of logs into the database. */
   async writeLogs(logs: AdminLog[]) {
-    await this.dbs.adminAuth.insertMany(logs.map((l) => l.toMongo()));
+    await this.dbs.logs.insertMany(logs.map((l) => l.toMongo()));
   }
 
   /** Deletes logs that are over `daysOld` days old. */
   async cleanupOldLogs(daysOld: number) {
-    await this.dbs.adminAuth.deleteMany({
+    await this.dbs.logs.deleteMany({
       timestamp: { $lt: nowUTC().add({ d: -daysOld }).toMongo() },
     });
   }

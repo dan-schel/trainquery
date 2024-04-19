@@ -20,7 +20,7 @@ type DisruptionsMode = (typeof DisruptionsModes)[number];
 export class EnvironmentOptions {
   static production = EnvironmentOptions.fromObj({
     name: "production",
-    logging: new AdminLoggingOptions("all", "all"),
+    logging: new AdminLoggingOptions("all", "all", true),
     config: "online",
     gtfs: "parse-online",
     persistGtfs: "prod-db",
@@ -28,7 +28,7 @@ export class EnvironmentOptions {
   });
   static development = EnvironmentOptions.fromObj({
     name: "development",
-    logging: new AdminLoggingOptions([], "all"),
+    logging: new AdminLoggingOptions([], "all", false),
     config: "online",
     gtfs: "clone-prod-db",
     persistGtfs: "off",
@@ -36,7 +36,7 @@ export class EnvironmentOptions {
   });
   static offline = EnvironmentOptions.fromObj({
     name: "offline",
-    logging: new AdminLoggingOptions([], "all"),
+    logging: new AdminLoggingOptions([], "all", false),
     config: "local",
     gtfs: "parse-local",
     persistGtfs: "local-db",
@@ -70,6 +70,7 @@ export class EnvironmentOptions {
     logger(`  logging:`);
     logger(`    info: ${printLoggingArray(this.logging.info)}`);
     logger(`    warn: ${printLoggingArray(this.logging.warn)}`);
+    logger(`    writeToDatabase: ${this.logging.writeToDatabase}`);
     logger(`  config: "${this.config}"`);
     logger(`  gtfs: "${this.gtfs}"`);
     logger(`  persistGtfs: "${this.persistGtfs}"`);

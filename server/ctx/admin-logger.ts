@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Logger, Server } from "./trainquery";
+import { Logger, Server, TrainQuery } from "./trainquery";
 import { FullConfig } from "../config/computed-config";
 import { EnvironmentOptions } from "./environment-options";
 import { ExpressServer } from "./express-server";
@@ -28,25 +28,31 @@ export class AdminLoggingOptions {
   constructor(
     readonly info: AdminLogService[] | "all",
     readonly warn: AdminLogService[] | "all",
+    readonly writeToDatabase: boolean,
   ) {}
 
   static readonly json = z
     .object({
       info: z.union([z.array(AdminLogServicesJson), z.literal("all")]),
       warn: z.union([z.array(AdminLogServicesJson), z.literal("all")]),
+      writeToDatabase: z.boolean(),
     })
-    .transform((x) => new AdminLoggingOptions(x.info, x.warn));
+    .transform(
+      (x) => new AdminLoggingOptions(x.info, x.warn, x.writeToDatabase),
+    );
 
   toJSON(): z.input<typeof AdminLoggingOptions.json> {
     return {
       info: this.info,
       warn: this.warn,
+      writeToDatabase: this.writeToDatabase,
     };
   }
 }
 
 export class AdminLog {
   constructor(
+    readonly instance: string,
     readonly level: AdminLogLevel,
     readonly service: AdminLogService | null,
     readonly message: string,
@@ -54,6 +60,7 @@ export class AdminLog {
   ) {}
 
   static readonly json = z.object({
+    instance: z.string(),
     level: AdminLogLevelsJson,
     service: AdminLogServicesJson.nullable(),
     message: z.string(),
@@ -61,6 +68,7 @@ export class AdminLog {
   });
 
   static readonly mongo = z.object({
+    instance: z.string(),
     level: AdminLogLevelsJson,
     service: AdminLogServicesJson.nullable(),
     message: z.string(),
@@ -69,6 +77,7 @@ export class AdminLog {
 
   toJSON(): z.input<typeof AdminLog.json> {
     return {
+      instance: this.instance,
       level: this.level,
       service: this.service,
       message: this.message,
@@ -78,6 +87,7 @@ export class AdminLog {
 
   toMongo(): z.input<typeof AdminLog.mongo> {
     return {
+      instance: this.instance,
       level: this.level,
       service: this.service,
       message: this.message,
@@ -97,24 +107,18 @@ const cleanupOlderThanDays = 7;
 
 export class AdminLogger extends Logger {
   private _buffer: AdminLog[] = [];
-  readonly options: {
-    info: AdminLogService[] | "all";
-    warn: AdminLogService[] | "all";
-  };
 
-  constructor({
-    info = "all",
-    warn = "all",
-  }: {
-    info?: AdminLogService[] | "all";
-    warn?: AdminLogService[] | "all";
-  } = {}) {
+  constructor(
+    readonly instance: string,
+    readonly options: AdminLoggingOptions,
+  ) {
     super();
-    this.options = { info, warn };
   }
 
-  async init(db: TrainQueryDB | null) {
-    if (db == null) {
+  async init(ctx: TrainQuery) {
+    const db = ctx.database;
+
+    if (!this.options.writeToDatabase || db == null) {
       return;
     }
 
@@ -142,7 +146,7 @@ export class AdminLogger extends Logger {
     service: AdminLogService | null,
     message: string,
   ): void {
-    const log = new AdminLog(level, service, message, nowUTC());
+    const log = new AdminLog(this.instance, level, service, message, nowUTC());
     this._buffer.push(log);
 
     // Also log to the console if the service is configured to do so.
