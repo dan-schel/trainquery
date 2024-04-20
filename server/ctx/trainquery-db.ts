@@ -38,15 +38,23 @@ export class TrainQueryDB {
     this._client = new MongoClient(url);
     await this._client.connect();
 
-    const gtfsDb = this._client.db("trainquery");
+    const db = this._client.db("trainquery");
+    db.createCollection("gtfsMetadataV1");
+    db.createCollection("gtfsTripsV1");
+    db.createCollection("gtfsCalendarsV1");
+    db.createCollection("disruptionsProcessedV1");
+    db.createCollection("disruptionsRawHandledV1");
+    db.createCollection("adminAuthV1");
+    db.createCollection("logsV1", { capped: true, size: 100000 });
+
     this._dbs = {
-      gtfsMetadata: gtfsDb.collection("gtfs-metadata-v1"),
-      gtfsTrips: gtfsDb.collection("gtfs-trips-v1"),
-      gtfsCalendars: gtfsDb.collection("gtfs-calendars-v1"),
-      disruptionsProcessed: gtfsDb.collection("disruptions-processed-v1"),
-      disruptionsRawHandled: gtfsDb.collection("disruptions-raw-handled-v1"),
-      adminAuth: gtfsDb.collection("admin-auth-v1"),
-      logs: gtfsDb.collection("logs-v1"),
+      gtfsMetadata: db.collection("gtfsMetadataV1"),
+      gtfsTrips: db.collection("gtfsTripsV1"),
+      gtfsCalendars: db.collection("gtfsCalendarsV1"),
+      disruptionsProcessed: db.collection("disruptionsProcessedV1"),
+      disruptionsRawHandled: db.collection("disruptionsRawHandledV1"),
+      adminAuth: db.collection("adminAuthV1"),
+      logs: db.collection("logsV1"),
     };
 
     // TODO: Might want to find a better place for this?
