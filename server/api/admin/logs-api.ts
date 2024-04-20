@@ -19,6 +19,7 @@ export async function logsApi(
     );
   }
 
+  // TODO: This should be nullable. If null passed, provide this instance's logs.
   const instance = requireParam(params, "instance");
 
   // TODO: This is ugly.
@@ -38,6 +39,7 @@ export async function logsApi(
   }
 
   return {
-    logWindow: ctx.logger.getWindow(ctx, instance, beforeSequence, count),
+    logWindow: await ctx.logger.getWindow(ctx, instance, beforeSequence, count),
+    availableInstances: await ctx.logger.getAvailableInstances(ctx),
   };
 }
