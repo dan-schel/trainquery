@@ -5,7 +5,7 @@ import { GtfsTrip } from "../gtfs/data/gtfs-trip";
 import { Session } from "../../shared/admin/session";
 import { RawHandledDisruption } from "../disruptions/raw-handled-disruption";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
-import { AdminLog } from "./admin-logger";
+import { AdminLog, AdminLogWindow } from "./admin-logs";
 
 type DBs = {
   gtfsMetadata: Collection<Document>;
@@ -45,7 +45,7 @@ export class TrainQueryDB {
     db.createCollection("disruptionsProcessedV1");
     db.createCollection("disruptionsRawHandledV1");
     db.createCollection("adminAuthV1");
-    db.createCollection("logsV1", { capped: true, size: 100000 });
+    db.createCollection("logsV1");
 
     this._dbs = {
       gtfsMetadata: db.collection("gtfsMetadataV1"),
@@ -60,7 +60,7 @@ export class TrainQueryDB {
     // TODO: Might want to find a better place for this?
     // It seems as though MongoDB is smart enough not to duplicate the index,
     // even though this is being called every time the server starts.
-    this._dbs.logs.createIndex({ timestamp: 1 });
+    this._dbs.logs.createIndex({ instance: 1, sequence: 1 });
   }
 
   get dbs(): DBs {
@@ -155,6 +155,21 @@ export class TrainQueryDB {
     await this.dbs.logs.deleteMany({
       timestamp: { $lt: nowUTC().add({ d: -daysOld }).toMongo() },
     });
+  }
+
+  /**
+   * Gets `count` number of logs from TrainQuery instance `instance` before log
+   * sequence number `beforeSeqence`.
+   */
+  async fetchLogs(instance: string, beforeSequence: number, count: number) {
+    const docs = await this.dbs.logs
+      .find({
+        instance,
+        sequence: { $gte: beforeSequence - count, $lt: beforeSequence },
+      })
+      .toArray();
+    const logs = docs.map((d) => AdminLog.mongo.parse(d));
+    return new AdminLogWindow(instance, logs, { beforeSequence, count });
   }
 
   async fetchRawHandledDisruptions(): Promise<RawHandledDisruption[]> {

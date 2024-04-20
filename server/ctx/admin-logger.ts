@@ -1,100 +1,17 @@
-import { z } from "zod";
 import { Logger, Server, TrainQuery } from "./trainquery";
 import { FullConfig } from "../config/computed-config";
 import { EnvironmentOptions } from "./environment-options";
 import { ExpressServer } from "./express-server";
 import chalk from "chalk";
-import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
 import { TrainQueryDB } from "./trainquery-db";
-
-export const AdminLogLevels = ["info", "warn"] as const;
-export type AdminLogLevel = (typeof AdminLogLevels)[number];
-export const AdminLogLevelsJson = z.enum(AdminLogLevels);
-
-// TODO: In future this enum will probably be more generally used outside of
-// the admin logger, so it might move out of this file.
-export const AdminLogServices = [
-  "config",
-  "disruptions",
-  "gtfs",
-  "gtfs-r",
-  "auth",
-] as const;
-export type AdminLogService = (typeof AdminLogServices)[number];
-export const AdminLogServicesJson = z.enum(AdminLogServices);
-
-export class AdminLoggingOptions {
-  constructor(
-    readonly info: AdminLogService[] | "all",
-    readonly warn: AdminLogService[] | "all",
-    readonly writeToDatabase: boolean,
-  ) {}
-
-  static readonly json = z
-    .object({
-      info: z.union([z.array(AdminLogServicesJson), z.literal("all")]),
-      warn: z.union([z.array(AdminLogServicesJson), z.literal("all")]),
-      writeToDatabase: z.boolean(),
-    })
-    .transform(
-      (x) => new AdminLoggingOptions(x.info, x.warn, x.writeToDatabase),
-    );
-
-  toJSON(): z.input<typeof AdminLoggingOptions.json> {
-    return {
-      info: this.info,
-      warn: this.warn,
-      writeToDatabase: this.writeToDatabase,
-    };
-  }
-}
-
-export class AdminLog {
-  constructor(
-    readonly instance: string,
-    readonly level: AdminLogLevel,
-    readonly service: AdminLogService | null,
-    readonly message: string,
-    readonly timestamp: QUtcDateTime,
-  ) {}
-
-  static readonly json = z.object({
-    instance: z.string(),
-    level: AdminLogLevelsJson,
-    service: AdminLogServicesJson.nullable(),
-    message: z.string(),
-    timestamp: QUtcDateTime.json,
-  });
-
-  static readonly mongo = z.object({
-    instance: z.string(),
-    level: AdminLogLevelsJson,
-    service: AdminLogServicesJson.nullable(),
-    message: z.string(),
-    timestamp: QUtcDateTime.mongo,
-  });
-
-  toJSON(): z.input<typeof AdminLog.json> {
-    return {
-      instance: this.instance,
-      level: this.level,
-      service: this.service,
-      message: this.message,
-      timestamp: this.timestamp.toJSON(),
-    };
-  }
-
-  toMongo(): z.input<typeof AdminLog.mongo> {
-    return {
-      instance: this.instance,
-      level: this.level,
-      service: this.service,
-      message: this.message,
-      timestamp: this.timestamp.toMongo(),
-    };
-  }
-}
+import {
+  AdminLog,
+  AdminLogLevel,
+  AdminLogService,
+  AdminLogWindow,
+  AdminLoggingOptions,
+} from "./admin-logs";
 
 /** Flush logs out to database every 10 seconds. */
 const flushIntervalMillis = 10 * 1000;
@@ -107,6 +24,7 @@ const cleanupOlderThanDays = 7;
 
 export class AdminLogger extends Logger {
   private _buffer: AdminLog[] = [];
+  private _nextSequence = 0;
 
   constructor(
     readonly instance: string,
@@ -146,7 +64,15 @@ export class AdminLogger extends Logger {
     service: AdminLogService | null,
     message: string,
   ): void {
-    const log = new AdminLog(this.instance, level, service, message, nowUTC());
+    const log = new AdminLog(
+      this.instance,
+      this._nextSequence,
+      level,
+      service,
+      message,
+      nowUTC(),
+    );
+    this._nextSequence++;
     this._buffer.push(log);
 
     // Also log to the console if the service is configured to do so.
@@ -163,6 +89,13 @@ export class AdminLogger extends Logger {
         console.log(text);
       }
     }
+  }
+
+  getBufferedWindow(): AdminLogWindow {
+    return new AdminLogWindow(this.instance, [...this._buffer], {
+      beforeSequence: this._nextSequence,
+      count: this._buffer.length,
+    });
   }
 
   logInstanceStarting(instanceID: string): void {
