@@ -17,6 +17,7 @@ import {
   disruptionsRawApi,
 } from "../api/admin/disruptions-api";
 import { gtfsApi } from "../api/admin/gtfs-api";
+import { logsApi } from "../api/admin/logs-api";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -111,6 +112,8 @@ export async function trainQuery(
       return await disruptionsRawApi(ctx, params);
     } else if (endpoint === "admin/gtfs") {
       return await gtfsApi(ctx, params);
+    } else if (endpoint === "admin/logs") {
+      return await logsApi(ctx, params);
     } else {
       throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
     }

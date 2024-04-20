@@ -58,6 +58,18 @@ export function requireParamOfSchema<T>(
   return result.data;
 }
 
+export function requireIntegerParam(
+  params: ServerParams,
+  name: string,
+): number {
+  const value = requireParam(params, name);
+  const num = parseIntNull(value);
+  if (num == null) {
+    throw new BadApiCallError(`"${name}" param should be an integer.`);
+  }
+  return num;
+}
+
 export function requireStopIDParam(params: ServerParams, name: string): StopID {
   const value = requireParam(params, name);
   const num = parseIntNull(value);

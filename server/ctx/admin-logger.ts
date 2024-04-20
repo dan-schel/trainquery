@@ -34,6 +34,13 @@ export class AdminLogger extends Logger {
   }
 
   async init(ctx: TrainQuery) {
+    // TODO: This logic doesn't belong here. I'm imagining there should be a
+    // separate AdminLoggingService service with the flushing logic. It should
+    // be provided with a reference to this class, which only handles filling
+    // the buffer, and providing a flush method to empty it when the service
+    // asks. Then we can do proper error handling logic there. This file should
+    // not even import TrainQueryDB.
+
     const db = ctx.database;
 
     if (!this.options.writeToDatabase || db == null) {
@@ -96,6 +103,65 @@ export class AdminLogger extends Logger {
       beforeSequence: this._nextSequence,
       count: this._buffer.length,
     });
+  }
+
+  async getWindow(
+    ctx: TrainQuery,
+    instance: string,
+    beforeSequence: number | null,
+    count: number,
+  ): Promise<AdminLogWindow> {
+    // TODO: This method doesn't belong here, move it to a new file like how
+    // getDepartures() is. Sometimes we we're not even querying this instance!
+
+    const db = ctx.database;
+
+    if (this.instance !== instance) {
+      // TODO: How can we know what the beforeSequence should be for another
+      // instance?
+      //
+      // I think we'll need another db query to simply fetch the latest X,
+      // sorted by sequence number.
+      return new AdminLogWindow(instance, [], {
+        beforeSequence: 0,
+        count: 0,
+      });
+    }
+
+    // If beforeSequence is null, use the latest logs we have.
+    const start = beforeSequence ?? this._nextSequence;
+    const query = {
+      beforeSequence: start,
+      count: count,
+    };
+
+    // See if any of the requested logs are in the buffer.
+    const buffered = this._buffer.filter(
+      (x) => x.sequence < start && x.sequence >= start - count,
+    );
+
+    // If we have enough from the buffer alone (or there is no DB connected),
+    // return them. All done!
+    if (buffered.length >= count || db == null) {
+      return new AdminLogWindow(this.instance, buffered, query);
+    }
+
+    // Otherwise get the rest from the database.
+    const remaining = count - buffered.length;
+    const fetched = await db.fetchLogs(
+      this.instance,
+      buffered[0].sequence,
+      remaining,
+    );
+    const joined = [...buffered, ...fetched.logs];
+    return new AdminLogWindow(this.instance, joined, query);
+  }
+
+  async getAvailableInstances(ctx: TrainQuery): Promise<string[]> {
+    // TODO: We need a DB query to aggregate all available logs and return the
+    // unique instance IDs (and add this instance ID to the list it returns just
+    // in case it hasn't flushed any yet (or is offline).
+    return [this.instance];
   }
 
   logInstanceStarting(instanceID: string): void {
