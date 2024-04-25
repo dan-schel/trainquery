@@ -5,7 +5,7 @@ import { GtfsTrip } from "../gtfs/data/gtfs-trip";
 import { Session } from "../../shared/admin/session";
 import { RawHandledDisruption } from "../disruptions/raw-handled-disruption";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
-import { AdminLog } from "./admin-logger";
+import { AdminLog, AdminLogWindow } from "../../shared/admin/logs";
 
 type DBs = {
   gtfsMetadata: Collection<Document>;
@@ -38,21 +38,29 @@ export class TrainQueryDB {
     this._client = new MongoClient(url);
     await this._client.connect();
 
-    const gtfsDb = this._client.db("trainquery");
+    const db = this._client.db("trainquery");
+    db.createCollection("gtfsMetadataV1");
+    db.createCollection("gtfsTripsV1");
+    db.createCollection("gtfsCalendarsV1");
+    db.createCollection("disruptionsProcessedV1");
+    db.createCollection("disruptionsRawHandledV1");
+    db.createCollection("adminAuthV1");
+    db.createCollection("logsV1");
+
     this._dbs = {
-      gtfsMetadata: gtfsDb.collection("gtfs-metadata-v1"),
-      gtfsTrips: gtfsDb.collection("gtfs-trips-v1"),
-      gtfsCalendars: gtfsDb.collection("gtfs-calendars-v1"),
-      disruptionsProcessed: gtfsDb.collection("disruptions-processed-v1"),
-      disruptionsRawHandled: gtfsDb.collection("disruptions-raw-handled-v1"),
-      adminAuth: gtfsDb.collection("admin-auth-v1"),
-      logs: gtfsDb.collection("logs-v1"),
+      gtfsMetadata: db.collection("gtfsMetadataV1"),
+      gtfsTrips: db.collection("gtfsTripsV1"),
+      gtfsCalendars: db.collection("gtfsCalendarsV1"),
+      disruptionsProcessed: db.collection("disruptionsProcessedV1"),
+      disruptionsRawHandled: db.collection("disruptionsRawHandledV1"),
+      adminAuth: db.collection("adminAuthV1"),
+      logs: db.collection("logsV1"),
     };
 
     // TODO: Might want to find a better place for this?
     // It seems as though MongoDB is smart enough not to duplicate the index,
     // even though this is being called every time the server starts.
-    this._dbs.logs.createIndex({ timestamp: 1 });
+    this._dbs.logs.createIndex({ instance: 1, sequence: 1 });
   }
 
   get dbs(): DBs {
@@ -147,6 +155,21 @@ export class TrainQueryDB {
     await this.dbs.logs.deleteMany({
       timestamp: { $lt: nowUTC().add({ d: -daysOld }).toMongo() },
     });
+  }
+
+  /**
+   * Gets `count` number of logs from TrainQuery instance `instance` before log
+   * sequence number `beforeSeqence`.
+   */
+  async fetchLogs(instance: string, beforeSequence: number, count: number) {
+    const docs = await this.dbs.logs
+      .find({
+        instance,
+        sequence: { $gte: beforeSequence - count, $lt: beforeSequence },
+      })
+      .toArray();
+    const logs = docs.map((d) => AdminLog.mongo.parse(d));
+    return new AdminLogWindow(instance, logs, { beforeSequence, count });
   }
 
   async fetchRawHandledDisruptions(): Promise<RawHandledDisruption[]> {

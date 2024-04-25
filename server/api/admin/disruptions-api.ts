@@ -2,6 +2,10 @@ import { RawDisruptionIDComponents } from "../../disruptions/raw-disruption-id-c
 import { ServerParams, TrainQuery } from "../../ctx/trainquery";
 import { requireParam } from "../../param-utils";
 
+// TODO: Are these APIs going to be wrapped with the network data like the
+// departures API? It would cause similar issues if these APIs return data
+// assuming different stops/lines than the frontend has.
+
 export async function disruptionsApi(
   ctx: TrainQuery,
   params: ServerParams,

@@ -1,100 +1,17 @@
-import { z } from "zod";
-import { Logger, Server, TrainQuery } from "./trainquery";
+import { Server, TrainQuery } from "./trainquery";
 import { FullConfig } from "../config/computed-config";
 import { EnvironmentOptions } from "./environment-options";
-import { ExpressServer } from "./express-server";
 import chalk from "chalk";
-import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
 import { TrainQueryDB } from "./trainquery-db";
-
-export const AdminLogLevels = ["info", "warn"] as const;
-export type AdminLogLevel = (typeof AdminLogLevels)[number];
-export const AdminLogLevelsJson = z.enum(AdminLogLevels);
-
-// TODO: In future this enum will probably be more generally used outside of
-// the admin logger, so it might move out of this file.
-export const AdminLogServices = [
-  "config",
-  "disruptions",
-  "gtfs",
-  "gtfs-r",
-  "auth",
-] as const;
-export type AdminLogService = (typeof AdminLogServices)[number];
-export const AdminLogServicesJson = z.enum(AdminLogServices);
-
-export class AdminLoggingOptions {
-  constructor(
-    readonly info: AdminLogService[] | "all",
-    readonly warn: AdminLogService[] | "all",
-    readonly writeToDatabase: boolean,
-  ) {}
-
-  static readonly json = z
-    .object({
-      info: z.union([z.array(AdminLogServicesJson), z.literal("all")]),
-      warn: z.union([z.array(AdminLogServicesJson), z.literal("all")]),
-      writeToDatabase: z.boolean(),
-    })
-    .transform(
-      (x) => new AdminLoggingOptions(x.info, x.warn, x.writeToDatabase),
-    );
-
-  toJSON(): z.input<typeof AdminLoggingOptions.json> {
-    return {
-      info: this.info,
-      warn: this.warn,
-      writeToDatabase: this.writeToDatabase,
-    };
-  }
-}
-
-export class AdminLog {
-  constructor(
-    readonly instance: string,
-    readonly level: AdminLogLevel,
-    readonly service: AdminLogService | null,
-    readonly message: string,
-    readonly timestamp: QUtcDateTime,
-  ) {}
-
-  static readonly json = z.object({
-    instance: z.string(),
-    level: AdminLogLevelsJson,
-    service: AdminLogServicesJson.nullable(),
-    message: z.string(),
-    timestamp: QUtcDateTime.json,
-  });
-
-  static readonly mongo = z.object({
-    instance: z.string(),
-    level: AdminLogLevelsJson,
-    service: AdminLogServicesJson.nullable(),
-    message: z.string(),
-    timestamp: QUtcDateTime.mongo,
-  });
-
-  toJSON(): z.input<typeof AdminLog.json> {
-    return {
-      instance: this.instance,
-      level: this.level,
-      service: this.service,
-      message: this.message,
-      timestamp: this.timestamp.toJSON(),
-    };
-  }
-
-  toMongo(): z.input<typeof AdminLog.mongo> {
-    return {
-      instance: this.instance,
-      level: this.level,
-      service: this.service,
-      message: this.message,
-      timestamp: this.timestamp.toMongo(),
-    };
-  }
-}
+import { AdminLoggingOptions } from "./admin-logs";
+import {
+  AdminLog,
+  AdminLogLevel,
+  AdminLogService,
+  AdminLogWindow,
+} from "../../shared/admin/logs";
+import { Logger } from "./logger";
 
 /** Flush logs out to database every 10 seconds. */
 const flushIntervalMillis = 10 * 1000;
@@ -107,6 +24,7 @@ const cleanupOlderThanDays = 7;
 
 export class AdminLogger extends Logger {
   private _buffer: AdminLog[] = [];
+  private _nextSequence = 0;
 
   constructor(
     readonly instance: string,
@@ -116,6 +34,13 @@ export class AdminLogger extends Logger {
   }
 
   async init(ctx: TrainQuery) {
+    // TODO: This logic doesn't belong here. I'm imagining there should be a
+    // separate AdminLoggingService service with the flushing logic. It should
+    // be provided with a reference to this class, which only handles filling
+    // the buffer, and providing a flush method to empty it when the service
+    // asks. Then we can do proper error handling logic there. This file should
+    // not even import TrainQueryDB.
+
     const db = ctx.database;
 
     if (!this.options.writeToDatabase || db == null) {
@@ -146,7 +71,15 @@ export class AdminLogger extends Logger {
     service: AdminLogService | null,
     message: string,
   ): void {
-    const log = new AdminLog(this.instance, level, service, message, nowUTC());
+    const log = new AdminLog(
+      this.instance,
+      this._nextSequence,
+      level,
+      service,
+      message,
+      nowUTC(),
+    );
+    this._nextSequence++;
     this._buffer.push(log);
 
     // Also log to the console if the service is configured to do so.
@@ -165,18 +98,86 @@ export class AdminLogger extends Logger {
     }
   }
 
+  getBufferedWindow(): AdminLogWindow {
+    return new AdminLogWindow(this.instance, [...this._buffer], {
+      beforeSequence: this._nextSequence,
+      count: this._buffer.length,
+    });
+  }
+
+  async getWindow(
+    ctx: TrainQuery,
+    instance: string,
+    beforeSequence: number | null,
+    count: number,
+  ): Promise<AdminLogWindow> {
+    // TODO: This method doesn't belong here, move it to a new file like how
+    // getDepartures() is. Sometimes we we're not even querying this instance!
+
+    const db = ctx.database;
+
+    if (this.instance !== instance) {
+      // TODO: How can we know what the beforeSequence should be for another
+      // instance?
+      //
+      // I think we'll need another db query to simply fetch the latest X,
+      // sorted by sequence number.
+      return new AdminLogWindow(instance, [], {
+        beforeSequence: 0,
+        count: 0,
+      });
+    }
+
+    // If beforeSequence is null, use the latest logs we have.
+    const start = beforeSequence ?? this._nextSequence;
+    const query = {
+      beforeSequence: start,
+      count: count,
+    };
+
+    // See if any of the requested logs are in the buffer.
+    const buffered = this._buffer.filter(
+      (x) => x.sequence < start && x.sequence >= start - count,
+    );
+
+    // If we have enough from the buffer alone (or there is no DB connected),
+    // return them. All done!
+    if (buffered.length >= count || db == null) {
+      return new AdminLogWindow(this.instance, buffered, query);
+    }
+
+    // Otherwise get the rest from the database.
+    const remaining = count - buffered.length;
+    const fetched = await db.fetchLogs(
+      this.instance,
+      buffered[0].sequence,
+      remaining,
+    );
+    const joined = [...buffered, ...fetched.logs];
+    return new AdminLogWindow(this.instance, joined, query);
+  }
+
+  async getAvailableInstances(_ctx: TrainQuery): Promise<string[]> {
+    // TODO: We need a DB query to aggregate all available logs and return the
+    // unique instance IDs (and add this instance ID to the list it returns just
+    // in case it hasn't flushed any yet (or is offline).
+    return [this.instance];
+  }
+
   logInstanceStarting(instanceID: string): void {
     this._log("info", null, `Instance "${instanceID}" starting...`);
   }
   logServerListening(server: Server): void {
-    if (server instanceof ExpressServer) {
+    // TODO: We used to import ExpressServer here, but that caused a circular
+    // dependency. I don't like this solution much though.
+    if ("port" in server && typeof server.port === "number") {
       this._log("info", null, `Server listening on port ${server.port}.`);
     } else {
       this._log("info", null, "Server ready.");
     }
   }
   logEnvOptions(envOptions: EnvironmentOptions): void {
-    envOptions.log((x) => this._log("info", null, x));
+    this._log("info", null, envOptions.toLogString());
   }
 
   logConfigRefresh(config: FullConfig, initial: boolean): void {

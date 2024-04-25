@@ -1,5 +1,9 @@
 import { ServerParams, TrainQuery } from "../../ctx/trainquery";
 
+// TODO: Is this API going to be wrapped with the network data like the
+// departures API? It would cause similar issues if this API returns data
+// assuming different stops/lines than the frontend has.
+
 export async function gtfsApi(
   ctx: TrainQuery,
   params: ServerParams,
