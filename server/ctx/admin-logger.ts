@@ -5,13 +5,13 @@ import { ExpressServer } from "./express-server";
 import chalk from "chalk";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
 import { TrainQueryDB } from "./trainquery-db";
+import { AdminLoggingOptions } from "./admin-logs";
 import {
   AdminLog,
   AdminLogLevel,
   AdminLogService,
   AdminLogWindow,
-  AdminLoggingOptions,
-} from "./admin-logs";
+} from "../../shared/admin/logs";
 
 /** Flush logs out to database every 10 seconds. */
 const flushIntervalMillis = 10 * 1000;
@@ -157,7 +157,7 @@ export class AdminLogger extends Logger {
     return new AdminLogWindow(this.instance, joined, query);
   }
 
-  async getAvailableInstances(ctx: TrainQuery): Promise<string[]> {
+  async getAvailableInstances(_ctx: TrainQuery): Promise<string[]> {
     // TODO: We need a DB query to aggregate all available logs and return the
     // unique instance IDs (and add this instance ID to the list it returns just
     // in case it hasn't flushed any yet (or is offline).

@@ -124,8 +124,8 @@ export async function trainQuery(
 }
 
 export type ServerParams = {
-  query: Record<string, string>;
-  body: Record<string, string>;
+  query: Partial<Record<string, string>>;
+  body: Partial<Record<string, string>>;
   header: {
     adminToken: string | null;
   };

@@ -1,6 +1,7 @@
 import fsp from "fs/promises";
 import { z } from "zod";
-import { AdminLogService, AdminLoggingOptions } from "./admin-logger";
+import { AdminLoggingOptions } from "./admin-logs";
+import { AdminLogService } from "../../shared/admin/logs";
 
 const ConfigModes = ["local", "online"] as const;
 const GtfsModes = [

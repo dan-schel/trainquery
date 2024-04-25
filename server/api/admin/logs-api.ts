@@ -1,11 +1,7 @@
-import { parseIntNull } from "@dan-schel/js-utils/dist/types";
+import { parseIntNull } from "@dan-schel/js-utils";
 import { AdminLogger } from "../../ctx/admin-logger";
 import { ServerParams, TrainQuery } from "../../ctx/trainquery";
-import {
-  BadApiCallError,
-  requireIntegerParam,
-  requireParam,
-} from "../../param-utils";
+import { BadApiCallError, requireIntegerParam } from "../../param-utils";
 
 export async function logsApi(
   ctx: TrainQuery,
@@ -19,10 +15,12 @@ export async function logsApi(
     );
   }
 
-  // TODO: This should be nullable. If null passed, provide this instance's logs.
-  const instance = requireParam(params, "instance");
+  // TODO: This is ugly. Refactor ServerParams to be a class you can call
+  // methods on instead of the requireParam() functions, and add new methods
+  // that allow for default values & params that aren't required.
+  const instance = params.query["instance"] ?? ctx.instanceID;
 
-  // TODO: This is ugly.
+  // TODO: This is ugly too.
   let beforeSequence: number | null = null;
   if (params.query["beforeSequence"] != null) {
     beforeSequence = parseIntNull(params.query["beforeSequence"]);

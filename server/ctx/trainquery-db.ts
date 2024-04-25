@@ -5,7 +5,7 @@ import { GtfsTrip } from "../gtfs/data/gtfs-trip";
 import { Session } from "../../shared/admin/session";
 import { RawHandledDisruption } from "../disruptions/raw-handled-disruption";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
-import { AdminLog, AdminLogWindow } from "./admin-logs";
+import { AdminLog, AdminLogWindow } from "../../shared/admin/logs";
 
 type DBs = {
   gtfsMetadata: Collection<Document>;
