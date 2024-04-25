@@ -150,7 +150,7 @@ export class AdminLogger extends Logger {
     const remaining = count - buffered.length;
     const fetched = await db.fetchLogs(
       this.instance,
-      buffered[0].sequence,
+      buffered[0]?.sequence ?? start,
       remaining,
     );
     const joined = [...fetched.logs, ...buffered];
