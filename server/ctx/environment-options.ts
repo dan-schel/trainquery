@@ -59,7 +59,7 @@ export class EnvironmentOptions {
     readonly disruptions: DisruptionsMode,
   ) {}
 
-  log(logger: (msg: string) => void) {
+  toLogString() {
     const printLoggingArray = (array: AdminLogService[] | "all") => {
       if (array === "all") {
         return '"all"';
@@ -67,16 +67,20 @@ export class EnvironmentOptions {
       return "[" + array.map((x) => '"' + x + '"').join(", ") + "]";
     };
 
-    logger(`Environment (${this.name}):`);
-    logger(`  logging:`);
-    logger(`    info: ${printLoggingArray(this.logging.info)}`);
-    logger(`    warn: ${printLoggingArray(this.logging.warn)}`);
-    logger(`    writeToDatabase: ${this.logging.writeToDatabase}`);
-    logger(`  config: "${this.config}"`);
-    logger(`  gtfs: "${this.gtfs}"`);
-    logger(`  persistGtfs: "${this.persistGtfs}"`);
-    logger(`  disruptions: "${this.disruptions}"`);
-    logger("NOTE THAT ENVIRONMENT OPTIONS ARE NOT* CURRENTLY USED!");
+    let result = "";
+
+    result += `Environment (${this.name}):\n`;
+    result += `  logging:\n`;
+    result += `    info: ${printLoggingArray(this.logging.info)}\n`;
+    result += `    warn: ${printLoggingArray(this.logging.warn)}\n`;
+    result += `    writeToDatabase: ${this.logging.writeToDatabase}\n`;
+    result += `  config: "${this.config}"\n`;
+    result += `  gtfs: "${this.gtfs}"\n`;
+    result += `  persistGtfs: "${this.persistGtfs}"\n`;
+    result += `  disruptions: "${this.disruptions}"\n`;
+    result += "NOTE THAT ENVIRONMENT OPTIONS ARE NOT* CURRENTLY USED!";
+
+    return result;
   }
 
   static loadFromName(name: string) {

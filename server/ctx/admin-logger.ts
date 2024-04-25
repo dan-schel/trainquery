@@ -1,7 +1,6 @@
-import { Logger, Server, TrainQuery } from "./trainquery";
+import { Server, TrainQuery } from "./trainquery";
 import { FullConfig } from "../config/computed-config";
 import { EnvironmentOptions } from "./environment-options";
-import { ExpressServer } from "./express-server";
 import chalk from "chalk";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
 import { TrainQueryDB } from "./trainquery-db";
@@ -12,6 +11,7 @@ import {
   AdminLogService,
   AdminLogWindow,
 } from "../../shared/admin/logs";
+import { Logger } from "./logger";
 
 /** Flush logs out to database every 10 seconds. */
 const flushIntervalMillis = 10 * 1000;
@@ -168,14 +168,16 @@ export class AdminLogger extends Logger {
     this._log("info", null, `Instance "${instanceID}" starting...`);
   }
   logServerListening(server: Server): void {
-    if (server instanceof ExpressServer) {
+    // TODO: We used to import ExpressServer here, but that caused a circular
+    // dependency. I don't like this solution much though.
+    if ("port" in server && typeof server.port === "number") {
       this._log("info", null, `Server listening on port ${server.port}.`);
     } else {
       this._log("info", null, "Server ready.");
     }
   }
   logEnvOptions(envOptions: EnvironmentOptions): void {
-    envOptions.log((x) => this._log("info", null, x));
+    this._log("info", null, envOptions.toLogString());
   }
 
   logConfigRefresh(config: FullConfig, initial: boolean): void {

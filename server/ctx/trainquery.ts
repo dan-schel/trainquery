@@ -4,7 +4,6 @@ import { ssrAppPropsApi, ssrRoutePropsApi } from "../api/ssr-props-api";
 import { FullConfig } from "../config/computed-config";
 import { ServerConfig } from "../config/server-config";
 import { Disruptions } from "../disruptions/disruptions";
-import { EnvironmentOptions } from "./environment-options";
 import { GtfsWorker } from "../gtfs/gtfs-worker";
 import { BadApiCallError } from "../param-utils";
 import { TrainQueryDB } from "./trainquery-db";
@@ -18,6 +17,7 @@ import {
 } from "../api/admin/disruptions-api";
 import { gtfsApi } from "../api/admin/gtfs-api";
 import { logsApi } from "../api/admin/logs-api";
+import { Logger } from "./logger";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -144,39 +144,6 @@ export abstract class Server {
 export abstract class ConfigProvider {
   abstract fetchConfig(logger?: Logger): Promise<ServerConfig>;
   abstract getRefreshMs(): number | null;
-}
-
-export abstract class Logger {
-  abstract init(ctx: TrainQuery): Promise<void>;
-
-  abstract logInstanceStarting(instanceID: string): void;
-  abstract logServerListening(server: Server): void;
-  abstract logEnvOptions(envOptions: EnvironmentOptions): void;
-
-  abstract logConfigRefresh(config: FullConfig, initial: boolean): void;
-  abstract logConfigRefreshFailure(err: unknown): void;
-  abstract logTimetableLoadFail(path: string): void;
-
-  abstract logRecallingGtfs(): void;
-  abstract logRecallingGtfsSuccess(): void;
-  abstract logRecallingGtfsEmpty(): void;
-  abstract logRecallingGtfsFailure(err: unknown): void;
-  abstract logRefreshingGtfs(): void;
-  abstract logRefreshingGtfsSuccess(): void;
-  abstract logRefreshingGtfsFailure(err: unknown): void;
-  abstract logPersistingGtfs(): void;
-  abstract logPersistingGtfsSuccess(): void;
-  abstract logPersistingGtfsFailure(err: unknown): void;
-  abstract logRefreshingGtfsRealtime(subfeed: string | null): void;
-  abstract logRefreshingGtfsRealtimeSuccess(subfeed: string | null): void;
-  abstract logRefreshingGtfsRealtimeFailure(
-    subfeed: string | null,
-    err: unknown,
-  ): void;
-
-  abstract logFetchingDisruptions(source: string): void;
-  abstract logFetchingDisruptionsSuccess(source: string, count: number): void;
-  abstract logFetchingDisruptionsFailure(source: string, err: unknown): void;
 }
 
 function hashify(ctx: TrainQuery, result: object) {
