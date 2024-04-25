@@ -153,7 +153,7 @@ export class AdminLogger extends Logger {
       buffered[0].sequence,
       remaining,
     );
-    const joined = [...buffered, ...fetched.logs];
+    const joined = [...fetched.logs, ...buffered];
     return new AdminLogWindow(this.instance, joined, query);
   }
 
