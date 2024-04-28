@@ -3,7 +3,6 @@ import { departuresApi } from "../api/departures-api";
 import { ssrAppPropsApi, ssrRoutePropsApi } from "../api/ssr-props-api";
 import { FullConfig } from "../config/computed-config";
 import { ServerConfig } from "../config/server-config";
-import { Disruptions } from "../disruptions/disruptions";
 import { GtfsWorker } from "../gtfs/gtfs-worker";
 import { BadApiCallError } from "../param-utils";
 import { TrainQueryDB } from "./trainquery-db";
@@ -18,6 +17,7 @@ import {
 import { gtfsApi } from "../api/admin/gtfs-api";
 import { logsApi } from "../api/admin/logs-api";
 import { Logger } from "./logger";
+import { DisruptionsManager } from "../disruptions-v2/disruptions-manager";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -28,7 +28,7 @@ export type TrainQuery = {
   readonly server: Server;
   readonly database: TrainQueryDB | null;
   readonly adminAuth: AdminAuth;
-  readonly disruptions: Disruptions;
+  readonly disruptions: DisruptionsManager;
   readonly banners: Banners;
   gtfs: GtfsWorker | null;
   readonly logger: Logger;
@@ -64,7 +64,7 @@ export async function trainQuery(
   refreshConfig(true);
 
   const server = serverBuilder();
-  const disruptions = new Disruptions();
+  const disruptions = new DisruptionsManager();
   const adminAuth = new AdminAuth(database ?? new LocalAdminAuthDB());
   const banners = new Banners();
 

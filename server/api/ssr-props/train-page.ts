@@ -54,8 +54,7 @@ export async function getTrainPageProps(ctx: TrainQuery, path: string) {
     return {};
   }
 
-  const departureWithDisruptions =
-    ctx.disruptions.determineDisruptions(departure);
+  const departureWithDisruptions = ctx.disruptions.attachDisruptions(departure);
 
   return {
     departure: departureWithDisruptions.toJSON(),

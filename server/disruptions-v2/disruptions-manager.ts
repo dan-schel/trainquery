@@ -7,10 +7,17 @@ import { DisruptionTypeHandler } from "./type-handlers/disruption-type-handler";
 import { GenericLineDisruptionHandler } from "./type-handlers/generic-line-disruption-handler";
 import { GenericStopDisruptionHandler } from "./type-handlers/generic-stop-disruption-handler";
 import { ProposedDisruptionSource } from "./sources/proposed-disruption-source";
-import { ProposedDisruption } from "../../shared/disruptions-v2/proposed/proposed-disruption";
+import {
+  ProposedDisruption,
+  ProposedDisruptionID,
+} from "../../shared/disruptions-v2/proposed/proposed-disruption";
 import { PtvProposedDisruption } from "../../shared/disruptions-v2/proposed/types/ptv-proposed-disruption";
 import { GenericLineDisruption } from "../../shared/disruptions-v2/types/generic-line-disruption";
 import { GenericStopDisruption } from "../../shared/disruptions-v2/types/generic-stop-disruption";
+import { QUtcDateTime } from "../../shared/qtime/qdatetime";
+import { nowUTC } from "../../shared/qtime/luxon-conversions";
+
+const disruptionsConsideredFreshMinutes = 15;
 
 export class DisruptionsManager {
   private readonly _sources: ProposedDisruptionSource[];
@@ -18,28 +25,25 @@ export class DisruptionsManager {
 
   // TODO: This is a local cache of disruptions so we don't need to query the
   // database every single time.
+  private readonly _proposedDisruptions: ProposedDisruption[];
   private readonly _disruptions: Disruption[];
+  private _lastUpdated: QUtcDateTime | null = null;
 
-  constructor(private readonly _ctx: TrainQuery) {
+  constructor() {
     this._handlers = new Map();
     this._sources = [];
     this._disruptions = [];
+    this._proposedDisruptions = [];
   }
 
-  async init(): Promise<void> {
-    this._handlers.set(
-      "generic-stop",
-      new GenericStopDisruptionHandler(this._ctx),
-    );
-    this._handlers.set(
-      "generic-line",
-      new GenericLineDisruptionHandler(this._ctx),
-    );
+  async init(ctx: TrainQuery): Promise<void> {
+    this._handlers.set("generic-stop", new GenericStopDisruptionHandler(ctx));
+    this._handlers.set("generic-line", new GenericLineDisruptionHandler(ctx));
 
-    const ptvConfig = this._ctx.getConfig().server.ptv;
-    if (!this._ctx.isOffline && ptvConfig != null) {
+    const ptvConfig = ctx.getConfig().server.ptv;
+    if (!ctx.isOffline && ptvConfig != null) {
       this._sources.push(
-        new PtvDisruptionSource(this._ctx, ptvConfig, (d) =>
+        new PtvDisruptionSource(ctx, ptvConfig, (d) =>
           this._handleNewDisruptions(d),
         ),
       );
@@ -58,8 +62,13 @@ export class DisruptionsManager {
     // disruptions against the database to see if they've already been curated
     // or automatically processed, ... and so on.
 
+    this._lastUpdated = nowUTC();
+
     // This is how you clear an array in Javascript. Wild.
     this._disruptions.length = 0;
+    this._proposedDisruptions.length = 0;
+
+    this._proposedDisruptions.push(...disruptions);
 
     for (const proposal of disruptions) {
       if (!(proposal instanceof PtvProposedDisruption)) {
@@ -112,6 +121,25 @@ export class DisruptionsManager {
       this._requireHandler(d).affectsService(d, departure),
     );
     return new DepartureWithDisruptions(departure, disruptions);
+  }
+
+  getProposedDisruptions(): ProposedDisruption[] {
+    return this._proposedDisruptions;
+  }
+
+  getProposedDisruption(id: ProposedDisruptionID): ProposedDisruption | null {
+    return this._proposedDisruptions.find((x) => x.id.equals(id)) ?? null;
+  }
+
+  isStale(): boolean {
+    if (this._lastUpdated == null) {
+      return true;
+    }
+
+    const expiry = this._lastUpdated.add({
+      m: disruptionsConsideredFreshMinutes,
+    });
+    return nowUTC().isAfter(expiry);
   }
 
   private _requireHandler(disruption: Disruption) {

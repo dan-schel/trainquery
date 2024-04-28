@@ -3,7 +3,6 @@ import { GtfsData } from "../gtfs/data/gtfs-data";
 import { GtfsCalendar } from "../gtfs/data/gtfs-calendar";
 import { GtfsTrip } from "../gtfs/data/gtfs-trip";
 import { Session } from "../../shared/admin/session";
-import { RawHandledDisruption } from "../disruptions/raw-handled-disruption";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
 import { AdminLog, AdminLogWindow } from "../../shared/admin/logs";
 
@@ -172,12 +171,12 @@ export class TrainQueryDB {
     return new AdminLogWindow(instance, logs, { beforeSequence, count });
   }
 
-  async fetchRawHandledDisruptions(): Promise<RawHandledDisruption[]> {
-    const docs = await this.dbs.disruptionsRawHandled.find().toArray();
-    return docs.map((d) => RawHandledDisruption.json.parse(d));
-  }
+  // async fetchRawHandledDisruptions(): Promise<RawHandledDisruption[]> {
+  //   const docs = await this.dbs.disruptionsRawHandled.find().toArray();
+  //   return docs.map((d) => RawHandledDisruption.json.parse(d));
+  // }
 
-  async writeRawHandledDisruption(disruption: RawHandledDisruption) {
-    await this.dbs.disruptionsRawHandled.insertOne(disruption.toJSON());
-  }
+  // async writeRawHandledDisruption(disruption: RawHandledDisruption) {
+  //   await this.dbs.disruptionsRawHandled.insertOne(disruption.toJSON());
+  // }
 }

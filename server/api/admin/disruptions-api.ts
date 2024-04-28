@@ -1,6 +1,7 @@
-import { RawDisruptionIDComponents } from "../../disruptions/raw-disruption-id-components";
 import { ServerParams, TrainQuery } from "../../ctx/trainquery";
 import { requireParam } from "../../param-utils";
+import { proposedDisruptionToJson } from "../../../shared/disruptions-v2/proposed/proposed-disruption-json";
+import { ProposedDisruptionID } from "../../../shared/disruptions-v2/proposed/proposed-disruption";
 
 // TODO: Are these APIs going to be wrapped with the network data like the
 // departures API? It would cause similar issues if these APIs return data
@@ -13,7 +14,9 @@ export async function disruptionsApi(
   await ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
 
   return {
-    raw: ctx.disruptions.getRaw().map((x) => x.toJSON(ctx)),
+    proposed: ctx.disruptions
+      .getProposedDisruptions()
+      .map((x) => proposedDisruptionToJson(x)),
   };
 }
 
@@ -24,27 +27,16 @@ export async function disruptionsRawApi(
   ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
 
   const encodedDisruptionID = requireParam(params, "id");
-  const decoded = RawDisruptionIDComponents.decode(encodedDisruptionID);
-  if (decoded == null) {
+  const id = ProposedDisruptionID.decodeFromUrl(encodedDisruptionID);
+  if (id == null) {
     return {
       disruption: null,
     };
   }
 
-  const disruption = ctx.disruptions.getRawDisruption(
-    decoded.source,
-    decoded.id,
-  );
-
-  if (disruption == null) {
-    return {
-      disruption: null,
-    };
-  }
+  const disruption = ctx.disruptions.getProposedDisruption(id);
 
   return {
-    disruption: {
-      markdown: disruption.createInfoMarkdown(ctx),
-    },
+    disruption: disruption,
   };
 }

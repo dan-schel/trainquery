@@ -73,6 +73,6 @@ export async function departuresApi(
   }
 
   return buckets.map((b) =>
-    b.items.map((d) => ctx.disruptions.determineDisruptions(d).toJSON()),
+    b.items.map((d) => ctx.disruptions.attachDisruptions(d).toJSON()),
   );
 }

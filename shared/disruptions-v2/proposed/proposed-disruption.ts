@@ -1,12 +1,19 @@
 import { z } from "zod";
 import { QUtcDateTime } from "../../qtime/qdatetime";
 import { type HasSharedConfig } from "../../system/config-utils";
+import { base48Safe, reencode, tryReencode } from "@dan-schel/js-utils";
+
+const encodedAlpha = "0123456789abcdef|";
 
 export class ProposedDisruptionID {
   constructor(
     readonly source: string,
     readonly idAtSource: string,
   ) {}
+
+  equals(other: ProposedDisruptionID) {
+    return this.source === other.source && this.idAtSource === other.idAtSource;
+  }
 
   static readonly json = z
     .object({
@@ -20,6 +27,37 @@ export class ProposedDisruptionID {
       source: this.source,
       idAtSource: this.idAtSource,
     };
+  }
+
+  encodeForUrl(): string {
+    const asString =
+      Buffer.from(this.source).toString("hex") +
+      "|" +
+      Buffer.from(this.idAtSource).toString("hex");
+    return reencode(asString, encodedAlpha, base48Safe);
+  }
+
+  static decodeFromUrl(input: string): ProposedDisruptionID | null {
+    const decodedString = tryReencode(input, base48Safe, encodedAlpha);
+    if (decodedString == null) {
+      return null;
+    }
+
+    const components = decodedString.split("|");
+    if (components.length !== 2) {
+      return null;
+    }
+
+    if (
+      !/^[0-9a-f]+$/g.test(components[0]) ||
+      !/^[0-9a-f]+$/g.test(components[1])
+    ) {
+      return null;
+    }
+    const source = Buffer.from(components[0], "hex").toString();
+    const idAtSource = Buffer.from(components[1], "hex").toString();
+
+    return new ProposedDisruptionID(source, idAtSource);
   }
 }
 
