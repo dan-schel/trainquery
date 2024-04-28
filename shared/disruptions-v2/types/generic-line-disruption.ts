@@ -1,26 +1,29 @@
 import { z } from "zod";
 import { QUtcDateTime } from "../../qtime/qdatetime";
 import { type LineID, LineIDJson } from "../../system/ids";
-import { Disruption, DisruptionFactory, RawDisruptionID } from "../disruption";
+import { Disruption, DisruptionFactory } from "../disruption";
+import { ProposedDisruptionID } from "../proposed/proposed-disruption";
+
+const disruptionType = "generic-line";
 
 export class GenericLineDisruption extends Disruption {
   constructor(
     id: string,
     createdAutomatically: boolean,
-    sources: RawDisruptionID[],
+    sources: ProposedDisruptionID[],
     readonly message: string,
     readonly affectedLines: LineID[],
     readonly starts: QUtcDateTime,
     readonly ends: QUtcDateTime,
   ) {
-    super(id, "generic-line", createdAutomatically, sources);
+    super(disruptionType, id, createdAutomatically, sources);
   }
 
   static readonly json = z
     .object({
       id: z.string(),
       createdAutomatically: z.boolean(),
-      sources: RawDisruptionID.json.array(),
+      sources: ProposedDisruptionID.json.array(),
       message: z.string(),
       affectedLines: LineIDJson.array(),
       starts: QUtcDateTime.json,
@@ -54,7 +57,7 @@ export class GenericLineDisruption extends Disruption {
 
 export class GenericLineDisruptionFactory extends DisruptionFactory {
   constructor() {
-    super("generic-line");
+    super(disruptionType);
   }
 
   get jsonSchema(): z.ZodType<Disruption, any, any> {

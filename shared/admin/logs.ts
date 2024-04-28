@@ -55,27 +55,6 @@ export class AdminLog {
         ),
     );
 
-  static readonly mongo = z
-    .object({
-      instance: z.string(),
-      sequence: z.number(),
-      level: AdminLogLevelsJson,
-      service: AdminLogServicesJson.nullable(),
-      message: z.string(),
-      timestamp: QUtcDateTime.mongo,
-    })
-    .transform(
-      (x) =>
-        new AdminLog(
-          x.instance,
-          x.sequence,
-          x.level,
-          x.service,
-          x.message,
-          x.timestamp,
-        ),
-    );
-
   toJSON(): z.input<typeof AdminLog.json> {
     return {
       instance: this.instance,
@@ -84,17 +63,6 @@ export class AdminLog {
       service: this.service,
       message: this.message,
       timestamp: this.timestamp.toJSON(),
-    };
-  }
-
-  toMongo(): z.input<typeof AdminLog.mongo> {
-    return {
-      instance: this.instance,
-      sequence: this.sequence,
-      level: this.level,
-      service: this.service,
-      message: this.message,
-      timestamp: this.timestamp.toMongo(),
     };
   }
 }

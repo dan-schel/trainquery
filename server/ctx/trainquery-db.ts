@@ -45,7 +45,7 @@ export class TrainQueryDB {
     db.createCollection("disruptionsProcessedV1");
     db.createCollection("disruptionsRawHandledV1");
     db.createCollection("adminAuthV1");
-    db.createCollection("logsV1");
+    db.createCollection("logsV2");
 
     this._dbs = {
       gtfsMetadata: db.collection("gtfsMetadataV1"),
@@ -54,7 +54,7 @@ export class TrainQueryDB {
       disruptionsProcessed: db.collection("disruptionsProcessedV1"),
       disruptionsRawHandled: db.collection("disruptionsRawHandledV1"),
       adminAuth: db.collection("adminAuthV1"),
-      logs: db.collection("logsV1"),
+      logs: db.collection("logsV2"),
     };
 
     // TODO: Might want to find a better place for this?
@@ -147,7 +147,7 @@ export class TrainQueryDB {
 
   /** Inserts a collection of logs into the database. */
   async writeLogs(logs: AdminLog[]) {
-    await this.dbs.logs.insertMany(logs.map((l) => l.toMongo()));
+    await this.dbs.logs.insertMany(logs.map((l) => l.toJSON()));
   }
 
   /** Deletes logs that are over `daysOld` days old. */
@@ -168,7 +168,7 @@ export class TrainQueryDB {
         sequence: { $gte: beforeSequence - count, $lt: beforeSequence },
       })
       .toArray();
-    const logs = docs.map((d) => AdminLog.mongo.parse(d));
+    const logs = docs.map((d) => AdminLog.json.parse(d));
     return new AdminLogWindow(instance, logs, { beforeSequence, count });
   }
 
