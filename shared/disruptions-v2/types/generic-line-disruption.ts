@@ -13,8 +13,8 @@ export class GenericLineDisruption extends Disruption {
     sources: ProposedDisruptionID[],
     readonly message: string,
     readonly affectedLines: LineID[],
-    readonly starts: QUtcDateTime,
-    readonly ends: QUtcDateTime,
+    readonly starts: QUtcDateTime | null,
+    readonly ends: QUtcDateTime | null,
   ) {
     super(disruptionType, id, createdAutomatically, sources);
   }
@@ -26,8 +26,8 @@ export class GenericLineDisruption extends Disruption {
       sources: ProposedDisruptionID.json.array(),
       message: z.string(),
       affectedLines: LineIDJson.array(),
-      starts: QUtcDateTime.json,
-      ends: QUtcDateTime.json,
+      starts: QUtcDateTime.json.nullable(),
+      ends: QUtcDateTime.json.nullable(),
     })
     .transform(
       (x) =>
@@ -49,8 +49,8 @@ export class GenericLineDisruption extends Disruption {
       sources: this.sources,
       message: this.message,
       affectedLines: this.affectedLines,
-      starts: this.starts.toJSON(),
-      ends: this.ends.toJSON(),
+      starts: this.starts?.toJSON() ?? null,
+      ends: this.ends?.toJSON() ?? null,
     };
   }
 }

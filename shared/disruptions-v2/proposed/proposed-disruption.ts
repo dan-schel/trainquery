@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { QUtcDateTime } from "../../qtime/qdatetime";
-import { HasSharedConfig } from "../../system/config-utils";
+import { type HasSharedConfig } from "../../system/config-utils";
 
 export class ProposedDisruptionID {
   constructor(

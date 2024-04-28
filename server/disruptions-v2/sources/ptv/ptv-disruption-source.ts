@@ -4,19 +4,20 @@ import { EnvironmentVariables } from "../../../ctx/environment-variables";
 import { TrainQuery } from "../../../ctx/trainquery";
 import {
   NewDisruptionsHandler,
-  RawDisruptionSource,
-} from "../raw-disruption-source";
+  ProposedDisruptionSource,
+} from "../proposed-disruption-source";
 import { QUtcDateTime } from "../../../../shared/qtime/qdatetime";
 import { callPtvApi } from "./call-ptv-api";
 import { nonNull } from "@dan-schel/js-utils";
-import { RawDisruption } from "../../../../shared/disruptions-v2/disruption";
+import { ProposedDisruptionID } from "../../../../shared/disruptions-v2/proposed/proposed-disruption";
+import { PtvProposedDisruption } from "../../../../shared/disruptions-v2/proposed/types/ptv-proposed-disruption";
 
 // Refresh disruptions from the PTV API every 5 minutes.
 const refreshInterval = 5 * 60 * 1000;
 
 const blacklistedUrls = ["https://ptv.vic.gov.au/live-travel-updates/"];
 
-export class PtvDisruptionSource extends RawDisruptionSource {
+export class PtvDisruptionSource extends ProposedDisruptionSource {
   private readonly _devID: string;
   private readonly _devKey: string;
 
@@ -110,7 +111,7 @@ async function fetchPtvDisruptions(
   ptvConfig: PtvConfig,
   devID: string,
   devKey: string,
-): Promise<RawDisruption[]> {
+) {
   const json = await callPtvApi(
     "/v3/disruptions",
     {
@@ -120,58 +121,29 @@ async function fetchPtvDisruptions(
     devKey,
   );
 
-  const raw = PtvDisruptionsSchema.parse(json);
-  const rawList = [
-    ...raw.disruptions.metro_train,
-    ...raw.disruptions.regional_train,
+  const result = PtvDisruptionsSchema.parse(json);
+  const list = [
+    ...result.disruptions.metro_train,
+    ...result.disruptions.regional_train,
   ];
 
-  const parsed = rawList
-    .map((d) => {
-      const lines = d.routes
-        .map((r) => ptvConfig.lines.get(r) ?? null)
-        .filter(nonNull);
-      const stops = d.stops
-        .map((r) => ptvConfig.stops.get(r) ?? null)
-        .filter(nonNull);
+  return list.map((d) => {
+    const lines = d.routes
+      .map((r) => ptvConfig.lines.get(r) ?? null)
+      .filter(nonNull);
+    const stops = d.stops
+      .map((r) => ptvConfig.stops.get(r) ?? null)
+      .filter(nonNull);
 
-      // TODO: I will return a list of RawDisruption here, but how will the
-      // automatic disruptions be created later? RawDisruption has markdown, but
-      // I don't want to have to parse markdown to build the auto disruptions.
-      // Should RawDisruption have a custom data field? Should it be a base
-      // class that PtvRawDisruption inherits from like how the disruption-v1
-      // stuff currently does it? When we compare the hash to see if any changes
-      // occured it probably makes more to sense to compare the custom data
-      // field than it's markdown representation. We will need to keep the
-      // markdown representation regardless though, so it can be viewed in the
-      // admin dashboard.
-
-      // const ptvData = new PtvRawDisruptionData(
-      //   d.disruption_id,
-      //   d.title,
-      //   d.description,
-      //   lines,
-      //   stops,
-      //   d.url,
-      //   d.from_date,
-      //   d.to_date,
-      // );
-
-      const hasStopVibes = /^.{3,30}( line)? stations?:.{10}/gi.test(d.title);
-
-      if (lines.length !== 0 && !hasStopVibes) {
-        return [
-          // new PtvGeneralDisruption(ptvData, lines, [])
-        ];
-      } else if (stops.length !== 0) {
-        return [
-          // new PtvGeneralDisruption(ptvData, [], stops)
-        ];
-      } else {
-        return [];
-      }
-    })
-    .flat();
-
-  return parsed;
+    return new PtvProposedDisruption(
+      new ProposedDisruptionID("ptv-api", d.disruption_id.toString()),
+      d.title,
+      d.description,
+      lines,
+      stops,
+      d.url,
+      d.from_date,
+      d.to_date,
+    );
+  });
 }

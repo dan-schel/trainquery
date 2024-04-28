@@ -1,18 +1,19 @@
-import {
-  Disruption,
-  RawDisruption,
-} from "../../shared/disruptions-v2/disruption";
+import { Disruption } from "../../shared/disruptions-v2/disruption";
 import { DepartureWithDisruptions } from "../../shared/disruptions-v2/departure-with-disruptions";
 import { Departure } from "../../shared/system/service/departure";
 import { TrainQuery } from "../ctx/trainquery";
 import { PtvDisruptionSource } from "./sources/ptv/ptv-disruption-source";
-import { RawDisruptionSource } from "./sources/raw-disruption-source";
 import { DisruptionTypeHandler } from "./type-handlers/disruption-type-handler";
 import { GenericLineDisruptionHandler } from "./type-handlers/generic-line-disruption-handler";
 import { GenericStopDisruptionHandler } from "./type-handlers/generic-stop-disruption-handler";
+import { ProposedDisruptionSource } from "./sources/proposed-disruption-source";
+import { ProposedDisruption } from "../../shared/disruptions-v2/proposed/proposed-disruption";
+import { PtvProposedDisruption } from "../../shared/disruptions-v2/proposed/types/ptv-proposed-disruption";
+import { GenericLineDisruption } from "../../shared/disruptions-v2/types/generic-line-disruption";
+import { GenericStopDisruption } from "../../shared/disruptions-v2/types/generic-stop-disruption";
 
 export class DisruptionsManager {
-  private readonly _sources: RawDisruptionSource[];
+  private readonly _sources: ProposedDisruptionSource[];
   private readonly _handlers: Map<string, DisruptionTypeHandler<Disruption>>;
 
   // TODO: This is a local cache of disruptions so we don't need to query the
@@ -47,8 +48,63 @@ export class DisruptionsManager {
     await Promise.all(this._sources.map((source) => source.init()));
   }
 
-  private _handleNewDisruptions = (_disruptions: RawDisruption[]) => {
-    throw new Error("Method not implemented.");
+  private _handleNewDisruptions = (disruptions: ProposedDisruption[]) => {
+    console.log(
+      `Just recieved ${disruptions.length} disruptions. What I do with them is yet to be implemented!`,
+    );
+
+    // <TEMPORARY>
+    // When we do it for real, this is where we should check these proposed
+    // disruptions against the database to see if they've already been curated
+    // or automatically processed, ... and so on.
+
+    // This is how you clear an array in Javascript. Wild.
+    this._disruptions.length = 0;
+
+    for (const proposal of disruptions) {
+      if (!(proposal instanceof PtvProposedDisruption)) {
+        continue;
+      }
+
+      const hasStopVibes = /^.{3,30}( line)? stations?:.{10}/gi.test(
+        proposal.title,
+      );
+
+      if (proposal.affectedLines.length !== 0 && !hasStopVibes) {
+        this._disruptions.push(
+          new GenericLineDisruption(
+            // The ID should be randomly generated UUID when we do this for
+            // real, but since we're regenerating every 5 mins, let's make it
+            // the PTV ID for now to keep it stable.
+            proposal.id.idAtSource,
+
+            true,
+            [proposal.id],
+            proposal.title,
+            proposal.affectedLines,
+            proposal.starts,
+            proposal.ends,
+          ),
+        );
+      } else if (proposal.affectedStops.length !== 0) {
+        this._disruptions.push(
+          new GenericStopDisruption(
+            // The ID should be randomly generated UUID when we do this for
+            // real, but since we're regenerating every 5 mins, let's make it
+            // the PTV ID for now to keep it stable.
+            proposal.id.idAtSource,
+
+            true,
+            [proposal.id],
+            proposal.title,
+            proposal.affectedStops,
+            proposal.starts,
+            proposal.ends,
+          ),
+        );
+      }
+    }
+    // </TEMPORARY>
   };
 
   attachDisruptions(departure: Departure): DepartureWithDisruptions {

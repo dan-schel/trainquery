@@ -12,7 +12,7 @@ import {
 } from "../../../system/ids";
 import { QUtcDateTime } from "../../../qtime/qdatetime";
 import {
-  HasSharedConfig,
+  type HasSharedConfig,
   requireLine,
   requireStop,
 } from "../../../system/config-utils";
