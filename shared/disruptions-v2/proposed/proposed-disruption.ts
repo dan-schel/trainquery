@@ -65,11 +65,12 @@ export abstract class ProposedDisruption {
   constructor(
     readonly type: string,
     readonly id: ProposedDisruptionID,
+    readonly summary: string,
+    readonly starts: QUtcDateTime | null,
+    readonly ends: QUtcDateTime | null,
   ) {}
 
   abstract getMarkdown(config: HasSharedConfig): string;
-  abstract getStart(): QUtcDateTime | null;
-  abstract getEnd(): QUtcDateTime | null;
 }
 
 export abstract class ProposedDisruptionFactory {

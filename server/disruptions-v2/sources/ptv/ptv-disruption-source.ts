@@ -137,13 +137,13 @@ async function fetchPtvDisruptions(
 
     return new PtvProposedDisruption(
       new ProposedDisruptionID("ptv-api", d.disruption_id.toString()),
+      d.from_date,
+      d.to_date,
       d.title,
       d.description,
       lines,
       stops,
       d.url,
-      d.from_date,
-      d.to_date,
     );
   });
 }

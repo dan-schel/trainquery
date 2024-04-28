@@ -13,8 +13,8 @@ import type { Departure } from "shared/system/service/departure";
 import type { PlatformID, StopID } from "shared/system/ids";
 import type { ConfidenceLevel } from "shared/system/enums";
 import type { ViaRuleFilteringData } from "shared/system/via-rule";
-import type { SerializedDisruption } from "shared/disruptions/serialized-disruption";
 import type { QDuration } from "shared/qtime/qduration";
+import type { Disruption } from "shared/disruptions-v2/disruption";
 
 export function getTerminusString(
   departure: Departure,
@@ -154,9 +154,7 @@ export function getLinesString(departure: Departure) {
   }`;
 }
 
-export function getDisruptionsString(
-  disruptions: SerializedDisruption[],
-): string | null {
+export function getDisruptionsString(disruptions: Disruption[]): string | null {
   if (disruptions.length === 0) {
     return null;
   }

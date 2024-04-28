@@ -15,10 +15,10 @@ import { getServicePageRoute, requireStop } from "shared/system/config-utils";
 import TrainPageStop from "@/components/line-diagram/TrainPageStop.vue";
 import { useNow } from "@/utils/now-provider";
 import Disruptions from "@/components/train/Disruptions.vue";
-import { DepartureWithDisruptions } from "../../shared/disruptions/departure-with-disruptions";
 import { generatePageHead, generatePageHeadNotFound } from "@/utils/head";
 import { useSettings } from "@/settings/settings";
 import LiveStatus from "@/components/train/LiveStatus.vue";
+import { DepartureWithDisruptions } from "shared/disruptions-v2/departure-with-disruptions";
 
 const { local } = useNow();
 

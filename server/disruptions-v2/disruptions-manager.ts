@@ -89,6 +89,7 @@ export class DisruptionsManager {
 
             true,
             [proposal.id],
+            proposal.url,
             proposal.title,
             proposal.affectedLines,
             proposal.starts,
@@ -105,6 +106,7 @@ export class DisruptionsManager {
 
             true,
             [proposal.id],
+            proposal.url,
             proposal.title,
             proposal.affectedStops,
             proposal.starts,

@@ -25,15 +25,19 @@ const proposedDisruptionType = "ptv";
 export class PtvProposedDisruption extends ProposedDisruption {
   constructor(
     id: ProposedDisruptionID,
+    starts: QUtcDateTime | null,
+    ends: QUtcDateTime | null,
     readonly title: string,
     readonly description: string,
     readonly affectedLines: LineID[],
     readonly affectedStops: StopID[],
     readonly url: string | null,
-    readonly starts: QUtcDateTime | null,
-    readonly ends: QUtcDateTime | null,
   ) {
-    super(proposedDisruptionType, id);
+    // TODO: I realise title is only being used for summary, so the field is
+    // essentially duplicated. I feel that it makes sense to "generate" the
+    // summary from the title (and not the description, for example), but idk,
+    // this is weird.
+    super(proposedDisruptionType, id, title, starts, ends);
   }
 
   getMarkdown(config: HasSharedConfig): string {
@@ -76,49 +80,41 @@ export class PtvProposedDisruption extends ProposedDisruption {
     `;
   }
 
-  getStart(): QUtcDateTime | null {
-    return this.starts;
-  }
-
-  getEnd(): QUtcDateTime | null {
-    return this.ends;
-  }
-
   static readonly json = z
     .object({
       id: ProposedDisruptionID.json,
+      starts: QUtcDateTime.json.nullable(),
+      ends: QUtcDateTime.json.nullable(),
       title: z.string(),
       description: z.string(),
       affectedLines: LineIDJson.array(),
       affectedStops: StopIDJson.array(),
       url: z.string().nullable(),
-      starts: QUtcDateTime.json.nullable(),
-      ends: QUtcDateTime.json.nullable(),
     })
     .transform(
       (x) =>
         new PtvProposedDisruption(
           x.id,
+          x.starts,
+          x.ends,
           x.title,
           x.description,
           x.affectedLines,
           x.affectedStops,
           x.url,
-          x.starts,
-          x.ends,
         ),
     );
 
   toJSON(): z.input<typeof PtvProposedDisruption.json> {
     return {
       id: this.id.toJSON(),
+      starts: this.starts?.toJSON() ?? null,
+      ends: this.ends?.toJSON() ?? null,
       title: this.title,
       description: this.description,
       affectedLines: this.affectedLines,
       affectedStops: this.affectedStops,
       url: this.url,
-      starts: this.starts?.toJSON() ?? null,
-      ends: this.ends?.toJSON() ?? null,
     };
   }
 }

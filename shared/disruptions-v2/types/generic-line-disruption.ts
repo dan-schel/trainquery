@@ -11,12 +11,16 @@ export class GenericLineDisruption extends Disruption {
     id: string,
     createdAutomatically: boolean,
     sources: ProposedDisruptionID[],
+    url: string | null,
     readonly message: string,
     readonly affectedLines: LineID[],
     readonly starts: QUtcDateTime | null,
     readonly ends: QUtcDateTime | null,
   ) {
-    super(disruptionType, id, createdAutomatically, sources);
+    // TODO: I realise message is only being used for summary, so the field is
+    // essentially duplicated. I feel that it makes sense to "generate" the
+    // summary from the message, but idk, this is weird.
+    super(disruptionType, id, createdAutomatically, sources, message, url);
   }
 
   static readonly json = z
@@ -24,6 +28,7 @@ export class GenericLineDisruption extends Disruption {
       id: z.string(),
       createdAutomatically: z.boolean(),
       sources: ProposedDisruptionID.json.array(),
+      url: z.string().nullable(),
       message: z.string(),
       affectedLines: LineIDJson.array(),
       starts: QUtcDateTime.json.nullable(),
@@ -35,6 +40,7 @@ export class GenericLineDisruption extends Disruption {
           x.id,
           x.createdAutomatically,
           x.sources,
+          x.url,
           x.message,
           x.affectedLines,
           x.starts,
@@ -47,6 +53,7 @@ export class GenericLineDisruption extends Disruption {
       id: this.id,
       createdAutomatically: this.createdAutomatically,
       sources: this.sources,
+      url: this.url,
       message: this.message,
       affectedLines: this.affectedLines,
       starts: this.starts?.toJSON() ?? null,

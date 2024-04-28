@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { type SerializedDisruption } from "../../../shared/disruptions/serialized-disruption";
+import type { Disruption } from "shared/disruptions-v2/disruption";
 import Icon from "../icons/Icon.vue";
 
 defineProps<{
-  disruptions: SerializedDisruption[];
+  disruptions: Disruption[];
 }>();
 </script>
 
@@ -12,7 +12,7 @@ defineProps<{
     <div v-for="(disruption, i) in disruptions" :key="i" class="disruption">
       <Icon id="uil:exclamation-circle"></Icon>
       <p>
-        {{ disruption.message }}
+        {{ disruption.summary }}
       </p>
       <a
         v-if="disruption.url != null"
