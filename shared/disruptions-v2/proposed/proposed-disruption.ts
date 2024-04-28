@@ -2,6 +2,7 @@ import { z } from "zod";
 import { QUtcDateTime } from "../../qtime/qdatetime";
 import { type HasSharedConfig } from "../../system/config-utils";
 import { base48Safe, reencode, tryReencode } from "@dan-schel/js-utils";
+import { hexToString, stringToHex } from "../../utils";
 
 const encodedAlpha = "0123456789abcdef|";
 
@@ -31,9 +32,7 @@ export class ProposedDisruptionID {
 
   encodeForUrl(): string {
     const asString =
-      Buffer.from(this.source).toString("hex") +
-      "|" +
-      Buffer.from(this.idAtSource).toString("hex");
+      stringToHex(this.source) + "|" + stringToHex(this.idAtSource);
     return reencode(asString, encodedAlpha, base48Safe);
   }
 
@@ -54,8 +53,8 @@ export class ProposedDisruptionID {
     ) {
       return null;
     }
-    const source = Buffer.from(components[0], "hex").toString();
-    const idAtSource = Buffer.from(components[1], "hex").toString();
+    const source = hexToString(components[0]);
+    const idAtSource = hexToString(components[1]);
 
     return new ProposedDisruptionID(source, idAtSource);
   }

@@ -53,10 +53,6 @@ export class DisruptionsManager {
   }
 
   private _handleNewDisruptions = (disruptions: ProposedDisruption[]) => {
-    console.log(
-      `Just recieved ${disruptions.length} disruptions. What I do with them is yet to be implemented!`,
-    );
-
     // <TEMPORARY>
     // When we do it for real, this is where we should check these proposed
     // disruptions against the database to see if they've already been curated

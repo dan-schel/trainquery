@@ -5,6 +5,7 @@ import {
   tryReencode,
 } from "@dan-schel/js-utils";
 import { QDate } from "../../shared/qtime/qdate";
+import { hexToString, stringToHex } from "../../shared/utils";
 
 const encodedAlpha = "0123456789abcdef|";
 
@@ -18,11 +19,11 @@ export class GtfsServiceIDComponents {
 
   asString() {
     return (
-      Buffer.from(this.gtfsTripID).toString("hex") +
+      stringToHex(this.gtfsTripID) +
       "|" +
       this.continuationIndex.toFixed() +
       "|" +
-      Buffer.from(this.subfeedID ?? "").toString("hex") +
+      stringToHex(this.subfeedID ?? "") +
       "|" +
       this.date.toISO({ useDashes: false })
     );
@@ -39,8 +40,8 @@ export class GtfsServiceIDComponents {
     ) {
       return null;
     }
-    const gtfsTripID = Buffer.from(components[0], "hex").toString();
-    const subfeedID = Buffer.from(components[2], "hex").toString();
+    const gtfsTripID = hexToString(components[0]);
+    const subfeedID = hexToString(components[2]);
 
     const continuationIndex = parseIntNull(components[1]);
     const date = QDate.parse(components[3]);

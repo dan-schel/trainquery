@@ -37,6 +37,7 @@ export async function disruptionsRawApi(
   const disruption = ctx.disruptions.getProposedDisruption(id);
 
   return {
-    disruption: disruption,
+    disruption:
+      disruption != null ? proposedDisruptionToJson(disruption) : null,
   };
 }

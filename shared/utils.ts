@@ -75,3 +75,20 @@ export const NumberRangeJson = z.string().transform((x, ctx) => {
 });
 
 export type ErrorLogger = (error: string) => void;
+
+// Adapted from:
+// https://stackoverflow.com/questions/21647928/javascript-unicode-string-to-hex
+export function stringToHex(input: string) {
+  const bytes = new TextEncoder().encode(input);
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join(
+    "",
+  );
+}
+
+export function hexToString(hex: string) {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i !== bytes.length; i++) {
+    bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
+  }
+  return new TextDecoder().decode(bytes);
+}

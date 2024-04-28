@@ -4,7 +4,7 @@ import { type StopID, StopIDJson } from "../../system/ids";
 import { Disruption, DisruptionFactory } from "../disruption";
 import { ProposedDisruptionID } from "../proposed/proposed-disruption";
 
-const disruptionType = "generic-line";
+const disruptionType = "generic-stop";
 
 export class GenericStopDisruption extends Disruption {
   constructor(
