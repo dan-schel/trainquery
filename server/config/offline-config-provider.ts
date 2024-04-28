@@ -1,4 +1,5 @@
-import { ConfigProvider, Logger } from "../ctx/trainquery";
+import { ConfigProvider } from "../ctx/trainquery";
+import { Logger } from "../ctx/logger";
 import fsp from "fs/promises";
 import { loadConfigFromFiles } from "./config-zip";
 import { ServerConfig } from "./server-config";

@@ -5,14 +5,8 @@ import { LineID, StopID } from "../../../shared/system/ids";
 import { Service } from "../../../shared/system/service/service";
 import { TrainQuery } from "../../ctx/trainquery";
 
-export abstract class DisruptionTypeHandler<
-  DisruptionType extends Disruption<string>,
-> {
+export abstract class DisruptionTypeHandler<DisruptionType extends Disruption> {
   constructor(readonly ctx: TrainQuery) {}
-
-  abstract handles(
-    disruption: Disruption<string>,
-  ): disruption is DisruptionType;
 
   abstract affectsService(
     disruption: DisruptionType,

@@ -8,7 +8,7 @@ import { glob } from "glob";
 import { Timetable } from "../../shared/system/timetable/timetable";
 import { parseTtbl } from "../../shared/system/timetable/parse-ttbl";
 import { parseTtblV3Compat } from "../../shared/system/timetable/parse-ttbl-v3-compat";
-import { Logger } from "../ctx/trainquery";
+import { Logger } from "../ctx/logger";
 import { ServerConfig } from "./server-config";
 import { FrontendOnlyConfig } from "../../shared/system/config/frontend-only-config";
 import { SharedConfig } from "../../shared/system/config/shared-config";

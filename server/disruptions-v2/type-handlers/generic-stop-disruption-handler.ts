@@ -1,16 +1,11 @@
 import { DisruptionTypeHandler } from "./disruption-type-handler";
 import { GenericStopDisruption } from "../../../shared/disruptions-v2/types/generic-stop-disruption";
-import { Disruption } from "../../../shared/disruptions-v2/disruption";
 import { QDate } from "../../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { StopID, LineID } from "../../../shared/system/ids";
 import { Service } from "../../../shared/system/service/service";
 
 export class GenericStopDisruptionHandler extends DisruptionTypeHandler<GenericStopDisruption> {
-  handles(disruption: Disruption<string>): disruption is GenericStopDisruption {
-    return disruption instanceof GenericStopDisruption;
-  }
-
   affectsService(
     _disruption: GenericStopDisruption,
     _service: Service,

@@ -1,6 +1,5 @@
 import { DisruptionTypeHandler } from "./disruption-type-handler";
 import { GenericLineDisruption } from "../../../shared/disruptions-v2/types/generic-line-disruption";
-import { Disruption } from "../../../shared/disruptions-v2/disruption";
 import { QDate } from "../../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { StopID, LineID } from "../../../shared/system/ids";
@@ -8,10 +7,6 @@ import { CompletePattern } from "../../../shared/system/service/complete-pattern
 import { Service } from "../../../shared/system/service/service";
 
 export class GenericLineDisruptionHandler extends DisruptionTypeHandler<GenericLineDisruption> {
-  handles(disruption: Disruption<string>): disruption is GenericLineDisruption {
-    return disruption instanceof GenericLineDisruption;
-  }
-
   affectsService(disruption: GenericLineDisruption, service: Service): boolean {
     if (!disruption.affectedLines.includes(service.line)) {
       return false;

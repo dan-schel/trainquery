@@ -13,14 +13,11 @@ import { GenericStopDisruptionHandler } from "./type-handlers/generic-stop-disru
 
 export class DisruptionsManager {
   private readonly _sources: RawDisruptionSource[];
-  private readonly _handlers: Map<
-    string,
-    DisruptionTypeHandler<Disruption<string>>
-  >;
+  private readonly _handlers: Map<string, DisruptionTypeHandler<Disruption>>;
 
   // TODO: This is a local cache of disruptions so we don't need to query the
   // database every single time.
-  private readonly _disruptions: Disruption<string>[];
+  private readonly _disruptions: Disruption[];
 
   constructor(private readonly _ctx: TrainQuery) {
     this._handlers = new Map();
@@ -54,21 +51,16 @@ export class DisruptionsManager {
     throw new Error("Method not implemented.");
   };
 
-  determineDisruptions(departure: Departure): DepartureWithDisruptions {
-    const ctx = this._ctx;
-
+  attachDisruptions(departure: Departure): DepartureWithDisruptions {
     const disruptions = this._disruptions.filter((d) =>
       this._requireHandler(d).affectsService(d, departure),
     );
-    return new DepartureWithDisruptions(
-      departure,
-      disruptions.map((d) => d.toJSON(ctx)),
-    );
+    return new DepartureWithDisruptions(departure, disruptions);
   }
 
-  private _requireHandler(disruption: Disruption<string>) {
+  private _requireHandler(disruption: Disruption) {
     const handler = this._handlers.get(disruption.type);
-    if (handler == null || !handler.handles(disruption)) {
+    if (handler == null) {
       throw new Error(`No handler for disruption type "${disruption.type}".`);
     }
     return handler;
