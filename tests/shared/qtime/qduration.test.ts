@@ -26,4 +26,10 @@ test("QDuration.components", () => {
     m: -1,
     s: -10,
   });
+  expect(new QDuration({ h: 30, s: -70 }).components).toStrictEqual({
+    d: 1,
+    h: 5,
+    m: 58,
+    s: 50,
+  });
 });
