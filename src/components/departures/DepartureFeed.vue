@@ -214,7 +214,7 @@ function handlePin() {
   font-size: 1rem;
 
   // For when it's not a link.
-  color: var(--color-ink-100);
+  color: var(--color-ink-80);
 }
 .pin-button.pinned {
   :deep(.icon) {
