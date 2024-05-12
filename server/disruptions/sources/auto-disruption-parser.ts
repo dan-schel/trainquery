@@ -1,6 +1,6 @@
 import { uuid } from "@dan-schel/js-utils";
-import { Disruption } from "../../../shared/disruptions-v2/disruption";
-import { ProposedDisruption } from "../../../shared/disruptions-v2/proposed/proposed-disruption";
+import { Disruption } from "../../../shared/disruptions/disruption";
+import { ProposedDisruption } from "../../../shared/disruptions/proposed/proposed-disruption";
 
 export abstract class AutoDisruptionParser {
   /**

@@ -6,7 +6,7 @@ import { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { callAPI } from "@/utils/call-api";
 import { useNow } from "@/utils/now-provider";
 import type { QLocalDateTime } from "shared/qtime/qdatetime";
-import { DepartureWithDisruptions } from "shared/disruptions-v2/departure-with-disruptions";
+import { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
 
 const props = defineProps<{
   feeds: DepartureFeed[];

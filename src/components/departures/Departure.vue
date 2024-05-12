@@ -18,7 +18,7 @@ import type { StopID } from "shared/system/ids";
 import { continuify } from "./helpers/continuify";
 import { useNow } from "@/utils/now-provider";
 import LiveIcon from "./LiveIcon.vue";
-import type { DepartureWithDisruptions } from "shared/disruptions-v2/departure-with-disruptions";
+import type { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
 
 const props = defineProps<{
   departure: DepartureWithDisruptions;

@@ -1,8 +1,8 @@
-import { Disruption } from "../../shared/disruptions-v2/disruption";
+import { Disruption } from "../../shared/disruptions/disruption";
 import {
   ProposedDisruption,
   ProposedDisruptionID,
-} from "../../shared/disruptions-v2/proposed/proposed-disruption";
+} from "../../shared/disruptions/proposed/proposed-disruption";
 import { AutoDisruptionParser } from "./sources/auto-disruption-parser";
 
 interface Input {

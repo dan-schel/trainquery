@@ -18,7 +18,7 @@ import Disruptions from "@/components/train/Disruptions.vue";
 import { generatePageHead, generatePageHeadNotFound } from "@/utils/head";
 import { useSettings } from "@/settings/settings";
 import LiveStatus from "@/components/train/LiveStatus.vue";
-import { DepartureWithDisruptions } from "shared/disruptions-v2/departure-with-disruptions";
+import { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
 
 const { local } = useNow();
 

@@ -17,7 +17,7 @@ import {
 import { gtfsApi } from "../api/admin/gtfs-api";
 import { logsApi } from "../api/admin/logs-api";
 import { Logger } from "./logger";
-import { DisruptionsManager } from "../disruptions-v2/disruptions-manager";
+import { DisruptionsManager } from "../disruptions/disruptions-manager";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {

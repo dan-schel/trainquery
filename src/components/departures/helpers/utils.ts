@@ -14,7 +14,7 @@ import type { PlatformID, StopID } from "shared/system/ids";
 import type { ConfidenceLevel } from "shared/system/enums";
 import type { ViaRuleFilteringData } from "shared/system/via-rule";
 import type { QDuration } from "shared/qtime/qduration";
-import type { Disruption } from "shared/disruptions-v2/disruption";
+import type { Disruption } from "shared/disruptions/disruption";
 
 export function getTerminusString(
   departure: Departure,

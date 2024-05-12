@@ -6,8 +6,8 @@ import { ProposedDisruptionSource } from "../proposed-disruption-source";
 import { QUtcDateTime } from "../../../../shared/qtime/qdatetime";
 import { callPtvApi } from "./call-ptv-api";
 import { nonNull } from "@dan-schel/js-utils";
-import { ProposedDisruptionID } from "../../../../shared/disruptions-v2/proposed/proposed-disruption";
-import { PtvProposedDisruption } from "../../../../shared/disruptions-v2/proposed/types/ptv-proposed-disruption";
+import { ProposedDisruptionID } from "../../../../shared/disruptions/proposed/proposed-disruption";
+import { PtvProposedDisruption } from "../../../../shared/disruptions/proposed/types/ptv-proposed-disruption";
 
 // Refresh disruptions from the PTV API every 5 minutes.
 const refreshInterval = 5 * 60 * 1000;

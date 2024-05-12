@@ -1,13 +1,13 @@
-import { Disruption } from "../../shared/disruptions-v2/disruption";
+import { Disruption } from "../../shared/disruptions/disruption";
 import {
   DisruptionJson,
   disruptionToJson,
-} from "../../shared/disruptions-v2/disruption-json";
-import { ProposedDisruption } from "../../shared/disruptions-v2/proposed/proposed-disruption";
+} from "../../shared/disruptions/disruption-json";
+import { ProposedDisruption } from "../../shared/disruptions/proposed/proposed-disruption";
 import {
   ProposedDisruptionJson,
   proposedDisruptionToJson,
-} from "../../shared/disruptions-v2/proposed/proposed-disruption-json";
+} from "../../shared/disruptions/proposed/proposed-disruption-json";
 import { TrainQueryDB } from "../ctx/trainquery-db";
 import { RequiredAction } from "./process-new-proposal";
 

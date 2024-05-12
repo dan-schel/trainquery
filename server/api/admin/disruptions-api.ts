@@ -1,7 +1,7 @@
 import { ServerParams, TrainQuery } from "../../ctx/trainquery";
 import { requireParam } from "../../param-utils";
-import { proposedDisruptionToJson } from "../../../shared/disruptions-v2/proposed/proposed-disruption-json";
-import { ProposedDisruptionID } from "../../../shared/disruptions-v2/proposed/proposed-disruption";
+import { proposedDisruptionToJson } from "../../../shared/disruptions/proposed/proposed-disruption-json";
+import { ProposedDisruptionID } from "../../../shared/disruptions/proposed/proposed-disruption";
 
 // TODO: Are these APIs going to be wrapped with the network data like the
 // departures API? It would cause similar issues if these APIs return data

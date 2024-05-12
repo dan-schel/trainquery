@@ -1,4 +1,4 @@
-import { ProposedDisruption } from "../../../shared/disruptions-v2/proposed/proposed-disruption";
+import { ProposedDisruption } from "../../../shared/disruptions/proposed/proposed-disruption";
 
 export type NewDisruptionsHandler = (disruptions: ProposedDisruption[]) => void;
 

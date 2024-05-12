@@ -1,5 +1,5 @@
 import { DisruptionTypeHandler } from "./disruption-type-handler";
-import { GenericStopDisruption } from "../../../shared/disruptions-v2/types/generic-stop-disruption";
+import { GenericStopDisruption } from "../../../shared/disruptions/types/generic-stop-disruption";
 import { QDate } from "../../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { StopID, LineID } from "../../../shared/system/ids";

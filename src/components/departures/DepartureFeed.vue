@@ -21,7 +21,7 @@ import {
 } from "@/settings/pinned-widgets";
 import { useSettings } from "@/settings/settings";
 import type { QLocalDateTime } from "shared/qtime/qdatetime";
-import type { DepartureWithDisruptions } from "shared/disruptions-v2/departure-with-disruptions";
+import type { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
 
 const props = defineProps<{
   feed: DepartureFeed;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Disruption } from "shared/disruptions-v2/disruption";
+import type { Disruption } from "shared/disruptions/disruption";
 import Icon from "../icons/Icon.vue";
 
 defineProps<{

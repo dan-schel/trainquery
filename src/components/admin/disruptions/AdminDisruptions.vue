@@ -5,8 +5,8 @@ import { onMounted, ref } from "vue";
 import { z } from "zod";
 import Icon from "@/components/icons/Icon.vue";
 import AdminRequestState from "@/components/admin/AdminRequestState.vue";
-import { ProposedDisruptionJson } from "shared/disruptions-v2/proposed/proposed-disruption-json";
-import type { ProposedDisruption } from "shared/disruptions-v2/proposed/proposed-disruption";
+import { ProposedDisruptionJson } from "shared/disruptions/proposed/proposed-disruption-json";
+import type { ProposedDisruption } from "shared/disruptions/proposed/proposed-disruption";
 
 const { callAdminApi } = useAdminAuth();
 

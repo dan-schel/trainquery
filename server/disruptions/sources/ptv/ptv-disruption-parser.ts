@@ -1,8 +1,8 @@
-import { Disruption } from "../../../../shared/disruptions-v2/disruption";
-import { ProposedDisruption } from "../../../../shared/disruptions-v2/proposed/proposed-disruption";
-import { PtvProposedDisruption } from "../../../../shared/disruptions-v2/proposed/types/ptv-proposed-disruption";
-import { GenericLineDisruption } from "../../../../shared/disruptions-v2/types/generic-line-disruption";
-import { GenericStopDisruption } from "../../../../shared/disruptions-v2/types/generic-stop-disruption";
+import { Disruption } from "../../../../shared/disruptions/disruption";
+import { ProposedDisruption } from "../../../../shared/disruptions/proposed/proposed-disruption";
+import { PtvProposedDisruption } from "../../../../shared/disruptions/proposed/types/ptv-proposed-disruption";
+import { GenericLineDisruption } from "../../../../shared/disruptions/types/generic-line-disruption";
+import { GenericStopDisruption } from "../../../../shared/disruptions/types/generic-stop-disruption";
 import { AutoDisruptionParser } from "../auto-disruption-parser";
 
 export class PtvDisruptionParser extends AutoDisruptionParser {

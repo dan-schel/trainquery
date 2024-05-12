@@ -1,5 +1,5 @@
-import { Disruption } from "../../shared/disruptions-v2/disruption";
-import { DepartureWithDisruptions } from "../../shared/disruptions-v2/departure-with-disruptions";
+import { Disruption } from "../../shared/disruptions/disruption";
+import { DepartureWithDisruptions } from "../../shared/disruptions/departure-with-disruptions";
 import { Departure } from "../../shared/system/service/departure";
 import { TrainQuery } from "../ctx/trainquery";
 import { PtvDisruptionSource } from "./sources/ptv/ptv-disruption-source";
@@ -10,7 +10,7 @@ import { ProposedDisruptionSource } from "./sources/proposed-disruption-source";
 import {
   ProposedDisruption,
   ProposedDisruptionID,
-} from "../../shared/disruptions-v2/proposed/proposed-disruption";
+} from "../../shared/disruptions/proposed/proposed-disruption";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
 import { AutoDisruptionParser } from "./sources/auto-disruption-parser";

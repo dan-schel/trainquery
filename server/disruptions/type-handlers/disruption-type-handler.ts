@@ -1,4 +1,4 @@
-import { Disruption } from "../../../shared/disruptions-v2/disruption";
+import { Disruption } from "../../../shared/disruptions/disruption";
 import { QDate } from "../../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { LineID, StopID } from "../../../shared/system/ids";

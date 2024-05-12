@@ -6,8 +6,8 @@ import { useRoute } from "vue-router";
 import AdminRequestState from "@/components/admin/AdminRequestState.vue";
 import { z } from "zod";
 import { parseMarkdown } from "@/utils/parse-markdown";
-import { ProposedDisruptionJson } from "shared/disruptions-v2/proposed/proposed-disruption-json";
-import type { ProposedDisruption } from "shared/disruptions-v2/proposed/proposed-disruption";
+import { ProposedDisruptionJson } from "shared/disruptions/proposed/proposed-disruption-json";
+import type { ProposedDisruption } from "shared/disruptions/proposed/proposed-disruption";
 import { getConfig } from "@/utils/get-config";
 
 const { callAdminApi } = useAdminAuth();
