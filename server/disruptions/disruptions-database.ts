@@ -38,6 +38,12 @@ export class InMemoryDisruptionDatabase implements DisruptionDatabase {
     actions.addToInbox.forEach((p) => {
       this._inbox.push(p);
     });
+    actions.removeFromInbox.forEach((p) => {
+      const idx = this._inbox.findIndex((x) => x.id.equals(p));
+      if (idx !== -1) {
+        this._inbox.splice(idx, 1);
+      }
+    });
     actions.removeFromHandled.forEach((p) => {
       const idx = this._handled.findIndex((x) => x.id.equals(p));
       if (idx !== -1) {
@@ -79,6 +85,11 @@ export class MongoDisruptionDatabase implements DisruptionDatabase {
       ...actions.addToInbox.map((p) =>
         this._db.dbs.disruptionInbox.insertOne(proposedDisruptionToJson(p)),
       ),
+    );
+    promises.push(
+      ...actions.removeFromInbox.map((p) => {
+        return this._db.dbs.disruptionInbox.deleteOne({ id: p.toJSON() });
+      }),
     );
     promises.push(
       ...actions.removeFromHandled.map((p) => {
