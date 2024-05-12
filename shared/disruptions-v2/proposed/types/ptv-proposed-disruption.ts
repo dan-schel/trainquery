@@ -19,6 +19,7 @@ import {
 import { formatDateTime } from "../../../qtime/format";
 import { toLocalDateTimeLuxon } from "../../../qtime/luxon-conversions";
 import { listifyAnd, nonNull } from "@dan-schel/js-utils";
+import { hashString } from "../../../system/cyrb53";
 
 const proposedDisruptionType = "ptv";
 
@@ -37,7 +38,22 @@ export class PtvProposedDisruption extends ProposedDisruption {
     // essentially duplicated. I feel that it makes sense to "generate" the
     // summary from the title (and not the description, for example), but idk,
     // this is weird.
-    super(proposedDisruptionType, id, title, starts, ends);
+    super(
+      proposedDisruptionType,
+      id,
+      title,
+      starts,
+      ends,
+      PtvProposedDisruption.hash(
+        title,
+        description,
+        affectedLines,
+        affectedStops,
+        url,
+        starts,
+        ends,
+      ),
+    );
   }
 
   getMarkdown(config: HasSharedConfig): string {
@@ -78,6 +94,28 @@ export class PtvProposedDisruption extends ProposedDisruption {
       .filter(nonNull)
       .join("\n")}
     `;
+  }
+
+  static hash(
+    title: string,
+    description: string,
+    affectedLines: LineID[],
+    affectedStops: StopID[],
+    url: string | null,
+    starts: QUtcDateTime | null,
+    ends: QUtcDateTime | null,
+  ): string {
+    return hashString(
+      JSON.stringify({
+        title: title,
+        description: description,
+        affectedLines: affectedLines,
+        affectedStops: affectedStops,
+        url: url,
+        starts: starts?.toJSON(),
+        ends: ends?.toJSON(),
+      }),
+    );
   }
 
   static readonly json = z

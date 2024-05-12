@@ -2,10 +2,7 @@ import { z } from "zod";
 import { PtvConfig } from "../../../config/ptv-config";
 import { EnvironmentVariables } from "../../../ctx/environment-variables";
 import { TrainQuery } from "../../../ctx/trainquery";
-import {
-  NewDisruptionsHandler,
-  ProposedDisruptionSource,
-} from "../proposed-disruption-source";
+import { ProposedDisruptionSource } from "../proposed-disruption-source";
 import { QUtcDateTime } from "../../../../shared/qtime/qdatetime";
 import { callPtvApi } from "./call-ptv-api";
 import { nonNull } from "@dan-schel/js-utils";
@@ -24,9 +21,8 @@ export class PtvDisruptionSource extends ProposedDisruptionSource {
   constructor(
     private readonly _ctx: TrainQuery,
     private readonly _ptvConfig: PtvConfig,
-    onNewDisruptions: NewDisruptionsHandler,
   ) {
-    super(onNewDisruptions);
+    super();
 
     const ptv = EnvironmentVariables.get().requirePtv();
     this._devID = ptv.devId;
@@ -50,7 +46,7 @@ export class PtvDisruptionSource extends ProposedDisruptionSource {
         "ptv-api",
         disruptions.length,
       );
-      this.onNewDisruptions(disruptions);
+      this.supplyNewDisruptions(disruptions);
     } catch (err) {
       this._ctx.logger.logFetchingDisruptionsFailure("ptv-api", err);
     }

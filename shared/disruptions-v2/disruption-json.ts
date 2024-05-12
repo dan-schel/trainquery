@@ -11,6 +11,7 @@ const map = new Map<string, DisruptionFactory>(array.map((x) => [x.type, x]));
 
 export const DisruptionJson = z
   .object({
+    id: z.string(),
     type: z.string(),
     data: z.any(),
   })
@@ -48,6 +49,11 @@ export function disruptionToJson(disruption: Disruption) {
   }
 
   return {
+    // This is duplicated in "data", but it's added here too to ensure all
+    // disruption types provide it under the same key so we can query the
+    // database by it.
+    id: disruption.id,
+
     type: disruption.type,
     data: factory.toJson(disruption),
   };

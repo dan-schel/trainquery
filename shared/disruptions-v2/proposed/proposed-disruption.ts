@@ -67,6 +67,9 @@ export abstract class ProposedDisruption {
     readonly summary: string,
     readonly starts: QUtcDateTime | null,
     readonly ends: QUtcDateTime | null,
+
+    /** If this value changes, it means the disruption should be re-processed. */
+    readonly hash: string,
   ) {}
 
   abstract getMarkdown(config: HasSharedConfig): string;

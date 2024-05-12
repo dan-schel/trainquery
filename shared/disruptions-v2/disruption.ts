@@ -13,6 +13,10 @@ export abstract class Disruption {
     // to render the PTV disruption it was created from.
     readonly url: string | null,
   ) {}
+
+  usesSource(source: ProposedDisruptionID): boolean {
+    return this.sources.some((x) => x.equals(source));
+  }
 }
 
 export abstract class DisruptionFactory {

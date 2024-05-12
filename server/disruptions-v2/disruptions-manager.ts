@@ -11,16 +11,16 @@ import {
   ProposedDisruption,
   ProposedDisruptionID,
 } from "../../shared/disruptions-v2/proposed/proposed-disruption";
-import { PtvProposedDisruption } from "../../shared/disruptions-v2/proposed/types/ptv-proposed-disruption";
-import { GenericLineDisruption } from "../../shared/disruptions-v2/types/generic-line-disruption";
-import { GenericStopDisruption } from "../../shared/disruptions-v2/types/generic-stop-disruption";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
+import { AutoDisruptionParser } from "./sources/auto-disruption-parser";
+import { PtvDisruptionParser } from "./sources/ptv/ptv-disruption-parser";
 
 const disruptionsConsideredFreshMinutes = 15;
 
 export class DisruptionsManager {
   private readonly _sources: ProposedDisruptionSource[];
+  private readonly _parsers: AutoDisruptionParser[];
   private readonly _handlers: Map<string, DisruptionTypeHandler<Disruption>>;
 
   // TODO: This is a local cache of disruptions so we don't need to query the
@@ -32,6 +32,7 @@ export class DisruptionsManager {
   constructor() {
     this._handlers = new Map();
     this._sources = [];
+    this._parsers = [];
     this._disruptions = [];
     this._proposedDisruptions = [];
   }
@@ -40,19 +41,19 @@ export class DisruptionsManager {
     this._handlers.set("generic-stop", new GenericStopDisruptionHandler(ctx));
     this._handlers.set("generic-line", new GenericLineDisruptionHandler(ctx));
 
+    // Add the PTV specific logic if the config uses PTV. Maybe these lists
+    // should come from the constructor?
     const ptvConfig = ctx.getConfig().server.ptv;
     if (!ctx.isOffline && ptvConfig != null) {
-      this._sources.push(
-        new PtvDisruptionSource(ctx, ptvConfig, (d) =>
-          this._handleNewDisruptions(d),
-        ),
-      );
+      this._sources.push(new PtvDisruptionSource(ctx, ptvConfig));
+      this._parsers.push(new PtvDisruptionParser());
     }
 
+    this._sources.forEach((x) => x.addListener(this._handleNewDisruptions));
     await Promise.all(this._sources.map((source) => source.init()));
   }
 
-  private _handleNewDisruptions = (disruptions: ProposedDisruption[]) => {
+  private _handleNewDisruptions(disruptions: ProposedDisruption[]) {
     // <TEMPORARY>
     // When we do it for real, this is where we should check these proposed
     // disruptions against the database to see if they've already been curated
@@ -65,54 +66,21 @@ export class DisruptionsManager {
     this._proposedDisruptions.length = 0;
 
     this._proposedDisruptions.push(...disruptions);
-
     for (const proposal of disruptions) {
-      if (!(proposal instanceof PtvProposedDisruption)) {
-        continue;
-      }
-
-      const hasStopVibes = /^.{3,30}( line)? stations?:.{10}/gi.test(
-        proposal.title,
-      );
-
-      if (proposal.affectedLines.length !== 0 && !hasStopVibes) {
-        this._disruptions.push(
-          new GenericLineDisruption(
-            // The ID should be randomly generated UUID when we do this for
-            // real, but since we're regenerating every 5 mins, let's make it
-            // the PTV ID for now to keep it stable.
-            proposal.id.idAtSource,
-
-            true,
-            [proposal.id],
-            proposal.url,
-            proposal.title,
-            proposal.affectedLines,
-            proposal.starts,
-            proposal.ends,
-          ),
-        );
-      } else if (proposal.affectedStops.length !== 0) {
-        this._disruptions.push(
-          new GenericStopDisruption(
-            // The ID should be randomly generated UUID when we do this for
-            // real, but since we're regenerating every 5 mins, let's make it
-            // the PTV ID for now to keep it stable.
-            proposal.id.idAtSource,
-
-            true,
-            [proposal.id],
-            proposal.url,
-            proposal.title,
-            proposal.affectedStops,
-            proposal.starts,
-            proposal.ends,
-          ),
-        );
-      }
+      this._disruptions.push(...this._parseDisruption(proposal));
     }
     // </TEMPORARY>
-  };
+  }
+
+  private _parseDisruption(proposal: ProposedDisruption): Disruption[] {
+    for (const parser of this._parsers) {
+      const parsed = parser.process(proposal);
+      if (parsed != null) {
+        return parsed;
+      }
+    }
+    return [];
+  }
 
   attachDisruptions(departure: Departure): DepartureWithDisruptions {
     const disruptions = this._disruptions.filter((d) =>

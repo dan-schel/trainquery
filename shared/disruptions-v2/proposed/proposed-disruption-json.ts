@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   ProposedDisruption,
   ProposedDisruptionFactory,
+  ProposedDisruptionID,
 } from "./proposed-disruption";
 import { PtvProposedDisruptionFactory } from "./types/ptv-proposed-disruption";
 
@@ -12,6 +13,7 @@ const map = new Map<string, ProposedDisruptionFactory>(
 
 export const ProposedDisruptionJson = z
   .object({
+    id: ProposedDisruptionID.json,
     type: z.string(),
     data: z.any(),
   })
@@ -49,6 +51,11 @@ export function proposedDisruptionToJson(disruption: ProposedDisruption) {
   }
 
   return {
+    // This is duplicated in "data", but it's added here too to ensure all
+    // disruption types provide it under the same key so we can query the
+    // database by it.
+    id: disruption.id.toJSON(),
+
     type: disruption.type,
     data: factory.toJson(disruption),
   };
