@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { Departure } from "../system/service/departure";
-import { Disruption } from "./disruption";
-import { DisruptionJson, disruptionToJson } from "./disruption-json";
+import { Disruption } from "./processed/disruption";
 
 export class DepartureWithDisruptions {
   constructor(
@@ -12,14 +11,14 @@ export class DepartureWithDisruptions {
   static json = z
     .object({
       departure: Departure.json,
-      disruptions: DisruptionJson.array(),
+      disruptions: Disruption.json.array(),
     })
     .transform((x) => new DepartureWithDisruptions(x.departure, x.disruptions));
 
   toJSON(): z.input<typeof DepartureWithDisruptions.json> {
     return {
       departure: this.departure.toJSON(),
-      disruptions: this.disruptions.map((x) => disruptionToJson(x)),
+      disruptions: this.disruptions.map((x) => x.toJSON()),
     };
   }
 }

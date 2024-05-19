@@ -2,19 +2,19 @@ import { z } from "zod";
 import { PtvConfig } from "../../../config/ptv-config";
 import { EnvironmentVariables } from "../../../ctx/environment-variables";
 import { TrainQuery } from "../../../ctx/trainquery";
-import { ProposedDisruptionSource } from "../proposed-disruption-source";
 import { QUtcDateTime } from "../../../../shared/qtime/qdatetime";
 import { callPtvApi } from "./call-ptv-api";
-import { nonNull } from "@dan-schel/js-utils";
-import { ProposedDisruptionID } from "../../../../shared/disruptions/proposed/proposed-disruption";
-import { PtvProposedDisruption } from "../../../../shared/disruptions/proposed/types/ptv-proposed-disruption";
+import { nonNull, unique } from "@dan-schel/js-utils";
+import { DisruptionProvider } from "../disruption-provider";
+import { PtvExternalDisruptionData } from "../../../../shared/disruptions/external/types/ptv";
+import { LineID, StopID } from "../../../../shared/system/ids";
 
 // Refresh disruptions from the PTV API every 5 minutes.
 const refreshInterval = 5 * 60 * 1000;
 
 const blacklistedUrls = ["https://ptv.vic.gov.au/live-travel-updates/"];
 
-export class PtvDisruptionSource extends ProposedDisruptionSource {
+export class PtvDisruptionProvider extends DisruptionProvider {
   private readonly _devID: string;
   private readonly _devKey: string;
 
@@ -46,7 +46,7 @@ export class PtvDisruptionSource extends ProposedDisruptionSource {
         "ptv-api",
         disruptions.length,
       );
-      this.supplyNewDisruptions(disruptions);
+      this.provideNewDisruptions(disruptions);
     } catch (err) {
       this._ctx.logger.logFetchingDisruptionsFailure("ptv-api", err);
     }
@@ -124,21 +124,22 @@ async function fetchPtvDisruptions(
   ];
 
   return list.map((d) => {
-    const lines = d.routes
-      .map((r) => ptvConfig.lines.get(r) ?? null)
-      .filter(nonNull);
-    const stops = d.stops
-      .map((r) => ptvConfig.stops.get(r) ?? null)
-      .filter(nonNull);
+    const lines = unique<LineID>(
+      d.routes.map((r) => ptvConfig.lines.get(r) ?? null).filter(nonNull),
+    );
 
-    return new PtvProposedDisruption(
-      new ProposedDisruptionID("ptv-api", d.disruption_id.toString()),
-      d.from_date,
-      d.to_date,
+    const stops = unique<StopID>(
+      d.stops.map((r) => ptvConfig.stops.get(r) ?? null).filter(nonNull),
+    );
+
+    return new PtvExternalDisruptionData(
+      d.disruption_id,
       d.title,
       d.description,
       lines,
       stops,
+      d.from_date,
+      d.to_date,
       d.url,
     );
   });

@@ -1,59 +1,74 @@
-import { Disruption } from "../../shared/disruptions/disruption";
 import { DepartureWithDisruptions } from "../../shared/disruptions/departure-with-disruptions";
 import { Departure } from "../../shared/system/service/departure";
 import { TrainQuery } from "../ctx/trainquery";
-import { PtvDisruptionSource } from "./sources/ptv/ptv-disruption-source";
+import { PtvDisruptionProvider } from "./provider/ptv/ptv-disruption-source";
 import { DisruptionTypeHandler } from "./type-handlers/disruption-type-handler";
 import { GenericLineDisruptionHandler } from "./type-handlers/generic-line-disruption-handler";
 import { GenericStopDisruptionHandler } from "./type-handlers/generic-stop-disruption-handler";
-import { ProposedDisruptionSource } from "./sources/proposed-disruption-source";
-import {
-  ProposedDisruption,
-  ProposedDisruptionID,
-} from "../../shared/disruptions/proposed/proposed-disruption";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
-import { AutoDisruptionParser } from "./sources/auto-disruption-parser";
-import { PtvDisruptionParser } from "./sources/ptv/ptv-disruption-parser";
+import { AutoDisruptionParser } from "./provider/auto-disruption-parser";
+import { PtvDisruptionParser } from "./provider/ptv/ptv-disruption-parser";
+import { DisruptionProvider } from "./provider/disruption-provider";
+import { DisruptionData } from "../../shared/disruptions/processed/disruption-data";
+import { ExternalDisruption } from "../../shared/disruptions/external/external-disruption";
+import { Disruption } from "../../shared/disruptions/processed/disruption";
+import { ExternalDisruptionData } from "../../shared/disruptions/external/external-disruption-data";
+import { uuid } from "@dan-schel/js-utils";
+import { toDisruptionID } from "../../shared/system/ids";
+import { GenericStopDisruptionData } from "../../shared/disruptions/processed/types/generic-stop";
+import { GenericLineDisruptionData } from "../../shared/disruptions/processed/types/generic-line";
+import { ExternalDisruptionID } from "../../shared/disruptions/external/external-disruption-id";
 
 const disruptionsConsideredFreshMinutes = 15;
 
 export class DisruptionsManager {
-  private readonly _sources: ProposedDisruptionSource[];
+  private readonly _providers: DisruptionProvider[];
   private readonly _parsers: AutoDisruptionParser[];
-  private readonly _handlers: Map<string, DisruptionTypeHandler<Disruption>>;
+  private readonly _handlers: Map<
+    string,
+    DisruptionTypeHandler<DisruptionData>
+  >;
 
   // TODO: This is a local cache of disruptions so we don't need to query the
   // database every single time.
-  private readonly _proposedDisruptions: ProposedDisruption[];
+  private readonly _externalDisruptions: ExternalDisruption[];
   private readonly _disruptions: Disruption[];
   private _lastUpdated: QUtcDateTime | null = null;
 
   constructor() {
     this._handlers = new Map();
-    this._sources = [];
+    this._providers = [];
     this._parsers = [];
     this._disruptions = [];
-    this._proposedDisruptions = [];
+    this._externalDisruptions = [];
   }
 
   async init(ctx: TrainQuery): Promise<void> {
-    this._handlers.set("generic-stop", new GenericStopDisruptionHandler(ctx));
-    this._handlers.set("generic-line", new GenericLineDisruptionHandler(ctx));
+    this._handlers.set(
+      GenericStopDisruptionData.type,
+      new GenericStopDisruptionHandler(ctx),
+    );
+    this._handlers.set(
+      GenericLineDisruptionData.type,
+      new GenericLineDisruptionHandler(ctx),
+    );
 
     // Add the PTV specific logic if the config uses PTV. Maybe these lists
     // should come from the constructor?
     const ptvConfig = ctx.getConfig().server.ptv;
     if (!ctx.isOffline && ptvConfig != null) {
-      this._sources.push(new PtvDisruptionSource(ctx, ptvConfig));
+      this._providers.push(new PtvDisruptionProvider(ctx, ptvConfig));
       this._parsers.push(new PtvDisruptionParser());
     }
 
-    this._sources.forEach((x) => x.addListener(this._handleNewDisruptions));
-    await Promise.all(this._sources.map((source) => source.init()));
+    this._providers.forEach((x) =>
+      x.addListener((y) => this._handleNewDisruptions(y)),
+    );
+    await Promise.all(this._providers.map((source) => source.init()));
   }
 
-  private _handleNewDisruptions(disruptions: ProposedDisruption[]) {
+  private _handleNewDisruptions(disruptions: ExternalDisruptionData[]) {
     // <TEMPORARY>
     // When we do it for real, this is where we should check these proposed
     // disruptions against the database to see if they've already been curated
@@ -63,18 +78,30 @@ export class DisruptionsManager {
 
     // This is how you clear an array in Javascript. Wild.
     this._disruptions.length = 0;
-    this._proposedDisruptions.length = 0;
+    this._externalDisruptions.length = 0;
 
-    this._proposedDisruptions.push(...disruptions);
-    for (const proposal of disruptions) {
-      this._disruptions.push(...this._parseDisruption(proposal));
+    const newDisruptions = disruptions.map((x) => new ExternalDisruption(x));
+
+    this._externalDisruptions.push(...newDisruptions);
+    for (const disruption of newDisruptions) {
+      const processed = this._parseFromExternal(disruption.data).map(
+        (x) =>
+          new Disruption(
+            toDisruptionID(uuid()),
+            x,
+            "provisional",
+            [disruption],
+            null,
+          ),
+      );
+      this._disruptions.push(...processed);
     }
     // </TEMPORARY>
   }
 
-  private _parseDisruption(proposal: ProposedDisruption): Disruption[] {
+  private _parseFromExternal(input: ExternalDisruptionData): DisruptionData[] {
     for (const parser of this._parsers) {
-      const parsed = parser.process(proposal);
+      const parsed = parser.process(input);
       if (parsed != null) {
         return parsed;
       }
@@ -84,17 +111,17 @@ export class DisruptionsManager {
 
   attachDisruptions(departure: Departure): DepartureWithDisruptions {
     const disruptions = this._disruptions.filter((d) =>
-      this._requireHandler(d).affectsService(d, departure),
+      this._requireHandler(d).affectsService(d.data, departure),
     );
     return new DepartureWithDisruptions(departure, disruptions);
   }
 
-  getProposedDisruptions(): ProposedDisruption[] {
-    return this._proposedDisruptions;
+  getExternalDisruptions(): ExternalDisruption[] {
+    return this._externalDisruptions;
   }
 
-  getProposedDisruption(id: ProposedDisruptionID): ProposedDisruption | null {
-    return this._proposedDisruptions.find((x) => x.id.equals(id)) ?? null;
+  getExternalDisruption(id: ExternalDisruptionID): ExternalDisruption | null {
+    return this._externalDisruptions.find((x) => x.id.equals(id)) ?? null;
   }
 
   isStale(): boolean {

@@ -1,10 +1,12 @@
-import { ProposedDisruption } from "../../../shared/disruptions/proposed/proposed-disruption";
+import { ExternalDisruptionData } from "../../../shared/disruptions/external/external-disruption-data";
 
-export type NewDisruptionsHandler = (disruptions: ProposedDisruption[]) => void;
+export type NewDisruptionsHandler = (
+  disruptions: ExternalDisruptionData[],
+) => void;
 
 // TODO: This will probably one day be refactored to extend from
 // TrainQueryService.
-export abstract class ProposedDisruptionSource {
+export abstract class DisruptionProvider {
   private readonly _listeners: NewDisruptionsHandler[] = [];
 
   addListener(listener: NewDisruptionsHandler) {
@@ -18,7 +20,7 @@ export abstract class ProposedDisruptionSource {
     }
   }
 
-  protected supplyNewDisruptions(disruptions: ProposedDisruption[]) {
+  protected provideNewDisruptions(disruptions: ExternalDisruptionData[]) {
     for (const listener of this._listeners) {
       listener(disruptions);
     }

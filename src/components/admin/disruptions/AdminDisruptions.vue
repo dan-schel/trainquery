@@ -5,17 +5,17 @@ import { onMounted, ref } from "vue";
 import { z } from "zod";
 import Icon from "@/components/icons/Icon.vue";
 import AdminRequestState from "@/components/admin/AdminRequestState.vue";
-import { ProposedDisruptionJson } from "shared/disruptions/proposed/proposed-disruption-json";
-import type { ProposedDisruption } from "shared/disruptions/proposed/proposed-disruption";
+import { ExternalDisruption } from "shared/disruptions/external/external-disruption";
+import { extractSummaryFromDisruption } from "@/components/admin/disruptions/extract-summary";
 
 const { callAdminApi } = useAdminAuth();
 
-const inbox = ref<ProposedDisruption[]>([]);
+const inbox = ref<ExternalDisruption[]>([]);
 const state = ref<"loading" | "error" | "success">("loading");
 
 async function handleMounted() {
   const schema = z.object({
-    proposed: ProposedDisruptionJson.array(),
+    inbox: ExternalDisruption.json.array(),
   });
 
   state.value = "loading";
@@ -23,7 +23,7 @@ async function handleMounted() {
     const response = await callAdminApi("/api/admin/disruptions", {});
     const data = await response.json();
     const parsed = schema.parse(data);
-    inbox.value = parsed.proposed;
+    inbox.value = parsed.inbox;
     state.value = "success";
   } catch (e) {
     console.warn("Failed to fetch disruptions.", e);
@@ -55,7 +55,7 @@ onMounted(() => {
         }"
       >
         <p>
-          {{ disruption.summary }}
+          {{ extractSummaryFromDisruption(disruption) }}
         </p>
       </RouterLink>
 

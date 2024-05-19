@@ -13,8 +13,8 @@ type DBs = {
   adminAuth: Collection<Document>;
   logs: Collection<Document>;
   disruptions: Collection<Document>;
-  disruptionInbox: Collection<Document>;
-  disruptionsHandled: Collection<Document>;
+  disruptionsInInbox: Collection<Document>;
+  disruptionsRejected: Collection<Document>;
 };
 
 export class TrainQueryDB {
@@ -45,8 +45,8 @@ export class TrainQueryDB {
     db.createCollection("adminAuthV1");
     db.createCollection("logsV2");
     db.createCollection("disruptionsV1");
-    db.createCollection("disruptionInboxV1");
-    db.createCollection("disruptionsHandledV1");
+    db.createCollection("disruptionsInInboxV1");
+    db.createCollection("disruptionsRejectedV1");
 
     this._dbs = {
       gtfsMetadata: db.collection("gtfsMetadataV1"),
@@ -55,8 +55,8 @@ export class TrainQueryDB {
       adminAuth: db.collection("adminAuthV1"),
       logs: db.collection("logsV2"),
       disruptions: db.collection("disruptionsV1"),
-      disruptionInbox: db.collection("disruptionInboxV1"),
-      disruptionsHandled: db.collection("disruptionsHandledV1"),
+      disruptionsInInbox: db.collection("disruptionsInInboxV1"),
+      disruptionsRejected: db.collection("disruptionsRejectedV1"),
     };
 
     // TODO: Might want to find a better place for this?

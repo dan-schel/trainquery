@@ -1,11 +1,13 @@
-import { Disruption } from "../../../shared/disruptions/disruption";
+import { DisruptionData } from "../../../shared/disruptions/processed/disruption-data";
 import { QDate } from "../../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { LineID, StopID } from "../../../shared/system/ids";
 import { Service } from "../../../shared/system/service/service";
 import { TrainQuery } from "../../ctx/trainquery";
 
-export abstract class DisruptionTypeHandler<DisruptionType extends Disruption> {
+export abstract class DisruptionTypeHandler<
+  DisruptionType extends DisruptionData,
+> {
   constructor(readonly ctx: TrainQuery) {}
 
   abstract affectsService(

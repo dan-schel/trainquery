@@ -1,13 +1,16 @@
 import { DisruptionTypeHandler } from "./disruption-type-handler";
-import { GenericLineDisruption } from "../../../shared/disruptions/types/generic-line-disruption";
 import { QDate } from "../../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
 import { StopID, LineID } from "../../../shared/system/ids";
 import { CompletePattern } from "../../../shared/system/service/complete-pattern";
 import { Service } from "../../../shared/system/service/service";
+import { GenericLineDisruptionData } from "../../../shared/disruptions/processed/types/generic-line";
 
-export class GenericLineDisruptionHandler extends DisruptionTypeHandler<GenericLineDisruption> {
-  affectsService(disruption: GenericLineDisruption, service: Service): boolean {
+export class GenericLineDisruptionHandler extends DisruptionTypeHandler<GenericLineDisruptionData> {
+  affectsService(
+    disruption: GenericLineDisruptionData,
+    service: Service,
+  ): boolean {
     if (!disruption.affectedLines.includes(service.line)) {
       return false;
     }
@@ -31,7 +34,7 @@ export class GenericLineDisruptionHandler extends DisruptionTypeHandler<GenericL
   }
 
   affectsStop(
-    _disruption: GenericLineDisruption,
+    _disruption: GenericLineDisruptionData,
     _stop: StopID,
     _time: QUtcDateTime,
   ): boolean {
@@ -39,7 +42,7 @@ export class GenericLineDisruptionHandler extends DisruptionTypeHandler<GenericL
   }
 
   affectsLine(
-    disruption: GenericLineDisruption,
+    disruption: GenericLineDisruptionData,
     line: LineID,
     time: QUtcDateTime,
   ): boolean {
@@ -49,7 +52,7 @@ export class GenericLineDisruptionHandler extends DisruptionTypeHandler<GenericL
     );
   }
 
-  affectsDate(_disruption: GenericLineDisruption, _date: QDate): boolean {
+  affectsDate(_disruption: GenericLineDisruptionData, _date: QDate): boolean {
     return false;
   }
 }

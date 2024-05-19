@@ -6,29 +6,29 @@ import { useRoute } from "vue-router";
 import AdminRequestState from "@/components/admin/AdminRequestState.vue";
 import { z } from "zod";
 import { parseMarkdown } from "@/utils/parse-markdown";
-import { ProposedDisruptionJson } from "shared/disruptions/proposed/proposed-disruption-json";
-import type { ProposedDisruption } from "shared/disruptions/proposed/proposed-disruption";
 import { getConfig } from "@/utils/get-config";
+import { ExternalDisruption } from "shared/disruptions/external/external-disruption";
+import { disruptionToMarkdown } from "./extract-summary";
 
 const { callAdminApi } = useAdminAuth();
 const route = useRoute();
 
 const encodedDisruptionID = route.params.id as string;
-const disruption = ref<ProposedDisruption | null>(null);
+const disruption = ref<ExternalDisruption | null>(null);
 const state = ref<"loading" | "error" | "success" | "not-found">("loading");
 
 const disruptionHtml = computed(() => {
   if (disruption.value == null) {
     return null;
   }
-  return parseMarkdown(disruption.value.getMarkdown(getConfig()), {
+  return parseMarkdown(disruptionToMarkdown(getConfig(), disruption.value), {
     useClassesOverSemanticHtml: true,
   });
 });
 
 async function handleMounted() {
   const schema = z.object({
-    disruption: ProposedDisruptionJson,
+    disruption: ExternalDisruption.json,
   });
   state.value = "loading";
   try {
