@@ -58,12 +58,15 @@ describe("processNewProposedDisruptions", () => {
     };
     const actions = processNewProposedDisruptions(input);
     expect(actions.addToInbox.length).toBe(1);
+    expect(actions.addToInbox[0].id.idAtSource).toBe("1");
     expect(actions.addDisruptions.length).toBe(1);
+    expect(actions.addDisruptions[0].sources[0].idAtSource).toBe("1");
 
     expect(actions.removeFromHandled.length).toBe(0);
     expect(actions.deleteDisruptions.length).toBe(0);
     expect(actions.removeFromInbox.length).toBe(0);
   });
+
   it("should bring handled proposals back to the inbox when updated", () => {
     const input = {
       disruptions: [],
@@ -74,12 +77,16 @@ describe("processNewProposedDisruptions", () => {
     };
     const actions = processNewProposedDisruptions(input);
     expect(actions.removeFromHandled.length).toBe(1);
+    expect(actions.removeFromHandled[0].idAtSource).toBe("1");
     expect(actions.addToInbox.length).toBe(1);
+    expect(actions.addToInbox[0].id.idAtSource).toBe("1");
+    expect(actions.addToInbox[0].hash).toBe("hash2");
 
     expect(actions.addDisruptions.length).toBe(1);
     expect(actions.deleteDisruptions.length).toBe(0);
     expect(actions.removeFromInbox.length).toBe(0);
   });
+
   it("should replace proposals in the inbox when updated", () => {
     const input = {
       disruptions: [],
@@ -90,12 +97,16 @@ describe("processNewProposedDisruptions", () => {
     };
     const actions = processNewProposedDisruptions(input);
     expect(actions.removeFromInbox.length).toBe(1);
+    expect(actions.removeFromInbox[0].idAtSource).toBe("1");
     expect(actions.addToInbox.length).toBe(1);
+    expect(actions.addToInbox[0].id.idAtSource).toBe("1");
+    expect(actions.addToInbox[0].hash).toBe("hash2");
 
     expect(actions.addDisruptions.length).toBe(1);
     expect(actions.deleteDisruptions.length).toBe(0);
     expect(actions.removeFromHandled.length).toBe(0);
   });
+
   it("should delete all automatically generated disruptions from outdated disruptions", () => {
     const input = {
       disruptions: [
@@ -112,12 +123,15 @@ describe("processNewProposedDisruptions", () => {
     };
     const actions = processNewProposedDisruptions(input);
     expect(actions.deleteDisruptions.length).toBe(1);
+    expect(actions.deleteDisruptions[0]).toBe("1");
     expect(actions.addDisruptions.length).toBe(1);
+    expect(actions.addDisruptions[0].sources[0].idAtSource).toBe("1");
 
     expect(actions.addToInbox.length).toBe(1);
     expect(actions.removeFromHandled.length).toBe(1);
     expect(actions.removeFromInbox.length).toBe(0);
   });
+
   it("should do nothing if the new proposal is already handled", () => {
     const input = {
       disruptions: [
@@ -139,6 +153,7 @@ describe("processNewProposedDisruptions", () => {
     expect(actions.deleteDisruptions.length).toBe(0);
     expect(actions.removeFromInbox.length).toBe(0);
   });
+
   it("should do nothing if the new proposal is already in the inbox", () => {
     const input = {
       disruptions: [
