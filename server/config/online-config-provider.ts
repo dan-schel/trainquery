@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
-import { ConfigProvider, Logger } from "../ctx/trainquery";
+import { ConfigProvider } from "../ctx/trainquery";
+import { Logger } from "../ctx/logger";
 import YAML from "yaml";
 import { z } from "zod";
 import fsp from "fs/promises";

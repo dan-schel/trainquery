@@ -14,11 +14,11 @@ import { formatRelativeTime, formatTime } from "shared/qtime/format";
 import { getServicePageRoute, requireStop } from "shared/system/config-utils";
 import TrainPageStop from "@/components/line-diagram/TrainPageStop.vue";
 import { useNow } from "@/utils/now-provider";
-import Disruptions from "@/components/train/Disruptions.vue";
-import { DepartureWithDisruptions } from "../../shared/disruptions/departure-with-disruptions";
+import Disruptions from "@/components/disruptions/Disruptions.vue";
 import { generatePageHead, generatePageHeadNotFound } from "@/utils/head";
 import { useSettings } from "@/settings/settings";
 import LiveStatus from "@/components/train/LiveStatus.vue";
+import { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
 
 const { local } = useNow();
 

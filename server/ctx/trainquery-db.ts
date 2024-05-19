@@ -3,7 +3,6 @@ import { GtfsData } from "../gtfs/data/gtfs-data";
 import { GtfsCalendar } from "../gtfs/data/gtfs-calendar";
 import { GtfsTrip } from "../gtfs/data/gtfs-trip";
 import { Session } from "../../shared/admin/session";
-import { RawHandledDisruption } from "../disruptions/raw-handled-disruption";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
 import { AdminLog, AdminLogWindow } from "../../shared/admin/logs";
 
@@ -11,10 +10,11 @@ type DBs = {
   gtfsMetadata: Collection<Document>;
   gtfsTrips: Collection<Document>;
   gtfsCalendars: Collection<Document>;
-  disruptionsProcessed: Collection<Document>;
-  disruptionsRawHandled: Collection<Document>;
   adminAuth: Collection<Document>;
   logs: Collection<Document>;
+  disruptions: Collection<Document>;
+  disruptionsInInbox: Collection<Document>;
+  disruptionsRejected: Collection<Document>;
 };
 
 export class TrainQueryDB {
@@ -42,19 +42,21 @@ export class TrainQueryDB {
     db.createCollection("gtfsMetadataV1");
     db.createCollection("gtfsTripsV1");
     db.createCollection("gtfsCalendarsV1");
-    db.createCollection("disruptionsProcessedV1");
-    db.createCollection("disruptionsRawHandledV1");
     db.createCollection("adminAuthV1");
-    db.createCollection("logsV1");
+    db.createCollection("logsV2");
+    db.createCollection("disruptionsV1");
+    db.createCollection("disruptionsInInboxV1");
+    db.createCollection("disruptionsRejectedV1");
 
     this._dbs = {
       gtfsMetadata: db.collection("gtfsMetadataV1"),
       gtfsTrips: db.collection("gtfsTripsV1"),
       gtfsCalendars: db.collection("gtfsCalendarsV1"),
-      disruptionsProcessed: db.collection("disruptionsProcessedV1"),
-      disruptionsRawHandled: db.collection("disruptionsRawHandledV1"),
       adminAuth: db.collection("adminAuthV1"),
-      logs: db.collection("logsV1"),
+      logs: db.collection("logsV2"),
+      disruptions: db.collection("disruptionsV1"),
+      disruptionsInInbox: db.collection("disruptionsInInboxV1"),
+      disruptionsRejected: db.collection("disruptionsRejectedV1"),
     };
 
     // TODO: Might want to find a better place for this?
@@ -147,7 +149,7 @@ export class TrainQueryDB {
 
   /** Inserts a collection of logs into the database. */
   async writeLogs(logs: AdminLog[]) {
-    await this.dbs.logs.insertMany(logs.map((l) => l.toMongo()));
+    await this.dbs.logs.insertMany(logs.map((l) => l.toJSON()));
   }
 
   /** Deletes logs that are over `daysOld` days old. */
@@ -168,16 +170,7 @@ export class TrainQueryDB {
         sequence: { $gte: beforeSequence - count, $lt: beforeSequence },
       })
       .toArray();
-    const logs = docs.map((d) => AdminLog.mongo.parse(d));
+    const logs = docs.map((d) => AdminLog.json.parse(d));
     return new AdminLogWindow(instance, logs, { beforeSequence, count });
-  }
-
-  async fetchRawHandledDisruptions(): Promise<RawHandledDisruption[]> {
-    const docs = await this.dbs.disruptionsRawHandled.find().toArray();
-    return docs.map((d) => RawHandledDisruption.json.parse(d));
-  }
-
-  async writeRawHandledDisruption(disruption: RawHandledDisruption) {
-    await this.dbs.disruptionsRawHandled.insertOne(disruption.toJSON());
   }
 }

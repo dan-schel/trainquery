@@ -1,4 +1,4 @@
-import { RawDisruptionIDComponents } from "../../disruptions/raw-disruption-id-components";
+import { ExternalDisruptionID } from "../../../shared/disruptions/external/external-disruption-id";
 import { ServerParams, TrainQuery } from "../../ctx/trainquery";
 import { requireParam } from "../../param-utils";
 
@@ -13,7 +13,7 @@ export async function disruptionsApi(
   await ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
 
   return {
-    raw: ctx.disruptions.getRaw().map((x) => x.toJSON(ctx)),
+    inbox: ctx.disruptions.getExternalDisruptions().map((x) => x.toJSON()),
   };
 }
 
@@ -24,27 +24,16 @@ export async function disruptionsRawApi(
   ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
 
   const encodedDisruptionID = requireParam(params, "id");
-  const decoded = RawDisruptionIDComponents.decode(encodedDisruptionID);
-  if (decoded == null) {
+  const id = ExternalDisruptionID.decodeFromUrl(encodedDisruptionID);
+  if (id == null) {
     return {
       disruption: null,
     };
   }
 
-  const disruption = ctx.disruptions.getRawDisruption(
-    decoded.source,
-    decoded.id,
-  );
-
-  if (disruption == null) {
-    return {
-      disruption: null,
-    };
-  }
+  const disruption = ctx.disruptions.getExternalDisruption(id);
 
   return {
-    disruption: {
-      markdown: disruption.createInfoMarkdown(ctx),
-    },
+    disruption: disruption?.toJSON() ?? null,
   };
 }

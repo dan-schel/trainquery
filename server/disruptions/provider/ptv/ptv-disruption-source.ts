@@ -1,34 +1,32 @@
 import { z } from "zod";
 import { PtvConfig } from "../../../config/ptv-config";
-import { TrainQuery } from "../../../ctx/trainquery";
-import { Disruption } from "../../disruption";
-import { DisruptionSource, NewDisruptionsHandler } from "../disruption-source";
-import { callPtvApi } from "./call-ptv-api";
-import { QUtcDateTime } from "../../../../shared/qtime/qdatetime";
-import { nonNull } from "@dan-schel/js-utils";
 import { EnvironmentVariables } from "../../../ctx/environment-variables";
-import { PtvGeneralDisruption } from "../../types/ptv-general-disruption";
-import { PtvRawDisruptionData } from "./ptv-raw-disruption-data";
+import { TrainQuery } from "../../../ctx/trainquery";
+import { QUtcDateTime } from "../../../../shared/qtime/qdatetime";
+import { callPtvApi } from "./call-ptv-api";
+import { nonNull, unique } from "@dan-schel/js-utils";
+import { DisruptionProvider } from "../disruption-provider";
+import { PtvExternalDisruptionData } from "../../../../shared/disruptions/external/types/ptv";
+import { LineID, StopID } from "../../../../shared/system/ids";
 
 // Refresh disruptions from the PTV API every 5 minutes.
 const refreshInterval = 5 * 60 * 1000;
 
 const blacklistedUrls = ["https://ptv.vic.gov.au/live-travel-updates/"];
 
-export class PtvDisruptionSource extends DisruptionSource {
-  readonly devID: string;
-  readonly devKey: string;
+export class PtvDisruptionProvider extends DisruptionProvider {
+  private readonly _devID: string;
+  private readonly _devKey: string;
 
   constructor(
-    readonly ctx: TrainQuery,
-    readonly ptvConfig: PtvConfig,
-    readonly onNewDisruptions: NewDisruptionsHandler,
+    private readonly _ctx: TrainQuery,
+    private readonly _ptvConfig: PtvConfig,
   ) {
-    super(onNewDisruptions);
+    super();
 
     const ptv = EnvironmentVariables.get().requirePtv();
-    this.devID = ptv.devId;
-    this.devKey = ptv.devKey;
+    this._devID = ptv.devId;
+    this._devKey = ptv.devKey;
   }
 
   async init(): Promise<void> {
@@ -38,19 +36,19 @@ export class PtvDisruptionSource extends DisruptionSource {
 
   private async _refresh(): Promise<void> {
     try {
-      this.ctx.logger.logFetchingDisruptions("ptv-api");
+      this._ctx.logger.logFetchingDisruptions("ptv-api");
       const disruptions = await fetchPtvDisruptions(
-        this.ptvConfig,
-        this.devID,
-        this.devKey,
+        this._ptvConfig,
+        this._devID,
+        this._devKey,
       );
-      this.ctx.logger.logFetchingDisruptionsSuccess(
+      this._ctx.logger.logFetchingDisruptionsSuccess(
         "ptv-api",
         disruptions.length,
       );
-      this.onNewDisruptions(disruptions);
+      this.provideNewDisruptions(disruptions);
     } catch (err) {
-      this.ctx.logger.logFetchingDisruptionsFailure("ptv-api", err);
+      this._ctx.logger.logFetchingDisruptionsFailure("ptv-api", err);
     }
   }
 }
@@ -97,6 +95,7 @@ const PtvDisruptionSchema = z.object({
     .transform((x) => x.stop_id)
     .array(),
 });
+
 const PtvDisruptionsSchema = z.object({
   disruptions: z.object({
     metro_train: PtvDisruptionSchema.array(),
@@ -108,7 +107,7 @@ async function fetchPtvDisruptions(
   ptvConfig: PtvConfig,
   devID: string,
   devKey: string,
-): Promise<Disruption[]> {
+) {
   const json = await callPtvApi(
     "/v3/disruptions",
     {
@@ -118,42 +117,30 @@ async function fetchPtvDisruptions(
     devKey,
   );
 
-  const raw = PtvDisruptionsSchema.parse(json);
-  const rawList = [
-    ...raw.disruptions.metro_train,
-    ...raw.disruptions.regional_train,
+  const result = PtvDisruptionsSchema.parse(json);
+  const list = [
+    ...result.disruptions.metro_train,
+    ...result.disruptions.regional_train,
   ];
 
-  const parsed = rawList
-    .map((d) => {
-      const lines = d.routes
-        .map((r) => ptvConfig.lines.get(r) ?? null)
-        .filter(nonNull);
-      const stops = d.stops
-        .map((r) => ptvConfig.stops.get(r) ?? null)
-        .filter(nonNull);
-      const ptvData = new PtvRawDisruptionData(
-        d.disruption_id,
-        d.title,
-        d.description,
-        lines,
-        stops,
-        d.url,
-        d.from_date,
-        d.to_date,
-      );
+  return list.map((d) => {
+    const lines = unique<LineID>(
+      d.routes.map((r) => ptvConfig.lines.get(r) ?? null).filter(nonNull),
+    );
 
-      const hasStopVibes = /^.{3,30}( line)? stations?:.{10}/gi.test(d.title);
+    const stops = unique<StopID>(
+      d.stops.map((r) => ptvConfig.stops.get(r) ?? null).filter(nonNull),
+    );
 
-      if (lines.length !== 0 && !hasStopVibes) {
-        return [new PtvGeneralDisruption(ptvData, lines, [])];
-      } else if (stops.length !== 0) {
-        return [new PtvGeneralDisruption(ptvData, [], stops)];
-      } else {
-        return [];
-      }
-    })
-    .flat();
-
-  return parsed;
+    return new PtvExternalDisruptionData(
+      d.disruption_id,
+      d.title,
+      d.description,
+      lines,
+      stops,
+      d.from_date,
+      d.to_date,
+      d.url,
+    );
+  });
 }

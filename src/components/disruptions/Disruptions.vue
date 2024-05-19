@@ -1,18 +1,27 @@
 <script setup lang="ts">
-import { type SerializedDisruption } from "../../../shared/disruptions/serialized-disruption";
+import type { Disruption } from "shared/disruptions/processed/disruption";
 import Icon from "../icons/Icon.vue";
+import { computed } from "vue";
+import { extractSummaryFromDisruption } from "./extract-summary";
 
-defineProps<{
-  disruptions: SerializedDisruption[];
+const props = defineProps<{
+  disruptions: Disruption[];
 }>();
+
+const displayData = computed(() => {
+  return props.disruptions.map((x) => ({
+    summary: extractSummaryFromDisruption(x),
+    url: null,
+  }));
+});
 </script>
 
 <template>
   <div class="disruptions">
-    <div v-for="(disruption, i) in disruptions" :key="i" class="disruption">
+    <div v-for="(disruption, i) in displayData" :key="i" class="disruption">
       <Icon id="uil:exclamation-circle"></Icon>
       <p>
-        {{ disruption.message }}
+        {{ disruption.summary }}
       </p>
       <a
         v-if="disruption.url != null"

@@ -1,23 +1,21 @@
 <script setup lang="ts">
 import PageContent from "@/components/common/PageContent.vue";
 import { useAdminAuth } from "@/utils/admin-auth-provider";
-import {
-  RawDisruptionJson,
-  type SerializedRawDisruption,
-} from "shared/disruptions/serialized-disruption";
 import { onMounted, ref } from "vue";
 import { z } from "zod";
 import Icon from "@/components/icons/Icon.vue";
 import AdminRequestState from "@/components/admin/AdminRequestState.vue";
+import { ExternalDisruption } from "shared/disruptions/external/external-disruption";
+import { extractSummaryFromDisruption } from "@/components/admin/disruptions/extract-summary";
 
 const { callAdminApi } = useAdminAuth();
 
-const inbox = ref<SerializedRawDisruption[]>([]);
+const inbox = ref<ExternalDisruption[]>([]);
 const state = ref<"loading" | "error" | "success">("loading");
 
 async function handleMounted() {
   const schema = z.object({
-    raw: RawDisruptionJson.array(),
+    inbox: ExternalDisruption.json.array(),
   });
 
   state.value = "loading";
@@ -25,7 +23,7 @@ async function handleMounted() {
     const response = await callAdminApi("/api/admin/disruptions", {});
     const data = await response.json();
     const parsed = schema.parse(data);
-    inbox.value = parsed.raw;
+    inbox.value = parsed.inbox;
     state.value = "success";
   } catch (e) {
     console.warn("Failed to fetch disruptions.", e);
@@ -53,11 +51,11 @@ onMounted(() => {
         class="disruption"
         :to="{
           name: 'admin-disruptions-raw',
-          params: { id: disruption.rawData.encodedID },
+          params: { id: disruption.id.encodeForUrl() },
         }"
       >
         <p>
-          {{ disruption.message }}
+          {{ extractSummaryFromDisruption(disruption) }}
         </p>
       </RouterLink>
 
