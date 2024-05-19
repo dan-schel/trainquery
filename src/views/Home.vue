@@ -51,7 +51,7 @@ const welcomeHtml = computed(() =>
         >
           <div class="section-title">
             <Icon id="uil:star"></Icon>
-            <p>Welcome to {{ getConfig().frontend.appName }}</p>
+            <p>Welcome to {{ getConfig().frontend.appName }}!</p>
           </div>
           <div class="markdown" v-html="welcomeHtml"></div>
           <p>
