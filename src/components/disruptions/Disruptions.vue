@@ -2,7 +2,10 @@
 import type { Disruption } from "shared/disruptions/processed/disruption";
 import Icon from "../icons/Icon.vue";
 import { computed } from "vue";
-import { extractSummaryFromDisruption } from "./extract-summary";
+import {
+  extractSummaryFromDisruption,
+  extractUrlForDisruption,
+} from "./extract-summary";
 
 const props = defineProps<{
   disruptions: Disruption[];
@@ -11,7 +14,9 @@ const props = defineProps<{
 const displayData = computed(() => {
   return props.disruptions.map((x) => ({
     summary: extractSummaryFromDisruption(x),
-    url: null,
+
+    // TODO: This is obviously temporary!
+    url: extractUrlForDisruption(x),
   }));
 });
 </script>
