@@ -25,6 +25,7 @@ import UilRedo from "./UilRedo.vue";
 import UilSearch from "./UilSearch.vue";
 import UilSetting from "./UilSetting.vue";
 import UilSliderHRange from "./UilSliderHRange.vue";
+import UilStar from "./UilStar.vue";
 import UilStethoscopeAlt from "./UilStethoscopeAlt.vue";
 import UilTimes from "./UilTimes.vue";
 import UilTimesCircle from "./UilTimesCircle.vue";
@@ -59,6 +60,7 @@ const Icons = {
   "uil:search": UilSearch,
   "uil:setting": UilSetting,
   "uil:slider-h-range": UilSliderHRange,
+  "uil:star": UilStar,
   "uil:stethoscope-alt": UilStethoscopeAlt,
   "uil:times": UilTimes,
   "uil:times-circle": UilTimesCircle,

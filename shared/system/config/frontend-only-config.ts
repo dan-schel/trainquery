@@ -14,6 +14,8 @@ export class FrontendOnlyConfig {
     readonly beta: boolean,
     /** Used on the homepage, e.g. 'Navigate Melbourne's train network'. */
     readonly tagline: string,
+    /** Markdown string displayed on the homepage to new users. */
+    readonly welcomeMarkdown: string,
     /** Markdown string with copyright info and disclaimers visible in the footer. */
     readonly footerMarkdown: string,
     /**
@@ -34,6 +36,7 @@ export class FrontendOnlyConfig {
       appName: z.string(),
       beta: z.boolean().default(false),
       tagline: z.string(),
+      welcomeMarkdown: z.string(),
       footerMarkdown: z.string(),
       metaDescription: z.string(),
       via: ViaRule.json.array().default([]),
@@ -46,6 +49,7 @@ export class FrontendOnlyConfig {
           x.appName,
           x.beta,
           x.tagline,
+          x.welcomeMarkdown,
           x.footerMarkdown,
           x.metaDescription,
           x.via,
@@ -59,6 +63,7 @@ export class FrontendOnlyConfig {
       appName: this.appName,
       beta: this.beta ? true : undefined,
       tagline: this.tagline,
+      welcomeMarkdown: this.welcomeMarkdown,
       footerMarkdown: this.footerMarkdown,
       metaDescription: this.metaDescription,
       via: this.via.map((v) => v.toJSON()),
