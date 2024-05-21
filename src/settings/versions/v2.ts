@@ -21,6 +21,7 @@ export const settingsV2 = z.object({
   // will always return a value for it. Even when the settings was v2 and didn't
   // contain it, using default() here means zod will fill it!
   showAdminDashboardShortcut: z.boolean().default(false),
+  enableNearbyStops: z.boolean().default(false),
 });
 
 export function parseOrMigrateToSettingsV2(
@@ -41,6 +42,7 @@ export function parseOrMigrateToSettingsV2(
       limitMapFPS: oldSettings.limitMapFPS,
       developerMode: false,
       showAdminDashboardShortcut: false,
+      enableNearbyStops: false,
     };
   }
 }

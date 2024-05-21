@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { mapJson } from "../utils";
-import { StopID, StopIDStringJson } from "./ids";
+import { type StopID, StopIDStringJson } from "./ids";
 
 type StopCoordinates = {
   latitude: number;
