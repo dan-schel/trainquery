@@ -59,6 +59,7 @@ async function loadShared(
       lines: z.string(),
       urlNames: z.string(),
       continuation: z.string().optional(),
+      locations: z.string().optional(),
     })
     .passthrough();
 
@@ -77,6 +78,10 @@ async function loadShared(
         ? undefined
         : (await loadYml(dataFolder, shared.continuation, continuationYml))
             .rules,
+    locations:
+      shared.locations == null
+        ? undefined
+        : await loadYml(dataFolder, shared.locations, z.any()),
     canonicalUrl: canonicalUrl,
   });
 }

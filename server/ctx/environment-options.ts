@@ -91,7 +91,7 @@ export class EnvironmentOptions {
     return selected;
   }
 
-  static json = z
+  static readonly json = z
     .object({
       name: z.string(),
       logging: AdminLoggingOptions.json,

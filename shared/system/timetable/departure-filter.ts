@@ -55,7 +55,7 @@ export class DepartureFilter {
     );
   }
 
-  static json = z.string().transform((x, ctx) => {
+  static readonly json = z.string().transform((x, ctx) => {
     const result = DepartureFilter.parse(x);
     if (result == null) {
       ctx.addIssue({

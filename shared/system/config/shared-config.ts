@@ -7,6 +7,7 @@ import {
   HookContinuationGroup,
   LinearContinuationGroup,
 } from "../continuation-group";
+import { Locations } from "../locations";
 
 /** Describes how to calculate the timezone offset of the timetables. */
 export type TimezoneConfig =
@@ -38,6 +39,8 @@ export class SharedConfig {
       | LinearContinuationGroup
       | HookContinuationGroup
     )[],
+    /** Provides latitude and longitude coordinates for stops. */
+    readonly locations: Locations,
     /** True if stops should list their platforms. Enables platform filtering. */
     readonly usePlatforms: boolean,
     /** The timezone the transit system's timetables use. */
@@ -60,6 +63,7 @@ export class SharedConfig {
         .union([LinearContinuationGroup.json, HookContinuationGroup.json])
         .array()
         .default([]),
+      locations: Locations.json.default({}),
       usePlatforms: z.boolean(),
       timezone: z.union([
         z.object({
@@ -80,6 +84,7 @@ export class SharedConfig {
           x.lines,
           x.urlNames,
           x.continuationRules,
+          x.locations,
           x.usePlatforms,
           x.timezone,
           x.serviceTypes,
@@ -96,6 +101,7 @@ export class SharedConfig {
         this.continuationRules.length === 0
           ? undefined
           : this.continuationRules.map((c) => c.toJSON()),
+      locations: this.locations.toJSON(),
       usePlatforms: this.usePlatforms,
       timezone: this.timezone,
       serviceTypes: this.serviceTypes.map((s) => s.toJSON()),

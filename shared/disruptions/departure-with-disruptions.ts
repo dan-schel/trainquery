@@ -8,7 +8,7 @@ export class DepartureWithDisruptions {
     readonly disruptions: Disruption[],
   ) {}
 
-  static json = z
+  static readonly json = z
     .object({
       departure: Departure.json,
       disruptions: Disruption.json.array(),

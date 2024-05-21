@@ -20,9 +20,10 @@ export class Settings {
     readonly limitMapFPS: boolean,
     readonly developerMode: boolean,
     readonly showAdminDashboardShortcut: boolean,
+    readonly enableNearbyStops: boolean,
   ) {}
 
-  static default = new Settings([], [], false, false, false, false);
+  static default = new Settings([], [], false, false, false, false, false);
 
   static parse(obj: unknown): Settings {
     const potentiallyOldSettings = anySettingsVersion.parse(obj);
@@ -38,6 +39,7 @@ export class Settings {
       settings.limitMapFPS,
       settings.developerMode,
       settings.showAdminDashboardShortcut,
+      settings.enableNearbyStops,
     );
   }
 
@@ -50,6 +52,7 @@ export class Settings {
       limitMapFPS: this.limitMapFPS,
       developerMode: this.developerMode,
       showAdminDashboardShortcut: this.showAdminDashboardShortcut,
+      enableNearbyStops: this.enableNearbyStops,
     };
   }
 
@@ -60,6 +63,7 @@ export class Settings {
     limitMapFPS,
     developerMode,
     showAdminDashboardShortcut,
+    enableNearbyStops,
   }: {
     pinnedWidgets?: PinnedWidget[];
     significantStops?: SignificantStop[];
@@ -67,6 +71,7 @@ export class Settings {
     limitMapFPS?: boolean;
     developerMode?: boolean;
     showAdminDashboardShortcut?: boolean;
+    enableNearbyStops?: boolean;
   }) {
     return new Settings(
       pinnedWidgets ?? this.pinnedWidgets,
@@ -75,6 +80,7 @@ export class Settings {
       limitMapFPS ?? this.limitMapFPS,
       developerMode ?? this.developerMode,
       showAdminDashboardShortcut ?? this.showAdminDashboardShortcut,
+      enableNearbyStops ?? this.enableNearbyStops,
     );
   }
 

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { parseInlineMarkdown } from "@/utils/parse-markdown";
-import Wordmark from "./Wordmark.vue";
 import { getConfig } from "@/utils/get-config";
 
 const disclaimerHtml = parseInlineMarkdown(getConfig().frontend.footerMarkdown);
@@ -10,13 +9,7 @@ const disclaimerHtml = parseInlineMarkdown(getConfig().frontend.footerMarkdown);
   <footer>
     <div class="content">
       <div class="divider"></div>
-      <Wordmark class="wordmark"></Wordmark>
       <p class="disclaimer" v-html="disclaimerHtml"></p>
-      <p>
-        <RouterLink :to="{ name: 'about' }" class="link">
-          About {{ getConfig().frontend.appName }}
-        </RouterLink>
-      </p>
     </div>
   </footer>
 </template>
@@ -27,7 +20,7 @@ footer {
   @include template.page-centerer;
 }
 .content {
-  padding: 1.5rem 1rem;
+  padding: 1rem 1rem;
 
   // For .divider positioning.
   position: relative;
@@ -38,10 +31,6 @@ footer {
   left: 1rem;
   right: 1rem;
   border-top: 1px solid var(--color-ink-20);
-}
-.wordmark {
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
 }
 p {
   font-size: 0.75rem;

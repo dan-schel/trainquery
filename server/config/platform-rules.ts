@@ -20,7 +20,7 @@ type StopPlatformRule = {
 export class PlatformRules {
   constructor(readonly rules: Map<StopID, StopPlatformRule>) {}
 
-  static json = mapJson(
+  static readonly json = mapJson(
     StopIDStringJson,
     z.object({
       confidence: ConfidenceLevelJson,
