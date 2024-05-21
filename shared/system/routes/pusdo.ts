@@ -11,7 +11,7 @@ export class PusdoFilter {
     readonly none: boolean,
   ) {}
 
-  static json = z.string().transform((x, ctx) => {
+  static readonly json = z.string().transform((x, ctx) => {
     const result = PusdoFilter.parse(x);
     if (result == null) {
       ctx.addIssue({

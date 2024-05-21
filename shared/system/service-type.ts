@@ -8,7 +8,7 @@ export class ServiceType {
     readonly mode: ServiceMode,
   ) {}
 
-  static json = z
+  static readonly json = z
     .object({
       id: ServiceTypeIDJson,
       mode: ServiceModeJson,

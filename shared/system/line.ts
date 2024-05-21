@@ -10,7 +10,6 @@ import {
   LineIDJson,
   type ServiceTypeID,
   ServiceTypeIDJson,
-  toServiceTypeID,
 } from "./ids";
 import { Route } from "./routes/line-route";
 import { RouteJson, routeToJSON } from "./routes/route-json";
@@ -38,7 +37,7 @@ export class Line {
       name: z.string(),
       color: LineColorJson.default("none"),
       visibility: LineVisibilityJson.default("regular"),
-      serviceType: ServiceTypeIDJson.default(toServiceTypeID("normal")),
+      serviceType: ServiceTypeIDJson.default("normal"),
       route: RouteJson,
     })
     .transform(
