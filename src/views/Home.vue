@@ -122,34 +122,6 @@ function attemptToFetchLocation(settings: Settings) {
             >
           </p>
         </div>
-        <div class="pinned-widgets">
-          <div class="section-title">
-            <Icon id="majesticons:pin-line"></Icon>
-            <p>Pinned widgets</p>
-          </div>
-          <DepartureGroup
-            v-if="pinnedWidgets != null && pinnedWidgets.length > 0"
-            :feeds="pinnedWidgets"
-            :time="null"
-            :allow-pinning="false"
-            :state-perspective="true"
-            :is-default-feeds="false"
-            :center-single="true"
-            :preserve-time="false"
-            :replace-on-navigate="false"
-          ></DepartureGroup>
-          <LoadingSpinner
-            v-if="pinnedWidgets == null"
-            class="loading"
-          ></LoadingSpinner>
-          <p
-            class="empty"
-            v-if="pinnedWidgets != null && pinnedWidgets.length === 0"
-          >
-            Click the pin button above a widget on a stop's page to show it
-            here.
-          </p>
-        </div>
         <div class="nearby-stops">
           <div class="section-title">
             <Icon id="uil:map-marker"></Icon>
@@ -194,8 +166,36 @@ function attemptToFetchLocation(settings: Settings) {
             </p>
           </div>
         </div>
+        <div class="pinned-widgets">
+          <div class="section-title">
+            <Icon id="majesticons:pin-line"></Icon>
+            <p>Pinned widgets</p>
+          </div>
+          <DepartureGroup
+            v-if="pinnedWidgets != null && pinnedWidgets.length > 0"
+            :feeds="pinnedWidgets"
+            :time="null"
+            :allow-pinning="false"
+            :state-perspective="true"
+            :is-default-feeds="false"
+            :center-single="true"
+            :preserve-time="false"
+            :replace-on-navigate="false"
+          ></DepartureGroup>
+          <LoadingSpinner
+            v-if="pinnedWidgets == null"
+            class="loading"
+          ></LoadingSpinner>
+          <p
+            class="empty"
+            v-if="pinnedWidgets != null && pinnedWidgets.length === 0"
+          >
+            Click the pin button above a widget on a stop's page to show it
+            here.
+          </p>
+        </div>
       </div>
-      <div class="spacer"></div>
+      <div class="spacer small"></div>
     </div>
   </main>
 </template>
@@ -239,6 +239,8 @@ main {
     align-self: center;
     text-align: center;
     max-width: 80ch;
+  }
+  .markdown :deep(p) {
     margin-bottom: 1.5rem;
   }
 }
@@ -285,7 +287,7 @@ main {
       }
       .stop-name {
         font-weight: bold;
-        color: --color-ink-100;
+        color: var(--color-ink-100);
       }
     }
   }
