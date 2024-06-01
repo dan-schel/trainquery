@@ -10,55 +10,25 @@ import {
   ParsingResults,
 } from "./provider/auto-disruption-parser";
 import { DisruptionData } from "../../shared/disruptions/processed/disruption-data";
+import { Transaction } from "./transaction";
 
 interface Input {
   readonly incomingDisruptions: ExternalDisruption[];
   readonly parsers: AutoDisruptionParser[];
 
-  readonly disruptions: Disruption[];
-  readonly inbox: ExternalDisruptionInInbox[];
-  readonly rejected: RejectedExternalDisruption[];
+  readonly disruptions: Transaction<Disruption, DisruptionID>;
+  readonly inbox: Transaction<ExternalDisruptionInInbox, ExternalDisruptionID>;
+  readonly rejected: Transaction<
+    RejectedExternalDisruption,
+    ExternalDisruptionID
+  >;
 }
 
-interface RequiredAction {
-  readonly disruptions: {
-    readonly add: Disruption[];
-    readonly update: Disruption[];
-    readonly delete: DisruptionID[];
-  };
-  readonly inbox: {
-    readonly add: ExternalDisruptionInInbox[];
-    readonly delete: ExternalDisruptionID[];
-  };
-  readonly rejected: {
-    readonly delete: ExternalDisruptionID[];
-  };
-}
-
-export function processIncomingDisruptions(input: Input): RequiredAction {
+export function processIncomingDisruptions(input: Input) {
   const { incomingDisruptions, parsers, disruptions, inbox, rejected } = input;
-  const result: RequiredAction = {
-    disruptions: {
-      add: [],
-      update: [],
-      delete: [],
-    },
-    inbox: {
-      add: [],
-      delete: [],
-    },
-    rejected: {
-      delete: [],
-    },
-  };
 
-  // This array is modified as the function runs.
-  const currentDisruptions = [...disruptions];
-
-  // TODO: Run through all disruptions, updating sources if need be.
-  for (let i = 0; i < disruptions.length; i++) {
-    const disruption = disruptions[i];
-
+  // Run through all disruptions, updating sources if need be.
+  for (const disruption of disruptions) {
     const updatedSources = incomingDisruptions.filter((d) =>
       disruption.usesSource(d),
     );
@@ -67,13 +37,10 @@ export function processIncomingDisruptions(input: Input): RequiredAction {
     }
 
     if (disruption.state === "approved" || disruption.state === "curated") {
-      result.disruptions.update.push(disruption.with({ updatedSources }));
+      disruptions.update(disruption.with({ updatedSources }));
     } else {
-      result.disruptions.delete.push(disruption.id);
-
-      // Track that we have deleted the disruption so that in the next step we
-      // re-parse the now orphaned external disruption.
-      currentDisruptions.splice(i, 1);
+      // TODO: This might break the for loop iterator.
+      disruptions.delete(disruption.id);
     }
   }
 
@@ -86,28 +53,28 @@ export function processIncomingDisruptions(input: Input): RequiredAction {
       if (!rejection.overturnsRejection(incoming)) {
         continue;
       } else {
-        result.rejected.delete.push(rejection.id);
+        rejected.delete(rejection.id);
       }
     }
 
     // Check the incoming disruptions isn't already handled, and otherwise add
     // it to the inbox.
     const foundInInbox = inbox.some((i) => i.hasSameID(incoming));
-    const usedAsSource = currentDisruptions.some((d) => d.usesSource(incoming));
+    const usedAsSource = disruptions.some((d) => d.usesSource(incoming));
     if (!foundInInbox && !usedAsSource) {
       const parsingResults = parseDisruption(incoming, parsers);
       if (parsingResults != null) {
         const parsed = parsingResults.disruptions.map((d) =>
           newDisruption(d, incoming, parsingResults.highConfidence),
         );
-        result.disruptions.add.push(...parsed);
+        disruptions.add(...parsed);
       }
 
       // If it wasn't parsed, or parsed with low confidence, sent it to the
       // inbox for human processing.
       if (parsingResults?.highConfidence !== true) {
         const newInboxEntry = new ExternalDisruptionInInbox(incoming);
-        result.inbox.add.push(newInboxEntry);
+        inbox.add(newInboxEntry);
       }
     }
   }
@@ -119,7 +86,8 @@ export function processIncomingDisruptions(input: Input): RequiredAction {
       (d) => !inboxEntry.hasSameID(d),
     );
     if (isDeleted) {
-      result.inbox.delete.push(inboxEntry.id);
+      // TODO: This might break the for loop iterator.
+      inbox.delete(inboxEntry.id);
     }
   }
   for (const rejectedEntry of rejected) {
@@ -127,11 +95,10 @@ export function processIncomingDisruptions(input: Input): RequiredAction {
       (d) => !rejectedEntry.hasSameID(d),
     );
     if (isDeleted) {
-      result.rejected.delete.push(rejectedEntry.id);
+      // TODO: This might break the for loop iterator.
+      rejected.delete(rejectedEntry.id);
     }
   }
-
-  return result;
 }
 
 function parseDisruption(
