@@ -12,6 +12,10 @@ export class ExternalDisruption {
     this.type = this.id.type;
   }
 
+  isOlderVersionOf(other: ExternalDisruption) {
+    return this.id.equals(other.id) && !this.data.matchesContent(other.data);
+  }
+
   static readonly json = z
     .discriminatedUnion("type", [
       z.object({

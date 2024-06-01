@@ -9,7 +9,7 @@ declare const RouteVariantIDBrand: unique symbol;
 declare const ServiceTypeIDBrand: unique symbol;
 declare const TimetableIDBrand: unique symbol;
 declare const StaticServiceIDBrand: unique symbol;
-declare const DisruptionID: unique symbol;
+declare const DisruptionIDBrand: unique symbol;
 
 /** Guaranteed to be a positive integer. */
 export type StopID = number & { [StopIDBrand]: true };
@@ -28,7 +28,7 @@ export type TimetableID = number & { [TimetableIDBrand]: true };
 /** Guaranteed to be a non-empty string. */
 export type StaticServiceID = string & { [StaticServiceIDBrand]: true };
 /** Guaranteed to be a non-empty string. */
-export type DisruptionID = string & { [StaticServiceIDBrand]: true };
+export type DisruptionID = string & { [DisruptionIDBrand]: true };
 
 /** Matches a positive integer. */
 export function isStopID(id: number): id is StopID {

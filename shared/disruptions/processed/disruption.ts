@@ -27,6 +27,10 @@ export class Disruption {
     this.type = data.getType();
   }
 
+  usesSource(external: ExternalDisruption) {
+    return this.sources.some((s) => s.id.equals(external.id));
+  }
+
   static readonly json = z
     .intersection(
       z.discriminatedUnion("type", [

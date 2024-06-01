@@ -1,14 +1,21 @@
 import { z } from "zod";
 import { Disruption } from "../processed/disruption";
 import { ExternalDisruption } from "./external-disruption";
+import { ExternalDisruptionID } from "./external-disruption-id";
 
 export class ExternalDisruptionInInbox {
+  readonly id: ExternalDisruptionID;
+
   constructor(
     readonly disruption: ExternalDisruption,
-
-    // Or might this also include "generated" disruptions?
     readonly provisionalDisruptions: Disruption[],
-  ) {}
+  ) {
+    this.id = disruption.id;
+  }
+
+  hasSameID(other: ExternalDisruption) {
+    return this.id.equals(other.id);
+  }
 
   static readonly json = z
     .object({

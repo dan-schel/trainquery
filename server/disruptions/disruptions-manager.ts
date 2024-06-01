@@ -103,7 +103,7 @@ export class DisruptionsManager {
     for (const parser of this._parsers) {
       const parsed = parser.process(input);
       if (parsed != null) {
-        return parsed;
+        return parsed.disruptions;
       }
     }
     return [];
