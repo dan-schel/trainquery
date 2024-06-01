@@ -25,12 +25,10 @@ export class TypeableTime {
     ampm?: string;
   }) {
     return new TypeableTime(
-      hour === undefined ? this.hour : hour,
-      explicitlyDivided === undefined
-        ? this.explicitlyDivided
-        : explicitlyDivided,
-      minute === undefined ? this.minute : minute,
-      ampm === undefined ? this.ampm : ampm,
+      hour ?? this.hour,
+      explicitlyDivided ?? this.explicitlyDivided,
+      minute ?? this.minute,
+      ampm ?? this.ampm,
     );
   }
 

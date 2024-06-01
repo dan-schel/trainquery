@@ -31,6 +31,28 @@ export class Disruption {
     return this.sources.some((s) => s.id.equals(external.id));
   }
 
+  with({
+    id,
+    data,
+    state,
+    sources,
+    updatedSources,
+  }: {
+    id?: DisruptionID;
+    data?: DisruptionData;
+    state?: DisruptionState;
+    sources?: ExternalDisruption[];
+    updatedSources?: ExternalDisruption[] | null;
+  }) {
+    return new Disruption(
+      id ?? this.id,
+      data ?? this.data,
+      state ?? this.state,
+      sources ?? this.sources,
+      updatedSources === undefined ? this.updatedSources : updatedSources,
+    );
+  }
+
   static readonly json = z
     .intersection(
       z.discriminatedUnion("type", [

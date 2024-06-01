@@ -16,6 +16,10 @@ export class ExternalDisruption {
     return this.id.equals(other.id) && !this.data.matchesContent(other.data);
   }
 
+  isIdenticalTo(other: ExternalDisruption) {
+    return this.id.equals(other.id) && this.data.matchesContent(other.data);
+  }
+
   static readonly json = z
     .discriminatedUnion("type", [
       z.object({

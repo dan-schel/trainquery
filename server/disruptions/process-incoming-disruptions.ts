@@ -1,4 +1,4 @@
-import { uuid } from "@dan-schel/js-utils";
+import { arraysMatch, uuid } from "@dan-schel/js-utils";
 import { ExternalDisruption } from "../../shared/disruptions/external/external-disruption";
 import { ExternalDisruptionID } from "../../shared/disruptions/external/external-disruption-id";
 import { ExternalDisruptionInInbox } from "../../shared/disruptions/external/external-disruption-in-inbox";
@@ -23,6 +23,7 @@ interface Input {
 interface RequiredAction {
   readonly disruptions: {
     readonly add: Disruption[];
+    readonly update: Disruption[];
     readonly delete: DisruptionID[];
   };
   readonly inbox: {
@@ -39,6 +40,7 @@ export function processIncomingDisruptions(input: Input): RequiredAction {
   const result: RequiredAction = {
     disruptions: {
       add: [],
+      update: [],
       delete: [],
     },
     inbox: {
@@ -49,6 +51,31 @@ export function processIncomingDisruptions(input: Input): RequiredAction {
       delete: [],
     },
   };
+
+  // This array is modified as the function runs.
+  const currentDisruptions = [...disruptions];
+
+  // TODO: Run through all disruptions, updating sources if need be.
+  for (let i = 0; i < disruptions.length; i++) {
+    const disruption = disruptions[i];
+
+    const updatedSources = incomingDisruptions.filter((d) =>
+      disruption.usesSource(d),
+    );
+    if (arraysMatch(updatedSources, disruption.sources, identicalMatcher)) {
+      continue;
+    }
+
+    if (disruption.state === "approved" || disruption.state === "curated") {
+      result.disruptions.update.push(disruption.with({ updatedSources }));
+    } else {
+      result.disruptions.delete.push(disruption.id);
+
+      // Track that we have deleted the disruption so that in the next step we
+      // re-parse the now orphaned external disruption.
+      currentDisruptions.splice(i, 1);
+    }
+  }
 
   for (const incoming of incomingDisruptions) {
     // Check whether this external disruption was rejected, and check if it's
@@ -66,7 +93,7 @@ export function processIncomingDisruptions(input: Input): RequiredAction {
     // Check the incoming disruptions isn't already handled, and otherwise add
     // it to the inbox.
     const foundInInbox = inbox.some((i) => i.hasSameID(incoming));
-    const usedAsSource = disruptions.some((d) => d.usesSource(incoming));
+    const usedAsSource = currentDisruptions.some((d) => d.usesSource(incoming));
     if (!foundInInbox && !usedAsSource) {
       const parsingResults = parseDisruption(incoming, parsers);
       if (parsingResults != null) {
@@ -74,20 +101,16 @@ export function processIncomingDisruptions(input: Input): RequiredAction {
           newDisruption(d, incoming, parsingResults.highConfidence),
         );
         result.disruptions.add.push(...parsed);
+      }
 
-        // High confidence parsing avoids creating a inbox entry.
-        if (!parsingResults.highConfidence) {
-          const newInboxEntry = new ExternalDisruptionInInbox(incoming, parsed);
-          result.inbox.add.push(newInboxEntry);
-        }
-      } else {
-        const newInboxEntry = new ExternalDisruptionInInbox(incoming, []);
+      // If it wasn't parsed, or parsed with low confidence, sent it to the
+      // inbox for human processing.
+      if (parsingResults?.highConfidence !== true) {
+        const newInboxEntry = new ExternalDisruptionInInbox(incoming);
         result.inbox.add.push(newInboxEntry);
       }
     }
   }
-
-  // TODO: Run through all disruptions, updating sources if need be.
 
   // Remove external disruptions that have since disappeared from the inbox and
   // rejected list.
@@ -132,4 +155,8 @@ function newDisruption(
   const id = toDisruptionID(uuid());
   const state = highConfidence ? "generated" : "provisional";
   return new Disruption(id, data, state, [source], null);
+}
+
+function identicalMatcher(a: ExternalDisruption, b: ExternalDisruption) {
+  return a.isIdenticalTo(b);
 }

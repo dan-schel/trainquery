@@ -26,6 +26,8 @@ export class InMemoryDisruptionDatabase implements DisruptionDatabase {
     return this._rejected;
   }
 
+  // TODO: Ensure we delete before we add (so replacement works).
+
   // async onNewProposal(actions: RequiredAction): Promise<void> {
   //   actions.addToInbox.forEach((p) => {
   //     this._inbox.push(p);
@@ -69,6 +71,8 @@ export class MongoDisruptionDatabase implements DisruptionDatabase {
     const json = await this._db.dbs.disruptionsRejected.find().toArray();
     return RejectedExternalDisruption.json.array().parse(json);
   }
+
+  // TODO: Ensure we delete before we add (so replacement works).
 
   // async onNewProposal(actions: RequiredAction): Promise<void> {
   //   const promises: Promise<any>[] = [];
