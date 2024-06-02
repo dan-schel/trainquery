@@ -6,10 +6,10 @@ import { toLineID, toStopID } from "../../../../../shared/system/ids";
 import { PtvExternalDisruptionData } from "../../../../../shared/disruptions/external/types/ptv";
 import { PtvDisruptionParser } from "../../../../../server/disruptions/provider/ptv/ptv-disruption-parser";
 import { ExternalDisruptionData } from "../../../../../shared/disruptions/external/external-disruption-data";
-import { ExternalDisruptionID } from "../../../../../shared/disruptions/external/external-disruption";
 import { GenericLineDisruptionData } from "../../../../../shared/disruptions/processed/types/generic-line";
 import { GenericStopDisruptionData } from "../../../../../shared/disruptions/processed/types/generic-stop";
-import { DisruptionData } from "../../../../../shared/disruptions/processed/disruption-data";
+import { ParsingResults } from "../../../../../server/disruptions/provider/auto-disruption-parser";
+import { ExternalDisruptionID } from "../../../../../shared/disruptions/external/external-disruption-id";
 
 const busesLilydaleLine = new PtvExternalDisruptionData(
   311965,
@@ -92,8 +92,8 @@ describe("PtvDisruptionParser", () => {
   });
 });
 
-function expectSingleDisruption(result: DisruptionData[] | null) {
+function expectSingleDisruption(result: ParsingResults | null) {
   assert(result != null, "expected result to be non-null");
-  expect(result.length).toBe(1);
-  return result[0];
+  expect(result.disruptions.length).toBe(1);
+  return result.disruptions[0];
 }

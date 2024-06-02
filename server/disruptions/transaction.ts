@@ -1,7 +1,7 @@
-export class Transaction<T, ID> {
+export class Transaction<T, ID extends string | number> {
   private readonly _current: T[];
   private readonly _initialIDs: Set<ID>;
-  private readonly _modified: Map<ID, T | null>;
+  private readonly _modified: Map<ID, T | undefined>;
 
   constructor(
     initial: T[],
@@ -10,6 +10,10 @@ export class Transaction<T, ID> {
     this._current = [...initial];
     this._modified = new Map();
     this._initialIDs = new Set(initial.map(this.identifier));
+
+    if (this._initialIDs.size !== this._current.length) {
+      throw new Error("Duplicate IDs in initial data.");
+    }
   }
 
   get actions() {
@@ -20,14 +24,16 @@ export class Transaction<T, ID> {
       ),
 
       // Everything in the modified map that was also in the initial set (except
-      // the nulls).
+      // the undefined values).
       update: [...this._modified.entries()]
-        .filter(([id, value]) => this._initialIDs.has(id) && value != null)
+        .filter(
+          ([id, value]) => this._initialIDs.has(id) && value !== undefined,
+        )
         .map(([_, value]) => value),
 
-      // The IDs of everything in the modified map that is null.
-      remove: [...this._modified.entries()]
-        .filter(([_, value]) => value == null)
+      // The IDs of everything in the modified map that is undefined.
+      delete: [...this._modified.entries()]
+        .filter(([_, value]) => value === undefined)
         .map(([id, _]) => id),
     };
   }
@@ -37,7 +43,7 @@ export class Transaction<T, ID> {
   }
 
   [Symbol.iterator]() {
-    return this._current.values();
+    return this.value.values();
   }
 
   add(...items: T[]) {
@@ -59,7 +65,7 @@ export class Transaction<T, ID> {
     const id = this.identifier(item);
     const idx = this._current.findIndex((x) => this.identifier(x) === id);
     if (idx === -1) {
-      throw new Error("Can't update - doesn't exist or was removed.");
+      throw new Error("Can't update - doesn't exist or was deleted.");
     }
     this._current[idx] = item;
     this._modified.set(id, item);
@@ -68,10 +74,14 @@ export class Transaction<T, ID> {
   delete(id: ID) {
     const idx = this._current.findIndex((x) => this.identifier(x) === id);
     if (idx === -1) {
-      throw new Error("Can't remove - doesn't exist or already removed.");
+      throw new Error("Can't delete - doesn't exist or already deleted.");
     }
     this._current.splice(idx, 1);
-    this._modified.set(id, null);
+    if (this._initialIDs.has(id)) {
+      this._modified.set(id, undefined);
+    } else {
+      this._modified.delete(id);
+    }
   }
 
   some(predicate: (item: T) => boolean) {

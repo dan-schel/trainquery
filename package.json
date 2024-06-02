@@ -18,7 +18,7 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "run-s lint-eslint lint-tsc type-check",
     "lint-eslint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "lint-tsc": "tsc --project server/tsconfig.json --noemit && tsc --project shared/tsconfig.json --noemit",
+    "lint-tsc": "tsc --project server/tsconfig.json --noemit && tsc --project shared/tsconfig.json --noemit && tsc --project tests/tsconfig.json --noemit",
     "format": "prettier --write src --write server --write shared --write tests",
     "pretqlint": "esbuild server/linter/main.ts --bundle --platform=node --minify --outfile=dist/lint.js",
     "tqlint": "node dist/lint.js"
