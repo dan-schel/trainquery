@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ExternalDisruption } from "./external-disruption";
-import { ExternalDisruptionID } from "./external-disruption-id";
+import type { ExternalDisruptionID } from "../../system/ids";
 
 // NOTE: The only reason we use ExternalDisruptionInInbox instead of just
 // ExternalDisruption to represent things in the inbox is in case we ever want
@@ -16,7 +16,7 @@ export class ExternalDisruptionInInbox {
   }
 
   hasSameID(other: ExternalDisruption) {
-    return this.id.equals(other.id);
+    return this.id === other.id;
   }
 
   static readonly json = z

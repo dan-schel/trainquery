@@ -10,6 +10,7 @@ declare const ServiceTypeIDBrand: unique symbol;
 declare const TimetableIDBrand: unique symbol;
 declare const StaticServiceIDBrand: unique symbol;
 declare const DisruptionIDBrand: unique symbol;
+declare const ExternalDisruptionIDBrand: unique symbol;
 
 /** Guaranteed to be a positive integer. */
 export type StopID = number & { [StopIDBrand]: true };
@@ -29,6 +30,10 @@ export type TimetableID = number & { [TimetableIDBrand]: true };
 export type StaticServiceID = string & { [StaticServiceIDBrand]: true };
 /** Guaranteed to be a non-empty string. */
 export type DisruptionID = string & { [DisruptionIDBrand]: true };
+/** Guaranteed to be a non-empty string. */
+export type ExternalDisruptionID = string & {
+  [ExternalDisruptionIDBrand]: true;
+};
 
 /** Matches a positive integer. */
 export function isStopID(id: number): id is StopID {
@@ -64,6 +69,10 @@ export function isStaticServiceID(id: string): id is StaticServiceID {
 }
 /** Matches any (non-empty) string. */
 export function isDisruptionID(id: string): id is DisruptionID {
+  return id.length > 0;
+}
+/** Matches any (non-empty) string. */
+export function isExternalDisruptionID(id: string): id is ExternalDisruptionID {
   return id.length > 0;
 }
 
@@ -130,6 +139,13 @@ export function toDisruptionID(id: string): DisruptionID {
   }
   throw badID("disruption", id);
 }
+/** Throws unless provided a non-empty string. */
+export function toExternalDisruptionID(id: string): ExternalDisruptionID {
+  if (isExternalDisruptionID(id)) {
+    return id;
+  }
+  throw badID("external disruption", id);
+}
 
 /** Matches a positive integer. */
 export const StopIDJson = z
@@ -186,6 +202,11 @@ export const DisruptionIDJson = z
   .string()
   .refine((x) => isDisruptionID(x))
   .transform((x) => toDisruptionID(x));
+/** Matches a non-empty string. */
+export const ExternalDisruptionIDJson = z
+  .string()
+  .refine((x) => isExternalDisruptionID(x))
+  .transform((x) => toExternalDisruptionID(x));
 
 function isPositiveInteger(val: number) {
   return Number.isInteger(val) && val >= 1;
@@ -203,7 +224,8 @@ function badID(
     | "service type"
     | "timetable"
     | "static service"
-    | "disruption",
+    | "disruption"
+    | "external disruption",
   val: number | string,
 ): Error {
   return new Error(`Bad ${type} ID: ${val}`);

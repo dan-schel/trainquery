@@ -2,14 +2,17 @@ import { assert, describe, expect, it } from "vitest";
 import { QDate } from "../../../../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../../../../shared/qtime/qdatetime";
 import { QTime } from "../../../../../shared/qtime/qtime";
-import { toLineID, toStopID } from "../../../../../shared/system/ids";
+import {
+  ExternalDisruptionID,
+  toLineID,
+  toStopID,
+} from "../../../../../shared/system/ids";
 import { PtvExternalDisruptionData } from "../../../../../shared/disruptions/external/types/ptv";
 import { PtvDisruptionParser } from "../../../../../server/disruptions/provider/ptv/ptv-disruption-parser";
 import { ExternalDisruptionData } from "../../../../../shared/disruptions/external/external-disruption-data";
 import { GenericLineDisruptionData } from "../../../../../shared/disruptions/processed/types/generic-line";
 import { GenericStopDisruptionData } from "../../../../../shared/disruptions/processed/types/generic-stop";
 import { ParsingResults } from "../../../../../server/disruptions/provider/auto-disruption-parser";
-import { ExternalDisruptionID } from "../../../../../shared/disruptions/external/external-disruption-id";
 
 const busesLilydaleLine = new PtvExternalDisruptionData(
   311965,
@@ -49,6 +52,9 @@ const lineStations = new PtvExternalDisruptionData(
 
 export class TestUnknownExternalDisruptionData extends ExternalDisruptionData {
   getID(): ExternalDisruptionID {
+    throw new Error("Method not implemented.");
+  }
+  getType(): string {
     throw new Error("Method not implemented.");
   }
   getSummary(): string {

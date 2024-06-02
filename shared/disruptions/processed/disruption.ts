@@ -28,7 +28,7 @@ export class Disruption {
   }
 
   usesSource(external: ExternalDisruption) {
-    return this.sources.some((s) => s.id.equals(external.id));
+    return this.sources.some((s) => s.id === external.id);
   }
 
   with({

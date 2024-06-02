@@ -84,6 +84,10 @@ export class Transaction<T, ID extends string | number> {
     }
   }
 
+  deleteItem(item: T) {
+    this.delete(this.identifier(item));
+  }
+
   some(predicate: (item: T) => boolean) {
     return this._current.some(predicate);
   }

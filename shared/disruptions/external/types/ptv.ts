@@ -6,9 +6,10 @@ import {
   LineIDJson,
   type StopID,
   StopIDJson,
+  type ExternalDisruptionID,
+  toExternalDisruptionID,
 } from "../../../system/ids";
 import { ExternalDisruptionData } from "../external-disruption-data";
-import { ExternalDisruptionID } from "../external-disruption-id";
 
 export class PtvExternalDisruptionData extends ExternalDisruptionData {
   static readonly type = "ptv";
@@ -65,10 +66,10 @@ export class PtvExternalDisruptionData extends ExternalDisruptionData {
     );
 
   getID(): ExternalDisruptionID {
-    return new ExternalDisruptionID(
-      PtvExternalDisruptionData.type,
-      this.id.toFixed(),
-    );
+    return toExternalDisruptionID(`${this.getType()}-${this.id.toFixed()}`);
+  }
+  getType(): string {
+    return PtvExternalDisruptionData.type;
   }
   getSummary(): string {
     return this.title;

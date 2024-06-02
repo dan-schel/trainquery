@@ -1,4 +1,4 @@
-import { ExternalDisruptionID } from "../../../shared/disruptions/external/external-disruption-id";
+import { isExternalDisruptionID } from "../../../shared/system/ids";
 import { ServerParams, TrainQuery } from "../../ctx/trainquery";
 import { requireParam } from "../../param-utils";
 
@@ -23,9 +23,8 @@ export async function disruptionsRawApi(
 ): Promise<object> {
   ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
 
-  const encodedDisruptionID = requireParam(params, "id");
-  const id = ExternalDisruptionID.decodeFromUrl(encodedDisruptionID);
-  if (id == null) {
+  const id = requireParam(params, "id");
+  if (!isExternalDisruptionID(id)) {
     return {
       disruption: null,
     };

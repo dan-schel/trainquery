@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ExternalDisruption } from "./external-disruption";
-import { ExternalDisruptionID } from "./external-disruption-id";
+import type { ExternalDisruptionID } from "../../system/ids";
 
 export class RejectedExternalDisruption {
   readonly id: ExternalDisruptionID;
@@ -17,7 +17,7 @@ export class RejectedExternalDisruption {
   }
 
   hasSameID(other: ExternalDisruption) {
-    return this.id.equals(other.id);
+    return this.id === other.id;
   }
 
   static readonly json = z

@@ -51,7 +51,7 @@ onMounted(() => {
         class="disruption"
         :to="{
           name: 'admin-disruptions-raw',
-          params: { id: disruption.id.encodeForUrl() },
+          params: { id: disruption.id },
         }"
       >
         <p>

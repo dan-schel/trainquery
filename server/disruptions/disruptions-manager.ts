@@ -15,10 +15,9 @@ import { ExternalDisruption } from "../../shared/disruptions/external/external-d
 import { Disruption } from "../../shared/disruptions/processed/disruption";
 import { ExternalDisruptionData } from "../../shared/disruptions/external/external-disruption-data";
 import { uuid } from "@dan-schel/js-utils";
-import { toDisruptionID } from "../../shared/system/ids";
+import { ExternalDisruptionID, toDisruptionID } from "../../shared/system/ids";
 import { GenericStopDisruptionData } from "../../shared/disruptions/processed/types/generic-stop";
 import { GenericLineDisruptionData } from "../../shared/disruptions/processed/types/generic-line";
-import { ExternalDisruptionID } from "../../shared/disruptions/external/external-disruption-id";
 
 const disruptionsConsideredFreshMinutes = 15;
 
@@ -121,7 +120,7 @@ export class DisruptionsManager {
   }
 
   getExternalDisruption(id: ExternalDisruptionID): ExternalDisruption | null {
-    return this._externalDisruptions.find((x) => x.id.equals(id)) ?? null;
+    return this._externalDisruptions.find((x) => x.id === id) ?? null;
   }
 
   isStale(): boolean {

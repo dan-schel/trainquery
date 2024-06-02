@@ -1,10 +1,13 @@
 import { arraysMatch, uuid } from "@dan-schel/js-utils";
 import { ExternalDisruption } from "../../shared/disruptions/external/external-disruption";
-import { ExternalDisruptionID } from "../../shared/disruptions/external/external-disruption-id";
 import { ExternalDisruptionInInbox } from "../../shared/disruptions/external/external-disruption-in-inbox";
 import { RejectedExternalDisruption } from "../../shared/disruptions/external/rejected-external-disruption";
 import { Disruption } from "../../shared/disruptions/processed/disruption";
-import { DisruptionID, toDisruptionID } from "../../shared/system/ids";
+import {
+  DisruptionID,
+  ExternalDisruptionID,
+  toDisruptionID,
+} from "../../shared/system/ids";
 import {
   AutoDisruptionParser,
   ParsingResults,
@@ -39,7 +42,6 @@ export function processIncomingDisruptions(input: Input) {
     if (disruption.state === "approved" || disruption.state === "curated") {
       disruptions.update(disruption.with({ updatedSources }));
     } else {
-      // TODO: This might break the for loop iterator.
       disruptions.delete(disruption.id);
     }
   }
@@ -86,7 +88,6 @@ export function processIncomingDisruptions(input: Input) {
       (d) => !inboxEntry.hasSameID(d),
     );
     if (isDeleted) {
-      // TODO: This might break the for loop iterator.
       inbox.delete(inboxEntry.id);
     }
   }
@@ -95,7 +96,6 @@ export function processIncomingDisruptions(input: Input) {
       (d) => !rejectedEntry.hasSameID(d),
     );
     if (isDeleted) {
-      // TODO: This might break the for loop iterator.
       rejected.delete(rejectedEntry.id);
     }
   }
