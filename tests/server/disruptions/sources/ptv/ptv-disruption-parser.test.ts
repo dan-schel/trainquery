@@ -57,9 +57,6 @@ export class TestUnknownExternalDisruptionData extends ExternalDisruptionData {
   getType(): string {
     throw new Error("Method not implemented.");
   }
-  getSummary(): string {
-    throw new Error("Method not implemented.");
-  }
   getStarts(): QUtcDateTime | null {
     throw new Error("Method not implemented.");
   }

@@ -1,5 +1,8 @@
 import { QUtcDateTime } from "../../qtime/qdatetime";
-import type { ExternalDisruptionID } from "../../system/ids";
+import {
+  toExternalDisruptionID,
+  type ExternalDisruptionID,
+} from "../../system/ids";
 
 export abstract class ExternalDisruptionData {
   /**
@@ -10,9 +13,12 @@ export abstract class ExternalDisruptionData {
   abstract getID(): ExternalDisruptionID;
 
   abstract getType(): string;
-  abstract getSummary(): string;
   abstract getStarts(): QUtcDateTime | null;
   abstract getEnds(): QUtcDateTime | null;
 
   abstract matchesContent(other: ExternalDisruptionData): boolean;
+
+  protected _createID(id: string): ExternalDisruptionID {
+    return toExternalDisruptionID(`${this.getType()}-${id}`);
+  }
 }

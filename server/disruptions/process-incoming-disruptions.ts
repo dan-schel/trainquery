@@ -25,6 +25,8 @@ interface Input {
     RejectedExternalDisruption,
     ExternalDisruptionID
   >;
+
+  readonly identifier?: (data: DisruptionData) => DisruptionID;
 }
 
 export function processIncomingDisruptions(input: Input) {
@@ -67,7 +69,12 @@ export function processIncomingDisruptions(input: Input) {
       const parsingResults = parseDisruption(incoming, parsers);
       if (parsingResults != null) {
         const parsed = parsingResults.disruptions.map((d) =>
-          newDisruption(d, incoming, parsingResults.highConfidence),
+          newDisruption(
+            d,
+            incoming,
+            parsingResults.highConfidence,
+            input.identifier ?? randomIdentifier,
+          ),
         );
         disruptions.add(...parsed);
       }
@@ -118,12 +125,17 @@ function newDisruption(
   data: DisruptionData,
   source: ExternalDisruption,
   highConfidence: boolean,
+  identifier: (data: DisruptionData) => DisruptionID,
 ) {
-  const id = toDisruptionID(uuid());
+  const id = identifier(data);
   const state = highConfidence ? "generated" : "provisional";
   return new Disruption(id, data, state, [source], null);
 }
 
 function identicalMatcher(a: ExternalDisruption, b: ExternalDisruption) {
   return a.isIdenticalTo(b);
+}
+
+function randomIdentifier(_data: DisruptionData): DisruptionID {
+  return toDisruptionID(uuid());
 }

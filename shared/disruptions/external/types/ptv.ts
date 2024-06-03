@@ -66,13 +66,10 @@ export class PtvExternalDisruptionData extends ExternalDisruptionData {
     );
 
   getID(): ExternalDisruptionID {
-    return toExternalDisruptionID(`${this.getType()}-${this.id.toFixed()}`);
+    return this._createID(this.id.toFixed());
   }
   getType(): string {
     return PtvExternalDisruptionData.type;
-  }
-  getSummary(): string {
-    return this.title;
   }
   getStarts(): QUtcDateTime | null {
     return this.starts;
