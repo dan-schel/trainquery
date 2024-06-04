@@ -18,7 +18,12 @@ export abstract class ExternalDisruptionData {
 
   abstract matchesContent(other: ExternalDisruptionData): boolean;
 
-  protected _createID(id: string): ExternalDisruptionID {
+  // TODO: This should be a protected method, but for some reason if I make it a
+  // protected method, the places where it's used as a value in a Vue ref no
+  // longer have this method. Try making it protected and run "npm run lint".
+  // Discussed here: https://github.com/vuejs/core/issues/3815. Might be fixed
+  // in a newer version of Vue, or there might be a workaround.
+  _createID(id: string): ExternalDisruptionID {
     return toExternalDisruptionID(`${this.getType()}-${id}`);
   }
 }

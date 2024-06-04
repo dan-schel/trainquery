@@ -7,7 +7,6 @@ import {
   type StopID,
   StopIDJson,
   type ExternalDisruptionID,
-  toExternalDisruptionID,
 } from "../../../system/ids";
 import { ExternalDisruptionData } from "../external-disruption-data";
 

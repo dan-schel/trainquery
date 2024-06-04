@@ -93,6 +93,7 @@ export class AdminLogger extends Logger {
       if (level === "warn") {
         console.warn(chalk.yellow(text));
       } else {
+        // eslint-disable-next-line no-console
         console.log(text);
       }
     }

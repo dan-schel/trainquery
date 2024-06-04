@@ -68,6 +68,8 @@ export async function departuresApi(
         ),
       );
     } else {
+      // TODO: Fall back on static ttbl data.
+      // eslint-disable-next-line no-console
       console.log("Departures empty since GTFS is not loaded yet.");
     }
   }
