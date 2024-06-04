@@ -259,24 +259,24 @@ describe("processIncomingDisruptions", () => {
   });
 
   it("it should regenerate auto-parsed disruptions if their sources are updated", () => {
-    const oldDisruption1 = new ExternalDisruption(
+    const oldSource = new ExternalDisruption(
       new DummyExternalDisruptionData("1", "old-content", false),
     );
-    const newDisruption1 = new ExternalDisruption(
+    const newSource = new ExternalDisruption(
       new DummyExternalDisruptionData("1", "new-content", false),
     );
 
-    const incomingDisruptions = [newDisruption1];
+    const incomingDisruptions = [newSource];
     const disruptions = createDisruptions([
       new Disruption(
         toDisruptionID("whatever"),
         new DummyDisruptionData("idk", "content"),
         "provisional",
-        [oldDisruption1],
+        [oldSource],
         null,
       ),
     ]);
-    const inbox = createInbox([new ExternalDisruptionInInbox(oldDisruption1)]);
+    const inbox = createInbox([new ExternalDisruptionInInbox(oldSource)]);
     const rejected = createRejected([]);
 
     processIncomingDisruptions({
@@ -288,7 +288,6 @@ describe("processIncomingDisruptions", () => {
       identifier,
     });
 
-    // TODO: This test fails - looks like I need to fix processIncomingDisruptions.
     expectActions(disruptions, inbox, rejected, {
       disruptions: {
         add: [
@@ -296,21 +295,152 @@ describe("processIncomingDisruptions", () => {
             toDisruptionID("1-1"),
             new DummyDisruptionData("1-1", "new-content"),
             "provisional",
-            [newDisruption1],
+            [newSource],
             null,
           ),
         ],
         delete: [toDisruptionID("whatever")],
       },
-      inbox: { update: [new ExternalDisruptionInInbox(newDisruption1)] },
+      inbox: { update: [new ExternalDisruptionInInbox(newSource)] },
     });
   });
 
-  // TODO: it should track source updates on manually-curated disruptions
+  it("it should track source updates on manually-curated disruptions", () => {
+    const oldSource = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "old-content", false),
+    );
+    const newSource = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "new-content", false),
+    );
 
-  // TODO: it should ignore rejected disruptions
+    const incomingDisruptions = [newSource];
+    const disruptions = createDisruptions([
+      new Disruption(
+        toDisruptionID("whatever"),
+        new DummyDisruptionData("idk", "content"),
+        "curated",
+        [oldSource],
+        null,
+      ),
+    ]);
+    const inbox = createInbox([]);
+    const rejected = createRejected([]);
 
-  // TODO: it should resurface rejected disruptions if they're updated
+    processIncomingDisruptions({
+      incomingDisruptions,
+      parsers,
+      disruptions,
+      inbox,
+      rejected,
+      identifier,
+    });
 
-  // TODO: it should ignore updated disruptions if they're permanently rejected
+    expectActions(disruptions, inbox, rejected, {
+      disruptions: {
+        update: [
+          new Disruption(
+            toDisruptionID("whatever"),
+            new DummyDisruptionData("idk", "content"),
+            "curated",
+            [oldSource],
+            [newSource],
+          ),
+        ],
+      },
+    });
+  });
+
+  it("it should ignore rejected disruptions", () => {
+    const incoming = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "content", false),
+    );
+
+    const incomingDisruptions = [incoming];
+    const disruptions = createDisruptions([]);
+    const inbox = createInbox([]);
+    const rejected = createRejected([
+      new RejectedExternalDisruption(incoming, true),
+    ]);
+
+    processIncomingDisruptions({
+      incomingDisruptions,
+      parsers,
+      disruptions,
+      inbox,
+      rejected,
+      identifier,
+    });
+
+    expectActions(disruptions, inbox, rejected, {});
+  });
+
+  it("it should resurface rejected disruptions if they're updated", () => {
+    const oldSource = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "old-content", false),
+    );
+    const newSource = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "new-content", false),
+    );
+
+    const incomingDisruptions = [newSource];
+    const disruptions = createDisruptions([]);
+    const inbox = createInbox([]);
+    const rejected = createRejected([
+      new RejectedExternalDisruption(oldSource, true),
+    ]);
+
+    processIncomingDisruptions({
+      incomingDisruptions,
+      parsers,
+      disruptions,
+      inbox,
+      rejected,
+      identifier,
+    });
+
+    expectActions(disruptions, inbox, rejected, {
+      disruptions: {
+        add: [
+          new Disruption(
+            toDisruptionID("1-1"),
+            new DummyDisruptionData("1-1", "new-content"),
+            "provisional",
+            [newSource],
+            null,
+          ),
+        ],
+      },
+      inbox: { add: [new ExternalDisruptionInInbox(newSource)] },
+      rejected: {
+        delete: [oldSource.id],
+      },
+    });
+  });
+
+  it("it should ignore updated disruptions if they're permanently rejected", () => {
+    const oldSource = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "old-content", false),
+    );
+    const newSource = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "new-content", false),
+    );
+
+    const incomingDisruptions = [newSource];
+    const disruptions = createDisruptions([]);
+    const inbox = createInbox([]);
+    const rejected = createRejected([
+      new RejectedExternalDisruption(oldSource, false),
+    ]);
+
+    processIncomingDisruptions({
+      incomingDisruptions,
+      parsers,
+      disruptions,
+      inbox,
+      rejected,
+      identifier,
+    });
+
+    expectActions(disruptions, inbox, rejected, {});
+  });
 });
