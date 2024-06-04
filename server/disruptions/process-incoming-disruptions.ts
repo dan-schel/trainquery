@@ -48,6 +48,27 @@ export function processIncomingDisruptions(input: Input) {
     }
   }
 
+  // Remove external disruptions that have since disappeared from the inbox and
+  // rejected list.
+  for (const inboxEntry of inbox) {
+    // Delete inbox entries even when updated, so the below code can re-generate
+    // disruptions for it.
+    const isDeleted = incomingDisruptions.every(
+      (d) => !inboxEntry.disruption.isIdenticalTo(d),
+    );
+    if (isDeleted) {
+      inbox.delete(inboxEntry.id);
+    }
+  }
+  for (const rejectedEntry of rejected) {
+    const isDeleted = incomingDisruptions.every(
+      (d) => !rejectedEntry.hasSameID(d),
+    );
+    if (isDeleted) {
+      rejected.delete(rejectedEntry.id);
+    }
+  }
+
   for (const incoming of incomingDisruptions) {
     // Check whether this external disruption was rejected, and check if it's
     // content has since changed, and whether that means this disruption should
@@ -85,25 +106,6 @@ export function processIncomingDisruptions(input: Input) {
         const newInboxEntry = new ExternalDisruptionInInbox(incoming);
         inbox.add(newInboxEntry);
       }
-    }
-  }
-
-  // Remove external disruptions that have since disappeared from the inbox and
-  // rejected list.
-  for (const inboxEntry of inbox) {
-    const isDeleted = incomingDisruptions.every(
-      (d) => !inboxEntry.hasSameID(d),
-    );
-    if (isDeleted) {
-      inbox.delete(inboxEntry.id);
-    }
-  }
-  for (const rejectedEntry of rejected) {
-    const isDeleted = incomingDisruptions.every(
-      (d) => !rejectedEntry.hasSameID(d),
-    );
-    if (isDeleted) {
-      rejected.delete(rejectedEntry.id);
     }
   }
 }

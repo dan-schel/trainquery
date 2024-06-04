@@ -269,9 +269,6 @@ describe("processIncomingDisruptions", () => {
     const incomingDisruptions = [newDisruption1];
     const disruptions = createDisruptions([
       new Disruption(
-        // TODO: Change this ID, does it become an update?
-        // I think it's fine to leave the ID as "whatever", since in production
-        // it will be a uuid that gets regenerated.
         toDisruptionID("whatever"),
         new DummyDisruptionData("idk", "content"),
         "provisional",
