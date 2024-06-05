@@ -29,6 +29,15 @@ interface Input {
   readonly identifier?: (data: DisruptionData) => DisruptionID;
 }
 
+const deletionStrategies = {
+  provisional: "on-any-source-update",
+  generated: "on-any-source-update",
+  "approved-autodelete": "on-all-sources-removed",
+  "curated-autodelete": "on-all-sources-removed",
+  approved: "never",
+  curated: "never",
+} as const;
+
 export function processIncomingDisruptions(input: Input) {
   const { incomingDisruptions, parsers, disruptions, inbox, rejected } = input;
 
@@ -41,10 +50,16 @@ export function processIncomingDisruptions(input: Input) {
       continue;
     }
 
-    if (disruption.state === "approved" || disruption.state === "curated") {
-      disruptions.update(disruption.with({ updatedSources }));
-    } else {
+    const deletionStrategy = deletionStrategies[disruption.state];
+    if (deletionStrategy === "on-any-source-update") {
       disruptions.delete(disruption.id);
+    } else if (
+      deletionStrategy === "on-all-sources-removed" &&
+      updatedSources.length === 0
+    ) {
+      disruptions.delete(disruption.id);
+    } else {
+      disruptions.update(disruption.with({ updatedSources }));
     }
   }
 

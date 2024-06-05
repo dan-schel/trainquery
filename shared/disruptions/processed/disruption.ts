@@ -10,6 +10,8 @@ export const DisruptionStates = [
   "generated",
   "approved",
   "curated",
+  "approved-autodelete",
+  "curated-autodelete",
 ] as const;
 export type DisruptionState = (typeof DisruptionStates)[number];
 export const DisruptionStateJson = z.enum(DisruptionStates);

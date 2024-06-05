@@ -305,21 +305,66 @@ describe("processIncomingDisruptions", () => {
     });
   });
 
-  it("it should track source updates on manually-curated disruptions", () => {
+  it("it should delete auto-parsed disruptions if their sources disappear", () => {
     const oldSource = new ExternalDisruption(
       new DummyExternalDisruptionData("1", "old-content", false),
     );
-    const newSource = new ExternalDisruption(
-      new DummyExternalDisruptionData("1", "new-content", false),
-    );
 
-    const incomingDisruptions = [newSource];
+    const incomingDisruptions: ExternalDisruption[] = [];
     const disruptions = createDisruptions([
       new Disruption(
         toDisruptionID("whatever"),
         new DummyDisruptionData("idk", "content"),
-        "curated",
+        "provisional",
         [oldSource],
+        null,
+      ),
+    ]);
+    const inbox = createInbox([new ExternalDisruptionInInbox(oldSource)]);
+    const rejected = createRejected([]);
+
+    processIncomingDisruptions({
+      incomingDisruptions,
+      parsers,
+      disruptions,
+      inbox,
+      rejected,
+      identifier,
+    });
+
+    expectActions(disruptions, inbox, rejected, {
+      disruptions: {
+        delete: [toDisruptionID("whatever")],
+      },
+      inbox: { delete: [oldSource.id] },
+    });
+  });
+
+  it("it should track source updates on manually-curated disruptions", () => {
+    const oldSource1 = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "old-content", false),
+    );
+    const newSource1 = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "new-content", false),
+    );
+    const oldSource2 = new ExternalDisruption(
+      new DummyExternalDisruptionData("2", "old-content", false),
+    );
+
+    const incomingDisruptions = [newSource1];
+    const disruptions = createDisruptions([
+      new Disruption(
+        toDisruptionID("1"),
+        new DummyDisruptionData("idk", "content"),
+        "curated",
+        [oldSource1],
+        null,
+      ),
+      new Disruption(
+        toDisruptionID("2"),
+        new DummyDisruptionData("idk", "content"),
+        "curated",
+        [oldSource2],
         null,
       ),
     ]);
@@ -339,11 +384,96 @@ describe("processIncomingDisruptions", () => {
       disruptions: {
         update: [
           new Disruption(
-            toDisruptionID("whatever"),
+            toDisruptionID("1"),
             new DummyDisruptionData("idk", "content"),
             "curated",
-            [oldSource],
-            [newSource],
+            [oldSource1],
+            [newSource1],
+          ),
+          new Disruption(
+            toDisruptionID("2"),
+            new DummyDisruptionData("idk", "content"),
+            "curated",
+            [oldSource2],
+            [],
+          ),
+        ],
+      },
+    });
+  });
+
+  it("it should delete auto-delete disruptions when all sources disappear", () => {
+    const oldSource = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "content", false),
+    );
+    const incomingDisruptions: ExternalDisruption[] = [];
+    const disruptions = createDisruptions([
+      new Disruption(
+        toDisruptionID("1"),
+        new DummyDisruptionData("idk", "content"),
+        "curated-autodelete",
+        [oldSource],
+        null,
+      ),
+    ]);
+    const inbox = createInbox([]);
+    const rejected = createRejected([]);
+
+    processIncomingDisruptions({
+      incomingDisruptions,
+      parsers,
+      disruptions,
+      inbox,
+      rejected,
+      identifier,
+    });
+
+    expectActions(disruptions, inbox, rejected, {
+      disruptions: {
+        delete: [toDisruptionID("1")],
+      },
+    });
+  });
+
+  it("it should retain auto-delete disruptions if some sources persist", () => {
+    const oldSource = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "content", false),
+    );
+    const currentSource = new ExternalDisruption(
+      new DummyExternalDisruptionData("2", "content", false),
+    );
+
+    const incomingDisruptions = [currentSource];
+    const disruptions = createDisruptions([
+      new Disruption(
+        toDisruptionID("1"),
+        new DummyDisruptionData("idk", "content"),
+        "curated-autodelete",
+        [oldSource, currentSource],
+        null,
+      ),
+    ]);
+    const inbox = createInbox([]);
+    const rejected = createRejected([]);
+
+    processIncomingDisruptions({
+      incomingDisruptions,
+      parsers,
+      disruptions,
+      inbox,
+      rejected,
+      identifier,
+    });
+
+    expectActions(disruptions, inbox, rejected, {
+      disruptions: {
+        update: [
+          new Disruption(
+            toDisruptionID("1"),
+            new DummyDisruptionData("idk", "content"),
+            "curated-autodelete",
+            [oldSource, currentSource],
+            [currentSource],
           ),
         ],
       },
