@@ -411,7 +411,7 @@ describe("processIncomingDisruptions", () => {
       new Disruption(
         toDisruptionID("1"),
         new DummyDisruptionData("idk", "content"),
-        "curated-autodelete",
+        "curated-auto-delete",
         [oldSource],
         null,
       ),
@@ -448,7 +448,7 @@ describe("processIncomingDisruptions", () => {
       new Disruption(
         toDisruptionID("1"),
         new DummyDisruptionData("idk", "content"),
-        "curated-autodelete",
+        "curated-auto-delete",
         [oldSource, currentSource],
         null,
       ),
@@ -471,7 +471,7 @@ describe("processIncomingDisruptions", () => {
           new Disruption(
             toDisruptionID("1"),
             new DummyDisruptionData("idk", "content"),
-            "curated-autodelete",
+            "curated-auto-delete",
             [oldSource, currentSource],
             [currentSource],
           ),

@@ -32,8 +32,8 @@ interface Input {
 const deletionStrategies = {
   provisional: "on-any-source-update",
   generated: "on-any-source-update",
-  "approved-autodelete": "on-all-sources-removed",
-  "curated-autodelete": "on-all-sources-removed",
+  "approved-auto-delete": "on-all-sources-removed",
+  "curated-auto-delete": "on-all-sources-removed",
   approved: "never",
   curated: "never",
 } as const;
