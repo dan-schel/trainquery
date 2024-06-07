@@ -10,7 +10,7 @@ function expectActions(
   transaction: Transaction<string, number>,
   actions: { add?: string[]; update?: string[]; delete?: number[] },
 ) {
-  expect(transaction.actions).toEqual({
+  expect(transaction.getActions()).toEqual({
     add: actions.add ?? [],
     update: actions.update ?? [],
     delete: actions.delete ?? [],
@@ -22,7 +22,7 @@ describe("Transaction", () => {
     it("should add a single item", () => {
       const transaction = new Transaction(["0-001"], identify);
       transaction.add("1-001");
-      expect(transaction.value).toEqual(["0-001", "1-001"]);
+      expect(transaction.getValues()).toEqual(["0-001", "1-001"]);
       expectActions(transaction, { add: ["1-001"] });
     });
 
@@ -35,7 +35,7 @@ describe("Transaction", () => {
       const transaction = new Transaction(["0-001"], identify);
       transaction.delete(0);
       transaction.add("0-001");
-      expect(transaction.value).toEqual(["0-001"]);
+      expect(transaction.getValues()).toEqual(["0-001"]);
 
       // It's not smart enough to know that the value didn't actually change.
       expectActions(transaction, { update: ["0-001"] });
@@ -46,7 +46,7 @@ describe("Transaction", () => {
     it("should delete a single item", () => {
       const transaction = new Transaction(["0-001"], identify);
       transaction.delete(0);
-      expect(transaction.value).toEqual([]);
+      expect(transaction.getValues()).toEqual([]);
       expectActions(transaction, { delete: [0] });
     });
 
@@ -59,7 +59,7 @@ describe("Transaction", () => {
       const transaction = new Transaction([], identify);
       transaction.add("0-001");
       transaction.delete(0);
-      expect(transaction.value).toEqual([]);
+      expect(transaction.getValues()).toEqual([]);
       expectActions(transaction, {});
     });
   });
@@ -68,7 +68,7 @@ describe("Transaction", () => {
     it("should update a single item", () => {
       const transaction = new Transaction(["0-001"], identify);
       transaction.update("0-002");
-      expect(transaction.value).toEqual(["0-002"]);
+      expect(transaction.getValues()).toEqual(["0-002"]);
       expectActions(transaction, { update: ["0-002"] });
     });
 
@@ -76,7 +76,7 @@ describe("Transaction", () => {
       const transaction = new Transaction([], identify);
       transaction.add("0-001");
       transaction.update("0-002");
-      expect(transaction.value).toEqual(["0-002"]);
+      expect(transaction.getValues()).toEqual(["0-002"]);
       expectActions(transaction, { add: ["0-002"] });
     });
 
@@ -89,7 +89,7 @@ describe("Transaction", () => {
       const transaction = new Transaction(["0-001"], identify);
       transaction.update("0-002");
       transaction.delete(0);
-      expect(transaction.value).toEqual([]);
+      expect(transaction.getValues()).toEqual([]);
       expectActions(transaction, { delete: [0] });
     });
   });
@@ -117,7 +117,7 @@ describe("Transaction", () => {
           transaction.delete(identify(value));
         }
       }
-      expect(transaction.value).toEqual(["0-001", "3-001"]);
+      expect(transaction.getValues()).toEqual(["0-001", "3-001"]);
       expectActions(transaction, { delete: [1, 2, 4] });
     });
   });

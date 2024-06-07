@@ -108,17 +108,17 @@ function expectActions(
     };
   },
 ) {
-  expect(disruptions.actions).toEqual({
+  expect(disruptions.getActions()).toEqual({
     add: actions.disruptions?.add ?? [],
     update: actions.disruptions?.update ?? [],
     delete: actions.disruptions?.delete ?? [],
   });
-  expect(inbox.actions).toEqual({
+  expect(inbox.getActions()).toEqual({
     add: actions.inbox?.add ?? [],
     update: actions.inbox?.update ?? [],
     delete: actions.inbox?.delete ?? [],
   });
-  expect(rejected.actions).toEqual({
+  expect(rejected.getActions()).toEqual({
     add: actions.rejected?.add ?? [],
     update: actions.rejected?.update ?? [],
     delete: actions.rejected?.delete ?? [],

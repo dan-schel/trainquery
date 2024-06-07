@@ -2,19 +2,28 @@ import { Disruption } from "../../shared/disruptions/processed/disruption";
 import { ExternalDisruptionInInbox } from "../../shared/disruptions/external/external-disruption-in-inbox";
 import { RejectedExternalDisruption } from "../../shared/disruptions/external/rejected-external-disruption";
 import { TrainQueryDB } from "../ctx/trainquery-db";
+import { Transaction } from "./transaction";
+import { DisruptionID, ExternalDisruptionID } from "../../shared/system/ids";
+import { Collection, Document } from "mongodb";
+
+export type DisruptionTransactions = {
+  disruptions: Transaction<Disruption, DisruptionID>;
+  inbox: Transaction<ExternalDisruptionInInbox, ExternalDisruptionID>;
+  rejected: Transaction<RejectedExternalDisruption, ExternalDisruptionID>;
+};
 
 export interface DisruptionDatabase {
   getDisruptions(): Promise<Disruption[]>;
   getInbox(): Promise<ExternalDisruptionInInbox[]>;
   getRejected(): Promise<RejectedExternalDisruption[]>;
 
-  // onNewProposal(actions: RequiredAction): Promise<void>;
+  onProcessedIncoming(transactions: DisruptionTransactions): Promise<void>;
 }
 
 export class InMemoryDisruptionDatabase implements DisruptionDatabase {
-  readonly _disruptions: Disruption[] = [];
-  readonly _inbox: ExternalDisruptionInInbox[] = [];
-  readonly _rejected: RejectedExternalDisruption[] = [];
+  private readonly _disruptions: Disruption[] = [];
+  private readonly _inbox: ExternalDisruptionInInbox[] = [];
+  private readonly _rejected: RejectedExternalDisruption[] = [];
 
   async getDisruptions(): Promise<Disruption[]> {
     return this._disruptions;
@@ -26,34 +35,16 @@ export class InMemoryDisruptionDatabase implements DisruptionDatabase {
     return this._rejected;
   }
 
-  // TODO: Ensure we delete before we add (so replacement works).
+  async onProcessedIncoming(transactions: DisruptionTransactions) {
+    this._disruptions.splice(0, this._disruptions.length);
+    this._disruptions.push(...transactions.disruptions.getValues());
 
-  // async onNewProposal(actions: RequiredAction): Promise<void> {
-  //   actions.addToInbox.forEach((p) => {
-  //     this._inbox.push(p);
-  //   });
-  //   actions.removeFromInbox.forEach((p) => {
-  //     const idx = this._inbox.findIndex((x) => x.id.equals(p));
-  //     if (idx !== -1) {
-  //       this._inbox.splice(idx, 1);
-  //     }
-  //   });
-  //   actions.removeFromHandled.forEach((p) => {
-  //     const idx = this._handled.findIndex((x) => x.id.equals(p));
-  //     if (idx !== -1) {
-  //       this._handled.splice(idx, 1);
-  //     }
-  //   });
-  //   actions.addDisruptions.forEach((d) => {
-  //     this._disruptions.push(d);
-  //   });
-  //   actions.deleteDisruptions.forEach((d) => {
-  //     const idx = this._disruptions.findIndex((y) => y.id === d);
-  //     if (idx !== -1) {
-  //       this._disruptions.splice(idx, 1);
-  //     }
-  //   });
-  // }
+    this._inbox.splice(0, this._disruptions.length);
+    this._inbox.push(...transactions.inbox.getValues());
+
+    this._rejected.splice(0, this._disruptions.length);
+    this._rejected.push(...transactions.rejected.getValues());
+  }
 }
 
 export class MongoDisruptionDatabase implements DisruptionDatabase {
@@ -72,37 +63,41 @@ export class MongoDisruptionDatabase implements DisruptionDatabase {
     return RejectedExternalDisruption.json.array().parse(json);
   }
 
-  // TODO: Ensure we delete before we add (so replacement works).
+  async onProcessedIncoming(
+    transactions: DisruptionTransactions,
+  ): Promise<void> {
+    // TODO: This is all done in series. It's probably fine since you wouldn't
+    // expect the transactions to have many changes (unless the external API)
+    // has a ton of new disruptions! Maybe we should do it in parallel though?
+    // Does it even make a difference to how MongoDB works? Dunno.
+    await this._applyTransaction(
+      transactions.disruptions,
+      this._db.dbs.disruptions,
+    );
+    await this._applyTransaction(
+      transactions.inbox,
+      this._db.dbs.disruptionsInInbox,
+    );
+    await this._applyTransaction(
+      transactions.rejected,
+      this._db.dbs.disruptionsRejected,
+    );
+  }
 
-  // async onNewProposal(actions: RequiredAction): Promise<void> {
-  //   const promises: Promise<any>[] = [];
-
-  //   promises.push(
-  //     ...actions.addToInbox.map((p) =>
-  //       this._db.dbs.disruptionInbox.insertOne(proposedDisruptionToJson(p)),
-  //     ),
-  //   );
-  //   promises.push(
-  //     ...actions.removeFromInbox.map((p) => {
-  //       return this._db.dbs.disruptionInbox.deleteOne({ id: p.toJSON() });
-  //     }),
-  //   );
-  //   promises.push(
-  //     ...actions.removeFromHandled.map((p) => {
-  //       return this._db.dbs.disruptionsHandled.deleteOne({ id: p.toJSON() });
-  //     }),
-  //   );
-  //   promises.push(
-  //     ...actions.addDisruptions.map((d) => {
-  //       return this._db.dbs.disruptions.insertOne(disruptionToJson(d));
-  //     }),
-  //   );
-  //   promises.push(
-  //     ...actions.deleteDisruptions.map((d) => {
-  //       return this._db.dbs.disruptions.deleteOne({ id: d });
-  //     }),
-  //   );
-
-  //   await Promise.all(promises);
-  // }
+  private async _applyTransaction(
+    transaction: Transaction<any, any>,
+    table: Collection<Document>,
+  ) {
+    // TODO: See comment about "done in series" above.
+    const actions = transaction.getActions();
+    for (const d of actions.add) {
+      await table.insertOne({ id: d });
+    }
+    for (const d of actions.update) {
+      await table.replaceOne({ id: d.id }, d);
+    }
+    for (const d of actions.delete) {
+      await table.deleteOne({ id: d });
+    }
+  }
 }

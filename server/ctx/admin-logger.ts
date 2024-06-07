@@ -12,6 +12,8 @@ import {
   AdminLogWindow,
 } from "../../shared/admin/logs";
 import { Logger } from "./logger";
+import { DisruptionTransactions } from "../disruptions/disruptions-database";
+import { Transaction } from "../disruptions/transaction";
 
 /** Flush logs out to database every 10 seconds. */
 const flushIntervalMillis = 10 * 1000;
@@ -267,5 +269,51 @@ export class AdminLogger extends Logger {
       "disruptions",
       `Failed to fetch disruptions from "${source}". ${err}`,
     );
+  }
+  logDisruptionProvidersNotReady(numUnavailable: number): void {
+    this._log(
+      "warn",
+      "disruptions",
+      `Waiting for data from ${numUnavailable} ${
+        numUnavailable === 1 ? "provider" : "providers"
+      } before processing new external disruptions.`,
+    );
+  }
+  logDisruptionTransactions(transactions: DisruptionTransactions): void {
+    const statements: string[] = [];
+
+    const forAction = (
+      array: unknown[],
+      verb: string,
+      singular: string,
+      plural: string,
+    ) => {
+      if (array.length > 0) {
+        const noun = array.length === 1 ? singular : plural;
+        statements.push(`${verb} ${array.length.toFixed()} ${noun}`);
+      }
+    };
+
+    const forCollection = (
+      transaction: Transaction<any, any>,
+      singular: string,
+      plural: string,
+    ) => {
+      const actions = transaction.getActions();
+      forAction(actions.add, "Added", singular, plural);
+      forAction(actions.update, "Updated", singular, plural);
+      forAction(actions.delete, "Deleted", singular, plural);
+    };
+
+    forCollection(transactions.disruptions, "disruption", "disruptions");
+    forCollection(transactions.inbox, "inbox entry", "inbox entries");
+    forCollection(transactions.rejected, "rejected entry", "rejected entries");
+
+    if (statements.length === 0) {
+      return;
+    }
+
+    const bulletPoints = statements.map((x) => `  - ${x}`).join("\n");
+    this._log("info", "disruptions", `Processed disruptions:\n${bulletPoints}`);
   }
 }

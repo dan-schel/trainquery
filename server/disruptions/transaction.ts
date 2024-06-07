@@ -16,7 +16,7 @@ export class Transaction<T, ID extends string | number> {
     }
   }
 
-  get actions() {
+  getActions() {
     return {
       // Everything in the current array that wasn't in the initial set.
       add: this._current.filter(
@@ -27,7 +27,7 @@ export class Transaction<T, ID extends string | number> {
       // the undefined values).
       update: [...this._modified.entries()]
         .filter(
-          ([id, value]) => this._initialIDs.has(id) && value !== undefined,
+          (x): x is [ID, T] => this._initialIDs.has(x[0]) && x[1] !== undefined,
         )
         .map(([_, value]) => value),
 
@@ -38,12 +38,12 @@ export class Transaction<T, ID extends string | number> {
     };
   }
 
-  get value() {
+  getValues() {
     return [...this._current];
   }
 
   [Symbol.iterator]() {
-    return this.value.values();
+    return this.getValues().values();
   }
 
   add(...items: T[]) {

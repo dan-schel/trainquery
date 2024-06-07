@@ -1,4 +1,5 @@
 import { FullConfig } from "../config/computed-config";
+import { DisruptionTransactions } from "../disruptions/disruptions-database";
 import { EnvironmentOptions } from "./environment-options";
 import { TrainQuery, Server } from "./trainquery";
 
@@ -33,4 +34,8 @@ export abstract class Logger {
   abstract logFetchingDisruptions(source: string): void;
   abstract logFetchingDisruptionsSuccess(source: string, count: number): void;
   abstract logFetchingDisruptionsFailure(source: string, err: unknown): void;
+  abstract logDisruptionProvidersNotReady(numUnavailable: number): void;
+  abstract logDisruptionTransactions(
+    transactions: DisruptionTransactions,
+  ): void;
 }
