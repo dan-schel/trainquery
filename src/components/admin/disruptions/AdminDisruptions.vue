@@ -5,17 +5,17 @@ import { onMounted, ref } from "vue";
 import { z } from "zod";
 import Icon from "@/components/icons/Icon.vue";
 import AdminRequestState from "@/components/admin/AdminRequestState.vue";
-import { ExternalDisruption } from "shared/disruptions/external/external-disruption";
 import { extractSummaryFromDisruption } from "@/components/admin/disruptions/extract-summary";
+import { ExternalDisruptionInInbox } from "shared/disruptions/external/external-disruption-in-inbox";
 
 const { callAdminApi } = useAdminAuth();
 
-const inbox = ref<ExternalDisruption[]>([]);
+const inbox = ref<ExternalDisruptionInInbox[]>([]);
 const state = ref<"loading" | "error" | "success">("loading");
 
 async function handleMounted() {
   const schema = z.object({
-    inbox: ExternalDisruption.json.array(),
+    inbox: ExternalDisruptionInInbox.json.array(),
   });
 
   state.value = "loading";
@@ -55,7 +55,7 @@ onMounted(() => {
         }"
       >
         <p>
-          {{ extractSummaryFromDisruption(disruption) }}
+          {{ extractSummaryFromDisruption(disruption.disruption) }}
         </p>
       </RouterLink>
 

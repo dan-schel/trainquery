@@ -13,7 +13,7 @@ export async function disruptionsApi(
   await ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
 
   return {
-    inbox: ctx.disruptions.getExternalDisruptions().map((x) => x.toJSON()),
+    inbox: ctx.disruptions.getDisruptionsInInbox().map((x) => x.toJSON()),
   };
 }
 
@@ -30,7 +30,7 @@ export async function disruptionsRawApi(
     };
   }
 
-  const disruption = ctx.disruptions.getExternalDisruption(id);
+  const disruption = ctx.disruptions.getDisruptionInInbox(id);
 
   return {
     disruption: disruption?.toJSON() ?? null,

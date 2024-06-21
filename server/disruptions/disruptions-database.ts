@@ -84,14 +84,14 @@ export class MongoDisruptionDatabase implements DisruptionDatabase {
     );
   }
 
-  private async _applyTransaction(
-    transaction: Transaction<any, any>,
-    table: Collection<Document>,
-  ) {
+  private async _applyTransaction<
+    A extends { id: unknown; toJSON: () => object },
+    B extends string | number,
+  >(transaction: Transaction<A, B>, table: Collection<Document>) {
     // TODO: See comment about "done in series" above.
     const actions = transaction.getActions();
     for (const d of actions.add) {
-      await table.insertOne({ id: d });
+      await table.insertOne(d.toJSON());
     }
     for (const d of actions.update) {
       await table.replaceOne({ id: d.id }, d);
