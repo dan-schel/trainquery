@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { ExternalDisruption } from "./external-disruption";
-import type { ExternalDisruptionID } from "../../system/ids";
+import {
+  ExternalDisruptionIDJson,
+  type ExternalDisruptionID,
+} from "../../system/ids";
 
 export class RejectedExternalDisruption {
   readonly id: ExternalDisruptionID;
@@ -22,6 +25,9 @@ export class RejectedExternalDisruption {
 
   static readonly json = z
     .object({
+      // Redundant, but allows makes delete commands in MongoDB cleaner.
+      // TODO: Maybe it this is another situation that calls for toMongo().
+      id: ExternalDisruptionIDJson,
       disruption: ExternalDisruption.json,
       resurfaceIfUpdated: z.boolean(),
     })
@@ -31,6 +37,7 @@ export class RejectedExternalDisruption {
 
   toJSON(): z.input<typeof RejectedExternalDisruption.json> {
     return {
+      id: this.id,
       disruption: this.disruption.toJSON(),
       resurfaceIfUpdated: this.resurfaceIfUpdated,
     };

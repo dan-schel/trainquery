@@ -82,11 +82,6 @@ export class DisruptionsManager {
       this._parsers.push(new PtvDisruptionParser());
     }
 
-    this._providers.forEach((provider) =>
-      provider.addListener((_x) => this._handleNewDisruptions(ctx)),
-    );
-    await Promise.all(this._providers.map((source) => source.init()));
-
     this._disruptionCache = new Polled({
       fetch: () => this._fetchDisruptionsInboxAndRejected(),
       scheduler: {
@@ -97,6 +92,11 @@ export class DisruptionsManager {
       pollInterval: 1000 * 60 * databaseRefreshIntervalMinutes,
     });
     await this._disruptionCache.init();
+
+    this._providers.forEach((provider) =>
+      provider.addListener((_x) => this._handleNewDisruptions(ctx)),
+    );
+    await Promise.all(this._providers.map((source) => source.init()));
   }
 
   private async _handleNewDisruptions(ctx: TrainQuery) {

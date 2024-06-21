@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { ExternalDisruption } from "./external-disruption";
-import type { ExternalDisruptionID } from "../../system/ids";
+import {
+  ExternalDisruptionIDJson,
+  type ExternalDisruptionID,
+} from "../../system/ids";
 
 // NOTE: The only reason we use ExternalDisruptionInInbox instead of just
 // ExternalDisruption to represent things in the inbox is in case we ever want
@@ -21,12 +24,16 @@ export class ExternalDisruptionInInbox {
 
   static readonly json = z
     .object({
+      // Redundant, but allows makes delete commands in MongoDB cleaner.
+      // TODO: Maybe it this is another situation that calls for toMongo().
+      id: ExternalDisruptionIDJson,
       disruption: ExternalDisruption.json,
     })
     .transform((x) => new ExternalDisruptionInInbox(x.disruption));
 
   toJSON(): z.input<typeof ExternalDisruptionInInbox.json> {
     return {
+      id: this.id,
       disruption: this.disruption.toJSON(),
     };
   }
