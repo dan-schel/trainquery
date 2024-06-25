@@ -94,7 +94,7 @@ export class MongoDisruptionDatabase implements DisruptionDatabase {
       await table.insertOne(d.toJSON());
     }
     for (const d of actions.update) {
-      await table.replaceOne({ id: d.id }, d);
+      await table.replaceOne({ id: d.id }, d.toJSON());
     }
     for (const d of actions.delete) {
       await table.deleteOne({ id: d });
