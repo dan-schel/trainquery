@@ -50,8 +50,8 @@ export class DepartureFilter {
       directions === undefined ? this.directions : directions,
       platforms === undefined ? this.platforms : platforms,
       serviceTypes === undefined ? this.serviceTypes : serviceTypes,
-      arrivals === undefined ? this.arrivals : arrivals,
-      setDownOnly === undefined ? this.setDownOnly : setDownOnly,
+      arrivals ?? this.arrivals,
+      setDownOnly ?? this.setDownOnly,
     );
   }
 

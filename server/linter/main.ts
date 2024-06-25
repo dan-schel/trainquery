@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { ZodError } from "zod";
 import { OfflineConfigProvider } from "../config/offline-config-provider";
 import { OnlineConfigProvider } from "../config/online-config-provider";

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ExternalDisruptionData } from "./external-disruption-data";
 import { PtvExternalDisruptionData } from "./types/ptv";
-import { ExternalDisruptionID } from "./external-disruption-id";
+import type { ExternalDisruptionID } from "../../system/ids";
 
 export class ExternalDisruption {
   readonly id: ExternalDisruptionID;
@@ -9,7 +9,15 @@ export class ExternalDisruption {
 
   constructor(readonly data: ExternalDisruptionData) {
     this.id = data.getID();
-    this.type = this.id.type;
+    this.type = data.getType();
+  }
+
+  isOlderVersionOf(other: ExternalDisruption) {
+    return this.id === other.id && !this.data.matchesContent(other.data);
+  }
+
+  isIdenticalTo(other: ExternalDisruption) {
+    return this.id === other.id && this.data.matchesContent(other.data);
   }
 
   static readonly json = z

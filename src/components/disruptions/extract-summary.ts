@@ -14,9 +14,11 @@ export function extractSummaryFromDisruption(disruption: Disruption) {
 }
 
 // <TEMPORARY>
+// TODO: Disruptions will one-day have their own page where they can show off
+// all their information, including sources. This function that extracts the
+// link from the first source is just a way to match pre-existing behaviour
+// that surfaces the PTV link until that page is created.
 export function extractUrlForDisruption(disruption: Disruption) {
-  console.log(disruption);
-
   if (disruption.sources.length === 0) {
     return null;
   }

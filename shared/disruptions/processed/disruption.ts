@@ -10,6 +10,8 @@ export const DisruptionStates = [
   "generated",
   "approved",
   "curated",
+  "approved-auto-delete",
+  "curated-auto-delete",
 ] as const;
 export type DisruptionState = (typeof DisruptionStates)[number];
 export const DisruptionStateJson = z.enum(DisruptionStates);
@@ -25,6 +27,32 @@ export class Disruption {
     readonly updatedSources: ExternalDisruption[] | null,
   ) {
     this.type = data.getType();
+  }
+
+  usesSource(external: ExternalDisruption) {
+    return this.sources.some((s) => s.id === external.id);
+  }
+
+  with({
+    id,
+    data,
+    state,
+    sources,
+    updatedSources,
+  }: {
+    id?: DisruptionID;
+    data?: DisruptionData;
+    state?: DisruptionState;
+    sources?: ExternalDisruption[];
+    updatedSources?: ExternalDisruption[] | null;
+  }) {
+    return new Disruption(
+      id ?? this.id,
+      data ?? this.data,
+      state ?? this.state,
+      sources ?? this.sources,
+      updatedSources === undefined ? this.updatedSources : updatedSources,
+    );
   }
 
   static readonly json = z

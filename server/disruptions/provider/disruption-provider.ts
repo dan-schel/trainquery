@@ -8,6 +8,7 @@ export type NewDisruptionsHandler = (
 // TrainQueryService.
 export abstract class DisruptionProvider {
   private readonly _listeners: NewDisruptionsHandler[] = [];
+  private _disruptions: ExternalDisruptionData[] | null = null;
 
   addListener(listener: NewDisruptionsHandler) {
     this._listeners.push(listener);
@@ -21,9 +22,14 @@ export abstract class DisruptionProvider {
   }
 
   protected provideNewDisruptions(disruptions: ExternalDisruptionData[]) {
+    this._disruptions = disruptions;
     for (const listener of this._listeners) {
       listener(disruptions);
     }
+  }
+
+  getDisruptions() {
+    return this._disruptions;
   }
 
   abstract init(): Promise<void>;

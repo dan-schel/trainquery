@@ -64,7 +64,7 @@ export function ptvDisruptionToMarkdown(
     # ${disruption.title}
     ${disruption.description}
     ${Object.keys(keyValue)
-      .map((x) => `**${x}**: ${keyValue[x]}`)
+      .map((x) => `**${x}:** ${keyValue[x]}`)
       .join("\n")}
     `;
 }

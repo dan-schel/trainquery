@@ -13,14 +13,29 @@ import { DisruptionProvider } from "./provider/disruption-provider";
 import { DisruptionData } from "../../shared/disruptions/processed/disruption-data";
 import { ExternalDisruption } from "../../shared/disruptions/external/external-disruption";
 import { Disruption } from "../../shared/disruptions/processed/disruption";
-import { ExternalDisruptionData } from "../../shared/disruptions/external/external-disruption-data";
-import { uuid } from "@dan-schel/js-utils";
-import { toDisruptionID } from "../../shared/system/ids";
+import { Polled, nonNull } from "@dan-schel/js-utils";
+import { ExternalDisruptionID } from "../../shared/system/ids";
 import { GenericStopDisruptionData } from "../../shared/disruptions/processed/types/generic-stop";
 import { GenericLineDisruptionData } from "../../shared/disruptions/processed/types/generic-line";
-import { ExternalDisruptionID } from "../../shared/disruptions/external/external-disruption-id";
+import { processIncomingDisruptions } from "./process-incoming-disruptions";
+import {
+  DisruptionDatabase,
+  DisruptionTransactions,
+  InMemoryDisruptionDatabase,
+  MongoDisruptionDatabase,
+} from "./disruptions-database";
+import { Transaction } from "./transaction";
+import { ExternalDisruptionInInbox } from "../../shared/disruptions/external/external-disruption-in-inbox";
+import { RejectedExternalDisruption } from "../../shared/disruptions/external/rejected-external-disruption";
 
 const disruptionsConsideredFreshMinutes = 15;
+const databaseRefreshIntervalMinutes = 5;
+
+type FullDisruptionData = {
+  disruptions: Disruption[];
+  inbox: ExternalDisruptionInInbox[];
+  rejected: RejectedExternalDisruption[];
+};
 
 export class DisruptionsManager {
   private readonly _providers: DisruptionProvider[];
@@ -30,21 +45,26 @@ export class DisruptionsManager {
     DisruptionTypeHandler<DisruptionData>
   >;
 
-  // TODO: This is a local cache of disruptions so we don't need to query the
-  // database every single time.
-  private readonly _externalDisruptions: ExternalDisruption[];
-  private readonly _disruptions: Disruption[];
-  private _lastUpdated: QUtcDateTime | null = null;
+  private _database: DisruptionDatabase | null;
+  private _lastUpdated: QUtcDateTime | null;
+  private _disruptionCache: Polled<FullDisruptionData, NodeJS.Timeout> | null;
 
   constructor() {
     this._handlers = new Map();
     this._providers = [];
     this._parsers = [];
-    this._disruptions = [];
-    this._externalDisruptions = [];
+
+    this._database = null;
+    this._lastUpdated = null;
+    this._disruptionCache = null;
   }
 
   async init(ctx: TrainQuery): Promise<void> {
+    this._database =
+      ctx.database != null
+        ? new MongoDisruptionDatabase(ctx.database)
+        : new InMemoryDisruptionDatabase();
+
     this._handlers.set(
       GenericStopDisruptionData.type,
       new GenericStopDisruptionHandler(ctx),
@@ -62,66 +82,88 @@ export class DisruptionsManager {
       this._parsers.push(new PtvDisruptionParser());
     }
 
-    this._providers.forEach((x) =>
-      x.addListener((y) => this._handleNewDisruptions(y)),
+    this._disruptionCache = new Polled({
+      fetch: () => this._fetchDisruptionsInboxAndRejected(),
+      scheduler: {
+        schedule: (callback, delay) => setTimeout(callback, delay),
+        cancelSchedule: (schedule) => clearTimeout(schedule),
+        getCurrentTimestamp: () => Date.now(),
+      },
+      pollInterval: 1000 * 60 * databaseRefreshIntervalMinutes,
+    });
+    await this._disruptionCache.init();
+
+    this._providers.forEach((provider) =>
+      provider.addListener((_x) => this._handleNewDisruptions(ctx)),
     );
     await Promise.all(this._providers.map((source) => source.init()));
   }
 
-  private _handleNewDisruptions(disruptions: ExternalDisruptionData[]) {
-    // <TEMPORARY>
-    // When we do it for real, this is where we should check these proposed
-    // disruptions against the database to see if they've already been curated
-    // or automatically processed, ... and so on.
+  private async _handleNewDisruptions(ctx: TrainQuery) {
+    const providerDisruptions = this._providers.map((x) => x.getDisruptions());
+    const availableProviderDisruptions = providerDisruptions.filter(nonNull);
+    const numUnavailable =
+      providerDisruptions.length - availableProviderDisruptions.length;
+
+    if (numUnavailable > 0) {
+      ctx.logger.logDisruptionProvidersNotReady(numUnavailable);
+      return;
+    }
+
+    const incoming = availableProviderDisruptions
+      .flat()
+      .map((x) => new ExternalDisruption(x));
+    const transactions =
+      await this._fetchDisruptionsInboxAndRejectedTransactions();
+
+    processIncomingDisruptions({
+      incomingDisruptions: incoming,
+      parsers: this._parsers,
+      ...transactions,
+    });
+
+    ctx.logger.logDisruptionTransactions(transactions);
+    await this._requireDatabase().onProcessedIncoming(transactions);
+    await this._requireCache().fetch();
 
     this._lastUpdated = nowUTC();
-
-    // This is how you clear an array in Javascript. Wild.
-    this._disruptions.length = 0;
-    this._externalDisruptions.length = 0;
-
-    const newDisruptions = disruptions.map((x) => new ExternalDisruption(x));
-
-    this._externalDisruptions.push(...newDisruptions);
-    for (const disruption of newDisruptions) {
-      const processed = this._parseFromExternal(disruption.data).map(
-        (x) =>
-          new Disruption(
-            toDisruptionID(uuid()),
-            x,
-            "provisional",
-            [disruption],
-            null,
-          ),
-      );
-      this._disruptions.push(...processed);
-    }
-    // </TEMPORARY>
   }
 
-  private _parseFromExternal(input: ExternalDisruptionData): DisruptionData[] {
-    for (const parser of this._parsers) {
-      const parsed = parser.process(input);
-      if (parsed != null) {
-        return parsed;
-      }
-    }
-    return [];
+  private async _fetchDisruptions() {
+    return await this._requireDatabase().getDisruptions();
+  }
+  private async _fetchDisruptionsInboxAndRejected(): Promise<FullDisruptionData> {
+    const disruptions = await this._fetchDisruptions();
+    const inbox = await this._requireDatabase().getInbox();
+    const rejected = await this._requireDatabase().getRejected();
+    return { disruptions, inbox, rejected };
+  }
+  private async _fetchDisruptionsInboxAndRejectedTransactions(): Promise<DisruptionTransactions> {
+    const data = await this._fetchDisruptionsInboxAndRejected();
+    return {
+      disruptions: new Transaction(data.disruptions, (x) => x.id),
+      inbox: new Transaction(data.inbox, (x) => x.id),
+      rejected: new Transaction(data.rejected, (x) => x.id),
+    };
   }
 
   attachDisruptions(departure: Departure): DepartureWithDisruptions {
-    const disruptions = this._disruptions.filter((d) =>
+    const disruptions = this._requireCache().require().value.disruptions;
+
+    const relevantDisruptions = disruptions.filter((d) =>
       this._requireHandler(d).affectsService(d.data, departure),
     );
-    return new DepartureWithDisruptions(departure, disruptions);
+    return new DepartureWithDisruptions(departure, relevantDisruptions);
   }
 
-  getExternalDisruptions(): ExternalDisruption[] {
-    return this._externalDisruptions;
+  getDisruptionsInInbox(): ExternalDisruptionInInbox[] {
+    return this._requireCache().require().value.inbox;
   }
 
-  getExternalDisruption(id: ExternalDisruptionID): ExternalDisruption | null {
-    return this._externalDisruptions.find((x) => x.id.equals(id)) ?? null;
+  getDisruptionInInbox(
+    id: ExternalDisruptionID,
+  ): ExternalDisruptionInInbox | null {
+    return this.getDisruptionsInInbox().find((x) => x.id === id) ?? null;
   }
 
   isStale(): boolean {
@@ -141,5 +183,21 @@ export class DisruptionsManager {
       throw new Error(`No handler for disruption type "${disruption.type}".`);
     }
     return handler;
+  }
+
+  private _requireDatabase() {
+    const database = this._database;
+    if (database == null) {
+      throw new Error("No database available. Call init() first.");
+    }
+    return database;
+  }
+
+  private _requireCache() {
+    const cache = this._disruptionCache;
+    if (cache == null) {
+      throw new Error("No cache available. Call init() first.");
+    }
+    return cache;
   }
 }
