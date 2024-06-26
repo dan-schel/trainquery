@@ -33,8 +33,10 @@ export class ExpressServer extends Server {
         const userAgent = req.header("user-agent") ?? "<unknown>";
 
         if (path === "ssrRouteProps") {
-          const path = String(req.query.path ?? "<unknown>");
-          ctx.logger.logPageRequest(path, ip, userAgent, true);
+          if (userAgent !== "node") {
+            const path = String(req.query.path ?? "<unknown>");
+            ctx.logger.logPageRequest(path, ip, userAgent, true);
+          }
         } else {
           ctx.logger.logApiRequest(req.url, ip, userAgent);
         }
