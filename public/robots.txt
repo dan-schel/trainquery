@@ -1,2 +1,13 @@
 User-agent: *
 Allow: /
+
+# Prevent crawlers loading tons of /train/* pages and having the server reload 
+# GTFS-R data each time. No reason for them to look in /admin/* either.
+#
+# Unfortunately even though the /train/* pages have noindex set, they still get
+# crawled all the time because the stop pages that lead to them do NOT have
+# nofollow set. Setting nofollow on stop pages wouldn't fix the problem entirely
+# either, because in theory the home page can link to /train/* pages too.
+User-agent: *
+Disallow: /train/
+Disallow: /admin/
