@@ -2,6 +2,8 @@ import { BadApiCallError } from "../param-utils";
 import { Server, ServerParams, TrainQuery } from "./trainquery";
 import express, { Express } from "express";
 
+const ignoreLoggingApiRoutes = ["ssrAppProps", "config"];
+
 export class ExpressServer extends Server {
   constructor(
     readonly port: number,
@@ -25,6 +27,18 @@ export class ExpressServer extends Server {
 
     app.all("/api/*", async (req, res) => {
       const path = req.path.replace(/^\/api\//, "");
+
+      if (!ignoreLoggingApiRoutes.includes(path)) {
+        const ip = req.ip ?? "<unknown>";
+        const userAgent = req.header("user-agent") ?? "<unknown>";
+
+        if (path === "ssrRouteProps") {
+          const path = String(req.query.path ?? "<unknown>");
+          ctx.logger.logPageRequest(path, ip, userAgent, true);
+        } else {
+          ctx.logger.logApiRequest(req.url, ip, userAgent);
+        }
+      }
 
       try {
         const params: ServerParams = {

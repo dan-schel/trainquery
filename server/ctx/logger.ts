@@ -38,4 +38,12 @@ export abstract class Logger {
   abstract logDisruptionTransactions(
     transactions: DisruptionTransactions,
   ): void;
+
+  abstract logPageRequest(
+    href: string,
+    ip: string,
+    userAgent: string,
+    spaNavigation: boolean,
+  ): void;
+  abstract logApiRequest(href: string, ip: string, userAgent: string): void;
 }
