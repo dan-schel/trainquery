@@ -1,2 +1,8 @@
 User-agent: *
 Allow: /
+
+# Prevent crawlers loading tons of /train/* pages and having the server reload 
+# GTFS-R data each time. No reason for them to look in /admin/* either.
+User-agent: *
+Disallow: /train/
+Disallow: /admin/
