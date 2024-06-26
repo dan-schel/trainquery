@@ -13,6 +13,8 @@ export const AdminLogServices = [
   "gtfs",
   "gtfs-r",
   "auth",
+  "page",
+  "api",
 ] as const;
 export type AdminLogService = (typeof AdminLogServices)[number];
 export const AdminLogServicesJson = z.enum(AdminLogServices);
