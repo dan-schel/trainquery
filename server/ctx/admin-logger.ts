@@ -316,4 +316,26 @@ export class AdminLogger extends Logger {
     const bulletPoints = statements.map((x) => `  - ${x}`).join("\n");
     this._log("info", "disruptions", `Processed disruptions:\n${bulletPoints}`);
   }
+
+  logPageRequest(
+    href: string,
+    ip: string,
+    userAgent: string,
+    spaNavigation: boolean,
+  ): void {
+    this._log(
+      "info",
+      "page",
+      `${
+        spaNavigation ? "Route props request" : "HTTP request"
+      } for "${href}" by "${userAgent}" from "${ip}".`,
+    );
+  }
+  logApiRequest(href: string, ip: string, userAgent: string): void {
+    this._log(
+      "info",
+      "api",
+      `Request for "${href}" by "${userAgent}" from "${ip}".`,
+    );
+  }
 }
