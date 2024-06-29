@@ -1,6 +1,9 @@
 <script setup lang="ts" generic="T">
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import Icon from "../icons/Icon.vue";
+import UilAngleLeft from "../icons/UilAngleLeft.vue";
+import UilAngleUp from "../icons/UilAngleUp.vue";
+import UilAngleRight from "../icons/UilAngleRight.vue";
+import UilAngleDown from "../icons/UilAngleDown.vue";
 
 interface Props<T> {
   modelValue: T;
@@ -143,7 +146,8 @@ function handleNextButton() {
       @click="handlePrevButton"
       title="Previous value"
     >
-      <Icon :id="horizontal ? 'uil:angle-left' : 'uil:angle-up'"></Icon>
+      <UilAngleLeft v-if="horizontal"></UilAngleLeft>
+      <UilAngleUp v-else></UilAngleUp>
     </button>
 
     <p class="current">{{ stringify(modelValue as T) }}</p>
@@ -152,7 +156,8 @@ function handleNextButton() {
     </p>
 
     <button class="next-button" @click="handleNextButton" title="Next value">
-      <Icon :id="horizontal ? 'uil:angle-right' : 'uil:angle-down'"></Icon>
+      <UilAngleRight v-if="horizontal"></UilAngleRight>
+      <UilAngleDown v-else></UilAngleDown>
     </button>
   </div>
 </template>

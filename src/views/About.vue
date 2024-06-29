@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import PageContent from "@/components/common/PageContent.vue";
 import Icon from "@/components/icons/Icon.vue";
+import type UilGithub from "@/components/icons/UilGithub.vue";
+import type UilInfoCircle from "@/components/icons/UilInfoCircle.vue";
 import { generatePageHead } from "@/utils/head";
 import { parseMarkdown } from "@/utils/parse-markdown";
 import { useHead } from "@vueuse/head";
@@ -37,11 +39,11 @@ useHead(
     <div class="markdown" v-html="innerHTML"></div>
     <div class="see-also">
       <a href="https://github.com/dan-schel/trainquery">
-        <Icon id="uil:github"></Icon>
+        <UilGithub></UilGithub>
         <p>Check out TrainQuery on GitHub</p>
       </a>
       <RouterLink :to="{ name: 'about-legal' }">
-        <Icon id="uil:info-circle"></Icon>
+        <UilInfoCircle></UilInfoCircle>
         <p>Licences and attribution</p>
       </RouterLink>
     </div>

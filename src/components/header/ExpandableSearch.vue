@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import Icon from "../icons/Icon.vue";
 import SearchResults from "./SearchResults.vue";
 import { useRouter } from "vue-router";
+import type UilSearch from "../icons/UilSearch.vue";
 
 const props = defineProps<{
   open: boolean;
@@ -40,7 +40,7 @@ const onSearchEnter = (e: Event) => {
 
 <template>
   <form autocomplete="off" @submit="onSearchEnter">
-    <Icon id="uil:search"></Icon>
+    <UilSearch></UilSearch>
     <input
       type="search"
       placeholder="Search stops, lines, or pages"
