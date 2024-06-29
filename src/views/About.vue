@@ -80,7 +80,7 @@ useHead(
     padding: 0 1rem;
     gap: 0.5rem;
 
-    .icon {
+    svg {
       font-size: 1.2rem;
     }
   }

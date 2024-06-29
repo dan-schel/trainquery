@@ -221,7 +221,7 @@ function handleNextButton() {
   @include template.button-hover;
   align-items: center;
   justify-content: center;
-  .icon {
+  svg {
     font-size: 1.2rem;
   }
 }

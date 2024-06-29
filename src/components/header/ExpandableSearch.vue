@@ -62,7 +62,7 @@ const onSearchEnter = (e: Event) => {
 form {
   position: relative;
 
-  .icon {
+  svg {
     color: var(--color-ink-50);
     position: absolute;
     left: 1.6rem;

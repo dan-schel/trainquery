@@ -230,7 +230,7 @@ onUnmounted(() => {
   border-bottom-right-radius: 0.75rem;
   overflow: hidden;
 }
-.icon {
+svg {
   font-size: 1.2rem;
 }
 

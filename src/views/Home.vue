@@ -308,7 +308,7 @@ main {
     color: var(--color-ink-100);
     font-size: 1rem;
   }
-  .icon {
+  svg {
     font-size: 1.2rem;
   }
 }

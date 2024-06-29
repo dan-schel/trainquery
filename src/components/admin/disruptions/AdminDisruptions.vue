@@ -110,7 +110,7 @@ h2 {
   justify-content: center;
   flex-grow: 1;
   padding: 1rem;
-  .icon {
+  svg {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
   }

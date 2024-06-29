@@ -55,11 +55,11 @@ const displayData = computed(() => {
   grid-template-areas: "icon text link";
   align-items: center;
 }
-.disruption > .icon {
+.disruption > svg {
   color: var(--color-error);
   justify-self: center;
 }
-.icon {
+svg {
   grid-area: icon;
   font-size: 1.2rem;
 }

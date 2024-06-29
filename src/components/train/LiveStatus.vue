@@ -72,17 +72,17 @@ const delay = computed(() => {
   grid-template-areas: "icon text";
   align-items: center;
 
-  &.positive > .icon {
+  &.positive > svg {
     color: var(--color-success);
   }
-  &.medium > .icon {
+  &.medium > svg {
     color: var(--color-warning);
   }
-  &.negative > .icon {
+  &.negative > svg {
     color: var(--color-error);
   }
 }
-.icon {
+svg {
   grid-area: icon;
   font-size: 1.2rem;
   justify-self: center;

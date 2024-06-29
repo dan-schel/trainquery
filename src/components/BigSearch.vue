@@ -76,7 +76,7 @@ form {
     background-color 0.1s,
     border-color 0.1s;
 
-  .icon {
+  svg {
     color: var(--color-ink-50);
     position: absolute;
     left: 1.5rem;

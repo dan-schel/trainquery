@@ -181,7 +181,7 @@ function handleCloseTimeEditor() {
     width: 2.5rem;
     align-items: center;
     justify-content: center;
-    .icon {
+    svg {
       font-size: 1.5rem;
     }
 

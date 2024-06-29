@@ -74,7 +74,7 @@ const detail = computed(() => {
         >
         <OneLineP class="primary-time">{{ detail.primaryTimeString }}</OneLineP>
         <LiveIcon
-          class="icon live-icon"
+          class="live-icon"
           v-if="detail.delayTimeString != null"
         ></LiveIcon>
       </div>
@@ -248,13 +248,13 @@ const detail = computed(() => {
     }
 
     &.line :deep(p),
-    &.line .icon {
+    &.line svg {
       color: var(--color-accent);
     }
 
     &.disruption {
       &:deep(p),
-      .icon {
+      svg {
         color: var(--color-error);
       }
       &:deep(p) {

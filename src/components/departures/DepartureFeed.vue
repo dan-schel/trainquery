@@ -265,7 +265,7 @@ function handlePin() {
 .empty {
   align-items: center;
   padding: 1rem;
-  .icon {
+  svg {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
   }
