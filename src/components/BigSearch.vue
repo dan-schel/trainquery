@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import Icon from "@/components/icons/Icon.vue";
 import SearchResults from "@/components/header/SearchResults.vue";
 import { useRouter } from "vue-router";
+import UilSearch from "./icons/UilSearch.vue";
 
 const query = ref("");
 const router = useRouter();
@@ -19,7 +19,7 @@ const onSearchEnter = (e: Event) => {
 <template>
   <div class="big-search">
     <form autocomplete="off" @submit="onSearchEnter">
-      <Icon id="uil:search"></Icon>
+      <UilSearch></UilSearch>
       <input
         type="search"
         placeholder="Search stops, lines, or pages"
@@ -76,7 +76,7 @@ form {
     background-color 0.1s,
     border-color 0.1s;
 
-  .icon {
+  svg {
     color: var(--color-ink-50);
     position: absolute;
     left: 1.5rem;

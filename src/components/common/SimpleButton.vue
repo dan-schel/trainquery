@@ -79,7 +79,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
   justify-content: center;
   height: 2rem;
 
-  .icon {
+  svg {
     font-size: 1.2rem;
   }
 
@@ -105,7 +105,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
   justify-content: center;
   padding: 0rem 0.5rem;
 
-  .icon {
+  svg {
     font-size: 1.2rem;
   }
   p {

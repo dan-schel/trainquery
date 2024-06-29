@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import Icon from "@/components/icons/Icon.vue";
 import { useNow } from "@/utils/now-provider";
 import type { Departure } from "shared/system/service/departure";
 import { KnownPerspectivePattern } from "shared/system/service/known-perspective-pattern";
 import type { ServedStop } from "shared/system/service/served-stop";
 import { computed } from "vue";
 import { getDelayString } from "../departures/helpers/utils";
+import UilCheck from "../icons/UilCheck.vue";
+import UilClock from "../icons/UilClock.vue";
+import UilExclamationCircle from "../icons/UilExclamationCircle.vue";
 
 const { utc } = useNow();
 const props = defineProps<{
@@ -44,13 +46,11 @@ const delay = computed(() => {
 
 <template>
   <div v-if="delay != null" class="container" :class="delay.type">
-    <Icon v-if="delay.type === 'positive'" id="uil:check"></Icon>
-    <Icon v-else-if="delay.type === 'medium'" id="uil:clock"></Icon>
-    <Icon
+    <UilCheck v-if="delay.type === 'positive'"></UilCheck>
+    <UilExclamationCircle
       v-else-if="delay.type === 'negative'"
-      id="uil:exclamation-circle"
-    ></Icon>
-    <Icon v-else id="uil:clock"></Icon>
+    ></UilExclamationCircle>
+    <UilClock v-else></UilClock>
     <p>
       {{
         delay.priorToOrigin ? "Currently estimated to run" : "Currently running"
@@ -72,17 +72,17 @@ const delay = computed(() => {
   grid-template-areas: "icon text";
   align-items: center;
 
-  &.positive > .icon {
+  &.positive > svg {
     color: var(--color-success);
   }
-  &.medium > .icon {
+  &.medium > svg {
     color: var(--color-warning);
   }
-  &.negative > .icon {
+  &.negative > svg {
     color: var(--color-error);
   }
 }
-.icon {
+svg {
   grid-area: icon;
   font-size: 1.2rem;
   justify-self: center;

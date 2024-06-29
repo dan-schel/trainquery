@@ -10,7 +10,6 @@ import {
   getStopPageRoute,
   requireStop,
 } from "shared/system/config-utils";
-import Icon from "../icons/Icon.vue";
 import type { DepartureFeed } from "shared/system/timetable/departure-feed";
 import { computed } from "vue";
 import { formatFilter } from "@/utils/format-filter";
@@ -22,6 +21,8 @@ import {
 import { useSettings } from "@/settings/settings";
 import type { QLocalDateTime } from "shared/qtime/qdatetime";
 import type { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
+import UilExclamationCircle from "../icons/UilExclamationCircle.vue";
+import UilCalendarSlash from "../icons/UilCalendarSlash.vue";
 
 const props = defineProps<{
   feed: DepartureFeed;
@@ -153,7 +154,7 @@ function handlePin() {
     </div>
     <div class="departures">
       <div class="error" v-if="error != null">
-        <Icon id="uil:exclamation-circle"></Icon>
+        <UilExclamationCircle></UilExclamationCircle>
         <p>Something went wrong</p>
       </div>
 
@@ -161,7 +162,7 @@ function handlePin() {
         class="empty"
         v-if="!loading && error == null && departures.length === 0"
       >
-        <Icon id="uil:calendar-slash"></Icon>
+        <UilCalendarSlash></UilCalendarSlash>
         <p>No trains scheduled</p>
       </div>
 
@@ -264,7 +265,7 @@ function handlePin() {
 .empty {
   align-items: center;
   padding: 1rem;
-  .icon {
+  svg {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
   }

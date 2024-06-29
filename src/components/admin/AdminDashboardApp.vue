@@ -73,7 +73,7 @@ defineProps<{
   background-color: var(--color-accent);
   margin-bottom: 1rem;
   border-radius: 1rem;
-  .icon {
+  svg {
     font-size: 3.5rem;
     color: var(--color-on-accent);
   }

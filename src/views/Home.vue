@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import DepartureGroup from "@/components/departures/DepartureGroup.vue";
-import Icon from "@/components/icons/Icon.vue";
 import { useHead } from "@vueuse/head";
 import BigSearch from "@/components/BigSearch.vue";
 import Wordmark from "@/components/Wordmark.vue";
@@ -19,6 +18,9 @@ import {
   maxDistance,
 } from "@/utils/nearby-stops";
 import { RouterLink } from "vue-router";
+import UilStar from "@/components/icons/UilStar.vue";
+import UilMapMarker from "@/components/icons/UilMapMarker.vue";
+import MajesticonsPinLine from "@/components/icons/MajesticonsPinLine.vue";
 
 useHead(
   generatePageHead({
@@ -115,7 +117,7 @@ function attemptToFetchLocation(settings: Settings) {
           v-if="pinnedWidgets != null && pinnedWidgets.length == 0"
         >
           <div class="section-title">
-            <Icon id="uil:star"></Icon>
+            <UilStar></UilStar>
             <p>Welcome to {{ getConfig().frontend.appName }}!</p>
           </div>
           <div class="markdown" v-html="welcomeHtml"></div>
@@ -127,7 +129,7 @@ function attemptToFetchLocation(settings: Settings) {
         </div>
         <div class="nearby-stops">
           <div class="section-title">
-            <Icon id="uil:map-marker"></Icon>
+            <UilMapMarker></UilMapMarker>
             <p>Nearby stops</p>
           </div>
           <LoadingSpinner
@@ -156,7 +158,7 @@ function attemptToFetchLocation(settings: Settings) {
               :key="stop.stop.id"
             >
               <RouterLink :to="stop.url">
-                <Icon id="uil:map-marker"></Icon>
+                <UilMapMarker></UilMapMarker>
                 <p>
                   <span class="stop-name">{{ stop.stop.name }}</span>
                   {{ formatDistance(stop.distance) }}
@@ -171,7 +173,7 @@ function attemptToFetchLocation(settings: Settings) {
         </div>
         <div class="pinned-widgets">
           <div class="section-title">
-            <Icon id="majesticons:pin-line"></Icon>
+            <MajesticonsPinLine></MajesticonsPinLine>
             <p>Pinned widgets</p>
           </div>
           <DepartureGroup
@@ -306,7 +308,7 @@ main {
     color: var(--color-ink-100);
     font-size: 1rem;
   }
-  .icon {
+  svg {
     font-size: 1.2rem;
   }
 }

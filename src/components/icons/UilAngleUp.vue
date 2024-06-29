@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import { defineComponent } from "vue";
+
+defineComponent({
+  name: "UilAngleUp",
+});
+</script>
 <template>
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -7,7 +14,7 @@
   >
     <path
       fill="currentColor"
-      d="m17 13.41l-4.29-4.24a1 1 0 0 0-1.42 0l-4.24 4.24a1 1 0 0 0 0 1.42a1 1 0 0 0 1.41 0L12 11.29l3.54 3.54a1 1 0 0 0 .7.29a1 1 0 0 0 .71-.29a1 1 0 0 0 .05-1.42Z"
+      d="m17 13.41l-4.29-4.24a1 1 0 0 0-1.42 0l-4.24 4.24a1 1 0 0 0 0 1.42a1 1 0 0 0 1.41 0L12 11.29l3.54 3.54a1 1 0 0 0 .7.29a1 1 0 0 0 .71-.29a1 1 0 0 0 .05-1.42"
     />
   </svg>
 </template>

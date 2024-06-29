@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import OneLineP from "@/components/common/OneLineP.vue";
-import Icon from "../icons/Icon.vue";
 import { RouterLink } from "vue-router";
 import { getServicePageRoute, requireLine } from "shared/system/config-utils";
 import { getConfig } from "@/utils/get-config";
@@ -19,6 +18,8 @@ import { continuify } from "./helpers/continuify";
 import { useNow } from "@/utils/now-provider";
 import LiveIcon from "./LiveIcon.vue";
 import type { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
+import UilExclamationCircle from "../icons/UilExclamationCircle.vue";
+import UilAngleRight from "../icons/UilAngleRight.vue";
 
 const props = defineProps<{
   departure: DepartureWithDisruptions;
@@ -73,7 +74,7 @@ const detail = computed(() => {
         >
         <OneLineP class="primary-time">{{ detail.primaryTimeString }}</OneLineP>
         <LiveIcon
-          class="icon live-icon"
+          class="live-icon"
           v-if="detail.delayTimeString != null"
         ></LiveIcon>
       </div>
@@ -82,7 +83,7 @@ const detail = computed(() => {
       <OneLineP>{{ detail.stoppingPatternString }}</OneLineP>
 
       <div v-if="detail.disruptionsString != null" class="extra disruption">
-        <Icon id="uil:exclamation-circle"></Icon>
+        <UilExclamationCircle></UilExclamationCircle>
         <OneLineP class="extra-text">
           {{ detail.disruptionsString }}
         </OneLineP>
@@ -122,7 +123,7 @@ const detail = computed(() => {
       <p class="platform-number">{{ detail.platform }}</p>
     </div>
     <div class="arrow">
-      <Icon id="uil:angle-right"></Icon>
+      <UilAngleRight></UilAngleRight>
     </div>
   </RouterLink>
 </template>
@@ -247,13 +248,13 @@ const detail = computed(() => {
     }
 
     &.line :deep(p),
-    &.line .icon {
+    &.line svg {
       color: var(--color-accent);
     }
 
     &.disruption {
       &:deep(p),
-      .icon {
+      svg {
         color: var(--color-error);
       }
       &:deep(p) {

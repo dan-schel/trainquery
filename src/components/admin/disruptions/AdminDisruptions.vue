@@ -3,10 +3,10 @@ import PageContent from "@/components/common/PageContent.vue";
 import { useAdminAuth } from "@/utils/admin-auth-provider";
 import { onMounted, ref } from "vue";
 import { z } from "zod";
-import Icon from "@/components/icons/Icon.vue";
 import AdminRequestState from "@/components/admin/AdminRequestState.vue";
 import { extractSummaryFromDisruption } from "@/components/admin/disruptions/extract-summary";
 import { ExternalDisruptionInInbox } from "shared/disruptions/external/external-disruption-in-inbox";
+import UilCheckCircle from "@/components/icons/UilCheckCircle.vue";
 
 const { callAdminApi } = useAdminAuth();
 
@@ -60,7 +60,7 @@ onMounted(() => {
       </RouterLink>
 
       <div class="empty" v-if="inbox.length === 0">
-        <Icon id="uil:check-circle"></Icon>
+        <UilCheckCircle></UilCheckCircle>
         <p>No disruptions awaiting processing</p>
       </div>
     </div>
@@ -110,7 +110,7 @@ h2 {
   justify-content: center;
   flex-grow: 1;
   padding: 1rem;
-  .icon {
+  svg {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
   }

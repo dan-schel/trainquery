@@ -80,7 +80,7 @@ const results = computed(() => {
 
   padding: 0.75rem 1rem;
 }
-.icon {
+svg {
   margin-right: 0.75rem;
   font-size: 1.2rem;
 }

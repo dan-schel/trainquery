@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import OneLineP from "../common/OneLineP.vue";
-import Icon from "../icons/Icon.vue";
 import FilterControls from "./FilterControls.vue";
 import TimeControls from "./TimeControls.vue";
 import { DepartureFilter } from "shared/system/timetable/departure-filter";
@@ -10,6 +9,10 @@ import type { StopID } from "shared/system/ids";
 import type { QLocalDateTime } from "shared/qtime/qdatetime";
 import { formatRelativeTime } from "shared/qtime/format";
 import { useNow } from "@/utils/now-provider";
+import UilClock from "../icons/UilClock.vue";
+import UilAngleDown from "../icons/UilAngleDown.vue";
+import UilFilter from "../icons/UilFilter.vue";
+import UilRedo from "../icons/UilRedo.vue";
 
 const props = defineProps<{
   stop: StopID;
@@ -81,20 +84,20 @@ onUnmounted(() => {
     <div class="buttons">
       <div class="non-reset-buttons">
         <button class="time-button" @click="handleTimeButtonClick">
-          <Icon id="uil:clock" title="Time"></Icon>
+          <UilClock></UilClock>
           <OneLineP class="text">
             <b v-if="time != null">{{ formatRelativeTime(time, local) }}</b>
             <template v-if="time == null">Now</template>
           </OneLineP>
-          <Icon id="uil:angle-down"></Icon>
+          <UilAngleDown></UilAngleDown>
         </button>
         <button class="filter-button" @click="handleFilterButtonClick">
-          <Icon id="uil:filter"></Icon>
+          <UilFilter></UilFilter>
           <OneLineP class="text">
             <b v-if="!isDefaultFilter">{{ filterLabel }}</b>
             <template v-if="isDefaultFilter">{{ filterLabel }}</template>
           </OneLineP>
-          <Icon id="uil:angle-down"></Icon>
+          <UilAngleDown></UilAngleDown>
         </button>
       </div>
       <button
@@ -103,7 +106,7 @@ onUnmounted(() => {
         v-if="showResetButton"
         @click="handleResetClicked"
       >
-        <Icon id="uil:redo"></Icon>
+        <UilRedo></UilRedo>
       </button>
     </div>
     <div class="dropdowns">
@@ -227,7 +230,7 @@ onUnmounted(() => {
   border-bottom-right-radius: 0.75rem;
   overflow: hidden;
 }
-.icon {
+svg {
   font-size: 1.2rem;
 }
 

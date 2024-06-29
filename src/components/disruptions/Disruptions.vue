@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { Disruption } from "shared/disruptions/processed/disruption";
-import Icon from "../icons/Icon.vue";
 import { computed } from "vue";
 import {
   extractSummaryFromDisruption,
   extractUrlForDisruption,
 } from "./extract-summary";
+import UilExclamationCircle from "../icons/UilExclamationCircle.vue";
+import UilExternalLinkAlt from "../icons/UilExternalLinkAlt.vue";
 
 const props = defineProps<{
   disruptions: Disruption[];
@@ -24,7 +25,7 @@ const displayData = computed(() => {
 <template>
   <div class="disruptions">
     <div v-for="(disruption, i) in displayData" :key="i" class="disruption">
-      <Icon id="uil:exclamation-circle"></Icon>
+      <UilExclamationCircle></UilExclamationCircle>
       <p>
         {{ disruption.summary }}
       </p>
@@ -34,7 +35,7 @@ const displayData = computed(() => {
         title="Find out more"
         :href="disruption.url"
       >
-        <Icon id="uil:external-link-alt"></Icon>
+        <UilExternalLinkAlt></UilExternalLinkAlt>
       </a>
     </div>
   </div>
@@ -54,11 +55,11 @@ const displayData = computed(() => {
   grid-template-areas: "icon text link";
   align-items: center;
 }
-.disruption > .icon {
+.disruption > svg {
   color: var(--color-error);
   justify-self: center;
 }
-.icon {
+svg {
   grid-area: icon;
   font-size: 1.2rem;
 }

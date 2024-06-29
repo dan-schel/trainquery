@@ -77,5 +77,5 @@ defineProps<{
 </script>
 
 <template>
-  <component class="icon" :is="Icons[id]"></component>
+  <component :is="Icons[id]"></component>
 </template>

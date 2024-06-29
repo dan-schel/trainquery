@@ -4,9 +4,10 @@ import NumberWheel from "../common/NumberWheel.vue";
 import { hour12To24, hour24To12, posMod } from "@dan-schel/js-utils";
 import Picker from "../common/Picker.vue";
 import { QTime } from "shared/qtime/qtime";
-import Icon from "../icons/Icon.vue";
 import { TypeableTime } from "./helpers/typeable-time";
 import TypeableTimeVue from "./TypeableTime.vue";
+import UilTimes from "../icons/UilTimes.vue";
+import UilCheck from "../icons/UilCheck.vue";
 
 interface Props {
   modelValue: QTime;
@@ -115,14 +116,14 @@ function handleCloseTimeEditor() {
         :display-error="false"
       ></TypeableTimeVue>
       <button type="button" title="Cancel" @click="handleCloseTimeEditor">
-        <Icon id="uil:times"></Icon>
+        <UilTimes></UilTimes>
       </button>
       <button
         type="submit"
         title="Set time"
         :disabled="!typeableSubmitEnabled ? true : undefined"
       >
-        <Icon id="uil:check"></Icon>
+        <UilCheck></UilCheck>
       </button>
     </form>
   </div>
@@ -180,7 +181,7 @@ function handleCloseTimeEditor() {
     width: 2.5rem;
     align-items: center;
     justify-content: center;
-    .icon {
+    svg {
       font-size: 1.5rem;
     }
 
