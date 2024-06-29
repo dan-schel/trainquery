@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import { defineComponent } from "vue";
+
+defineComponent({
+  name: "UilTrashAlt",
+});
+</script>
 <template>
   <svg
     xmlns="http://www.w3.org/2000/svg"
