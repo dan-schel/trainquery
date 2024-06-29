@@ -6,7 +6,7 @@ import type { ServedStop } from "shared/system/service/served-stop";
 import { computed } from "vue";
 import { getDelayString } from "../departures/helpers/utils";
 import UilCheck from "../icons/UilCheck.vue";
-import type UilClock from "../icons/UilClock.vue";
+import UilClock from "../icons/UilClock.vue";
 import UilExclamationCircle from "../icons/UilExclamationCircle.vue";
 
 const { utc } = useNow();

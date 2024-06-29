@@ -21,7 +21,7 @@ import {
 import { useSettings } from "@/settings/settings";
 import type { QLocalDateTime } from "shared/qtime/qdatetime";
 import type { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
-import type UilExclamationCircle from "../icons/UilExclamationCircle.vue";
+import UilExclamationCircle from "../icons/UilExclamationCircle.vue";
 import UilCalendarSlash from "../icons/UilCalendarSlash.vue";
 
 const props = defineProps<{

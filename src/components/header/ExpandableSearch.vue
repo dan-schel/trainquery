@@ -2,7 +2,7 @@
 import { ref, watch } from "vue";
 import SearchResults from "./SearchResults.vue";
 import { useRouter } from "vue-router";
-import type UilSearch from "../icons/UilSearch.vue";
+import UilSearch from "../icons/UilSearch.vue";
 
 const props = defineProps<{
   open: boolean;

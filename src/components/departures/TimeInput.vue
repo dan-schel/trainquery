@@ -6,8 +6,8 @@ import Picker from "../common/Picker.vue";
 import { QTime } from "shared/qtime/qtime";
 import { TypeableTime } from "./helpers/typeable-time";
 import TypeableTimeVue from "./TypeableTime.vue";
-import type UilTimes from "../icons/UilTimes.vue";
-import type UilCheck from "../icons/UilCheck.vue";
+import UilTimes from "../icons/UilTimes.vue";
+import UilCheck from "../icons/UilCheck.vue";
 
 interface Props {
   modelValue: QTime;

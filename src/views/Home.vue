@@ -18,9 +18,9 @@ import {
   maxDistance,
 } from "@/utils/nearby-stops";
 import { RouterLink } from "vue-router";
-import type UilStar from "@/components/icons/UilStar.vue";
-import type UilMapMarker from "@/components/icons/UilMapMarker.vue";
-import type MajesticonsPinLine from "@/components/icons/MajesticonsPinLine.vue";
+import UilStar from "@/components/icons/UilStar.vue";
+import UilMapMarker from "@/components/icons/UilMapMarker.vue";
+import MajesticonsPinLine from "@/components/icons/MajesticonsPinLine.vue";
 
 useHead(
   generatePageHead({

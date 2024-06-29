@@ -18,7 +18,7 @@ import { continuify } from "./helpers/continuify";
 import { useNow } from "@/utils/now-provider";
 import LiveIcon from "./LiveIcon.vue";
 import type { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
-import type UilExclamationCircle from "../icons/UilExclamationCircle.vue";
+import UilExclamationCircle from "../icons/UilExclamationCircle.vue";
 import UilAngleRight from "../icons/UilAngleRight.vue";
 
 const props = defineProps<{

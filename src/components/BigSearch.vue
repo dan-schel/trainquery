@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import SearchResults from "@/components/header/SearchResults.vue";
 import { useRouter } from "vue-router";
-import type UilSearch from "./icons/UilSearch.vue";
+import UilSearch from "./icons/UilSearch.vue";
 
 const query = ref("");
 const router = useRouter();

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import PageContent from "@/components/common/PageContent.vue";
-import type UilGithub from "@/components/icons/UilGithub.vue";
-import type UilInfoCircle from "@/components/icons/UilInfoCircle.vue";
+import UilGithub from "@/components/icons/UilGithub.vue";
+import UilInfoCircle from "@/components/icons/UilInfoCircle.vue";
 import { generatePageHead } from "@/utils/head";
 import { parseMarkdown } from "@/utils/parse-markdown";
 import { useHead } from "@vueuse/head";
