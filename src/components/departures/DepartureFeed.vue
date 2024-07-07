@@ -218,7 +218,7 @@ function handlePin() {
   color: var(--color-ink-80);
 }
 .pin-button.pinned {
-  svg {
+  :deep(svg) {
     color: var(--color-accent);
   }
 }
