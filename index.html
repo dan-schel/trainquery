@@ -6,15 +6,35 @@
     <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
     <link ref="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="mask-icon" href="/favicon.svg" color="#FFFFFF" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#242933" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
     <script>
-      const theme = localStorage.getItem("trainquery-theme");
-      if (theme === "light" || theme === "dark") {
-        document.documentElement.classList.add(theme);
+      const darkModePreference = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      );
+
+      function applyTheme() {
+        const theme = localStorage.getItem("trainquery-theme");
+        const inferredTheme =
+          theme ?? (darkModePreference.matches ? "dark" : "light");
+
+        console.log("Applying theme", theme, inferredTheme);
+
+        document.documentElement.classList.remove("light", "dark");
+        if (theme === "light" || theme === "dark") {
+          document.documentElement.classList.add(theme);
+        }
+
+        const themeColor = { light: "#ffffff", dark: "#242933" };
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute("content", themeColor[inferredTheme]);
       }
+
+      applyTheme();
+      darkModePreference.addEventListener("change", applyTheme);
     </script>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
