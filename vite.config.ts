@@ -26,7 +26,6 @@ export default defineConfig({
         name: "TrainQuery",
         short_name: "TrainQuery",
         description: "Navigate Melbourne's train network",
-        theme_color: "#000000",
         background_color: "#242933",
         icons: [
           {
