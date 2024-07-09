@@ -149,7 +149,9 @@ export class TrainQueryDB {
 
   /** Inserts a collection of logs into the database. */
   async writeLogs(logs: AdminLog[]) {
-    await this.dbs.logs.insertMany(logs.map((l) => l.toJSON()));
+    // Use toMongo() to ensure the dates are not stored as strings, and the
+    // cleanupOldLogs function works correctly.
+    await this.dbs.logs.insertMany(logs.map((l) => l.toMongo()));
   }
 
   /** Deletes logs that are over `daysOld` days old. */
@@ -170,7 +172,7 @@ export class TrainQueryDB {
         sequence: { $gte: beforeSequence - count, $lt: beforeSequence },
       })
       .toArray();
-    const logs = docs.map((d) => AdminLog.json.parse(d));
+    const logs = docs.map((d) => AdminLog.mongo.parse(d));
     return new AdminLogWindow(instance, logs, { beforeSequence, count });
   }
 }
