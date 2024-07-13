@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import MajesticonsPin from "./MajesticonsPin.vue";
 import MajesticonsPinLine from "./MajesticonsPinLine.vue";
+import MaterialSymbolsCallMergeRounded from "./MaterialSymbolsCallMergeRounded.vue";
 import UilAlignLeft from "./UilAlignLeft.vue";
 import UilAngleDown from "./UilAngleDown.vue";
 import UilAngleLeft from "./UilAngleLeft.vue";
 import UilAngleRight from "./UilAngleRight.vue";
 import UilAngleUp from "./UilAngleUp.vue";
+import UilBan from "./UilBan.vue";
 import UilBars from "./UilBars.vue";
 import UilCalendar from "./UilCalendar.vue";
 import UilCalendarSlash from "./UilCalendarSlash.vue";
@@ -21,6 +23,8 @@ import UilHome from "./UilHome.vue";
 import UilInfoCircle from "./UilInfoCircle.vue";
 import UilMap from "./UilMap.vue";
 import UilMapMarker from "./UilMapMarker.vue";
+import UilPaperclip from "./UilPaperclip.vue";
+import UilPlus from "./UilPlus.vue";
 import UilRedo from "./UilRedo.vue";
 import UilSearch from "./UilSearch.vue";
 import UilSetting from "./UilSetting.vue";
@@ -36,11 +40,13 @@ import UilWrench from "./UilWrench.vue";
 const Icons = {
   "majesticons:pin": MajesticonsPin,
   "majesticons:pin-line": MajesticonsPinLine,
+  "material-symbols:call-merge-rounded": MaterialSymbolsCallMergeRounded,
   "uil:align-left": UilAlignLeft,
   "uil:angle-down": UilAngleDown,
   "uil:angle-left": UilAngleLeft,
   "uil:angle-right": UilAngleRight,
   "uil:angle-up": UilAngleUp,
+  "uil:ban": UilBan,
   "uil:bars": UilBars,
   "uil:calendar": UilCalendar,
   "uil:calendar-slash": UilCalendarSlash,
@@ -56,6 +62,8 @@ const Icons = {
   "uil:info-circle": UilInfoCircle,
   "uil:map": UilMap,
   "uil:map-marker": UilMapMarker,
+  "uil:paperclip": UilPaperclip,
+  "uil:plus": UilPlus,
   "uil:redo": UilRedo,
   "uil:search": UilSearch,
   "uil:setting": UilSetting,

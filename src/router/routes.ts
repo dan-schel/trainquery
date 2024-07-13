@@ -60,10 +60,10 @@ export default [
     component: () => import("../views/admin/disruptions/AdminDisruptions.vue"),
   },
   {
-    path: "/admin/disruptions/raw/:id",
-    name: "admin-disruptions-raw",
+    path: "/admin/disruptions/process/:id",
+    name: "admin-disruptions-process",
     component: () =>
-      import("../views/admin/disruptions/AdminDisruptionsRaw.vue"),
+      import("../views/admin/disruptions/AdminDisruptionsProcess.vue"),
   },
   {
     path: "/admin/gtfs",

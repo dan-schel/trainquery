@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import Icon, { type IconID } from "../icons/Icon.vue";
 import { type RouteLocationRaw } from "vue-router";
+import LoadingSpinner from "./LoadingSpinner.vue";
 
 export type ButtonContent =
   | { icon: IconID; text?: never; altText: string }
   | { icon: IconID; text: string; altText?: never }
   | { icon?: never; text: string; altText?: never };
-export type ButtonLayout = "traditional" | "tile" | "traditional-wide";
+export type ButtonLayout =
+  | "traditional"
+  | "tile"
+  | "traditional-wide"
+  | "tile-wide";
 export type ButtonTheme = "hover" | "filled" | "filled-neutral";
 
 export interface Props {
@@ -16,6 +21,7 @@ export interface Props {
   theme?: ButtonTheme;
   disabled?: boolean;
   submit?: boolean;
+  loading?: boolean;
 }
 withDefaults(defineProps<Props>(), {
   layout: "traditional",
@@ -38,15 +44,18 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       button: layout === 'traditional',
       'button-wide': layout === 'traditional-wide',
       tile: layout === 'tile',
+      'tile-wide': layout === 'tile-wide',
       'theme-hover': theme === 'hover',
       'theme-filled': theme === 'filled',
       'theme-filled-neutral': theme === 'filled-neutral',
+      loading: loading === true,
     }"
     :title="content.altText"
-    :disabled="disabled ? true : undefined"
+    :disabled="disabled || loading ? true : undefined"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>
+    <LoadingSpinner class="spinner" v-if="loading === true"></LoadingSpinner>
   </RouterLink>
   <button
     v-else
@@ -57,16 +66,19 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       button: layout === 'traditional',
       'button-wide': layout === 'traditional-wide',
       tile: layout === 'tile',
+      'tile-wide': layout === 'tile-wide',
       'theme-hover': theme === 'hover',
       'theme-filled': theme === 'filled',
       'theme-filled-neutral': theme === 'filled-neutral',
+      loading: loading === true,
     }"
     :title="content.altText"
-    :disabled="disabled ? true : undefined"
+    :disabled="disabled || loading ? true : undefined"
     :type="submit ? 'submit' : undefined"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>
+    <LoadingSpinner class="spinner" v-if="loading === true"></LoadingSpinner>
   </button>
 </template>
 
@@ -98,7 +110,8 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
   padding-left: 1rem;
   padding-right: 1rem;
 }
-.tile {
+.tile,
+.tile-wide {
   @include template.content-text-icon;
   height: 4rem;
   align-items: center;
@@ -112,6 +125,10 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
     margin-top: 0.25rem;
   }
 }
+.tile-wide {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
 .theme-hover {
   @include template.button-hover;
 }
@@ -120,5 +137,18 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
 }
 .theme-filled-neutral {
   @include template.button-filled-neutral;
+}
+.loading {
+  position: relative;
+  > :not(.spinner) {
+    visibility: hidden;
+  }
+  .spinner {
+    position: absolute;
+    left: calc(50% - 0.5em);
+    top: calc(50% - 0.5em);
+    font-size: 1.5rem;
+    color: var(--content-color);
+  }
 }
 </style>

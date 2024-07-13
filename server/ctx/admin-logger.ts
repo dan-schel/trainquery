@@ -314,7 +314,7 @@ export class AdminLogger extends Logger {
     }
 
     const bulletPoints = statements.map((x) => `  - ${x}`).join("\n");
-    this._log("info", "disruptions", `Processed disruptions:\n${bulletPoints}`);
+    this._log("info", "disruptions", `Modified disruptions:\n${bulletPoints}`);
   }
 
   logPageRequest(

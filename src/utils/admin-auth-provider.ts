@@ -12,6 +12,7 @@ export const adminAuthInjectionKey = Symbol() as InjectionKey<{
   callAdminApi: (
     apiPath: string,
     params: Record<string, string>,
+    usePost?: boolean,
   ) => Promise<Response>;
 }>;
 

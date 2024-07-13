@@ -26,7 +26,7 @@ export function disruptionToMarkdown(
   throw new Error(`Unknown external disruption type: ${disruption.type}`);
 }
 
-export function ptvDisruptionToMarkdown(
+function ptvDisruptionToMarkdown(
   config: HasSharedConfig,
   disruption: PtvExternalDisruptionData,
 ) {

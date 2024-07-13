@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import type { Disruption } from "shared/disruptions/processed/disruption";
 import { computed } from "vue";
-import {
-  extractSummaryFromDisruption,
-  extractUrlForDisruption,
-} from "./extract-summary";
+import { formatDisruption, extractUrlForDisruption } from "./format-disruption";
 import UilExclamationCircle from "../icons/UilExclamationCircle.vue";
 import UilExternalLinkAlt from "../icons/UilExternalLinkAlt.vue";
 
@@ -14,7 +11,7 @@ const props = defineProps<{
 
 const displayData = computed(() => {
   return props.disruptions.map((x) => ({
-    summary: extractSummaryFromDisruption(x),
+    summary: formatDisruption(x).summary,
 
     // TODO: This is obviously temporary!
     url: extractUrlForDisruption(x),
@@ -81,3 +78,4 @@ svg {
   min-height: 2.5rem;
 }
 </style>
+./format-disruption

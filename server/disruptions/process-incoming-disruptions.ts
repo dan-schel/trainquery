@@ -44,7 +44,7 @@ export function processIncomingDisruptions(input: Input) {
   // Run through all disruptions, updating sources if need be.
   for (const disruption of disruptions) {
     const updatedSources = incomingDisruptions.filter((d) =>
-      disruption.usesSource(d),
+      disruption.usesSource(d.id),
     );
     if (arraysMatch(updatedSources, disruption.sources, identicalMatcher)) {
       continue;
@@ -100,7 +100,7 @@ export function processIncomingDisruptions(input: Input) {
     // Check the incoming disruptions isn't already handled, and otherwise add
     // it to the inbox.
     const foundInInbox = inbox.some((i) => i.hasSameID(incoming));
-    const usedAsSource = disruptions.some((d) => d.usesSource(incoming));
+    const usedAsSource = disruptions.some((d) => d.usesSource(incoming.id));
     if (!foundInInbox && !usedAsSource) {
       const parsingResults = parseDisruption(incoming, parsers);
       if (parsingResults != null) {

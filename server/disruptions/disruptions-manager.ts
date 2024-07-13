@@ -27,6 +27,7 @@ import {
 import { Transaction } from "./transaction";
 import { ExternalDisruptionInInbox } from "../../shared/disruptions/external/external-disruption-in-inbox";
 import { RejectedExternalDisruption } from "../../shared/disruptions/external/rejected-external-disruption";
+import { rejectDisruption } from "./reject-disruption";
 
 const disruptionsConsideredFreshMinutes = 15;
 const databaseRefreshIntervalMinutes = 5;
@@ -123,7 +124,7 @@ export class DisruptionsManager {
     });
 
     ctx.logger.logDisruptionTransactions(transactions);
-    await this._requireDatabase().onProcessedIncoming(transactions);
+    await this._requireDatabase().applyTransactions(transactions);
     await this._requireCache().fetch();
 
     this._lastUpdated = nowUTC();
@@ -148,7 +149,7 @@ export class DisruptionsManager {
   }
 
   attachDisruptions(departure: Departure): DepartureWithDisruptions {
-    const disruptions = this._requireCache().require().value.disruptions;
+    const disruptions = this._requireFullDisruptionData().disruptions;
 
     const relevantDisruptions = disruptions.filter((d) =>
       this._requireHandler(d).affectsService(d.data, departure),
@@ -157,13 +158,38 @@ export class DisruptionsManager {
   }
 
   getDisruptionsInInbox(): ExternalDisruptionInInbox[] {
-    return this._requireCache().require().value.inbox;
+    return this._requireFullDisruptionData().inbox;
   }
 
   getDisruptionInInbox(
     id: ExternalDisruptionID,
   ): ExternalDisruptionInInbox | null {
     return this.getDisruptionsInInbox().find((x) => x.id === id) ?? null;
+  }
+
+  getProvisionalDisruptionsWithSource(id: ExternalDisruptionID): Disruption[] {
+    return this._requireFullDisruptionData().disruptions.filter(
+      (x) => x.usesSource(id) && x.state === "provisional",
+    );
+  }
+
+  async rejectDisruption(
+    ctx: TrainQuery,
+    disruption: ExternalDisruption,
+    resurfaceIfUpdated: boolean,
+  ): Promise<void> {
+    const transactions =
+      await this._fetchDisruptionsInboxAndRejectedTransactions();
+
+    rejectDisruption({
+      toReject: disruption,
+      resurfaceIfUpdated,
+      ...transactions,
+    });
+
+    ctx.logger.logDisruptionTransactions(transactions);
+    await this._requireDatabase().applyTransactions(transactions);
+    await this._requireCache().fetch();
   }
 
   isStale(): boolean {
@@ -199,5 +225,9 @@ export class DisruptionsManager {
       throw new Error("No cache available. Call init() first.");
     }
     return cache;
+  }
+
+  private _requireFullDisruptionData(): FullDisruptionData {
+    return this._requireCache().require().value;
   }
 }

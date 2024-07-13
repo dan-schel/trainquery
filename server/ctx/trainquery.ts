@@ -11,8 +11,9 @@ import { loginApi } from "../api/admin/login-api";
 import { AdminAuth, LocalAdminAuthDB } from "../admin/auth";
 import { logoutApi } from "../api/admin/logout-api";
 import {
-  disruptionsApi,
-  disruptionsRawApi,
+  disruptionInboxApi,
+  disruptionInboxProcessApi,
+  disruptionInboxSingleApi,
 } from "../api/admin/disruptions-api";
 import { gtfsApi } from "../api/admin/gtfs-api";
 import { logsApi } from "../api/admin/logs-api";
@@ -106,10 +107,13 @@ export async function trainQuery(
       return await loginApi(ctx, params);
     } else if (endpoint === "admin/logout") {
       return await logoutApi(ctx, params);
-    } else if (endpoint === "admin/disruptions") {
-      return await disruptionsApi(ctx, params);
-    } else if (endpoint === "admin/disruptions/raw") {
-      return await disruptionsRawApi(ctx, params);
+    } else if (endpoint === "admin/disruptions/inbox") {
+      return await disruptionInboxApi(ctx, params);
+    } else if (endpoint === "admin/disruptions/inbox/single") {
+      return await disruptionInboxSingleApi(ctx, params);
+    } else if (endpoint === "admin/disruptions/inbox/process") {
+      // TODO: This is dumb. It should be POST only.
+      return await disruptionInboxProcessApi(ctx, params);
     } else if (endpoint === "admin/gtfs") {
       return await gtfsApi(ctx, params);
     } else if (endpoint === "admin/logs") {
