@@ -11,8 +11,10 @@ import SimpleButton from "@/components/common/SimpleButton.vue";
 import OutgoingDisruption from "./OutgoingDisruption.vue";
 import OutgoingRejection from "./OutgoingRejection.vue";
 import { useAdminAuth } from "@/utils/admin-auth-provider";
+import { useRouter } from "vue-router";
 
 const { callAdminApi } = useAdminAuth();
+const router = useRouter();
 
 const props = defineProps<{
   inbox: ExternalDisruptionInInbox;
@@ -56,6 +58,7 @@ async function handleApply() {
       },
       true,
     );
+    router.push({ name: "admin-disruptions" });
   } catch (err) {
     console.warn("Failed to process disruption.", err);
   }
