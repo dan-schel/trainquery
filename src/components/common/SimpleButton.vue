@@ -6,7 +6,11 @@ export type ButtonContent =
   | { icon: IconID; text?: never; altText: string }
   | { icon: IconID; text: string; altText?: never }
   | { icon?: never; text: string; altText?: never };
-export type ButtonLayout = "traditional" | "tile" | "traditional-wide";
+export type ButtonLayout =
+  | "traditional"
+  | "tile"
+  | "traditional-wide"
+  | "tile-wide";
 export type ButtonTheme = "hover" | "filled" | "filled-neutral";
 
 export interface Props {
@@ -38,6 +42,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       button: layout === 'traditional',
       'button-wide': layout === 'traditional-wide',
       tile: layout === 'tile',
+      'tile-wide': layout === 'tile-wide',
       'theme-hover': theme === 'hover',
       'theme-filled': theme === 'filled',
       'theme-filled-neutral': theme === 'filled-neutral',
@@ -57,6 +62,7 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       button: layout === 'traditional',
       'button-wide': layout === 'traditional-wide',
       tile: layout === 'tile',
+      'tile-wide': layout === 'tile-wide',
       'theme-hover': theme === 'hover',
       'theme-filled': theme === 'filled',
       'theme-filled-neutral': theme === 'filled-neutral',
@@ -98,7 +104,8 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
   padding-left: 1rem;
   padding-right: 1rem;
 }
-.tile {
+.tile,
+.tile-wide {
   @include template.content-text-icon;
   height: 4rem;
   align-items: center;
@@ -111,6 +118,10 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
   p {
     margin-top: 0.25rem;
   }
+}
+.tile-wide {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 .theme-hover {
   @include template.button-hover;

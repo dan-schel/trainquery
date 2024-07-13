@@ -6,7 +6,7 @@ import { requireParam } from "../../param-utils";
 // departures API? It would cause similar issues if these APIs return data
 // assuming different stops/lines than the frontend has.
 
-export async function disruptionsApi(
+export async function disruptionInboxApi(
   ctx: TrainQuery,
   params: ServerParams,
 ): Promise<object> {
@@ -17,7 +17,7 @@ export async function disruptionsApi(
   };
 }
 
-export async function disruptionsRawApi(
+export async function disruptionInboxSingleApi(
   ctx: TrainQuery,
   params: ServerParams,
 ): Promise<object> {

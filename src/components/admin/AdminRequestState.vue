@@ -9,9 +9,7 @@ defineProps<{
 
 <template>
   <PageContent :title="title" title-margin="1rem">
-    <LoadingSpinner v-if="state === 'loading'" class="spinner"
-      >Loading...</LoadingSpinner
-    >
+    <LoadingSpinner v-if="state === 'loading'" class="spinner"></LoadingSpinner>
     <p v-if="state === 'not-found'" class="error">Not found.</p>
     <p v-if="state === 'error'" class="error">Something went wrong.</p>
   </PageContent>
