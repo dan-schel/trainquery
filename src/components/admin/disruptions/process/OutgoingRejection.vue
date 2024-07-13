@@ -13,7 +13,7 @@ const emit = defineEmits<{
 <template>
   <div class="card">
     <UilBan></UilBan>
-    <h2>Disruption rejected</h2>
+    <p class="title">Disruption rejected</p>
     <Switch
       class="switch"
       :modelValue="resurfaceIfUpdated"
@@ -37,7 +37,7 @@ const emit = defineEmits<{
 svg {
   font-size: 1.5rem;
 }
-h2 {
+.title {
   @include utils.h3;
   margin-bottom: 1rem;
 }

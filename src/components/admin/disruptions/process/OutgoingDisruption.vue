@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SimpleButton from "@/components/common/SimpleButton.vue";
+import { formatDisruption } from "@/components/disruptions/format-disruption";
 import { Disruption } from "shared/disruptions/processed/disruption";
 import { computed } from "vue";
 
@@ -11,6 +12,8 @@ defineEmits<{
   (e: "approve"): void;
   (e: "delete"): void;
 }>();
+
+const formatted = computed(() => formatDisruption(props.disruption));
 
 const provisionality = computed(() => {
   if (props.disruption.state === "provisional") {
@@ -28,10 +31,10 @@ const provisionality = computed(() => {
     class="disruption"
     :class="{ provisional: provisionality === 'currently' }"
   >
-    <h2>I'm a disruption!</h2>
+    <p class="title">{{ formatted.type }}</p>
+    <p class="title" v-if="formatted.impact != null">{{ formatted.impact }}</p>
     <p>
-      This is some more detail about me. Hope it's enough to cause some text
-      wrapping.
+      {{ formatted.summary }}
     </p>
 
     <div class="actions">
@@ -65,7 +68,7 @@ const provisionality = computed(() => {
 @use "@/assets/css-template/import" as template;
 @use "@/assets/utils" as utils;
 
-h2 {
+.title {
   @include utils.h3;
 }
 .disruption {
@@ -83,3 +86,4 @@ h2 {
   justify-content: flex-end;
 }
 </style>
+@/components/disruptions/format-disruption

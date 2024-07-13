@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ExternalDisruptionInInbox } from "shared/disruptions/external/external-disruption-in-inbox";
 import { Disruption } from "shared/disruptions/processed/disruption";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { disruptionToMarkdown } from "../extract-summary";
 import { getConfig } from "@/utils/get-config";
 import { parseMarkdown } from "@/utils/parse-markdown";
@@ -9,6 +9,7 @@ import UilAngleDown from "@/components/icons/UilAngleDown.vue";
 import UilAngleRight from "@/components/icons/UilAngleRight.vue";
 import SimpleButton from "@/components/common/SimpleButton.vue";
 import OutgoingDisruption from "./OutgoingDisruption.vue";
+import OutgoingRejection from "./OutgoingRejection.vue";
 
 const props = defineProps<{
   inbox: ExternalDisruptionInInbox;
@@ -23,10 +24,27 @@ const disruptionHtml = computed(() => {
     },
   );
 });
+
+const isRejected = ref<boolean>(false);
+const resurfaceIfUpdated = ref<boolean>(true);
+const submitting = ref<boolean>(false);
+
+function handleReject() {
+  isRejected.value = true;
+}
+
+function handleReset() {
+  isRejected.value = false;
+  resurfaceIfUpdated.value = true;
+}
+
+function handleApply() {
+  submitting.value = true;
+}
 </script>
 
 <template>
-  <div class="columns">
+  <div class="workspace">
     <section class="incoming" v-html="disruptionHtml"></section>
     <div class="arrow-locator">
       <div class="arrow">
@@ -43,6 +61,7 @@ const disruptionHtml = computed(() => {
         ></SimpleButton>
         <SimpleButton
           :content="{ icon: 'uil:ban', text: 'Reject' }"
+          @click="handleReject"
         ></SimpleButton>
         <SimpleButton
           :content="{
@@ -53,12 +72,16 @@ const disruptionHtml = computed(() => {
         <div class="flex-grow"></div>
         <SimpleButton
           :content="{ icon: 'uil:redo', altText: 'Reset' }"
-          disabled
+          @click="handleReset"
         ></SimpleButton>
       </div>
       <div class="outgoing-list">
-        <!-- <OutgoingRejection></OutgoingRejection> -->
+        <OutgoingRejection
+          v-if="isRejected"
+          v-model:resurface-if-updated="resurfaceIfUpdated"
+        ></OutgoingRejection>
         <OutgoingDisruption
+          v-else
           v-for="d in provisional"
           :key="d.id"
           :disruption="d"
@@ -70,7 +93,9 @@ const disruptionHtml = computed(() => {
           :content="{ icon: 'uil:check', text: 'Apply' }"
           layout="traditional-wide"
           theme="filled"
-          disabled
+          :loading="submitting"
+          :disabled="!isRejected"
+          @click="handleApply"
         ></SimpleButton>
       </div>
     </section>
@@ -81,7 +106,7 @@ const disruptionHtml = computed(() => {
 @use "@/assets/css-template/import" as template;
 @use "@/assets/utils" as utils;
 
-.columns {
+.workspace {
   flex-grow: 1;
   margin-bottom: 2rem;
 }
@@ -159,7 +184,7 @@ const disruptionHtml = computed(() => {
 
 // Desktop layout.
 @media screen and (min-width: 48rem) {
-  .columns {
+  .workspace {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     height: 0;
