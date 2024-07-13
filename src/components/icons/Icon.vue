@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MajesticonsPin from "./MajesticonsPin.vue";
 import MajesticonsPinLine from "./MajesticonsPinLine.vue";
+import MaterialSymbolsCallMergeRounded from "./MaterialSymbolsCallMergeRounded.vue";
 import UilAlignLeft from "./UilAlignLeft.vue";
 import UilAngleDown from "./UilAngleDown.vue";
 import UilAngleLeft from "./UilAngleLeft.vue";
@@ -39,6 +40,7 @@ import UilWrench from "./UilWrench.vue";
 const Icons = {
   "majesticons:pin": MajesticonsPin,
   "majesticons:pin-line": MajesticonsPinLine,
+  "material-symbols:call-merge-rounded": MaterialSymbolsCallMergeRounded,
   "uil:align-left": UilAlignLeft,
   "uil:angle-down": UilAngleDown,
   "uil:angle-left": UilAngleLeft,

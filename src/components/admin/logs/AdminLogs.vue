@@ -87,7 +87,7 @@ onMounted(() => {
   height: 20rem;
 
   .flex-grow {
-    flex-grow: 1;
+    @include template.flex-grow;
   }
   .log {
     padding: 0.75rem 1rem;

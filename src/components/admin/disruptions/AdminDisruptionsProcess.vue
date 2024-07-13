@@ -109,23 +109,21 @@ onMounted(() => {
         <div class="toolbar">
           <SimpleButton
             :content="{ icon: 'uil:plus', text: 'New' }"
-            layout="tile-wide"
-            theme="filled-neutral"
+            layout="traditional-wide"
+            theme="filled"
           ></SimpleButton>
           <SimpleButton
             :content="{ icon: 'uil:ban', text: 'Reject' }"
-            layout="tile-wide"
-            theme="filled-neutral"
           ></SimpleButton>
           <SimpleButton
-            :content="{ icon: 'uil:paperclip', text: 'Attach' }"
-            layout="tile-wide"
-            theme="filled-neutral"
+            :content="{
+              icon: 'material-symbols:call-merge-rounded',
+              text: 'Merge',
+            }"
           ></SimpleButton>
+          <div class="flex-grow"></div>
           <SimpleButton
-            :content="{ icon: 'uil:redo', text: 'Reset' }"
-            layout="tile-wide"
-            theme="filled-neutral"
+            :content="{ icon: 'uil:redo', altText: 'Reset' }"
             disabled
           ></SimpleButton>
         </div>
@@ -198,11 +196,17 @@ onMounted(() => {
 }
 .toolbar {
   @include template.row;
-  gap: 0.5rem;
   margin: 1rem;
   margin-bottom: 0;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--color-ink-20);
+
+  > :first-child {
+    margin-right: 0.5rem;
+  }
+  .flex-grow {
+    @include template.flex-grow;
+  }
 }
 .outgoing-list {
   flex-grow: 1;
