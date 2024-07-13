@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T, K extends string">
-export type PickerTheme = "cupertino" | "subtle";
+export type PickerTheme = "cupertino" | "subtle" | "tabs";
 
 export interface Props<T, K> {
   group: string;
@@ -28,8 +28,9 @@ const isSelected = (option: T) => {
 <template>
   <div
     :class="{
-      cupertino: theme === 'cupertino',
-      subtle: theme === 'subtle',
+      'theme-cupertino': theme === 'cupertino',
+      'theme-subtle': theme === 'subtle',
+      'theme-tabs': theme === 'tabs',
     }"
   >
     <label v-for="option in options" :key="keyify(option)">
@@ -49,10 +50,13 @@ const isSelected = (option: T) => {
 
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
-.cupertino {
+.theme-cupertino {
   @include template.picker-cupertino($content-class: "content");
 }
-.subtle {
+.theme-subtle {
   @include template.picker-subtle($content-class: "content");
+}
+.theme-tabs {
+  @include template.picker-tabs($content-class: "content");
 }
 </style>
