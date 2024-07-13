@@ -78,6 +78,7 @@ async function handleApply() {
           :content="{ icon: 'uil:plus', text: 'New' }"
           layout="traditional-wide"
           theme="filled"
+          disabled
         ></SimpleButton>
         <SimpleButton
           :content="{ icon: 'uil:ban', text: 'Reject' }"
@@ -88,6 +89,7 @@ async function handleApply() {
             icon: 'material-symbols:call-merge-rounded',
             text: 'Merge',
           }"
+          disabled
         ></SimpleButton>
         <div class="flex-grow"></div>
         <SimpleButton

@@ -37,7 +37,8 @@ const provisionality = computed(() => {
       {{ formatted.summary }}
     </p>
 
-    <div class="actions">
+    <!-- Disabled for now. -->
+    <div class="actions" v-if="false">
       <SimpleButton
         class="delete-button"
         :content="{

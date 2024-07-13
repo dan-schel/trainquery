@@ -4,18 +4,18 @@ import Picker from "@/components/common/Picker.vue";
 import { ref } from "vue";
 import InboxFeed from "./InboxFeed.vue";
 
-type Tab = "inbox" | "updated" | "curated" | "handled";
+type Tab = "inbox" | "updated" | "curated" | "rejected";
 const tabs: { value: Tab; name: string }[] = [
   { value: "inbox" as const, name: "Inbox" },
   { value: "updated" as const, name: "Updated" },
   { value: "curated" as const, name: "Curated" },
-  { value: "handled" as const, name: "Handled" },
+  { value: "rejected" as const, name: "Rejected" },
 ];
 const tabCounts: Record<Tab, number> = {
-  inbox: 8,
-  updated: 2,
+  inbox: 0,
+  updated: 0,
   curated: 0,
-  handled: 0,
+  rejected: 0,
 };
 
 const currentTab = ref<Tab>("inbox");
@@ -40,6 +40,15 @@ const currentTab = ref<Tab>("inbox");
     </Picker>
 
     <InboxFeed v-if="currentTab === 'inbox'" />
+    <p v-if="currentTab === 'updated'" class="not-implemented">
+      The updated feed is not implemented yet!
+    </p>
+    <p v-if="currentTab === 'curated'" class="not-implemented">
+      The curated list is not implemented yet!
+    </p>
+    <p v-if="currentTab === 'rejected'" class="not-implemented">
+      The rejection bin is not implemented yet!
+    </p>
   </PageContent>
 </template>
 
@@ -68,5 +77,8 @@ const currentTab = ref<Tab>("inbox");
       font-size: 0.8rem;
     }
   }
+}
+.not-implemented {
+  margin-top: 1rem;
 }
 </style>
