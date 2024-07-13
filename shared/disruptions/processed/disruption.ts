@@ -6,7 +6,7 @@ import { ExternalDisruption } from "../external/external-disruption";
 import {
   type DisruptionID,
   DisruptionIDJson,
-  ExternalDisruptionID,
+  type ExternalDisruptionID,
 } from "../../system/ids";
 
 export const DisruptionStates = [
