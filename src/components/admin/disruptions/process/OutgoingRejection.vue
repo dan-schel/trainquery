@@ -5,7 +5,7 @@ import UilBan from "@/components/icons/UilBan.vue";
 defineProps<{
   resurfaceIfUpdated: boolean;
 }>();
-const emit = defineEmits<{
+defineEmits<{
   (e: "update:resurfaceIfUpdated", newValue: boolean): void;
 }>();
 </script>
@@ -17,7 +17,7 @@ const emit = defineEmits<{
     <Switch
       class="switch"
       :modelValue="resurfaceIfUpdated"
-      @update:modelValue="emit('update:resurfaceIfUpdated', $event)"
+      @update:modelValue="$emit('update:resurfaceIfUpdated', $event)"
     >
       <p>Resurface disruption if updated</p>
     </Switch>

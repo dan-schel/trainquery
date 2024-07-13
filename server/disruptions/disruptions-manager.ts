@@ -161,6 +161,10 @@ export class DisruptionsManager {
     return this._requireFullDisruptionData().inbox;
   }
 
+  getRejectedDisruptions(): RejectedExternalDisruption[] {
+    return this._requireFullDisruptionData().rejected;
+  }
+
   getDisruptionInInbox(
     id: ExternalDisruptionID,
   ): ExternalDisruptionInInbox | null {

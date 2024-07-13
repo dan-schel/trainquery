@@ -14,6 +14,7 @@ import {
   disruptionInboxApi,
   disruptionInboxProcessApi,
   disruptionInboxSingleApi,
+  disruptionRejectedApi,
 } from "../api/admin/disruptions-api";
 import { gtfsApi } from "../api/admin/gtfs-api";
 import { logsApi } from "../api/admin/logs-api";
@@ -109,6 +110,8 @@ export async function trainQuery(
       return await logoutApi(ctx, params);
     } else if (endpoint === "admin/disruptions/inbox") {
       return await disruptionInboxApi(ctx, params);
+    } else if (endpoint === "admin/disruptions/rejected") {
+      return await disruptionRejectedApi(ctx, params);
     } else if (endpoint === "admin/disruptions/inbox/single") {
       return await disruptionInboxSingleApi(ctx, params);
     } else if (endpoint === "admin/disruptions/inbox/process") {
