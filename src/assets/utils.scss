@@ -51,3 +51,12 @@
   visibility: hidden;
   pointer-events: none;
 }
+
+@mixin disruption-card($dashed: false) {
+  border-radius: 0.5rem;
+  border: 2px solid var(--color-ink-20);
+  @if $dashed {
+    border: 2px solid var(--color-ink-40);
+    border-style: dotted;
+  }
+}

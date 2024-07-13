@@ -2,7 +2,7 @@
 import { generatePageHead } from "@/utils/head";
 import { useHead } from "@vueuse/head";
 import AdminAuthProtected from "@/components/admin/AdminAuthProtected.vue";
-import AdminDisruptionsProcess from "@/components/admin/disruptions/AdminDisruptionsProcess.vue";
+import AdminDisruptionsProcess from "@/components/admin/disruptions/process/AdminDisruptionsProcess.vue";
 
 useHead(
   generatePageHead({

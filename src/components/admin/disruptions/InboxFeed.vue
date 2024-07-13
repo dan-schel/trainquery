@@ -108,3 +108,4 @@ onMounted(() => {
   }
 }
 </style>
+@/components/admin/disruptions/process/extract-summary

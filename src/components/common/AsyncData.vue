@@ -1,7 +1,10 @@
 <script setup lang="ts" generic="T">
 import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
+
+export type AsyncState<T> = "loading" | "error" | "not-found" | { data: T };
+
 defineProps<{
-  state: "loading" | "error" | "not-found" | { data: T };
+  state: AsyncState<T>;
 }>();
 </script>
 

@@ -3,7 +3,11 @@ import { DisruptionData } from "./disruption-data";
 import { GenericLineDisruptionData } from "./types/generic-line";
 import { GenericStopDisruptionData } from "./types/generic-stop";
 import { ExternalDisruption } from "../external/external-disruption";
-import { type DisruptionID, DisruptionIDJson } from "../../system/ids";
+import {
+  type DisruptionID,
+  DisruptionIDJson,
+  ExternalDisruptionID,
+} from "../../system/ids";
 
 export const DisruptionStates = [
   "provisional",
@@ -29,8 +33,8 @@ export class Disruption {
     this.type = data.getType();
   }
 
-  usesSource(external: ExternalDisruption) {
-    return this.sources.some((s) => s.id === external.id);
+  usesSource(id: ExternalDisruptionID) {
+    return this.sources.some((s) => s.id === id);
   }
 
   with({

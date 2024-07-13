@@ -148,7 +148,7 @@ export class DisruptionsManager {
   }
 
   attachDisruptions(departure: Departure): DepartureWithDisruptions {
-    const disruptions = this._requireCache().require().value.disruptions;
+    const disruptions = this._requireFullDisruptionData().disruptions;
 
     const relevantDisruptions = disruptions.filter((d) =>
       this._requireHandler(d).affectsService(d.data, departure),
@@ -157,13 +157,19 @@ export class DisruptionsManager {
   }
 
   getDisruptionsInInbox(): ExternalDisruptionInInbox[] {
-    return this._requireCache().require().value.inbox;
+    return this._requireFullDisruptionData().inbox;
   }
 
   getDisruptionInInbox(
     id: ExternalDisruptionID,
   ): ExternalDisruptionInInbox | null {
     return this.getDisruptionsInInbox().find((x) => x.id === id) ?? null;
+  }
+
+  getProvisionalDisruptionsWithSource(id: ExternalDisruptionID): Disruption[] {
+    return this._requireFullDisruptionData().disruptions.filter(
+      (x) => x.usesSource(id) && x.state === "provisional",
+    );
   }
 
   isStale(): boolean {
@@ -199,5 +205,9 @@ export class DisruptionsManager {
       throw new Error("No cache available. Call init() first.");
     }
     return cache;
+  }
+
+  private _requireFullDisruptionData(): FullDisruptionData {
+    return this._requireCache().require().value;
   }
 }

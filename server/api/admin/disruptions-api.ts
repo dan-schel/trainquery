@@ -26,13 +26,20 @@ export async function disruptionInboxSingleApi(
   const id = requireParam(params, "id");
   if (!isExternalDisruptionID(id)) {
     return {
-      disruption: null,
+      notFound: true,
     };
   }
 
-  const disruption = ctx.disruptions.getDisruptionInInbox(id);
+  const inbox = ctx.disruptions.getDisruptionInInbox(id);
+  if (inbox == null) {
+    return {
+      notFound: true,
+    };
+  }
 
+  const provisional = ctx.disruptions.getProvisionalDisruptionsWithSource(id);
   return {
-    disruption: disruption?.toJSON() ?? null,
+    inbox: inbox.toJSON(),
+    provisional: provisional.map((x) => x.toJSON()),
   };
 }

@@ -69,14 +69,12 @@ h2 {
   @include utils.h3;
 }
 .disruption {
+  @include utils.disruption-card;
   padding: 1rem;
-  border: 2px solid var(--color-ink-20);
-  border-radius: 0.5rem;
   gap: 1rem;
 
   &.provisional {
-    border: 2px solid var(--color-ink-40);
-    border-style: dotted;
+    @include utils.disruption-card($dashed: true);
   }
 }
 .actions {

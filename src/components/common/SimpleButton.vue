@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Icon, { type IconID } from "../icons/Icon.vue";
 import { type RouteLocationRaw } from "vue-router";
+import LoadingSpinner from "./LoadingSpinner.vue";
 
 export type ButtonContent =
   | { icon: IconID; text?: never; altText: string }
@@ -20,6 +21,7 @@ export interface Props {
   theme?: ButtonTheme;
   disabled?: boolean;
   submit?: boolean;
+  loading?: boolean;
 }
 withDefaults(defineProps<Props>(), {
   layout: "traditional",
@@ -46,12 +48,14 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       'theme-hover': theme === 'hover',
       'theme-filled': theme === 'filled',
       'theme-filled-neutral': theme === 'filled-neutral',
+      loading: loading === true,
     }"
     :title="content.altText"
-    :disabled="disabled ? true : undefined"
+    :disabled="disabled || loading ? true : undefined"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>
+    <LoadingSpinner class="spinner" v-if="loading === true"></LoadingSpinner>
   </RouterLink>
   <button
     v-else
@@ -66,13 +70,15 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
       'theme-hover': theme === 'hover',
       'theme-filled': theme === 'filled',
       'theme-filled-neutral': theme === 'filled-neutral',
+      loading: loading === true,
     }"
     :title="content.altText"
-    :disabled="disabled ? true : undefined"
+    :disabled="disabled || loading ? true : undefined"
     :type="submit ? 'submit' : undefined"
   >
     <Icon v-if="content.icon != null" :id="content.icon"></Icon>
     <p v-if="content.text != null">{{ content.text }}</p>
+    <LoadingSpinner class="spinner" v-if="loading === true"></LoadingSpinner>
   </button>
 </template>
 
@@ -131,5 +137,18 @@ defineEmits<{ (e: "click", payload: MouseEvent): void }>();
 }
 .theme-filled-neutral {
   @include template.button-filled-neutral;
+}
+.loading {
+  position: relative;
+  > :not(.spinner) {
+    visibility: hidden;
+  }
+  .spinner {
+    position: absolute;
+    left: calc(50% - 0.5em);
+    top: calc(50% - 0.5em);
+    font-size: 1.5rem;
+    color: var(--content-color);
+  }
 }
 </style>
