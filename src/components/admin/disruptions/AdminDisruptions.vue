@@ -2,7 +2,7 @@
 import PageContent from "@/components/common/PageContent.vue";
 import Picker from "@/components/common/Picker.vue";
 import { ref } from "vue";
-import AdminDisruptionsInbox from "./AdminDisruptionsInbox.vue";
+import InboxFeed from "./InboxFeed.vue";
 
 type Tab = "inbox" | "updated" | "curation" | "handled";
 const tabs = [
@@ -29,7 +29,7 @@ const currentTab = ref<Tab>("inbox");
       </template>
     </Picker>
 
-    <AdminDisruptionsInbox v-if="currentTab === 'inbox'" />
+    <InboxFeed v-if="currentTab === 'inbox'" />
   </PageContent>
 </template>
 
