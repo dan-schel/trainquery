@@ -27,6 +27,7 @@ import {
 import { Transaction } from "./transaction";
 import { ExternalDisruptionInInbox } from "../../shared/disruptions/external/external-disruption-in-inbox";
 import { RejectedExternalDisruption } from "../../shared/disruptions/external/rejected-external-disruption";
+import { rejectDisruption } from "./reject-disruption";
 
 const disruptionsConsideredFreshMinutes = 15;
 const databaseRefreshIntervalMinutes = 5;
@@ -123,7 +124,7 @@ export class DisruptionsManager {
     });
 
     ctx.logger.logDisruptionTransactions(transactions);
-    await this._requireDatabase().onProcessedIncoming(transactions);
+    await this._requireDatabase().applyTransactions(transactions);
     await this._requireCache().fetch();
 
     this._lastUpdated = nowUTC();
@@ -170,6 +171,25 @@ export class DisruptionsManager {
     return this._requireFullDisruptionData().disruptions.filter(
       (x) => x.usesSource(id) && x.state === "provisional",
     );
+  }
+
+  async rejectDisruption(
+    ctx: TrainQuery,
+    disruption: ExternalDisruption,
+    resurfaceIfUpdated: boolean,
+  ): Promise<void> {
+    const transactions =
+      await this._fetchDisruptionsInboxAndRejectedTransactions();
+
+    rejectDisruption({
+      toReject: disruption,
+      resurfaceIfUpdated,
+      ...transactions,
+    });
+
+    ctx.logger.logDisruptionTransactions(transactions);
+    await this._requireDatabase().applyTransactions(transactions);
+    await this._requireCache().fetch();
   }
 
   isStale(): boolean {

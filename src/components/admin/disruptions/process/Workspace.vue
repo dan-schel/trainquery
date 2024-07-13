@@ -10,6 +10,9 @@ import UilAngleRight from "@/components/icons/UilAngleRight.vue";
 import SimpleButton from "@/components/common/SimpleButton.vue";
 import OutgoingDisruption from "./OutgoingDisruption.vue";
 import OutgoingRejection from "./OutgoingRejection.vue";
+import { useAdminAuth } from "@/utils/admin-auth-provider";
+
+const { callAdminApi } = useAdminAuth();
 
 const props = defineProps<{
   inbox: ExternalDisruptionInInbox;
@@ -38,8 +41,25 @@ function handleReset() {
   resurfaceIfUpdated.value = true;
 }
 
-function handleApply() {
+async function handleApply() {
   submitting.value = true;
+  try {
+    await callAdminApi(
+      "/api/admin/disruptions/inbox/process",
+      {
+        action: JSON.stringify({
+          reject: {
+            disruption: props.inbox.disruption,
+            resurfaceIfUpdated: resurfaceIfUpdated.value,
+          },
+        }),
+      },
+      true,
+    );
+  } catch (err) {
+    console.warn("Failed to process disruption.", err);
+  }
+  submitting.value = false;
 }
 </script>
 

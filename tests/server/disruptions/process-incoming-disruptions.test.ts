@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 import { processIncomingDisruptions } from "../../../server/disruptions/process-incoming-disruptions";
 import { ExternalDisruption } from "../../../shared/disruptions/external/external-disruption";
 import {
@@ -7,56 +7,22 @@ import {
 } from "../../../server/disruptions/provider/auto-disruption-parser";
 import { Disruption } from "../../../shared/disruptions/processed/disruption";
 import {
-  DisruptionID,
-  ExternalDisruptionID,
   toDisruptionID,
   toExternalDisruptionID,
 } from "../../../shared/system/ids";
 import { ExternalDisruptionInInbox } from "../../../shared/disruptions/external/external-disruption-in-inbox";
 import { RejectedExternalDisruption } from "../../../shared/disruptions/external/rejected-external-disruption";
 import { DisruptionData } from "../../../shared/disruptions/processed/disruption-data";
-import { Transaction } from "../../../server/disruptions/transaction";
 import { ExternalDisruptionData } from "../../../shared/disruptions/external/external-disruption-data";
-import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
+import {
+  DummyDisruptionData,
+  DummyExternalDisruptionData,
+  createDisruptions,
+  createInbox,
+  createRejected,
+  expectActions,
+} from "./utils";
 
-class DummyExternalDisruptionData extends ExternalDisruptionData {
-  constructor(
-    readonly id: string,
-    readonly content: string,
-    readonly highConfidenceParsing: boolean,
-  ) {
-    super();
-  }
-  getID(): ExternalDisruptionID {
-    return toExternalDisruptionID(`dummy-${this.id}`);
-  }
-  getType(): string {
-    return "dummy";
-  }
-  getStarts(): QUtcDateTime | null {
-    throw new Error("Method not implemented.");
-  }
-  getEnds(): QUtcDateTime | null {
-    throw new Error("Method not implemented.");
-  }
-  matchesContent(other: ExternalDisruptionData): boolean {
-    if (other instanceof DummyExternalDisruptionData) {
-      return this.content === other.content;
-    }
-    return false;
-  }
-}
-class DummyDisruptionData extends DisruptionData {
-  constructor(
-    readonly id: string,
-    readonly content: string,
-  ) {
-    super();
-  }
-  getType(): string {
-    return "dummy";
-  }
-}
 class DummyDisruptionParser extends AutoDisruptionParser {
   process(input: ExternalDisruptionData): ParsingResults | null {
     if (input instanceof DummyExternalDisruptionData) {
@@ -70,59 +36,12 @@ class DummyDisruptionParser extends AutoDisruptionParser {
 }
 
 const parsers = [new DummyDisruptionParser()];
-function createDisruptions(disruptions: Disruption[]) {
-  return new Transaction(disruptions, (x) => x.id);
-}
-function createInbox(disruptions: ExternalDisruptionInInbox[]) {
-  return new Transaction(disruptions, (x) => x.id);
-}
-function createRejected(disruptions: RejectedExternalDisruption[]) {
-  return new Transaction(disruptions, (x) => x.id);
-}
+
 function identifier(data: DisruptionData) {
   if (data instanceof DummyDisruptionData) {
     return toDisruptionID(data.id);
   }
   throw new Error();
-}
-
-function expectActions(
-  disruptions: Transaction<Disruption, DisruptionID>,
-  inbox: Transaction<ExternalDisruptionInInbox, ExternalDisruptionID>,
-  rejected: Transaction<RejectedExternalDisruption, ExternalDisruptionID>,
-  actions: {
-    disruptions?: {
-      add?: Disruption[];
-      update?: Disruption[];
-      delete?: DisruptionID[];
-    };
-    inbox?: {
-      add?: ExternalDisruptionInInbox[];
-      update?: ExternalDisruptionInInbox[];
-      delete?: ExternalDisruptionID[];
-    };
-    rejected?: {
-      add?: RejectedExternalDisruption[];
-      update?: RejectedExternalDisruption[];
-      delete?: ExternalDisruptionID[];
-    };
-  },
-) {
-  expect(disruptions.getActions()).toEqual({
-    add: actions.disruptions?.add ?? [],
-    update: actions.disruptions?.update ?? [],
-    delete: actions.disruptions?.delete ?? [],
-  });
-  expect(inbox.getActions()).toEqual({
-    add: actions.inbox?.add ?? [],
-    update: actions.inbox?.update ?? [],
-    delete: actions.inbox?.delete ?? [],
-  });
-  expect(rejected.getActions()).toEqual({
-    add: actions.rejected?.add ?? [],
-    update: actions.rejected?.update ?? [],
-    delete: actions.rejected?.delete ?? [],
-  });
 }
 
 describe("processIncomingDisruptions", () => {

@@ -12,6 +12,7 @@ import { AdminAuth, LocalAdminAuthDB } from "../admin/auth";
 import { logoutApi } from "../api/admin/logout-api";
 import {
   disruptionInboxApi,
+  disruptionInboxProcessApi,
   disruptionInboxSingleApi,
 } from "../api/admin/disruptions-api";
 import { gtfsApi } from "../api/admin/gtfs-api";
@@ -110,6 +111,9 @@ export async function trainQuery(
       return await disruptionInboxApi(ctx, params);
     } else if (endpoint === "admin/disruptions/inbox/single") {
       return await disruptionInboxSingleApi(ctx, params);
+    } else if (endpoint === "admin/disruptions/inbox/process") {
+      // TODO: This is dumb. It should be POST only.
+      return await disruptionInboxProcessApi(ctx, params);
     } else if (endpoint === "admin/gtfs") {
       return await gtfsApi(ctx, params);
     } else if (endpoint === "admin/logs") {

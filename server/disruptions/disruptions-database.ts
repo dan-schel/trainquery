@@ -17,7 +17,7 @@ export interface DisruptionDatabase {
   getInbox(): Promise<ExternalDisruptionInInbox[]>;
   getRejected(): Promise<RejectedExternalDisruption[]>;
 
-  onProcessedIncoming(transactions: DisruptionTransactions): Promise<void>;
+  applyTransactions(transactions: DisruptionTransactions): Promise<void>;
 }
 
 export class InMemoryDisruptionDatabase implements DisruptionDatabase {
@@ -35,7 +35,7 @@ export class InMemoryDisruptionDatabase implements DisruptionDatabase {
     return this._rejected;
   }
 
-  async onProcessedIncoming(transactions: DisruptionTransactions) {
+  async applyTransactions(transactions: DisruptionTransactions) {
     this._disruptions.splice(0, this._disruptions.length);
     this._disruptions.push(...transactions.disruptions.getValues());
 
@@ -63,9 +63,7 @@ export class MongoDisruptionDatabase implements DisruptionDatabase {
     return RejectedExternalDisruption.json.array().parse(json);
   }
 
-  async onProcessedIncoming(
-    transactions: DisruptionTransactions,
-  ): Promise<void> {
+  async applyTransactions(transactions: DisruptionTransactions): Promise<void> {
     // TODO: This is all done in series. It's probably fine since you wouldn't
     // expect the transactions to have many changes (unless the external API)
     // has a ton of new disruptions! Maybe we should do it in parallel though?

@@ -33,6 +33,7 @@ function requireSession() {
 async function callAdminApi(
   apiPath: string,
   params: Record<string, string>,
+  usePost: boolean = false,
 ): Promise<Response> {
   if (session.value == null) {
     throw new Error(
@@ -45,12 +46,22 @@ async function callAdminApi(
     url.searchParams.set(k, v);
   }
 
-  // TODO: Use resiliant call function in "@/utils/call-api".
-  const response = await fetch(url.href, {
-    headers: {
-      "admin-token": session.value.token,
-    },
-  });
+  // TODO: This code sucks. It also should use resiliant call logic like in
+  // "@/utils/call-api".
+  const response = !usePost
+    ? await fetch(url.href, {
+        headers: {
+          "admin-token": session.value.token,
+        },
+      })
+    : await fetch(url.href, {
+        method: "POST",
+        headers: {
+          "admin-token": session.value.token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
+      });
 
   // Occurs if the admin token is invalid or expired. Does NOT occur if the user
   // has the wrong role/inadequate permissions.
