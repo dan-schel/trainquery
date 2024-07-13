@@ -87,4 +87,3 @@ const provisionality = computed(() => {
   justify-content: flex-end;
 }
 </style>
-@/components/disruptions/format-disruption
