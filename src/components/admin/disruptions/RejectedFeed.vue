@@ -3,9 +3,9 @@ import { useAdminAuth } from "@/utils/admin-auth-provider";
 import { onMounted, ref } from "vue";
 import { z } from "zod";
 import { extractSummaryFromDisruption } from "@/components/admin/disruptions/extract-summary";
-import { ExternalDisruptionInInbox } from "shared/disruptions/external/external-disruption-in-inbox";
 import UilCheckCircle from "@/components/icons/UilCheckCircle.vue";
 import AsyncData from "@/components/common/AsyncData.vue";
+import { RejectedExternalDisruption } from "shared/disruptions/external/rejected-external-disruption";
 
 const { callAdminApi } = useAdminAuth();
 
@@ -13,13 +13,13 @@ const emit = defineEmits<{
   (e: "updateCounts", newCounts: { inbox: number; updated: number }): void;
 }>();
 
-const state = ref<"loading" | "error" | { data: ExternalDisruptionInInbox[] }>(
+const state = ref<"loading" | "error" | { data: RejectedExternalDisruption[] }>(
   "loading",
 );
 
 async function handleMounted() {
   const schema = z.object({
-    inbox: ExternalDisruptionInInbox.json.array(),
+    rejected: RejectedExternalDisruption.json.array(),
     counts: z.object({
       inbox: z.number(),
       updated: z.number(),
@@ -28,10 +28,10 @@ async function handleMounted() {
 
   state.value = "loading";
   try {
-    const response = await callAdminApi("/api/admin/disruptions/inbox", {});
+    const response = await callAdminApi("/api/admin/disruptions/rejected", {});
     const data = await response.json();
     const parsed = schema.parse(data);
-    state.value = { data: parsed.inbox };
+    state.value = { data: parsed.rejected };
     emit("updateCounts", parsed.counts);
   } catch (e) {
     console.warn("Failed to fetch disruptions.", e);
@@ -48,19 +48,13 @@ onMounted(() => {
   <div class="disruptions">
     <AsyncData :state="state">
       <template #default="{ data }">
-        <RouterLink
-          v-for="(disruption, i) in data"
-          :key="i"
-          class="disruption"
-          :to="{
-            name: 'admin-disruptions-process',
-            params: { id: disruption.id },
-          }"
-        >
+        <!-- Temporarily a div, change back to a RouterLink when the route is
+        implemented. -->
+        <div v-for="(disruption, i) in data" :key="i" class="disruption">
           <p>
             {{ extractSummaryFromDisruption(disruption.disruption) }}
           </p>
-        </RouterLink>
+        </div>
 
         <div class="empty" v-if="data.length === 0">
           <UilCheckCircle></UilCheckCircle>
@@ -82,8 +76,8 @@ onMounted(() => {
   margin-bottom: 2rem;
 }
 .disruption {
-  @include template.button-hover;
-  --button-rounding: 0;
+  // @include template.button-hover;
+  // --button-rounding: 0;
 
   // For the divider.
   position: relative;

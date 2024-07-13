@@ -78,4 +78,3 @@ svg {
   min-height: 2.5rem;
 }
 </style>
-./format-disruption

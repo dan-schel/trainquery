@@ -18,8 +18,32 @@ export async function disruptionInboxApi(
 ): Promise<object> {
   await ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
 
+  const inbox = ctx.disruptions.getDisruptionsInInbox();
+
   return {
-    inbox: ctx.disruptions.getDisruptionsInInbox().map((x) => x.toJSON()),
+    inbox: inbox.map((x) => x.toJSON()),
+    counts: {
+      inbox: inbox.length,
+      updated: 0,
+    },
+  };
+}
+
+export async function disruptionRejectedApi(
+  ctx: TrainQuery,
+  params: ServerParams,
+): Promise<object> {
+  await ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+
+  const inbox = ctx.disruptions.getDisruptionsInInbox();
+  const rejected = ctx.disruptions.getRejectedDisruptions();
+
+  return {
+    rejected: rejected.map((x) => x.toJSON()),
+    counts: {
+      inbox: inbox.length,
+      updated: 0,
+    },
   };
 }
 

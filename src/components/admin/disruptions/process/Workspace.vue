@@ -11,8 +11,10 @@ import SimpleButton from "@/components/common/SimpleButton.vue";
 import OutgoingDisruption from "./OutgoingDisruption.vue";
 import OutgoingRejection from "./OutgoingRejection.vue";
 import { useAdminAuth } from "@/utils/admin-auth-provider";
+import { useRouter } from "vue-router";
 
 const { callAdminApi } = useAdminAuth();
+const router = useRouter();
 
 const props = defineProps<{
   inbox: ExternalDisruptionInInbox;
@@ -56,6 +58,7 @@ async function handleApply() {
       },
       true,
     );
+    router.push({ name: "admin-disruptions" });
   } catch (err) {
     console.warn("Failed to process disruption.", err);
   }
@@ -102,13 +105,17 @@ async function handleApply() {
           v-if="isRejected"
           v-model:resurface-if-updated="resurfaceIfUpdated"
         ></OutgoingRejection>
-        <OutgoingDisruption
-          v-else
-          v-for="d in provisional"
-          :key="d.id"
-          :disruption="d"
-          :formerly-provisional="false"
-        ></OutgoingDisruption>
+        <template v-else>
+          <OutgoingDisruption
+            v-for="d in provisional"
+            :key="d.id"
+            :disruption="d"
+            :formerly-provisional="false"
+          ></OutgoingDisruption>
+          <p v-if="provisional.length == 0" class="empty">
+            No provisional disruptions are in effect.
+          </p>
+        </template>
       </div>
       <div class="bottom">
         <SimpleButton
@@ -167,6 +174,11 @@ async function handleApply() {
   flex-grow: 1;
   padding: 1rem;
   gap: 0.5rem;
+}
+.empty {
+  margin: 1rem 0;
+  text-align: center;
+  font-style: italic;
 }
 .bottom {
   @include template.row;

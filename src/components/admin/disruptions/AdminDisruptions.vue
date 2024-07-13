@@ -3,6 +3,7 @@ import PageContent from "@/components/common/PageContent.vue";
 import Picker from "@/components/common/Picker.vue";
 import { ref } from "vue";
 import InboxFeed from "./InboxFeed.vue";
+import RejectedFeed from "./RejectedFeed.vue";
 
 type Tab = "inbox" | "updated" | "curated" | "rejected";
 const tabs: { value: Tab; name: string }[] = [
@@ -11,14 +12,29 @@ const tabs: { value: Tab; name: string }[] = [
   { value: "curated" as const, name: "Curated" },
   { value: "rejected" as const, name: "Rejected" },
 ];
-const tabCounts: Record<Tab, number> = {
+const tabCounts = ref<Record<Tab, number>>({
   inbox: 0,
   updated: 0,
   curated: 0,
   rejected: 0,
-};
+});
 
 const currentTab = ref<Tab>("inbox");
+
+function handleUpdateCounts({
+  inbox,
+  updated,
+}: {
+  inbox: number;
+  updated: number;
+}) {
+  tabCounts.value = {
+    inbox,
+    updated,
+    curated: 0,
+    rejected: 0,
+  };
+}
 </script>
 
 <template>
@@ -39,16 +55,20 @@ const currentTab = ref<Tab>("inbox");
       </template>
     </Picker>
 
-    <InboxFeed v-if="currentTab === 'inbox'" />
+    <InboxFeed
+      v-if="currentTab === 'inbox'"
+      @update-counts="handleUpdateCounts"
+    />
     <p v-if="currentTab === 'updated'" class="not-implemented">
       The updated feed is not implemented yet!
     </p>
     <p v-if="currentTab === 'curated'" class="not-implemented">
       The curated list is not implemented yet!
     </p>
-    <p v-if="currentTab === 'rejected'" class="not-implemented">
-      The rejection bin is not implemented yet!
-    </p>
+    <RejectedFeed
+      v-if="currentTab === 'rejected'"
+      @update-counts="handleUpdateCounts"
+    />
   </PageContent>
 </template>
 
