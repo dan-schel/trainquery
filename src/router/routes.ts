@@ -66,6 +66,12 @@ export default [
       import("../views/admin/disruptions/AdminDisruptionsProcess.vue"),
   },
   {
+    path: "/admin/disruptions/restore/:id",
+    name: "admin-disruptions-restore",
+    component: () =>
+      import("../views/admin/disruptions/AdminDisruptionsRestore.vue"),
+  },
+  {
     path: "/admin/gtfs",
     name: "admin-gtfs",
     component: () => import("../views/admin/AdminGtfs.vue"),

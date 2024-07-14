@@ -15,6 +15,8 @@ import {
   disruptionInboxProcessApi,
   disruptionInboxSingleApi,
   disruptionRejectedApi,
+  disruptionRejectedSingleApi,
+  disruptionRestoreApi,
 } from "../api/admin/disruptions-api";
 import { gtfsApi } from "../api/admin/gtfs-api";
 import { logsApi } from "../api/admin/logs-api";
@@ -114,9 +116,14 @@ export async function trainQuery(
       return await disruptionRejectedApi(ctx, params);
     } else if (endpoint === "admin/disruptions/inbox/single") {
       return await disruptionInboxSingleApi(ctx, params);
+    } else if (endpoint === "admin/disruptions/rejected/single") {
+      return await disruptionRejectedSingleApi(ctx, params);
     } else if (endpoint === "admin/disruptions/inbox/process") {
       // TODO: This is dumb. It should be POST only.
       return await disruptionInboxProcessApi(ctx, params);
+    } else if (endpoint === "admin/disruptions/rejected/restore") {
+      // TODO: This is dumb. It should be POST only.
+      return await disruptionRestoreApi(ctx, params);
     } else if (endpoint === "admin/gtfs") {
       return await gtfsApi(ctx, params);
     } else if (endpoint === "admin/logs") {

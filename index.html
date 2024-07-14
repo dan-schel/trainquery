@@ -20,8 +20,6 @@
         const inferredTheme =
           theme ?? (darkModePreference.matches ? "dark" : "light");
 
-        console.log("Applying theme", theme, inferredTheme);
-
         document.documentElement.classList.remove("light", "dark");
         if (theme === "light" || theme === "dark") {
           document.documentElement.classList.add(theme);

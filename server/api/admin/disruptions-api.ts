@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { isExternalDisruptionID } from "../../../shared/system/ids";
+import {
+  ExternalDisruptionIDJson,
+  isExternalDisruptionID,
+} from "../../../shared/system/ids";
 import { ServerParams, TrainQuery } from "../../ctx/trainquery";
 import {
   BadApiCallError,
@@ -74,6 +77,31 @@ export async function disruptionInboxSingleApi(
   };
 }
 
+export async function disruptionRejectedSingleApi(
+  ctx: TrainQuery,
+  params: ServerParams,
+): Promise<object> {
+  ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+
+  const id = requireParam(params, "id");
+  if (!isExternalDisruptionID(id)) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const rejected = ctx.disruptions.getRejectedDisruption(id);
+  if (rejected == null) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    rejected: rejected.toJSON(),
+  };
+}
+
 export async function disruptionInboxProcessApi(
   ctx: TrainQuery,
   params: ServerParams,
@@ -111,6 +139,47 @@ export async function disruptionInboxProcessApi(
       // TODO: It's not really an internal server error if the inbox disruption no
       // longer exists, which is probably the most likely cause of errors here.
       throw new BadApiCallError("Failed to reject disruption.", 500);
+    }
+
+    // TODO: This is dumb. We should be able to just return 200.
+    return {
+      success: true,
+    };
+  } catch {
+    throw new BadApiCallError("Action was not JSON.", 400);
+  }
+}
+
+export async function disruptionRestoreApi(
+  ctx: TrainQuery,
+  params: ServerParams,
+): Promise<object> {
+  ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+
+  // TODO: This is dumb, but I only allow key value pairs right now. :/
+  const action = requireBodyParam(params, "action");
+
+  // TODO: We should just something like this for ALL param parsing in ALL APIs!
+  // TODO: We just support reject for now. Later this schema will be a union
+  // which allows the below, but alternatively allows something like:
+  // { add: Disruption[]; approve: DisruptionID[]; merge: DisruptionID[]; etc. }
+  // (Example only, that schema design might be super dumb lol.)
+  const schema = z.object({
+    restore: ExternalDisruptionIDJson,
+  });
+
+  try {
+    const actionParsed = schema.safeParse(JSON.parse(action));
+    if (!actionParsed.success) {
+      throw new BadApiCallError("Invalid action.", 400);
+    }
+
+    try {
+      await ctx.disruptions.restoreDisruption(ctx, actionParsed.data.restore);
+    } catch (e) {
+      // TODO: It's not really an internal server error if the inbox disruption no
+      // longer exists, which is probably the most likely cause of errors here.
+      throw new BadApiCallError("Failed to restore disruption.", 500);
     }
 
     // TODO: This is dumb. We should be able to just return 200.
