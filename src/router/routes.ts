@@ -66,10 +66,10 @@ export default [
       import("../views/admin/disruptions/AdminDisruptionsProcess.vue"),
   },
   {
-    path: "/admin/disruptions/unreject/:id",
-    name: "admin-disruptions-unreject",
+    path: "/admin/disruptions/restore/:id",
+    name: "admin-disruptions-restore",
     component: () =>
-      import("../views/admin/disruptions/AdminDisruptionsUnreject.vue"),
+      import("../views/admin/disruptions/AdminDisruptionsRestore.vue"),
   },
   {
     path: "/admin/gtfs",

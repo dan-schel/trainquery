@@ -30,10 +30,10 @@ async function handleRestore() {
   restoring.value = true;
   try {
     await callAdminApi(
-      "/api/admin/disruptions/rejected/unreject",
+      "/api/admin/disruptions/rejected/restore",
       {
         action: JSON.stringify({
-          unreject: props.rejected.id,
+          restore: props.rejected.id,
         }),
       },
       true,

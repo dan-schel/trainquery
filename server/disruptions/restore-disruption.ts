@@ -15,7 +15,7 @@ interface Input {
   >;
 }
 
-export function unrejectDisruption(input: Input) {
+export function restoreDisruption(input: Input) {
   const { disruption, rejected } = input;
 
   // Add the disruption to the rejected list.
@@ -23,5 +23,5 @@ export function unrejectDisruption(input: Input) {
 
   // TODO: In future, this function should handle recreating the auto-parsed
   // disruptions and inbox entry.
-  // (See comment at DisruptionsManager.unrejectDisruption for more details.)
+  // (See comment at DisruptionsManager.restoreDisruption for more details.)
 }

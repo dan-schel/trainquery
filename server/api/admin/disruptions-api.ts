@@ -150,7 +150,7 @@ export async function disruptionInboxProcessApi(
   }
 }
 
-export async function disruptionUnrejectApi(
+export async function disruptionRestoreApi(
   ctx: TrainQuery,
   params: ServerParams,
 ): Promise<object> {
@@ -165,7 +165,7 @@ export async function disruptionUnrejectApi(
   // { add: Disruption[]; approve: DisruptionID[]; merge: DisruptionID[]; etc. }
   // (Example only, that schema design might be super dumb lol.)
   const schema = z.object({
-    unreject: ExternalDisruptionIDJson,
+    restore: ExternalDisruptionIDJson,
   });
 
   try {
@@ -175,11 +175,11 @@ export async function disruptionUnrejectApi(
     }
 
     try {
-      await ctx.disruptions.unrejectDisruption(ctx, actionParsed.data.unreject);
+      await ctx.disruptions.restoreDisruption(ctx, actionParsed.data.restore);
     } catch (e) {
       // TODO: It's not really an internal server error if the inbox disruption no
       // longer exists, which is probably the most likely cause of errors here.
-      throw new BadApiCallError("Failed to unreject disruption.", 500);
+      throw new BadApiCallError("Failed to restore disruption.", 500);
     }
 
     // TODO: This is dumb. We should be able to just return 200.

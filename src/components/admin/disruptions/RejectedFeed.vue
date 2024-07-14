@@ -53,7 +53,7 @@ onMounted(() => {
           :key="i"
           class="disruption"
           :to="{
-            name: 'admin-disruptions-unreject',
+            name: 'admin-disruptions-restore',
             params: { id: disruption.id },
           }"
         >
