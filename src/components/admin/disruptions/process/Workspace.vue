@@ -60,6 +60,7 @@ async function handleApply() {
     );
     router.push({ name: "admin-disruptions" });
   } catch (err) {
+    // TODO: A toast notification?
     console.warn("Failed to process disruption.", err);
   }
   submitting.value = false;

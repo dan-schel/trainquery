@@ -28,6 +28,7 @@ import { Transaction } from "./transaction";
 import { ExternalDisruptionInInbox } from "../../shared/disruptions/external/external-disruption-in-inbox";
 import { RejectedExternalDisruption } from "../../shared/disruptions/external/rejected-external-disruption";
 import { rejectDisruption } from "./reject-disruption";
+import { unrejectDisruption } from "./unreject-disruption";
 
 const disruptionsConsideredFreshMinutes = 15;
 const databaseRefreshIntervalMinutes = 5;
@@ -171,6 +172,12 @@ export class DisruptionsManager {
     return this.getDisruptionsInInbox().find((x) => x.id === id) ?? null;
   }
 
+  getRejectedDisruption(
+    id: ExternalDisruptionID,
+  ): RejectedExternalDisruption | null {
+    return this.getRejectedDisruptions().find((x) => x.id === id) ?? null;
+  }
+
   getProvisionalDisruptionsWithSource(id: ExternalDisruptionID): Disruption[] {
     return this._requireFullDisruptionData().disruptions.filter(
       (x) => x.usesSource(id) && x.state === "provisional",
@@ -194,6 +201,40 @@ export class DisruptionsManager {
     ctx.logger.logDisruptionTransactions(transactions);
     await this._requireDatabase().applyTransactions(transactions);
     await this._requireCache().fetch();
+  }
+
+  async unrejectDisruption(
+    ctx: TrainQuery,
+    disruption: ExternalDisruptionID,
+  ): Promise<void> {
+    const transactions =
+      await this._fetchDisruptionsInboxAndRejectedTransactions();
+
+    unrejectDisruption({
+      disruption,
+      ...transactions,
+    });
+
+    ctx.logger.logDisruptionTransactions(transactions);
+    await this._requireDatabase().applyTransactions(transactions);
+    await this._requireCache().fetch();
+
+    // We call this to ensure the inbox entry and provisional disruptions are
+    // re-created.
+    //
+    // TODO: Ideally we would extract the logic from processIncomingDisruptions
+    // that deals with fresh disruptions, and run that inside unrejectDisruption
+    // to avoid the second call here. We would also ideally process the latest
+    // version of this external disruption if it has been updated since being
+    // rejected (in the case where resurfacedIfUpdated was false).
+    //
+    // Perhaps we can have processNewDisruptions update rejected disruptions
+    // when their content changes too (maybe store the original content in the
+    // rejected object for comparison), which then means in unrejectDisruption
+    // we can pass along the data we're unrejecting, which is up-to-date, to
+    // that extracted logic. This avoids the weirdness around this call
+    // potentially doing nothing if not all disruption sources have data.
+    await this._handleNewDisruptions(ctx);
   }
 
   isStale(): boolean {

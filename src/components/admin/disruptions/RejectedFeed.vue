@@ -48,13 +48,19 @@ onMounted(() => {
   <div class="disruptions">
     <AsyncData :state="state">
       <template #default="{ data }">
-        <!-- Temporarily a div, change back to a RouterLink when the route is
-        implemented. -->
-        <div v-for="(disruption, i) in data" :key="i" class="disruption">
+        <RouterLink
+          v-for="(disruption, i) in data"
+          :key="i"
+          class="disruption"
+          :to="{
+            name: 'admin-disruptions-unreject',
+            params: { id: disruption.id },
+          }"
+        >
           <p>
             {{ extractSummaryFromDisruption(disruption.disruption) }}
           </p>
-        </div>
+        </RouterLink>
 
         <div class="empty" v-if="data.length === 0">
           <UilCheckCircle></UilCheckCircle>
@@ -76,8 +82,8 @@ onMounted(() => {
   margin-bottom: 2rem;
 }
 .disruption {
-  // @include template.button-hover;
-  // --button-rounding: 0;
+  @include template.button-hover;
+  --button-rounding: 0;
 
   // For the divider.
   position: relative;
