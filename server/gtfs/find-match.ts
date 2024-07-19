@@ -37,11 +37,10 @@ export function matchToRoute<T>(
   for (const combination of combinations) {
     // Filter out stops that the parsing rules say we can ignore for this
     // combination's line, e.g. Southern Cross on the Sandringham line.
-    const effectiveStoppingOrder = stoppingOrder.filter(
-      (s) =>
-        !feedConfig
-          .getParsingRulesForLine(combination.line)
-          .ignoreStops.includes(s.stop),
+    const effectiveStoppingOrder = filterStoppingOrder(
+      stoppingOrder,
+      feedConfig,
+      combination.line,
     );
 
     // Build the stopping pattern by slotting in the stops in the stopping order
@@ -153,6 +152,22 @@ function mapWithStopLists(
       o.direction,
     ).stops,
   }));
+}
+
+function filterStoppingOrder<T>(
+  stoppingOrder: { stop: StopID; value: T }[],
+  feedConfig: GtfsFeedConfig,
+  line: LineID,
+): { stop: StopID; value: T }[] {
+  const stoppingList = stoppingOrder.map((s) => s.stop);
+
+  // Work out which stops can be ignored for this line and this stopping list.
+  const lineRules = feedConfig.getParsingRulesForLine(line);
+  const stopsToIgnore = lineRules.ignoreStops
+    .filter((r) => r.applies(stoppingList))
+    .map((x) => x.stop);
+
+  return stoppingOrder.filter((s) => !stopsToIgnore.includes(s.stop));
 }
 
 export function getCombinationsForRouteID(

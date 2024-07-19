@@ -8,10 +8,36 @@ import {
 } from "../../shared/system/ids";
 import { IntStringJson, mapJson } from "../../shared/utils";
 
+export class IgnoreStopsRules {
+  constructor(
+    readonly stop: StopID,
+    readonly ifPresent: StopID[],
+  ) {}
+
+  applies(stoppingOrder: StopID[]) {
+    // Array.every correctly returns true for an empty array.
+    return this.ifPresent.every((s) => stoppingOrder.includes(s));
+  }
+
+  static readonly json = z
+    .union([
+      StopIDJson,
+      z.object({
+        stop: StopIDJson,
+        ifPresent: StopIDJson.array().default([]),
+      }),
+    ])
+    .transform((x) =>
+      typeof x === "number"
+        ? new IgnoreStopsRules(x, [])
+        : new IgnoreStopsRules(x.stop, x.ifPresent),
+    );
+}
+
 export class GtfsParsingRules {
   constructor(
     readonly routeIDRegex: RegExp[],
-    readonly ignoreStops: StopID[],
+    readonly ignoreStops: IgnoreStopsRules[],
     readonly canDedupeWith: LineID[],
   ) {}
 
@@ -24,7 +50,7 @@ export class GtfsParsingRules {
         .array()
         .transform((x) => x.map((r) => new RegExp(r)))
         .default([]),
-      ignoreStops: StopIDJson.array().default([]),
+      ignoreStops: IgnoreStopsRules.json.array().default([]),
       canDedupeWith: LineIDJson.array().default([]),
     })
     .transform(
