@@ -2,22 +2,30 @@ import { z } from "zod";
 import { type StopID, StopIDJson } from "../ids";
 import { PusdoFilter } from "./pusdo";
 
+/*
+ * ROUTE STOP TYPE EXPLANATION:
+ *
+ * |-----------------------------|----------------|--------------------|
+ * |                             | "On this line" | Not "on this line" |
+ * |-----------------------------|----------------|--------------------|
+ * | Trains sometimes stop here  | stops          | viaish             |
+ * |-----------------------------|----------------|--------------------|
+ * | Trains never EVER stop here | express        | via                |
+ * |-----------------------------|----------------|--------------------|
+ *
+ * Examples:
+ * - "stops": Berwick on the Gippsland line.
+ * - "viaish": East Pakenham on the Gippsland line.
+ * - "express": South Kensington on the Sunbury line.
+ * - "via": Cardinia Road on the Gippsland line.
+ *
+ * Recording "via" stops seems redundant, but it's done so we can show them on
+ * the line diagram on the line page (and also might be required for the train
+ * map in the future).
+ */
+
 /** All route stop types. */
-export const RouteStopTypes = [
-  // Considered a stop on the line. Not all trains necessarily stop here, but
-  // "stopping all stations" trains would.
-  "stops",
-  // Still considered "a stop on the line", but line diagrams show this stop
-  // greyed out, acknowledging that it's always skipped.
-  "express",
-  // A stop that isn't considered to be "on this line" at all, i.e. a service
-  // can skip this stop and still be considered "stopping all stations", e.g.
-  // suburban stations on V/Line trains. Only shown on the line page as skipped.
-  "via",
-  // Like "via", but suddenly is considered to be "on this line" for a service
-  // that provides a stopping time, e.g. East Pakenham on the Gippsland line.
-  "viaish",
-] as const;
+export const RouteStopTypes = ["stops", "express", "via", "viaish"] as const;
 /** E.g. 'stops', 'via', 'express', etc. */
 export type RouteStopType = (typeof RouteStopTypes)[number];
 /** Matches a value in {@link RouteStopTypes}. */
