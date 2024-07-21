@@ -1,12 +1,8 @@
 import { z } from "zod";
-import {
-  DirectionDefinition,
-  Route,
-  RouteStop,
-  type StopList,
-  nonViaStopIDs,
-} from "./line-route";
+import { DirectionDefinition, Route } from "./line-route";
 import { toRouteVariantID } from "../ids";
+import { StopList, StopListID } from "./stop-list/stop-list";
+import { RouteStop } from "./route-stop";
 
 /** The simplest type of line route. */
 export class LinearRoute extends Route {
@@ -47,25 +43,16 @@ export class LinearRoute extends Route {
     return route.type === "linear";
   }
 
-  getStopLists(): StopList[] {
-    const stops = nonViaStopIDs(this.stops);
-    const stopsReversed = [...stops].reverse();
-
+  protected defineStopLists(): StopList[] {
     return [
-      {
-        variant: LinearRoute.regularID,
-        direction: this.forward.id,
-        stops: stops.map((h) => h.stop),
-        picksUp: stops.map((h) => h.picksUp),
-        setsDown: stops.map((h) => h.setsDown),
-      },
-      {
-        variant: LinearRoute.regularID,
-        direction: this.reverse.id,
-        stops: stopsReversed.map((h) => h.stop),
-        picksUp: stopsReversed.map((h) => h.picksUp),
-        setsDown: stopsReversed.map((h) => h.setsDown),
-      },
+      new StopList(
+        new StopListID(LinearRoute.regularID, this.forward.id),
+        this.stops,
+      ),
+      new StopList(
+        new StopListID(LinearRoute.regularID, this.reverse.id),
+        [...this.stops].reverse(),
+      ),
     ];
   }
 }

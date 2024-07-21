@@ -3,7 +3,7 @@ import type { IconID } from "../icons/Icon.vue";
 import {
   getLinePageRoute,
   getStopPageRoute,
-  linesThatStopAt,
+  linesWithCanonicalStop,
 } from "shared/system/config-utils";
 import type { Stop } from "shared/system/stop";
 import { listifyAnd } from "@dan-schel/js-utils";
@@ -223,7 +223,7 @@ function similarity(query: string, tag: string): number {
 }
 
 function stopSubtitle(stop: Stop): string {
-  const lineNames = linesThatStopAt(getConfig(), stop.id, {
+  const lineNames = linesWithCanonicalStop(getConfig(), stop.id, {
     ignoreInvisibleLines: true,
     sortAlphabetically: true,
   }).map((l) => l.name);

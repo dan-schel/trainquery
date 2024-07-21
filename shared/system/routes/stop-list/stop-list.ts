@@ -1,35 +1,34 @@
 import { z } from "zod";
 import {
   DirectionIDJson,
-  LineIDJson,
   RouteVariantIDJson,
   type DirectionID,
-  type LineID,
   type RouteVariantID,
 } from "../../ids";
 import { RouteStop } from "../route-stop";
 
 export class StopListID {
   constructor(
-    readonly line: LineID,
     readonly variant: RouteVariantID,
     readonly direction: DirectionID,
   ) {}
 
   static readonly json = z
     .object({
-      line: LineIDJson,
       variant: RouteVariantIDJson,
       direction: DirectionIDJson,
     })
-    .transform((x) => new StopListID(x.line, x.variant, x.direction));
+    .transform((x) => new StopListID(x.variant, x.direction));
 
   toJSON(): z.input<typeof StopListID.json> {
     return {
-      line: this.line,
       variant: this.variant,
       direction: this.direction,
     };
+  }
+
+  equals(other: StopListID): boolean {
+    return this.variant === other.variant && this.direction === other.direction;
   }
 }
 
@@ -41,9 +40,19 @@ export class StopList {
   readonly possibleStops = this.routeStops.filter(
     (x) => x.type === "stops" || x.type === "viaish",
   );
+  /**
+   * The stops that are considered "on this line", i.e. the route stops with all
+   * `via` and `viaish` stops removed.
+   */
+  readonly canonicalStops = this.routeStops.filter(
+    (x) => x.type === "stops" || x.type === "express",
+  );
 
   constructor(
-    /** The line, variant, and direction which uniquely identify this stop. */
+    /**
+     * The variant and direction which uniquely identify this stop list from
+     * others in the same line.
+     */
     readonly id: StopListID,
     /** All stops on this route, including `express` and `via` stops. */
     readonly routeStops: RouteStop[],

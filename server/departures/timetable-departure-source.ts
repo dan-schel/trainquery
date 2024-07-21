@@ -1,7 +1,10 @@
 import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
 import { QDayOfWeek } from "../../shared/qtime/qdayofweek";
-import { linesThatStopAt, requireLine } from "../../shared/system/config-utils";
+import {
+  linesWithPossibleStop,
+  requireLine,
+} from "../../shared/system/config-utils";
 import {
   DirectionID,
   LineID,
@@ -27,7 +30,9 @@ export class TimetableDepartureSource extends DepartureSource<TimetablePossibili
 
   prepare(stop: StopID): void {
     this._stop = stop;
-    this._lines = linesThatStopAt(this._ctx.getConfig(), stop).map((l) => l.id);
+    this._lines = linesWithPossibleStop(this._ctx.getConfig(), stop).map(
+      (l) => l.id,
+    );
   }
 
   async fetch(

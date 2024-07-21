@@ -1,12 +1,8 @@
 import { z } from "zod";
-import {
-  DirectionDefinition,
-  Route,
-  RouteStop,
-  type StopList,
-  nonViaStopIDs,
-} from "./line-route";
+import { DirectionDefinition, Route } from "./line-route";
 import { toRouteVariantID } from "../ids";
+import { StopList, StopListID } from "./stop-list/stop-list";
+import { RouteStop } from "./route-stop";
 
 /** Route with a balloon loop section where services terminate inside the loop. */
 export class HookRoute extends Route {
@@ -65,41 +61,23 @@ export class HookRoute extends Route {
     return route.type === "hook";
   }
 
-  getStopLists(): StopList[] {
-    const hooked = nonViaStopIDs([...this.stops, ...this.hooked]);
-    const direct = nonViaStopIDs([...this.stops, ...this.direct]);
+  protected defineStopLists(): StopList[] {
+    const hooked = [...this.stops, ...this.hooked];
+    const direct = [...this.stops, ...this.direct];
     const hookedReversed = [...hooked].reverse();
     const directReversed = [...direct].reverse();
 
     return [
-      {
-        variant: HookRoute.hookedID,
-        direction: this.forward.id,
-        stops: hooked.map((h) => h.stop),
-        picksUp: hooked.map((h) => h.picksUp),
-        setsDown: hooked.map((h) => h.setsDown),
-      },
-      {
-        variant: HookRoute.hookedID,
-        direction: this.reverse.id,
-        stops: hookedReversed.map((h) => h.stop),
-        picksUp: hookedReversed.map((h) => h.picksUp),
-        setsDown: hookedReversed.map((h) => h.setsDown),
-      },
-      {
-        variant: HookRoute.directID,
-        direction: this.forward.id,
-        stops: direct.map((h) => h.stop),
-        picksUp: direct.map((h) => h.picksUp),
-        setsDown: direct.map((h) => h.setsDown),
-      },
-      {
-        variant: HookRoute.directID,
-        direction: this.reverse.id,
-        stops: directReversed.map((h) => h.stop),
-        picksUp: directReversed.map((h) => h.picksUp),
-        setsDown: directReversed.map((h) => h.setsDown),
-      },
+      new StopList(new StopListID(HookRoute.hookedID, this.forward.id), hooked),
+      new StopList(new StopListID(HookRoute.directID, this.forward.id), direct),
+      new StopList(
+        new StopListID(HookRoute.hookedID, this.reverse.id),
+        hookedReversed,
+      ),
+      new StopList(
+        new StopListID(HookRoute.directID, this.reverse.id),
+        directReversed,
+      ),
     ];
   }
 }

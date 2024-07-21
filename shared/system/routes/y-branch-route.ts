@@ -1,12 +1,8 @@
 import { z } from "zod";
-import {
-  DirectionDefinition,
-  Route,
-  RouteStop,
-  type StopList,
-  nonViaStopIDs,
-} from "./line-route";
+import { DirectionDefinition, Route } from "./line-route";
 import { type RouteVariantID, RouteVariantIDJson } from "../ids";
+import { RouteStop } from "./route-stop";
+import { StopList, StopListID } from "./stop-list/stop-list";
 
 /** The details of a single branch in a {@link YBranchRoute}. */
 export class Branch {
@@ -92,47 +88,29 @@ export class YBranchRoute extends Route {
     return route.type === "y-branch";
   }
 
-  getStopLists(): StopList[] {
-    const firstBranch = nonViaStopIDs([
-      ...this.firstBranch.stops,
-      ...this.shared,
-    ]);
-    const secondBranch = nonViaStopIDs([
-      ...this.secondBranch.stops,
-      ...this.shared,
-    ]);
+  protected defineStopLists(): StopList[] {
+    const firstBranch = [...this.firstBranch.stops, ...this.shared];
+    const secondBranch = [...this.secondBranch.stops, ...this.shared];
     const firstBranchReversed = [...firstBranch].reverse();
     const secondBranchReversed = [...secondBranch].reverse();
 
     return [
-      {
-        variant: this.firstBranch.id,
-        direction: this.forward.id,
-        stops: firstBranch.map((h) => h.stop),
-        picksUp: firstBranch.map((h) => h.picksUp),
-        setsDown: firstBranch.map((h) => h.setsDown),
-      },
-      {
-        variant: this.firstBranch.id,
-        direction: this.reverse.id,
-        stops: firstBranchReversed.map((h) => h.stop),
-        picksUp: firstBranchReversed.map((h) => h.picksUp),
-        setsDown: firstBranchReversed.map((h) => h.setsDown),
-      },
-      {
-        variant: this.secondBranch.id,
-        direction: this.forward.id,
-        stops: secondBranch.map((h) => h.stop),
-        picksUp: secondBranch.map((h) => h.picksUp),
-        setsDown: secondBranch.map((h) => h.setsDown),
-      },
-      {
-        variant: this.secondBranch.id,
-        direction: this.reverse.id,
-        stops: secondBranchReversed.map((h) => h.stop),
-        picksUp: secondBranchReversed.map((h) => h.picksUp),
-        setsDown: secondBranchReversed.map((h) => h.setsDown),
-      },
+      new StopList(
+        new StopListID(this.firstBranch.id, this.forward.id),
+        firstBranch,
+      ),
+      new StopList(
+        new StopListID(this.secondBranch.id, this.forward.id),
+        secondBranch,
+      ),
+      new StopList(
+        new StopListID(this.firstBranch.id, this.reverse.id),
+        firstBranchReversed,
+      ),
+      new StopList(
+        new StopListID(this.secondBranch.id, this.reverse.id),
+        secondBranchReversed,
+      ),
     ];
   }
 }

@@ -3,8 +3,8 @@ import { useHead, type UseHeadInput } from "@vueuse/head";
 import { useRoute, useRouter } from "vue-router";
 import {
   getStopPageRoute,
-  linesThatStopAt,
   getStopFromUrlName,
+  linesWithCanonicalStop,
 } from "shared/system/config-utils";
 import { computed, ref, watch } from "vue";
 import { getConfig } from "@/utils/get-config";
@@ -124,7 +124,7 @@ const lines = computed(() => {
     return [];
   }
 
-  return linesThatStopAt(getConfig(), stop.value.id, {
+  return linesWithCanonicalStop(getConfig(), stop.value.id, {
     ignoreInvisibleLines: true,
   }).map((l) => l.id);
 });

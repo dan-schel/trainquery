@@ -92,3 +92,16 @@ export function hexToString(hex: string) {
   }
   return new TextDecoder().decode(bytes);
 }
+
+export class Lazy<T> {
+  private value: T | null = null;
+
+  constructor(private readonly factory: () => T) {}
+
+  get() {
+    if (this.value == null) {
+      this.value = this.factory();
+    }
+    return this.value;
+  }
+}

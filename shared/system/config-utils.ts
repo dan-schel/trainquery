@@ -20,18 +20,36 @@ import {
 
 export type HasSharedConfig = { shared: SharedConfig };
 
-export function linesThatStopAt(
+type LinesThatStopAtOptions = {
+  ignoreInvisibleLines?: boolean;
+  sortAlphabetically?: boolean;
+};
+
+export function linesWithCanonicalStop(
   config: HasSharedConfig,
   stop: StopID,
+  options: LinesThatStopAtOptions = {},
+) {
+  return filterLines(config, (l) => l.route.isCanonicalStop(stop), options);
+}
+
+export function linesWithPossibleStop(
+  config: HasSharedConfig,
+  stop: StopID,
+  options: LinesThatStopAtOptions = {},
+) {
+  return filterLines(config, (l) => l.route.isPossibleStop(stop), options);
+}
+
+function filterLines(
+  config: HasSharedConfig,
+  matcher: (l: Line) => boolean,
   {
     ignoreInvisibleLines = false,
     sortAlphabetically = false,
-  }: {
-    ignoreInvisibleLines?: boolean;
-    sortAlphabetically?: boolean;
-  } = {},
+  }: LinesThatStopAtOptions,
 ) {
-  let lines = config.shared.lines.filter((l) => l.route.stopsAt(stop));
+  let lines = config.shared.lines.filter(matcher);
   if (ignoreInvisibleLines && !lines.every((l) => l.visibility !== "regular")) {
     lines = lines.filter((l) => l.visibility === "regular");
   }

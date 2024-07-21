@@ -1,7 +1,7 @@
 import { formatDirection } from "@/utils/format-filter";
 import { getConfig } from "@/utils/get-config";
 import { unique } from "@dan-schel/js-utils";
-import { linesThatStopAt, requireStop } from "shared/system/config-utils";
+import { linesWithPossibleStop, requireStop } from "shared/system/config-utils";
 import type {
   DirectionID,
   LineID,
@@ -34,7 +34,7 @@ export type AvailableFilters = {
 };
 
 export function getAvailableFilters(stop: StopID): AvailableFilters {
-  const lines = linesThatStopAt(getConfig(), stop, {
+  const lines = linesWithPossibleStop(getConfig(), stop, {
     sortAlphabetically: true,
   });
 

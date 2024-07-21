@@ -1,6 +1,9 @@
 import { QDate } from "../../shared/qtime/qdate";
 import { QUtcDateTime } from "../../shared/qtime/qdatetime";
-import { getLine, linesThatStopAt } from "../../shared/system/config-utils";
+import {
+  getLine,
+  linesWithPossibleStop,
+} from "../../shared/system/config-utils";
 import { StopID } from "../../shared/system/ids";
 import { TrainQuery } from "../ctx/trainquery";
 import { DepartureSource } from "./departure-source";
@@ -31,7 +34,9 @@ export class GtfsDepartureSource extends DepartureSource<GtfsPossibility> {
   prepare(stop: StopID): void {
     this._stop = stop;
 
-    const lines = linesThatStopAt(this._ctx.getConfig(), stop).map((l) => l.id);
+    const lines = linesWithPossibleStop(this._ctx.getConfig(), stop).map(
+      (l) => l.id,
+    );
     this._relevantTrips = this._gtfsData.trips.filter((t) =>
       lines.includes(t.line),
     );

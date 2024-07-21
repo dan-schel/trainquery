@@ -72,10 +72,9 @@ function writeGrid(
   }
 
   const header = `[${route}, ${direction}]`;
-  const stops = requireLine(config, timetable.line).route.requireStops(
-    route,
-    direction,
-  );
+  const stops = requireLine(config, timetable.line)
+    .route.requireStopList(route, direction)
+    .possibleStops.map((s) => s.stop);
 
   const maxStopIDDigits = Math.max(...stops).toFixed().length;
   const stopHeaders = stops.map((s) => {
