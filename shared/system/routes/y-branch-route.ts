@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { DirectionDefinition, Route } from "./line-route";
+import { DirectionDefinition, Route, createBothDirections } from "./line-route";
 import { type RouteVariantID, RouteVariantIDJson } from "../ids";
 import { RouteStop } from "./route-stop";
-import { StopList, StopListID } from "./stop-list/stop-list";
 
 /** The details of a single branch in a {@link YBranchRoute}. */
 export class Branch {
@@ -51,27 +50,37 @@ export class YBranchRoute extends Route {
     /** Stops, ordered the first shared stop to the end of the 'fork handle'. */
     readonly shared: RouteStop[],
   ) {
-    super("y-branch");
+    super("y-branch", [
+      ...createBothDirections(firstBranch.id, forward.id, reverse.id, [
+        ...firstBranch.stops,
+        ...shared,
+      ]),
+      ...createBothDirections(secondBranch.id, forward.id, reverse.id, [
+        ...secondBranch.stops,
+        ...shared,
+      ]),
+    ]);
   }
 
-  static readonly yBranchJson = z.object({
-    type: z.literal("y-branch"),
-    forward: DirectionDefinition.json,
-    reverse: DirectionDefinition.json,
-    firstBranch: Branch.json,
-    secondBranch: Branch.json,
-    shared: RouteStop.json.array(),
-  });
-
-  static transform(x: z.infer<typeof YBranchRoute.yBranchJson>) {
-    return new YBranchRoute(
-      x.forward,
-      x.reverse,
-      x.firstBranch,
-      x.secondBranch,
-      x.shared,
+  static readonly yBranchJson = z
+    .object({
+      type: z.literal("y-branch"),
+      forward: DirectionDefinition.json,
+      reverse: DirectionDefinition.json,
+      firstBranch: Branch.json,
+      secondBranch: Branch.json,
+      shared: RouteStop.json.array(),
+    })
+    .transform(
+      (x) =>
+        new YBranchRoute(
+          x.forward,
+          x.reverse,
+          x.firstBranch,
+          x.secondBranch,
+          x.shared,
+        ),
     );
-  }
 
   toJSON(): z.input<typeof YBranchRoute.yBranchJson> {
     return {
@@ -86,31 +95,5 @@ export class YBranchRoute extends Route {
 
   static detect(route: Route): route is YBranchRoute {
     return route.type === "y-branch";
-  }
-
-  protected defineStopLists(): StopList[] {
-    const firstBranch = [...this.firstBranch.stops, ...this.shared];
-    const secondBranch = [...this.secondBranch.stops, ...this.shared];
-    const firstBranchReversed = [...firstBranch].reverse();
-    const secondBranchReversed = [...secondBranch].reverse();
-
-    return [
-      new StopList(
-        new StopListID(this.firstBranch.id, this.forward.id),
-        firstBranch,
-      ),
-      new StopList(
-        new StopListID(this.secondBranch.id, this.forward.id),
-        secondBranch,
-      ),
-      new StopList(
-        new StopListID(this.firstBranch.id, this.reverse.id),
-        firstBranchReversed,
-      ),
-      new StopList(
-        new StopListID(this.secondBranch.id, this.reverse.id),
-        secondBranchReversed,
-      ),
-    ];
   }
 }

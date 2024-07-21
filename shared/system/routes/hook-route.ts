@@ -1,7 +1,6 @@
 import { z } from "zod";
-import { DirectionDefinition, Route } from "./line-route";
+import { DirectionDefinition, Route, createBothDirections } from "./line-route";
 import { toRouteVariantID } from "../ids";
-import { StopList, StopListID } from "./stop-list/stop-list";
 import { RouteStop } from "./route-stop";
 
 /** Route with a balloon loop section where services terminate inside the loop. */
@@ -30,21 +29,30 @@ export class HookRoute extends Route {
      */
     readonly direct: RouteStop[],
   ) {
-    super("hook");
+    super("hook", [
+      ...createBothDirections(HookRoute.hookedID, forward.id, reverse.id, [
+        ...stops,
+        ...hooked,
+      ]),
+      ...createBothDirections(HookRoute.directID, forward.id, reverse.id, [
+        ...stops,
+        ...direct,
+      ]),
+    ]);
   }
 
-  static readonly hookJson = z.object({
-    type: z.literal("hook"),
-    forward: DirectionDefinition.json,
-    reverse: DirectionDefinition.json,
-    stops: RouteStop.json.array(),
-    hooked: RouteStop.json.array(),
-    direct: RouteStop.json.array(),
-  });
-
-  static transform(x: z.infer<typeof HookRoute.hookJson>) {
-    return new HookRoute(x.forward, x.reverse, x.stops, x.hooked, x.direct);
-  }
+  static readonly hookJson = z
+    .object({
+      type: z.literal("hook"),
+      forward: DirectionDefinition.json,
+      reverse: DirectionDefinition.json,
+      stops: RouteStop.json.array(),
+      hooked: RouteStop.json.array(),
+      direct: RouteStop.json.array(),
+    })
+    .transform(
+      (x) => new HookRoute(x.forward, x.reverse, x.stops, x.hooked, x.direct),
+    );
 
   toJSON(): z.input<typeof HookRoute.hookJson> {
     return {
@@ -59,25 +67,5 @@ export class HookRoute extends Route {
 
   static detect(route: Route): route is HookRoute {
     return route.type === "hook";
-  }
-
-  protected defineStopLists(): StopList[] {
-    const hooked = [...this.stops, ...this.hooked];
-    const direct = [...this.stops, ...this.direct];
-    const hookedReversed = [...hooked].reverse();
-    const directReversed = [...direct].reverse();
-
-    return [
-      new StopList(new StopListID(HookRoute.hookedID, this.forward.id), hooked),
-      new StopList(new StopListID(HookRoute.directID, this.forward.id), direct),
-      new StopList(
-        new StopListID(HookRoute.hookedID, this.reverse.id),
-        hookedReversed,
-      ),
-      new StopList(
-        new StopListID(HookRoute.directID, this.reverse.id),
-        directReversed,
-      ),
-    ];
   }
 }

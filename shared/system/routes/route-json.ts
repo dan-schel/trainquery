@@ -5,19 +5,11 @@ import { LinearRoute } from "./linear-route";
 import { YBranchRoute } from "./y-branch-route";
 import { fromRouteType } from "./line-routes";
 
-export const RouteJson = z
-  .discriminatedUnion("type", [
-    LinearRoute.linearJson,
-    YBranchRoute.yBranchJson,
-    HookRoute.hookJson,
-  ])
-  .transform((x): Route => {
-    return {
-      linear: LinearRoute.transform,
-      "y-branch": YBranchRoute.transform,
-      hook: HookRoute.transform,
-    }[x.type](x as any);
-  });
+export const RouteJson = z.union([
+  LinearRoute.linearJson,
+  YBranchRoute.yBranchJson,
+  HookRoute.hookJson,
+]);
 
 export function routeToJSON(route: Route): z.input<typeof RouteJson> {
   return fromRouteType<z.input<typeof RouteJson>>(route, {

@@ -1,7 +1,6 @@
 import { z } from "zod";
-import { DirectionDefinition, Route } from "./line-route";
+import { DirectionDefinition, Route, createBothDirections } from "./line-route";
 import { toRouteVariantID } from "../ids";
-import { StopList, StopListID } from "./stop-list/stop-list";
 import { RouteStop } from "./route-stop";
 
 /** The simplest type of line route. */
@@ -16,19 +15,25 @@ export class LinearRoute extends Route {
     /** Array of stops this line stops at or travels via. */
     readonly stops: RouteStop[],
   ) {
-    super("linear");
+    super(
+      "linear",
+      createBothDirections(
+        LinearRoute.regularID,
+        forward.id,
+        reverse.id,
+        stops,
+      ),
+    );
   }
 
-  static readonly linearJson = z.object({
-    type: z.literal("linear"),
-    forward: DirectionDefinition.json,
-    reverse: DirectionDefinition.json,
-    stops: RouteStop.json.array(),
-  });
-
-  static transform(x: z.infer<typeof LinearRoute.linearJson>) {
-    return new LinearRoute(x.forward, x.reverse, x.stops);
-  }
+  static readonly linearJson = z
+    .object({
+      type: z.literal("linear"),
+      forward: DirectionDefinition.json,
+      reverse: DirectionDefinition.json,
+      stops: RouteStop.json.array(),
+    })
+    .transform((x) => new LinearRoute(x.forward, x.reverse, x.stops));
 
   toJSON(): z.input<typeof LinearRoute.linearJson> {
     return {
@@ -41,18 +46,5 @@ export class LinearRoute extends Route {
 
   static detect(route: Route): route is LinearRoute {
     return route.type === "linear";
-  }
-
-  protected defineStopLists(): StopList[] {
-    return [
-      new StopList(
-        new StopListID(LinearRoute.regularID, this.forward.id),
-        this.stops,
-      ),
-      new StopList(
-        new StopListID(LinearRoute.regularID, this.reverse.id),
-        [...this.stops].reverse(),
-      ),
-    ];
   }
 }

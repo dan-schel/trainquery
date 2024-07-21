@@ -1,12 +1,15 @@
 import { z } from "zod";
 import {
   DirectionIDJson,
+  LineID,
+  LineIDJson,
   RouteVariantIDJson,
   type DirectionID,
   type RouteVariantID,
 } from "../../ids";
 import { RouteStop } from "../route-stop";
 
+/** Uniquely identifies a stop list from others in the same line. */
 export class StopListID {
   constructor(
     readonly variant: RouteVariantID,
@@ -27,8 +30,49 @@ export class StopListID {
     };
   }
 
-  equals(other: StopListID): boolean {
+  equals(other: StopListID | FullStopListID): boolean {
     return this.variant === other.variant && this.direction === other.direction;
+  }
+
+  toFullStopListID(line: LineID): FullStopListID {
+    return new FullStopListID(line, this.variant, this.direction);
+  }
+}
+
+/** Uniquely identifies a stop list, and includes the line ID. */
+export class FullStopListID {
+  constructor(
+    readonly line: LineID,
+    readonly variant: RouteVariantID,
+    readonly direction: DirectionID,
+  ) {}
+
+  static readonly json = z
+    .object({
+      line: LineIDJson,
+      variant: RouteVariantIDJson,
+      direction: DirectionIDJson,
+    })
+    .transform((x) => new FullStopListID(x.line, x.variant, x.direction));
+
+  toJSON(): z.input<typeof FullStopListID.json> {
+    return {
+      line: this.line,
+      variant: this.variant,
+      direction: this.direction,
+    };
+  }
+
+  equals(other: FullStopListID): boolean {
+    return (
+      this.line === other.line &&
+      this.variant === other.variant &&
+      this.direction === other.direction
+    );
+  }
+
+  toStopListID(): StopListID {
+    return new StopListID(this.variant, this.direction);
   }
 }
 
