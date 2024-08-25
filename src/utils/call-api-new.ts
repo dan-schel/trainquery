@@ -19,7 +19,7 @@ export async function callApi<
     resilient = true,
     authSession = null,
   }: { resilient?: boolean; authSession?: Session | null } = {},
-): Promise<FetchResult<ResultSchema>> {
+): Promise<FetchResult<z.infer<ResultSchema>>> {
   return await fetchApiResilient(
     api,
     params,
@@ -36,7 +36,7 @@ async function fetchApiResilient<
   params: z.infer<ParamsSchema>,
   authSession: Session | null,
   timeouts: number[],
-): Promise<FetchResult<ResultSchema>> {
+): Promise<FetchResult<z.infer<ResultSchema>>> {
   const result = await fetchApi(api, params, authSession);
 
   if (

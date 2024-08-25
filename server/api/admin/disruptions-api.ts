@@ -19,7 +19,7 @@ export async function disruptionInboxApi(
   ctx: TrainQuery,
   params: ServerParams,
 ): Promise<object> {
-  await ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+  await ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
 
   const inbox = ctx.disruptions.getDisruptionsInInbox();
 
@@ -36,7 +36,7 @@ export async function disruptionRejectedApi(
   ctx: TrainQuery,
   params: ServerParams,
 ): Promise<object> {
-  await ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+  await ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
 
   const inbox = ctx.disruptions.getDisruptionsInInbox();
   const rejected = ctx.disruptions.getRejectedDisruptions();
@@ -54,7 +54,7 @@ export async function disruptionInboxSingleApi(
   ctx: TrainQuery,
   params: ServerParams,
 ): Promise<object> {
-  ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+  ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
 
   const id = requireParam(params, "id");
   if (!isExternalDisruptionID(id)) {
@@ -81,7 +81,7 @@ export async function disruptionRejectedSingleApi(
   ctx: TrainQuery,
   params: ServerParams,
 ): Promise<object> {
-  ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+  ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
 
   const id = requireParam(params, "id");
   if (!isExternalDisruptionID(id)) {
@@ -106,7 +106,7 @@ export async function disruptionInboxProcessApi(
   ctx: TrainQuery,
   params: ServerParams,
 ): Promise<object> {
-  ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+  ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
 
   // TODO: This is dumb, but I only allow key value pairs right now. :/
   const action = requireBodyParam(params, "action");
@@ -154,7 +154,7 @@ export async function disruptionRestoreApi(
   ctx: TrainQuery,
   params: ServerParams,
 ): Promise<object> {
-  ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+  ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
 
   // TODO: This is dumb, but I only allow key value pairs right now. :/
   const action = requireBodyParam(params, "action");

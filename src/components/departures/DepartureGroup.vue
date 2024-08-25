@@ -3,10 +3,11 @@ import { onMounted, ref, watch } from "vue";
 import DepartureFeedVue from "./DepartureFeed.vue";
 import { repeat } from "@dan-schel/js-utils";
 import { DepartureFeed } from "shared/system/timetable/departure-feed";
-import { callAPI } from "@/utils/call-api";
 import { useNow } from "@/utils/now-provider";
 import type { QLocalDateTime } from "shared/qtime/qdatetime";
 import { DepartureWithDisruptions } from "shared/disruptions/departure-with-disruptions";
+import { callApi } from "@/utils/call-api-new";
+import { departuresApi } from "shared/api/departures-api";
 
 const props = defineProps<{
   feeds: DepartureFeed[];
@@ -36,17 +37,15 @@ async function init(reset: boolean) {
   }
 
   if (props.feeds.length > 0) {
-    try {
-      departureLists.value = await callAPI(
-        "departures",
-        {
-          feeds: DepartureFeed.encode(props.feeds),
-          time: (props.time?.toUTC() ?? utc.value).toISO(),
-        },
-        DepartureWithDisruptions.json.array().array(),
-      );
-    } catch (err) {
-      console.warn(err);
+    const response = await callApi(departuresApi, {
+      feeds: props.feeds,
+      time: props.time?.toUTC() ?? utc.value,
+    });
+
+    if (response.type === "success") {
+      departureLists.value = response.data;
+    } else if (response.type === "error") {
+      console.warn(response.error);
       error.value = "unknown";
       departureLists.value = repeat(null, props.feeds.length).map((_x) => []);
     }

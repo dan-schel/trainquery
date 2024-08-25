@@ -31,13 +31,11 @@ export async function fetchApi<
   api: ApiDefinition<ParamsSchema, ResultSchema>,
   params: z.infer<ParamsSchema>,
   authSession: Session | null,
-): Promise<FetchResult<ResultSchema>> {
+): Promise<FetchResult<z.infer<ResultSchema>>> {
   try {
     const response = await fetch(`/api/${api.endpoint}`, {
       method: "POST",
-      body: JSON.stringify({
-        params: api.paramsSerializer(params),
-      }),
+      body: JSON.stringify(api.paramsSerializer(params)),
       headers: {
         "Content-Type": "application/json",
         ...(authSession != null ? { "admin-token": authSession.token } : {}),

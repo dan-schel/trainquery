@@ -6,7 +6,7 @@ import { QUtcDateTime } from "../qtime/qdatetime";
 
 export const departuresApi = api({
   endpoint: "departures",
-  requiredRoles: [],
+  requiredRole: null,
   checkConfigHash: true,
 
   ...params(

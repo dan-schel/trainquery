@@ -7,7 +7,7 @@ export async function logsApi(
   ctx: TrainQuery,
   params: ServerParams,
 ): Promise<object> {
-  await ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+  await ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
 
   if (!(ctx.logger instanceof AdminLogger)) {
     throw new BadApiCallError(

@@ -33,10 +33,10 @@ export type ApiDefinition<
    */
   endpoint: string;
   /**
-   * The admin role the user needs to have, e.g. ["superadmin"]. Use an empty
-   * array if no authentication is needed to call this API.
+   * The admin role the user needs to have, e.g. "superadmin", or null if no
+   * authentication is needed to call this API.
    */
-  requiredRoles: Role[];
+  requiredRole: Role | null;
   /**
    * True if the config hash should be sent along with the request, and the
    * updated config sent back if the server has a newer version.

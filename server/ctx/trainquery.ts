@@ -22,6 +22,8 @@ import { gtfsApi } from "../api/admin/gtfs-api";
 import { logsApi } from "../api/admin/logs-api";
 import { Logger } from "./logger";
 import { DisruptionsManager } from "../disruptions/disruptions-manager";
+import { ApiHandler } from "../api/api-handler";
+import { departuresApiHandler } from "../api/departures-api-new";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -97,41 +99,45 @@ export async function trainQuery(
   ctx.gtfs = gtfs;
   gtfs?.init();
 
-  await server.start(ctx, async (endpoint: string, params: ServerParams) => {
-    if (endpoint === "ssrAppProps") {
-      return await ssrAppPropsApi(ctx);
-    } else if (endpoint === "ssrRouteProps") {
-      return await ssrRoutePropsApi(ctx, params);
-    } else if (endpoint === "config") {
-      return await configApi(ctx);
-    } else if (endpoint === "departures") {
-      return hashify(ctx, await departuresApi(ctx, params));
-    } else if (endpoint === "admin/login") {
-      return await loginApi(ctx, params);
-    } else if (endpoint === "admin/logout") {
-      return await logoutApi(ctx, params);
-    } else if (endpoint === "admin/disruptions/inbox") {
-      return await disruptionInboxApi(ctx, params);
-    } else if (endpoint === "admin/disruptions/rejected") {
-      return await disruptionRejectedApi(ctx, params);
-    } else if (endpoint === "admin/disruptions/inbox/single") {
-      return await disruptionInboxSingleApi(ctx, params);
-    } else if (endpoint === "admin/disruptions/rejected/single") {
-      return await disruptionRejectedSingleApi(ctx, params);
-    } else if (endpoint === "admin/disruptions/inbox/process") {
-      // TODO: This is dumb. It should be POST only.
-      return await disruptionInboxProcessApi(ctx, params);
-    } else if (endpoint === "admin/disruptions/rejected/restore") {
-      // TODO: This is dumb. It should be POST only.
-      return await disruptionRestoreApi(ctx, params);
-    } else if (endpoint === "admin/gtfs") {
-      return await gtfsApi(ctx, params);
-    } else if (endpoint === "admin/logs") {
-      return await logsApi(ctx, params);
-    } else {
-      throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
-    }
-  });
+  await server.start(
+    ctx,
+    [departuresApiHandler],
+    async (endpoint: string, params: ServerParams) => {
+      if (endpoint === "ssrAppProps") {
+        return await ssrAppPropsApi(ctx);
+      } else if (endpoint === "ssrRouteProps") {
+        return await ssrRoutePropsApi(ctx, params);
+      } else if (endpoint === "config") {
+        return await configApi(ctx);
+      } else if (endpoint === "departures") {
+        return hashify(ctx, await departuresApi(ctx, params));
+      } else if (endpoint === "admin/login") {
+        return await loginApi(ctx, params);
+      } else if (endpoint === "admin/logout") {
+        return await logoutApi(ctx, params);
+      } else if (endpoint === "admin/disruptions/inbox") {
+        return await disruptionInboxApi(ctx, params);
+      } else if (endpoint === "admin/disruptions/rejected") {
+        return await disruptionRejectedApi(ctx, params);
+      } else if (endpoint === "admin/disruptions/inbox/single") {
+        return await disruptionInboxSingleApi(ctx, params);
+      } else if (endpoint === "admin/disruptions/rejected/single") {
+        return await disruptionRejectedSingleApi(ctx, params);
+      } else if (endpoint === "admin/disruptions/inbox/process") {
+        // TODO: This is dumb. It should be POST only.
+        return await disruptionInboxProcessApi(ctx, params);
+      } else if (endpoint === "admin/disruptions/rejected/restore") {
+        // TODO: This is dumb. It should be POST only.
+        return await disruptionRestoreApi(ctx, params);
+      } else if (endpoint === "admin/gtfs") {
+        return await gtfsApi(ctx, params);
+      } else if (endpoint === "admin/logs") {
+        return await logsApi(ctx, params);
+      } else {
+        throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
+      }
+    },
+  );
   logger.logServerListening(server);
 
   return ctx;
@@ -148,6 +154,7 @@ export type ServerParams = {
 export abstract class Server {
   abstract start(
     ctx: TrainQuery,
+    handlers: ApiHandler<any, any>[],
     requestListener: (
       endpoint: string,
       params: ServerParams,

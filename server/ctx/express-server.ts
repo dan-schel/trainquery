@@ -1,8 +1,8 @@
+import { z } from "zod";
+import { ApiHandler } from "../api/api-handler";
 import { BadApiCallError } from "../param-utils";
 import { Server, ServerParams, TrainQuery } from "./trainquery";
 import express, { Express } from "express";
-
-const ignoreLoggingApiRoutes = ["ssrAppProps", "config"];
 
 export class ExpressServer extends Server {
   constructor(
@@ -17,6 +17,7 @@ export class ExpressServer extends Server {
 
   async start(
     ctx: TrainQuery,
+    handlers: ApiHandler<z.ZodTypeAny, z.ZodTypeAny>[],
     requestListener: (
       endpoint: string,
       params: ServerParams,
@@ -25,22 +26,44 @@ export class ExpressServer extends Server {
     const app = express();
     app.use(express.json());
 
+    for (const { api, handler } of handlers) {
+      app.post(`/api/${api.endpoint}`, async (req, res) => {
+        try {
+          if (api.requiredRole != null) {
+            const parsedToken = z
+              .string()
+              .optional()
+              .safeParse(req.headers["admin-token"]);
+            const token = parsedToken.success ? parsedToken.data ?? null : null;
+            ctx.adminAuth.throwUnlessAuthenticated(token, api.requiredRole);
+          }
+
+          const parsed = api.paramsSchema.safeParse(req.body);
+
+          if (!parsed.success) {
+            res.status(400).send(`Invalid params.\n\n${parsed.error}`);
+            return;
+          }
+
+          const result = handler(ctx, parsed.data);
+
+          res.json({
+            result: api.resultSerializer(result),
+            hash: api.checkConfigHash ? ctx.getConfig().hash : undefined,
+          });
+        } catch (e) {
+          if (BadApiCallError.detect(e)) {
+            res.status(e.statusCode).send(e.message);
+          } else {
+            console.warn(e);
+            res.status(500).send("Internal server error.");
+          }
+        }
+      });
+    }
+
     app.all("/api/*", async (req, res) => {
       const path = req.path.replace(/^\/api\//, "");
-
-      if (!ignoreLoggingApiRoutes.includes(path)) {
-        const ip = req.ip ?? "<unknown>";
-        const userAgent = req.header("user-agent") ?? "<unknown>";
-
-        if (path === "ssrRouteProps") {
-          if (userAgent !== "node") {
-            const path = String(req.query.path ?? "<unknown>");
-            ctx.logger.logPageRequest(path, ip, userAgent, true);
-          }
-        } else {
-          ctx.logger.logApiRequest(req.url, ip, userAgent);
-        }
-      }
 
       try {
         const params: ServerParams = {

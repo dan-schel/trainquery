@@ -5,6 +5,14 @@ import { TrainQuery } from "../ctx/trainquery";
 export type ApiHandler<
   ParamsSchema extends z.ZodTypeAny,
   ResultSchema extends z.ZodTypeAny,
+> = {
+  api: ApiDefinition<ParamsSchema, ResultSchema>;
+  handler: ApiHandlerFunction<ParamsSchema, ResultSchema>;
+};
+
+export type ApiHandlerFunction<
+  ParamsSchema extends z.ZodTypeAny,
+  ResultSchema extends z.ZodTypeAny,
 > = (
   ctx: TrainQuery,
   params: z.infer<ParamsSchema>,
@@ -15,8 +23,8 @@ export function handle<
   ResultSchema extends z.ZodTypeAny,
 >(
   api: ApiDefinition<ParamsSchema, ResultSchema>,
-  handler: ApiHandler<ParamsSchema, ResultSchema>,
-) {
+  handler: ApiHandlerFunction<ParamsSchema, ResultSchema>,
+): ApiHandler<ParamsSchema, ResultSchema> {
   return { api, handler };
 }
 

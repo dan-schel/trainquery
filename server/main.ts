@@ -106,36 +106,10 @@ function getDatabase(isOffline: boolean): TrainQueryDB | null {
 async function setupDevServer(ctx: TrainQuery, app: Express) {
   serveSitemapXml(app, ctx);
 
-  const ignoreLoggingPrefixes = ["/src/", "/shared/", "/node_modules/", "/@"];
-  const ignoreLoggingSuffixes = [
-    ".woff2",
-    ".ico",
-    ".png",
-    ".jpg",
-    ".jpeg",
-    ".svg",
-    ".css",
-    ".scss",
-    ".ts",
-    ".js",
-  ];
-
   // Create vite-ssr server in middleware mode.
   const viteServer = await createSsrServer({
     server: { middlewareMode: true },
     appType: "custom",
-  });
-  app.use((req, res, next) => {
-    if (
-      !ignoreLoggingPrefixes.some((ext) => req.path.startsWith(ext)) &&
-      !ignoreLoggingSuffixes.some((ext) => req.path.endsWith(ext))
-    ) {
-      const ip = req.ip ?? "<unknown>";
-      const userAgent = req.header("user-agent") ?? "<unknown>";
-      ctx.logger.logPageRequest(req.url, ip, userAgent, false);
-    }
-
-    next();
   });
   app.use(viteServer.middlewares);
 }
@@ -158,10 +132,6 @@ async function setupProdServer(ctx: TrainQuery, app: Express) {
   const renderPage = (await import(`${dist}/server/main.js`)).default.default;
   app.get("*", async (req, res) => {
     const url = req.protocol + "://" + req.get("host") + req.originalUrl;
-
-    const ip = req.ip ?? "<unknown>";
-    const userAgent = req.header("user-agent") ?? "<unknown>";
-    ctx.logger.logPageRequest(req.url, ip, userAgent, false);
 
     const { html, status, statusText, headers } = await renderPage(url, {
       manifest,

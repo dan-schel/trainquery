@@ -8,7 +8,7 @@ export async function gtfsApi(
   ctx: TrainQuery,
   params: ServerParams,
 ): Promise<object> {
-  await ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
+  await ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
 
   const report = ctx.gtfs?.getDataNoRealtime()?.parsingReport;
   if (report == null) {

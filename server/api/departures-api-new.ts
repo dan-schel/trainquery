@@ -13,7 +13,7 @@ import { FilteredBucket } from "../departures/filtered-bucket";
 const maxFeeds = 10;
 const maxCount = 20;
 
-const departuresApiHandler = handle(
+export const departuresApiHandler = handle(
   departuresApi,
   async (ctx, { feeds, time }) => {
     if (feeds.length > maxFeeds || feeds.some((f) => f.count > maxCount)) {

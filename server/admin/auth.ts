@@ -86,11 +86,32 @@ export class AdminAuth {
     return session;
   }
 
-  async throwUnlessAuthenticated(
+  async legacyThrowUnlessAuthenticated(
     params: ServerParams,
     role: Role,
   ): Promise<Session> {
     const token = params.header.adminToken;
+    if (token == null) {
+      throw new BadApiCallError("No admin token provided.", 401);
+    }
+
+    const session = await this.getSession(token);
+    if (session == null) {
+      throw new BadApiCallError("Admin token invalid/expired.", 401);
+    }
+
+    const allRoles = applyRoleInheritance(session.roles);
+    if (!allRoles.includes(role)) {
+      throw new BadApiCallError("Access denied - Inadequate permissions.", 403);
+    }
+
+    return session;
+  }
+
+  async throwUnlessAuthenticated(
+    token: string | null,
+    role: Role,
+  ): Promise<Session> {
     if (token == null) {
       throw new BadApiCallError("No admin token provided.", 401);
     }
