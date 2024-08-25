@@ -58,6 +58,9 @@ export type ApiDefinition<
  * Builds an {@link ApiDefinition} (allowing the params and result schemas to be
  * provided inline).
  */
-export function api(def: ApiDefinition<any, any>) {
+export function api<
+  ParamsSchema extends z.ZodTypeAny,
+  ResultSchema extends z.ZodTypeAny,
+>(def: ApiDefinition<ParamsSchema, ResultSchema>) {
   return def;
 }
