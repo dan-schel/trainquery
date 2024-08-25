@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Role } from "../admin/session";
+import { type Role } from "../admin/session";
 
 /** Supplies a schema and serializer for the API's input parameters. */
 export function params<Schema extends z.ZodTypeAny>(
