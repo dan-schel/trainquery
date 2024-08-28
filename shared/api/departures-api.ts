@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { api, params, result } from "./api-definition";
+import { api } from "./api-definition";
 import { DepartureWithDisruptions } from "../disruptions/departure-with-disruptions";
 import { DepartureFeed } from "../system/timetable/departure-feed";
 import { QUtcDateTime } from "../qtime/qdatetime";
@@ -9,18 +9,16 @@ export const departuresApi = api({
   requiredRole: null,
   checkConfigHash: true,
 
-  ...params(
-    z.object({
-      feeds: DepartureFeed.json.array(),
-      time: QUtcDateTime.json,
-    }),
-    (params) => ({
-      feeds: params.feeds.map((x) => x.toJSON()),
-      time: params.time.toJSON(),
-    }),
-  ),
+  paramsSchema: z.object({
+    feeds: DepartureFeed.json.array(),
+    time: QUtcDateTime.json,
+  }),
+  resultSchema: DepartureWithDisruptions.json.array().array(),
 
-  ...result(DepartureWithDisruptions.json.array().array(), (result) =>
+  paramsSerializer: (params) => ({
+    feeds: params.feeds.map((x) => x.toJSON()),
+    time: params.time.toJSON(),
+  }),
+  resultSerializer: (result) =>
     result.map((feed) => feed.map((x) => x.toJSON())),
-  ),
 });

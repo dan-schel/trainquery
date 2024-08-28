@@ -1,28 +1,6 @@
 import { z } from "zod";
 import { type Role } from "../admin/session";
 
-/** Supplies a schema and serializer for the API's input parameters. */
-export function params<P, PS>(
-  schema: z.ZodType<P, any, PS>,
-  serializer: (input: P) => PS,
-) {
-  return {
-    paramsSchema: schema,
-    paramsSerializer: serializer,
-  };
-}
-
-/** Supplies a schema and serializer for the API's result response. */
-export function result<R, RS>(
-  schema: z.ZodType<R, any, RS>,
-  serializer: (input: R) => RS,
-) {
-  return {
-    resultSchema: schema,
-    resultSerializer: serializer,
-  };
-}
-
 export type ApiDefinition<P, R, PS, RS> = {
   /**
    * The API endpoint, e.g. "departures" for "example.com/api/departures" or
