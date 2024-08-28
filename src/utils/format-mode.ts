@@ -15,8 +15,8 @@ export function formatMode(
       ? "train lines"
       : "trains"
     : line
-    ? "train line"
-    : "train";
+      ? "train line"
+      : "train";
 
   return {
     "suburban-train": capital ? `Suburban ${suffix}` : `suburban ${suffix}`,

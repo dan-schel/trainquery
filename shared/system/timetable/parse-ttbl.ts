@@ -214,7 +214,8 @@ function parseGrid(
     // Ensure every other term is a timetable time or "-".
     const potentialTimes = terms.slice(2).map((t) => ({
       input: t,
-      time: t === "-" ? null : QTimetableTime.parse(t) ?? ("INVALID!" as const),
+      time:
+        t === "-" ? null : (QTimetableTime.parse(t) ?? ("INVALID!" as const)),
     }));
     const badTime = potentialTimes.find((t) => t.time === "INVALID!");
     if (badTime != null) {
