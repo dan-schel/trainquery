@@ -1,5 +1,4 @@
 import type { ApiDefinition } from "shared/api/api-definition";
-import { z } from "zod";
 import { fetchApi, type FetchResult } from "./call-api-fetcher";
 import type { Session } from "shared/admin/session";
 
@@ -9,17 +8,14 @@ const resilienceTimeouts = [500, 2000];
  * Sends a request to the backend, and parses the result. Retries multiple times
  * unless `resilient` is explicitly set to false.
  */
-export async function callApi<
-  ParamsSchema extends z.ZodTypeAny,
-  ResultSchema extends z.ZodTypeAny,
->(
-  api: ApiDefinition<ParamsSchema, ResultSchema>,
-  params: z.infer<ParamsSchema>,
+export async function callApi<P, R, PS, RS>(
+  api: ApiDefinition<P, R, PS, RS>,
+  params: P,
   {
     resilient = true,
     authSession = null,
   }: { resilient?: boolean; authSession?: Session | null } = {},
-): Promise<FetchResult<z.infer<ResultSchema>>> {
+): Promise<FetchResult<R>> {
   return await fetchApiResilient(
     api,
     params,
@@ -28,15 +24,12 @@ export async function callApi<
   );
 }
 
-async function fetchApiResilient<
-  ParamsSchema extends z.ZodTypeAny,
-  ResultSchema extends z.ZodTypeAny,
->(
-  api: ApiDefinition<ParamsSchema, ResultSchema>,
-  params: z.infer<ParamsSchema>,
+async function fetchApiResilient<P, R, PS, RS>(
+  api: ApiDefinition<P, R, PS, RS>,
+  params: P,
   authSession: Session | null,
   timeouts: number[],
-): Promise<FetchResult<z.infer<ResultSchema>>> {
+): Promise<FetchResult<R>> {
   const result = await fetchApi(api, params, authSession);
 
   if (

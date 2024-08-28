@@ -154,7 +154,7 @@ export type ServerParams = {
 export abstract class Server {
   abstract start(
     ctx: TrainQuery,
-    handlers: ApiHandler<any, any>[],
+    handlers: ApiHandler<any, any, any, any>[],
     requestListener: (
       endpoint: string,
       params: ServerParams,

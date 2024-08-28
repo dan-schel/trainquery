@@ -24,14 +24,11 @@ export type FetchResult<T> =
   | FailedFetchResult
   | ConfigOutdatedFetchResult;
 
-export async function fetchApi<
-  ParamsSchema extends z.ZodTypeAny,
-  ResultSchema extends z.ZodTypeAny,
->(
-  api: ApiDefinition<ParamsSchema, ResultSchema>,
-  params: z.infer<ParamsSchema>,
+export async function fetchApi<P, R, PS, RS>(
+  api: ApiDefinition<P, R, PS, RS>,
+  params: P,
   authSession: Session | null,
-): Promise<FetchResult<z.infer<ResultSchema>>> {
+): Promise<FetchResult<R>> {
   try {
     const response = await fetch(`/api/${api.endpoint}`, {
       method: "POST",
@@ -55,14 +52,10 @@ export async function fetchApi<
     }
 
     const json = await response.json();
-    const parsed = z
-      .object({
-        result: api.resultSchema,
-        hash: api.checkConfigHash ? z.string() : z.undefined(),
-      })
-      .safeParse(json);
 
-    if (!parsed.success) {
+    const parsed = parseResultAndHash(api, json);
+
+    if ("error" in parsed) {
       // The result JSON is in an unexpected format. No point retrying.
       return {
         type: "error",
@@ -72,11 +65,7 @@ export async function fetchApi<
       };
     }
 
-    // The type assertions here are required because Typescript can't infer the
-    // correct type from z.ZodTypeAny.
-    // (More info: https://zod.dev/?id=inferring-the-inferred-type)
-    const result = parsed.data.result as z.infer<ResultSchema>;
-    const hash = parsed.data.hash as string | undefined;
+    const { result, hash } = parsed;
 
     if (hash != null && getConfig().hash !== hash) {
       // The cached config the client has is outdated, so refresh the page to
@@ -100,4 +89,38 @@ export async function fetchApi<
       httpCode: null,
     };
   }
+}
+
+function parseResultAndHash<P, R, PS, RS>(
+  api: ApiDefinition<P, R, PS, RS>,
+  json: unknown,
+): { result: R; hash: string | undefined } | { error: unknown } {
+  // For some reason, adding api.resultSchema directly into this schema breaks
+  // the inferred types, and I'd have to do a type assertion ("as"). So instead,
+  // We first check it's an object with a hash and result (of some kind), and
+  // then check the result against the schema afterwards.
+  const fullSchema = z.object({
+    result: z.unknown(),
+    hash: api.checkConfigHash ? z.string() : z.undefined(),
+  });
+
+  const parsedFullResponse = fullSchema.safeParse(json);
+
+  if (!parsedFullResponse.success) {
+    return {
+      error: parsedFullResponse.error,
+    };
+  }
+
+  const parsedResult = api.resultSchema.safeParse(
+    parsedFullResponse.data.result,
+  );
+
+  if (!parsedResult.success) {
+    return {
+      error: parsedResult.error,
+    };
+  }
+
+  return { result: parsedResult.data, hash: parsedFullResponse.data.hash };
 }

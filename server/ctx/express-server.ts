@@ -17,7 +17,7 @@ export class ExpressServer extends Server {
 
   async start(
     ctx: TrainQuery,
-    handlers: ApiHandler<z.ZodTypeAny, z.ZodTypeAny>[],
+    handlers: ApiHandler<any, any, any, any>[],
     requestListener: (
       endpoint: string,
       params: ServerParams,
@@ -62,13 +62,10 @@ export class ExpressServer extends Server {
   }
 }
 
-function createApiRoute<
-  ParamSchema extends z.ZodTypeAny,
-  ResultSchema extends z.ZodTypeAny,
->(
+function createApiRoute<P, R, PS, RS>(
   ctx: TrainQuery,
   app: express.Application,
-  handler: ApiHandler<ParamSchema, ResultSchema>,
+  handler: ApiHandler<P, R, PS, RS>,
 ) {
   const { api, handler: handlerFunction } = handler;
 
@@ -90,7 +87,6 @@ function createApiRoute<
         return;
       }
 
-      // TODO: Check if removing await here causes a type error.
       const result = await handlerFunction(ctx, parsed.data);
 
       res.json({

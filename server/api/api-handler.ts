@@ -1,30 +1,20 @@
-import { z } from "zod";
 import { ApiDefinition } from "../../shared/api/api-definition";
 import { TrainQuery } from "../ctx/trainquery";
 
-export type ApiHandler<
-  ParamsSchema extends z.ZodTypeAny,
-  ResultSchema extends z.ZodTypeAny,
-> = {
-  api: ApiDefinition<ParamsSchema, ResultSchema>;
-  handler: ApiHandlerFunction<ParamsSchema, ResultSchema>;
+export type ApiHandler<P, R, PS, RS> = {
+  api: ApiDefinition<P, R, PS, RS>;
+  handler: ApiHandlerFunction<P, R>;
 };
 
-export type ApiHandlerFunction<
-  ParamsSchema extends z.ZodTypeAny,
-  ResultSchema extends z.ZodTypeAny,
-> = (
+export type ApiHandlerFunction<P, R> = (
   ctx: TrainQuery,
-  params: z.infer<ParamsSchema>,
-) => Promise<z.infer<ResultSchema>>;
+  params: P,
+) => Promise<R>;
 
-export function handle<
-  ParamsSchema extends z.ZodTypeAny,
-  ResultSchema extends z.ZodTypeAny,
->(
-  api: ApiDefinition<ParamsSchema, ResultSchema>,
-  handler: ApiHandlerFunction<ParamsSchema, ResultSchema>,
-): ApiHandler<ParamsSchema, ResultSchema> {
+export function handle<P, R, PS, RS>(
+  api: ApiDefinition<P, R, PS, RS>,
+  handler: ApiHandlerFunction<P, R>,
+): ApiHandler<P, R, PS, RS> {
   return { api, handler };
 }
 

@@ -2,9 +2,9 @@ import { z } from "zod";
 import { type Role } from "../admin/session";
 
 /** Supplies a schema and serializer for the API's input parameters. */
-export function params<Schema extends z.ZodTypeAny>(
-  schema: Schema,
-  serializer: (input: z.infer<Schema>) => z.input<Schema>,
+export function params<P, PS>(
+  schema: z.ZodType<P, any, PS>,
+  serializer: (input: P) => PS,
 ) {
   return {
     paramsSchema: schema,
@@ -13,9 +13,9 @@ export function params<Schema extends z.ZodTypeAny>(
 }
 
 /** Supplies a schema and serializer for the API's result response. */
-export function result<Schema extends z.ZodTypeAny>(
-  schema: Schema,
-  serializer: (input: z.infer<Schema>) => z.input<Schema>,
+export function result<R, RS>(
+  schema: z.ZodType<R, any, RS>,
+  serializer: (input: R) => RS,
 ) {
   return {
     resultSchema: schema,
@@ -23,10 +23,7 @@ export function result<Schema extends z.ZodTypeAny>(
   };
 }
 
-export type ApiDefinition<
-  ParamsSchema extends z.ZodTypeAny,
-  ResultSchema extends z.ZodTypeAny,
-> = {
+export type ApiDefinition<P, R, PS, RS> = {
   /**
    * The API endpoint, e.g. "departures" for "example.com/api/departures" or
    * "disruptions/rejected" for "example.com/api/disruptions/rejected".
@@ -44,23 +41,20 @@ export type ApiDefinition<
   checkConfigHash: boolean;
 
   /** The schema of the API's input parameters. */
-  paramsSchema: ParamsSchema;
+  paramsSchema: z.ZodType<P, any, PS>;
   /** A function that can serialize the API's input parameters to JSON. */
-  paramsSerializer: (input: z.infer<ParamsSchema>) => z.input<ParamsSchema>;
+  paramsSerializer: (input: P) => PS;
 
   /** The schema of the API's result response. */
-  resultSchema: ResultSchema;
+  resultSchema: z.ZodType<R, any, RS>;
   /** A function that can serialize the API's result response to JSON. */
-  resultSerializer: (input: z.infer<ResultSchema>) => z.input<ResultSchema>;
+  resultSerializer: (input: R) => RS;
 };
 
 /**
  * Builds an {@link ApiDefinition} (allowing the params and result schemas to be
  * provided inline).
  */
-export function api<
-  ParamsSchema extends z.ZodTypeAny,
-  ResultSchema extends z.ZodTypeAny,
->(def: ApiDefinition<ParamsSchema, ResultSchema>) {
+export function api<P, R, PS, RS>(def: ApiDefinition<P, R, PS, RS>) {
   return def;
 }
