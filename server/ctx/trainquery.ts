@@ -1,5 +1,4 @@
 import { configApi } from "../api/config-api";
-import { departuresApi } from "../api/departures-api";
 import { ssrAppPropsApi, ssrRoutePropsApi } from "../api/ssr-props-api";
 import { FullConfig } from "../config/computed-config";
 import { ServerConfig } from "../config/server-config";
@@ -18,7 +17,6 @@ import {
   disruptionRejectedSingleApi,
   disruptionRestoreApi,
 } from "../api/admin/disruptions-api";
-import { gtfsApi } from "../api/admin/gtfs-api";
 import { logsApi } from "../api/admin/logs-api";
 import { Logger } from "./logger";
 import { DisruptionsManager } from "../disruptions/disruptions-manager";
@@ -110,8 +108,6 @@ export async function trainQuery(
         return await ssrRoutePropsApi(ctx, params);
       } else if (endpoint === "config") {
         return await configApi(ctx);
-      } else if (endpoint === "departures") {
-        return hashify(ctx, await departuresApi(ctx, params));
       } else if (endpoint === "admin/login") {
         return await loginApi(ctx, params);
       } else if (endpoint === "admin/logout") {
@@ -130,8 +126,6 @@ export async function trainQuery(
       } else if (endpoint === "admin/disruptions/rejected/restore") {
         // TODO: This is dumb. It should be POST only.
         return await disruptionRestoreApi(ctx, params);
-      } else if (endpoint === "admin/gtfs") {
-        return await gtfsApi(ctx, params);
       } else if (endpoint === "admin/logs") {
         return await logsApi(ctx, params);
       } else {
@@ -166,11 +160,4 @@ export abstract class Server {
 export abstract class ConfigProvider {
   abstract fetchConfig(logger?: Logger): Promise<ServerConfig>;
   abstract getRefreshMs(): number | null;
-}
-
-function hashify(ctx: TrainQuery, result: object) {
-  return {
-    hash: ctx.getConfig().hash,
-    result: result,
-  };
 }
