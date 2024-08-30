@@ -8,7 +8,7 @@ import SimpleButton from "@/components/common/SimpleButton.vue";
 import { useAdminAuth } from "@/utils/admin-auth-provider";
 import { useRouter } from "vue-router";
 
-const { callAdminApi } = useAdminAuth();
+const { callAdminApiLegacy } = useAdminAuth();
 const router = useRouter();
 
 const props = defineProps<{
@@ -29,7 +29,7 @@ const restoring = ref<boolean>(false);
 async function handleRestore() {
   restoring.value = true;
   try {
-    await callAdminApi(
+    await callAdminApiLegacy(
       "/api/admin/disruptions/rejected/restore",
       {
         action: JSON.stringify({

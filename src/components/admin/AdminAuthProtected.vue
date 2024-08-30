@@ -6,10 +6,13 @@ import {
   readAdminAuth,
   writeAdminAuth,
 } from "@/utils/admin-auth-provider";
-import { throwUnlessOk } from "@/utils/call-api";
 import { Session } from "shared/admin/session";
 import { onMounted, provide, ref } from "vue";
 import { z } from "zod";
+import { type ApiDefinition } from "shared/api/api-definition";
+import { callApi } from "@/utils/call-api-new";
+import type { FetchResult } from "@/utils/call-api-fetcher";
+import { throwUnlessOk } from "@/utils/call-api";
 
 const session = ref<Session | null>(null);
 const mounted = ref(false);
@@ -30,14 +33,14 @@ function requireSession() {
   return session.value;
 }
 
-async function callAdminApi(
+async function callAdminApiLegacy(
   apiPath: string,
   params: Record<string, string>,
   usePost: boolean = false,
 ): Promise<Response> {
   if (session.value == null) {
     throw new Error(
-      "Unauthenticated - do not call callAdminApi() outside of an admin-protected route!",
+      "Unauthenticated - do not call callAdminApiLegacy() outside of an admin-protected route!",
     );
   }
 
@@ -71,6 +74,32 @@ async function callAdminApi(
   }
 
   throwUnlessOk(response);
+
+  return response;
+}
+
+async function callAdminApi<P, R, PS, RS>(
+  api: ApiDefinition<P, R, PS, RS>,
+  params: P,
+  { resilient = true }: { resilient?: boolean } = {},
+): Promise<FetchResult<R>> {
+  if (session.value == null) {
+    throw new Error(
+      "Unauthenticated - do not call callAdminApi() outside of an admin-protected route!",
+    );
+  }
+
+  const response = await callApi(api, params, {
+    resilient,
+    authSession: session.value,
+  });
+
+  if (response.type === "error") {
+    if (response.httpCode === 401) {
+      console.warn("Admin token invalid or expired. You have been logged out.");
+      setSession(null, true);
+    }
+  }
 
   return response;
 }
@@ -119,7 +148,7 @@ async function login(username: string, password: string) {
 }
 
 async function logout() {
-  await callAdminApi("/api/admin/logout", {});
+  await callAdminApiLegacy("/api/admin/logout", {});
   setSession(null, true);
 }
 
@@ -128,6 +157,7 @@ provide(adminAuthInjectionKey, {
   requireSession,
   login,
   logout,
+  callAdminApiLegacy,
   callAdminApi,
 });
 

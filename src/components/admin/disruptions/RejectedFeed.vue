@@ -7,7 +7,7 @@ import UilCheckCircle from "@/components/icons/UilCheckCircle.vue";
 import AsyncData from "@/components/common/AsyncData.vue";
 import { RejectedExternalDisruption } from "shared/disruptions/external/rejected-external-disruption";
 
-const { callAdminApi } = useAdminAuth();
+const { callAdminApiLegacy } = useAdminAuth();
 
 const emit = defineEmits<{
   (e: "updateCounts", newCounts: { inbox: number; updated: number }): void;
@@ -28,7 +28,10 @@ async function handleMounted() {
 
   state.value = "loading";
   try {
-    const response = await callAdminApi("/api/admin/disruptions/rejected", {});
+    const response = await callAdminApiLegacy(
+      "/api/admin/disruptions/rejected",
+      {},
+    );
     const data = await response.json();
     const parsed = schema.parse(data);
     state.value = { data: parsed.rejected };

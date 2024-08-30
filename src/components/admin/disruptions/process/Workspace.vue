@@ -13,7 +13,7 @@ import OutgoingRejection from "./OutgoingRejection.vue";
 import { useAdminAuth } from "@/utils/admin-auth-provider";
 import { useRouter } from "vue-router";
 
-const { callAdminApi } = useAdminAuth();
+const { callAdminApiLegacy } = useAdminAuth();
 const router = useRouter();
 
 const props = defineProps<{
@@ -46,7 +46,7 @@ function handleReset() {
 async function handleApply() {
   submitting.value = true;
   try {
-    await callAdminApi(
+    await callAdminApiLegacy(
       "/api/admin/disruptions/inbox/process",
       {
         action: JSON.stringify({

@@ -9,7 +9,7 @@ import { formatDateTime } from "shared/qtime/format";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import { getConfig } from "@/utils/get-config";
 
-const { callAdminApi } = useAdminAuth();
+const { callAdminApiLegacy } = useAdminAuth();
 
 // TODO: Implement scrolling to load more logs, a refresh button, filtering
 // by service, and viewing the logs of other instances.
@@ -25,7 +25,7 @@ async function handleMounted() {
 
   state.value = "loading";
   try {
-    const response = await callAdminApi("/api/admin/logs", {
+    const response = await callAdminApiLegacy("/api/admin/logs", {
       count: "100",
     });
     const data = await response.json();

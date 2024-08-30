@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import PageContent from "@/components/common/PageContent.vue";
 
-// const { callAdminApi } = useAdminAuth();
+// const { callAdminApiLegacy } = useAdminAuth();
 
 // const testSecret = ref<string>("Loading...");
 
 // async function handleMounted() {
-//   const response = await callAdminApi("/api/admin/testSecret", {});
+//   const response = await callAdminApiLegacy("/api/admin/testSecret", {});
 //   if (response.ok) {
 //     const data = await response.json();
 //     testSecret.value = data.secret;

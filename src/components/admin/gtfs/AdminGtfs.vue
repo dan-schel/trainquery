@@ -8,7 +8,7 @@ import { getConfig } from "@/utils/get-config";
 import { requireStop } from "shared/system/config-utils";
 import AdminRequestState from "@/components/admin/AdminRequestState.vue";
 
-const { callAdminApi } = useAdminAuth();
+const { callAdminApiLegacy } = useAdminAuth();
 
 const reportData = ref<{
   unsupportedGtfsStopIDs: number[];
@@ -30,7 +30,7 @@ async function handleMounted() {
 
   state.value = "loading";
   try {
-    const response = await callAdminApi("/api/admin/gtfs", {});
+    const response = await callAdminApiLegacy("/api/admin/gtfs", {});
     const data = await response.json();
     const parsed = schema.parse(data);
     if (parsed.hasData) {

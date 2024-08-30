@@ -15,7 +15,7 @@ const ResponseSchema = z.object({
 const route = useRoute();
 const encodedDisruptionID = route.params.id as string;
 
-const { callAdminApi } = useAdminAuth();
+const { callAdminApiLegacy } = useAdminAuth();
 const state = ref<AsyncState<z.infer<typeof ResponseSchema>>>("loading");
 
 async function handleMounted() {
@@ -27,7 +27,7 @@ async function handleMounted() {
   ]);
   state.value = "loading";
   try {
-    const response = await callAdminApi(
+    const response = await callAdminApiLegacy(
       "/api/admin/disruptions/rejected/single",
       {
         id: encodedDisruptionID,
