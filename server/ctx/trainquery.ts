@@ -1,4 +1,4 @@
-import { configApi } from "../api/config-api";
+import { configApiHandler } from "../api/config-api";
 import { ssrAppPropsApi, ssrRoutePropsApi } from "../api/ssr-props-api";
 import { FullConfig } from "../config/computed-config";
 import { ServerConfig } from "../config/server-config";
@@ -100,14 +100,12 @@ export async function trainQuery(
 
   await server.start(
     ctx,
-    [departuresApiHandler, gtfsApiHandler],
+    [departuresApiHandler, gtfsApiHandler, configApiHandler],
     async (endpoint: string, params: ServerParams) => {
       if (endpoint === "ssrAppProps") {
         return await ssrAppPropsApi(ctx);
       } else if (endpoint === "ssrRouteProps") {
         return await ssrRoutePropsApi(ctx, params);
-      } else if (endpoint === "config") {
-        return await configApi(ctx);
       } else if (endpoint === "admin/login") {
         return await loginApi(ctx, params);
       } else if (endpoint === "admin/logout") {

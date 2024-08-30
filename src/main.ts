@@ -5,7 +5,6 @@ import routes from "./router/routes";
 import viteSSR from "vite-ssr/vue";
 import { createHead } from "@vueuse/head";
 import { initConfig, provideConfig } from "./utils/get-config";
-import { FrontendConfig } from "shared/system/config/frontend-config";
 import {
   finishedNavigating,
   provideNavigating,
@@ -13,6 +12,8 @@ import {
 } from "./utils/navigating-provider";
 import { provideBanners, setBanners } from "./utils/banners-provider";
 import { Banner } from "shared/banner";
+import { callApi } from "./utils/call-api-new";
+import { configApi } from "shared/api/config-api";
 
 export default viteSSR(
   App,
@@ -37,9 +38,15 @@ export default viteSSR(
     app.use(head);
 
     if (import.meta.env.SSR) {
-      const res = await fetch(`${baseUrl}/api/config`);
-      const json = await res.json();
-      provideConfig(FrontendConfig.json.parse(json));
+      const response = await callApi(configApi, null, {
+        baseUrl,
+        resilient: false,
+      });
+      if (response.type === "success") {
+        provideConfig(response.data);
+      } else if (response.type === "error") {
+        throw response.error;
+      }
     } else {
       await initConfig(initialState.app.configHash);
     }

@@ -1,5 +1,6 @@
-import { TrainQuery } from "../ctx/trainquery";
+import { handle } from "./api-handler";
+import { configApi } from "../../shared/api/config-api";
 
-export async function configApi(ctx: TrainQuery): Promise<object> {
-  return ctx.getConfig().forFrontend().toJSON();
-}
+export const configApiHandler = handle(configApi, async (ctx) => {
+  return ctx.getConfig().forFrontend();
+});

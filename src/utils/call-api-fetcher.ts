@@ -28,9 +28,10 @@ export async function fetchApi<P, R, PS, RS>(
   api: ApiDefinition<P, R, PS, RS>,
   params: P,
   authSession: Session | null,
+  baseUrl: string,
 ): Promise<FetchResult<R>> {
   try {
-    const response = await fetch(`/api/${api.endpoint}`, {
+    const response = await fetch(`${baseUrl}/api/${api.endpoint}`, {
       method: "POST",
       body: JSON.stringify({ params: api.paramsSerializer(params) }),
       headers: {

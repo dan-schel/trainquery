@@ -14,13 +14,19 @@ export async function callApi<P, R, PS, RS>(
   {
     resilient = true,
     authSession = null,
-  }: { resilient?: boolean; authSession?: Session | null } = {},
+    baseUrl = "",
+  }: {
+    resilient?: boolean;
+    authSession?: Session | null;
+    baseUrl?: string;
+  } = {},
 ): Promise<FetchResult<R>> {
   return await fetchApiResilient(
     api,
     params,
     authSession,
     resilient ? resilienceTimeouts : [],
+    baseUrl,
   );
 }
 
@@ -29,8 +35,9 @@ async function fetchApiResilient<P, R, PS, RS>(
   params: P,
   authSession: Session | null,
   timeouts: number[],
+  baseUrl: string,
 ): Promise<FetchResult<R>> {
-  const result = await fetchApi(api, params, authSession);
+  const result = await fetchApi(api, params, authSession, baseUrl);
 
   if (
     result.type !== "error" ||
@@ -42,5 +49,11 @@ async function fetchApiResilient<P, R, PS, RS>(
 
   const [timeout, ...nextTimeouts] = timeouts;
   await new Promise((resolve) => setTimeout(resolve, timeout));
-  return await fetchApiResilient(api, params, authSession, nextTimeouts);
+  return await fetchApiResilient(
+    api,
+    params,
+    authSession,
+    nextTimeouts,
+    baseUrl,
+  );
 }

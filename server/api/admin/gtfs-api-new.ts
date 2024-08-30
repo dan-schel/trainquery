@@ -1,7 +1,7 @@
 import { handle } from "../api-handler";
 import { gtfsApi } from "../../../shared/api/gtfs-api";
 
-export const gtfsApiHandler = handle(gtfsApi, async (ctx, _params) => {
+export const gtfsApiHandler = handle(gtfsApi, async (ctx) => {
   const report = ctx.gtfs?.getDataNoRealtime()?.parsingReport;
   if (report == null) {
     return {
