@@ -24,6 +24,7 @@ import { Logger } from "./logger";
 import { DisruptionsManager } from "../disruptions/disruptions-manager";
 import { ApiHandler } from "../api/api-handler";
 import { departuresApiHandler } from "../api/departures-api-new";
+import { gtfsApiHandler } from "../api/admin/gtfs-api-new";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -101,7 +102,7 @@ export async function trainQuery(
 
   await server.start(
     ctx,
-    [departuresApiHandler],
+    [departuresApiHandler, gtfsApiHandler],
     async (endpoint: string, params: ServerParams) => {
       if (endpoint === "ssrAppProps") {
         return await ssrAppPropsApi(ctx);

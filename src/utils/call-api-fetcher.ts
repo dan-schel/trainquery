@@ -32,7 +32,7 @@ export async function fetchApi<P, R, PS, RS>(
   try {
     const response = await fetch(`/api/${api.endpoint}`, {
       method: "POST",
-      body: JSON.stringify(api.paramsSerializer(params)),
+      body: JSON.stringify({ params: api.paramsSerializer(params) }),
       headers: {
         "Content-Type": "application/json",
         ...(authSession != null ? { "admin-token": authSession.token } : {}),

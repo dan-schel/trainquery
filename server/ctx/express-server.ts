@@ -80,7 +80,7 @@ function createApiRoute<P, R, PS, RS>(
         ctx.adminAuth.throwUnlessAuthenticated(token, api.requiredRole);
       }
 
-      const parsed = api.paramsSchema.safeParse(req.body);
+      const parsed = api.paramsSchema.safeParse(req.body.params);
 
       if (!parsed.success) {
         res.status(400).send(`Invalid params.\n\n${parsed.error}`);

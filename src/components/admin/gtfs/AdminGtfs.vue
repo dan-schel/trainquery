@@ -2,13 +2,13 @@
 import PageContent from "@/components/common/PageContent.vue";
 import { useAdminAuth } from "@/utils/admin-auth-provider";
 import { onMounted, ref } from "vue";
-import { z } from "zod";
-import { StopIDJson, type StopID } from "shared/system/ids";
+import { type StopID } from "shared/system/ids";
 import { getConfig } from "@/utils/get-config";
 import { requireStop } from "shared/system/config-utils";
 import AdminRequestState from "@/components/admin/AdminRequestState.vue";
+import { gtfsApi } from "shared/api/gtfs-api";
 
-const { callAdminApiLegacy } = useAdminAuth();
+const { callAdminApi } = useAdminAuth();
 
 const reportData = ref<{
   unsupportedGtfsStopIDs: number[];
@@ -17,33 +17,22 @@ const reportData = ref<{
 const state = ref<"loading" | "error" | "success">("loading");
 
 async function handleMounted() {
-  const schema = z.union([
-    z.object({
-      hasData: z.literal(true),
-      unsupportedGtfsStopIDs: z.number().array(),
-      unsupportedRoutes: StopIDJson.array().array(),
-    }),
-    z.object({
-      hasData: z.literal(false),
-    }),
-  ]);
-
   state.value = "loading";
-  try {
-    const response = await callAdminApiLegacy("/api/admin/gtfs", {});
-    const data = await response.json();
-    const parsed = schema.parse(data);
-    if (parsed.hasData) {
+  const response = await callAdminApi(gtfsApi, null);
+
+  if (response.type === "success") {
+    const data = response.data;
+    if (data.hasData) {
       reportData.value = {
-        unsupportedGtfsStopIDs: parsed.unsupportedGtfsStopIDs,
-        unsupportedRoutes: parsed.unsupportedRoutes,
+        unsupportedGtfsStopIDs: data.unsupportedGtfsStopIDs,
+        unsupportedRoutes: data.unsupportedRoutes,
       };
     } else {
       reportData.value = null;
     }
     state.value = "success";
-  } catch (e) {
-    console.warn("Failed to fetch GTFS data.", e);
+  } else if (response.type === "error") {
+    console.warn("Failed to fetch GTFS data.", response.error);
     state.value = "error";
   }
 }
