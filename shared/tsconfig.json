@@ -1,9 +1,5 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "esModuleInterop": true,
-    "target": "ES2015",
-    "module": "preserve",
-    "skipLibCheck": true
+    "strict": true
   }
 }
