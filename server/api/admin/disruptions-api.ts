@@ -1,139 +1,87 @@
-import { z } from "zod";
+import { BadApiCallError } from "../../param-utils";
+import { handle } from "../api-handler";
 import {
-  ExternalDisruptionIDJson,
-  isExternalDisruptionID,
-} from "../../../shared/system/ids";
-import { ServerParams, TrainQuery } from "../../ctx/trainquery";
-import {
-  BadApiCallError,
-  requireBodyParam,
-  requireParam,
-} from "../../param-utils";
-import { ExternalDisruption } from "../../../shared/disruptions/external/external-disruption";
+  disruptionInboxApi,
+  disruptionInboxProcessApi,
+  disruptionInboxSingleApi,
+  disruptionRejectedApi,
+  disruptionRejectedRestoreApi,
+  disruptionRejectedSingleApi,
+} from "../../../shared/api/admin/disruptions-api";
 
-// TODO: Are these APIs going to be wrapped with the network data like the
-// departures API? It would cause similar issues if these APIs return data
-// assuming different stops/lines than the frontend has.
+export const disruptionInboxApiHandler = handle(
+  disruptionInboxApi,
+  async (ctx) => {
+    const inbox = ctx.disruptions.getDisruptionsInInbox();
 
-export async function disruptionInboxApi(
-  ctx: TrainQuery,
-  params: ServerParams,
-): Promise<object> {
-  await ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
-
-  const inbox = ctx.disruptions.getDisruptionsInInbox();
-
-  return {
-    inbox: inbox.map((x) => x.toJSON()),
-    counts: {
-      inbox: inbox.length,
-      updated: 0,
-    },
-  };
-}
-
-export async function disruptionRejectedApi(
-  ctx: TrainQuery,
-  params: ServerParams,
-): Promise<object> {
-  await ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
-
-  const inbox = ctx.disruptions.getDisruptionsInInbox();
-  const rejected = ctx.disruptions.getRejectedDisruptions();
-
-  return {
-    rejected: rejected.map((x) => x.toJSON()),
-    counts: {
-      inbox: inbox.length,
-      updated: 0,
-    },
-  };
-}
-
-export async function disruptionInboxSingleApi(
-  ctx: TrainQuery,
-  params: ServerParams,
-): Promise<object> {
-  ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
-
-  const id = requireParam(params, "id");
-  if (!isExternalDisruptionID(id)) {
     return {
-      notFound: true,
+      inbox: inbox,
+      counts: {
+        inbox: inbox.length,
+        updated: 0,
+      },
     };
-  }
+  },
+);
 
-  const inbox = ctx.disruptions.getDisruptionInInbox(id);
-  if (inbox == null) {
+export const disruptionRejectedApiHandler = handle(
+  disruptionRejectedApi,
+  async (ctx) => {
+    const inbox = ctx.disruptions.getDisruptionsInInbox();
+    const rejected = ctx.disruptions.getRejectedDisruptions();
+
     return {
-      notFound: true,
+      rejected: rejected,
+      counts: {
+        inbox: inbox.length,
+        updated: 0,
+      },
     };
-  }
+  },
+);
 
-  const provisional = ctx.disruptions.getProvisionalDisruptionsWithSource(id);
-  return {
-    inbox: inbox.toJSON(),
-    provisional: provisional.map((x) => x.toJSON()),
-  };
-}
-
-export async function disruptionRejectedSingleApi(
-  ctx: TrainQuery,
-  params: ServerParams,
-): Promise<object> {
-  ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
-
-  const id = requireParam(params, "id");
-  if (!isExternalDisruptionID(id)) {
-    return {
-      notFound: true,
-    };
-  }
-
-  const rejected = ctx.disruptions.getRejectedDisruption(id);
-  if (rejected == null) {
-    return {
-      notFound: true,
-    };
-  }
-
-  return {
-    rejected: rejected.toJSON(),
-  };
-}
-
-export async function disruptionInboxProcessApi(
-  ctx: TrainQuery,
-  params: ServerParams,
-): Promise<object> {
-  ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
-
-  // TODO: This is dumb, but I only allow key value pairs right now. :/
-  const action = requireBodyParam(params, "action");
-
-  // TODO: We should just something like this for ALL param parsing in ALL APIs!
-  // TODO: We just support reject for now. Later this schema will be a union
-  // which allows the below, but alternatively allows something like:
-  // { add: Disruption[]; approve: DisruptionID[]; merge: DisruptionID[]; etc. }
-  // (Example only, that schema design might be super dumb lol.)
-  const schema = z.object({
-    reject: z.object({
-      disruption: ExternalDisruption.json,
-      resurfaceIfUpdated: z.boolean(),
-    }),
-  });
-
-  try {
-    const actionParsed = schema.safeParse(JSON.parse(action));
-    if (!actionParsed.success) {
-      throw new BadApiCallError("Invalid action.", 400);
+export const disruptionInboxSingleApiHandler = handle(
+  disruptionInboxSingleApi,
+  async (ctx, { id }) => {
+    const inbox = ctx.disruptions.getDisruptionInInbox(id);
+    if (inbox == null) {
+      return {
+        notFound: true as const,
+      };
     }
 
+    const provisional = ctx.disruptions.getProvisionalDisruptionsWithSource(id);
+    return {
+      inbox,
+      provisional,
+    };
+  },
+);
+
+export const disruptionRejectedSingleApiHandler = handle(
+  disruptionRejectedSingleApi,
+  async (ctx, { id }) => {
+    const rejected = ctx.disruptions.getRejectedDisruption(id);
+    if (rejected == null) {
+      return {
+        notFound: true as const,
+      };
+    }
+
+    return {
+      rejected,
+    };
+  },
+);
+
+export const disruptionInboxProcessApiHandler = handle(
+  disruptionInboxProcessApi,
+  async (ctx, params) => {
     try {
       await ctx.disruptions.rejectDisruption(
         ctx,
-        actionParsed.data.reject.disruption,
-        actionParsed.data.reject.resurfaceIfUpdated,
+        params.reject.disruption,
+        params.reject.resurfaceIfUpdated,
       );
     } catch (e) {
       // TODO: It's not really an internal server error if the inbox disruption no
@@ -141,52 +89,21 @@ export async function disruptionInboxProcessApi(
       throw new BadApiCallError("Failed to reject disruption.", 500);
     }
 
-    // TODO: This is dumb. We should be able to just return 200.
-    return {
-      success: true,
-    };
-  } catch {
-    throw new BadApiCallError("Action was not JSON.", 400);
-  }
-}
+    return null;
+  },
+);
 
-export async function disruptionRestoreApi(
-  ctx: TrainQuery,
-  params: ServerParams,
-): Promise<object> {
-  ctx.adminAuth.legacyThrowUnlessAuthenticated(params, "superadmin");
-
-  // TODO: This is dumb, but I only allow key value pairs right now. :/
-  const action = requireBodyParam(params, "action");
-
-  // TODO: We should just something like this for ALL param parsing in ALL APIs!
-  // TODO: We just support reject for now. Later this schema will be a union
-  // which allows the below, but alternatively allows something like:
-  // { add: Disruption[]; approve: DisruptionID[]; merge: DisruptionID[]; etc. }
-  // (Example only, that schema design might be super dumb lol.)
-  const schema = z.object({
-    restore: ExternalDisruptionIDJson,
-  });
-
-  try {
-    const actionParsed = schema.safeParse(JSON.parse(action));
-    if (!actionParsed.success) {
-      throw new BadApiCallError("Invalid action.", 400);
-    }
-
+export const disruptionRejectedRestoreApiHandler = handle(
+  disruptionRejectedRestoreApi,
+  async (ctx, params) => {
     try {
-      await ctx.disruptions.restoreDisruption(ctx, actionParsed.data.restore);
+      await ctx.disruptions.restoreDisruption(ctx, params.restore);
     } catch (e) {
       // TODO: It's not really an internal server error if the inbox disruption no
       // longer exists, which is probably the most likely cause of errors here.
       throw new BadApiCallError("Failed to restore disruption.", 500);
     }
 
-    // TODO: This is dumb. We should be able to just return 200.
-    return {
-      success: true,
-    };
-  } catch {
-    throw new BadApiCallError("Action was not JSON.", 400);
-  }
-}
+    return null;
+  },
+);

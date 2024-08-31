@@ -10,12 +10,12 @@ import { loginApiHandler } from "../api/admin/login-api";
 import { AdminAuth, LocalAdminAuthDB } from "../admin/auth";
 import { logoutApiHandler } from "../api/admin/logout-api";
 import {
-  disruptionInboxApi,
-  disruptionInboxProcessApi,
-  disruptionInboxSingleApi,
-  disruptionRejectedApi,
-  disruptionRejectedSingleApi,
-  disruptionRestoreApi,
+  disruptionInboxApiHandler,
+  disruptionInboxProcessApiHandler,
+  disruptionInboxSingleApiHandler,
+  disruptionRejectedApiHandler,
+  disruptionRejectedRestoreApiHandler,
+  disruptionRejectedSingleApiHandler,
 } from "../api/admin/disruptions-api";
 import { logsApiHandler } from "../api/admin/logs-api";
 import { Logger } from "./logger";
@@ -102,31 +102,23 @@ export async function trainQuery(
     ctx,
     [
       departuresApiHandler,
+      loginApiHandler,
+      logoutApiHandler,
       gtfsApiHandler,
       configApiHandler,
       logsApiHandler,
-      loginApiHandler,
-      logoutApiHandler,
+      disruptionInboxApiHandler,
+      disruptionInboxSingleApiHandler,
+      disruptionInboxProcessApiHandler,
+      disruptionRejectedApiHandler,
+      disruptionRejectedSingleApiHandler,
+      disruptionRejectedRestoreApiHandler,
     ],
     async (endpoint: string, params: ServerParams) => {
       if (endpoint === "ssrAppProps") {
         return await ssrAppPropsApi(ctx);
       } else if (endpoint === "ssrRouteProps") {
         return await ssrRoutePropsApi(ctx, params);
-      } else if (endpoint === "admin/disruptions/inbox") {
-        return await disruptionInboxApi(ctx, params);
-      } else if (endpoint === "admin/disruptions/rejected") {
-        return await disruptionRejectedApi(ctx, params);
-      } else if (endpoint === "admin/disruptions/inbox/single") {
-        return await disruptionInboxSingleApi(ctx, params);
-      } else if (endpoint === "admin/disruptions/rejected/single") {
-        return await disruptionRejectedSingleApi(ctx, params);
-      } else if (endpoint === "admin/disruptions/inbox/process") {
-        // TODO: This is dumb. It should be POST only.
-        return await disruptionInboxProcessApi(ctx, params);
-      } else if (endpoint === "admin/disruptions/rejected/restore") {
-        // TODO: This is dumb. It should be POST only.
-        return await disruptionRestoreApi(ctx, params);
       } else {
         throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
       }

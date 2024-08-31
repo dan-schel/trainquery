@@ -11,11 +11,6 @@ export const adminAuthInjectionKey = Symbol() as InjectionKey<{
   requireSession: () => Session;
   login: (username: string, password: string) => Promise<Session>;
   logout: () => Promise<void>;
-  callAdminApiLegacy: (
-    apiPath: string,
-    params: Record<string, string>,
-    usePost?: boolean,
-  ) => Promise<Response>;
   callAdminApi: <P, R, PS, RS>(
     api: ApiDefinition<P, R, PS, RS>,
     params: P,
@@ -33,9 +28,6 @@ export function useAdminAuth() {
       throw new Error("Admin auth not injected correctly.");
     },
     logout: () => {
-      throw new Error("Admin auth not injected correctly.");
-    },
-    callAdminApiLegacy: () => {
       throw new Error("Admin auth not injected correctly.");
     },
     callAdminApi: () => {

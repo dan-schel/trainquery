@@ -12,8 +12,9 @@ import OutgoingDisruption from "./OutgoingDisruption.vue";
 import OutgoingRejection from "./OutgoingRejection.vue";
 import { useAdminAuth } from "@/utils/admin-auth-provider";
 import { useRouter } from "vue-router";
+import { disruptionInboxProcessApi } from "shared/api/admin/disruptions-api";
 
-const { callAdminApiLegacy } = useAdminAuth();
+const { callAdminApi } = useAdminAuth();
 const router = useRouter();
 
 const props = defineProps<{
@@ -45,24 +46,21 @@ function handleReset() {
 
 async function handleApply() {
   submitting.value = true;
-  try {
-    await callAdminApiLegacy(
-      "/api/admin/disruptions/inbox/process",
-      {
-        action: JSON.stringify({
-          reject: {
-            disruption: props.inbox.disruption,
-            resurfaceIfUpdated: resurfaceIfUpdated.value,
-          },
-        }),
-      },
-      true,
-    );
+
+  const response = await callAdminApi(disruptionInboxProcessApi, {
+    reject: {
+      disruption: props.inbox.disruption,
+      resurfaceIfUpdated: resurfaceIfUpdated.value,
+    },
+  });
+
+  if (response.type === "success") {
     router.push({ name: "admin-disruptions" });
-  } catch (err) {
+  } else if (response.type === "error") {
     // TODO: A toast notification?
-    console.warn("Failed to process disruption.", err);
+    console.warn("Failed to process disruption.", response.error);
   }
+
   submitting.value = false;
 }
 </script>

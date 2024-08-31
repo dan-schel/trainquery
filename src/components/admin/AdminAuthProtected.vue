@@ -33,55 +33,6 @@ function requireSession() {
   return session.value;
 }
 
-async function callAdminApiLegacy(
-  apiPath: string,
-  params: Record<string, string>,
-  usePost: boolean = false,
-): Promise<Response> {
-  if (session.value == null) {
-    throw new Error(
-      "Unauthenticated - do not call callAdminApiLegacy() outside of an admin-protected route!",
-    );
-  }
-
-  const url = new URL(apiPath, window.location.origin);
-  for (const [k, v] of Object.entries(params)) {
-    url.searchParams.set(k, v);
-  }
-
-  // TODO: This code sucks. It also should use resiliant call logic like in
-  // "@/utils/call-api".
-  const response = !usePost
-    ? await fetch(url.href, {
-        headers: {
-          "admin-token": session.value.token,
-        },
-      })
-    : await fetch(url.href, {
-        method: "POST",
-        headers: {
-          "admin-token": session.value.token,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(params),
-      });
-
-  // Occurs if the admin token is invalid or expired. Does NOT occur if the user
-  // has the wrong role/inadequate permissions.
-  if (response.status === 401) {
-    console.warn("Admin token invalid or expired. You have been logged out.");
-    setSession(null, true);
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `Status code ${response.status} when fetching "${response.url}".`,
-    );
-  }
-
-  return response;
-}
-
 async function callAdminApi<P, R, PS, RS>(
   api: ApiDefinition<P, R, PS, RS>,
   params: P,
@@ -142,7 +93,6 @@ provide(adminAuthInjectionKey, {
   requireSession,
   login,
   logout,
-  callAdminApiLegacy,
   callAdminApi,
 });
 
