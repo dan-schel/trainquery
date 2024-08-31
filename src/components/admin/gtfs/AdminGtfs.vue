@@ -6,7 +6,7 @@ import { type StopID } from "shared/system/ids";
 import { getConfig } from "@/utils/get-config";
 import { requireStop } from "shared/system/config-utils";
 import AdminRequestState from "@/components/admin/AdminRequestState.vue";
-import { gtfsApi } from "shared/api/gtfs-api";
+import { gtfsApi } from "shared/api/admin/gtfs-api";
 
 const { callAdminApi } = useAdminAuth();
 

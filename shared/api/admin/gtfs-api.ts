@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { api } from "./api-definition";
-import { StopIDJson } from "../system/ids";
+import { api } from "../api-definition";
+import { StopIDJson } from "../../system/ids";
 
 export const gtfsApi = api({
   endpoint: "admin/gtfs",

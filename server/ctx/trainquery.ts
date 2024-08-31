@@ -17,7 +17,7 @@ import {
   disruptionRejectedSingleApi,
   disruptionRestoreApi,
 } from "../api/admin/disruptions-api";
-import { logsApi } from "../api/admin/logs-api";
+import { logsApiHandler } from "../api/admin/logs-api";
 import { Logger } from "./logger";
 import { DisruptionsManager } from "../disruptions/disruptions-manager";
 import { ApiHandler } from "../api/api-handler";
@@ -100,7 +100,7 @@ export async function trainQuery(
 
   await server.start(
     ctx,
-    [departuresApiHandler, gtfsApiHandler, configApiHandler],
+    [departuresApiHandler, gtfsApiHandler, configApiHandler, logsApiHandler],
     async (endpoint: string, params: ServerParams) => {
       if (endpoint === "ssrAppProps") {
         return await ssrAppPropsApi(ctx);
@@ -124,8 +124,6 @@ export async function trainQuery(
       } else if (endpoint === "admin/disruptions/rejected/restore") {
         // TODO: This is dumb. It should be POST only.
         return await disruptionRestoreApi(ctx, params);
-      } else if (endpoint === "admin/logs") {
-        return await logsApi(ctx, params);
       } else {
         throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
       }
