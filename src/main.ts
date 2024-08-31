@@ -12,7 +12,7 @@ import {
 } from "./utils/navigating-provider";
 import { provideBanners, setBanners } from "./utils/banners-provider";
 import { Banner } from "shared/banner";
-import { callApi } from "./utils/call-api-new";
+import { callApi } from "./utils/call-api";
 import { configApi } from "shared/api/config-api";
 
 export default viteSSR(

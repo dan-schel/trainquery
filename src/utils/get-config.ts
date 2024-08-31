@@ -1,5 +1,5 @@
 import { FrontendConfig } from "shared/system/config/frontend-config";
-import { callApi } from "./call-api-new";
+import { callApi } from "./call-api";
 import { configApi } from "shared/api/config-api";
 
 const lsKey = "trainquery-config";

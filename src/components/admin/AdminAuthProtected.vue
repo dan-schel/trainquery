@@ -10,7 +10,7 @@ import { Session } from "shared/admin/session";
 import { onMounted, provide, ref } from "vue";
 import { z } from "zod";
 import { type ApiDefinition } from "shared/api/api-definition";
-import { callApi } from "@/utils/call-api-new";
+import { callApi } from "@/utils/call-api";
 import type { FetchResult } from "@/utils/call-api-fetcher";
 
 const session = ref<Session | null>(null);
