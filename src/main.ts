@@ -30,6 +30,9 @@ export default viteSSR(
     // Download app props during SSR. They will be already set if using the
     // prod server, so this is only really for dev mode.
     if (import.meta.env.SSR && initialState.app == null) {
+      // Keep this as a fetch, don't use callApi(), because we don't need/want
+      // the parsing from JSON logic. THe serialized JSON goes straight into the
+      // HTML.
       const res = await fetch(`${baseUrl}/api/ssrAppProps`);
       initialState.app = await res.json();
     }
@@ -82,6 +85,7 @@ export default viteSSR(
         return next();
       }
 
+      // Keep this as a fetch. See comment on the api/ssrAppProps fetch above.
       const res = await fetch(
         `${baseUrl}/api/ssrRouteProps?page=${String(
           to.name,

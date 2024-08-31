@@ -12,7 +12,6 @@ import { z } from "zod";
 import { type ApiDefinition } from "shared/api/api-definition";
 import { callApi } from "@/utils/call-api-new";
 import type { FetchResult } from "@/utils/call-api-fetcher";
-import { throwUnlessOk } from "@/utils/call-api";
 
 const session = ref<Session | null>(null);
 const mounted = ref(false);
@@ -73,7 +72,11 @@ async function callAdminApiLegacy(
     setSession(null, true);
   }
 
-  throwUnlessOk(response);
+  if (!response.ok) {
+    throw new Error(
+      `Status code ${response.status} when fetching "${response.url}".`,
+    );
+  }
 
   return response;
 }

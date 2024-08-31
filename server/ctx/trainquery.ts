@@ -21,8 +21,8 @@ import { logsApi } from "../api/admin/logs-api";
 import { Logger } from "./logger";
 import { DisruptionsManager } from "../disruptions/disruptions-manager";
 import { ApiHandler } from "../api/api-handler";
-import { departuresApiHandler } from "../api/departures-api-new";
-import { gtfsApiHandler } from "../api/admin/gtfs-api-new";
+import { departuresApiHandler } from "../api/departures-api";
+import { gtfsApiHandler } from "../api/admin/gtfs-api";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
