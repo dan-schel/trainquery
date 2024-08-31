@@ -8,10 +8,11 @@ import {
 } from "@/utils/admin-auth-provider";
 import { Session } from "shared/admin/session";
 import { onMounted, provide, ref } from "vue";
-import { z } from "zod";
 import { type ApiDefinition } from "shared/api/api-definition";
 import { callApi } from "@/utils/call-api";
 import type { FetchResult } from "@/utils/call-api-fetcher";
+import { loginApi } from "shared/api/admin/login-api";
+import { logoutApi } from "shared/api/admin/logout-api";
 
 const session = ref<Session | null>(null);
 const mounted = ref(false);
@@ -112,46 +113,27 @@ async function login(username: string, password: string) {
     throw new Error("Username and password required.");
   }
 
-  let response;
-  try {
-    response = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
-    });
-  } catch (e) {
+  const response = await callApi(loginApi, { username, password });
+
+  if (response.type === "success") {
+    const session = response.data;
+    if (session == null) {
+      throw new Error("Incorrect username or password.");
+    }
+    setSession(session, true);
+    return session;
+  } else if (response.type === "error") {
+    if (response.httpCode === 429) {
+      throw new Error("Too many login attempts. Please try again later.");
+    }
+    throw new Error("Something went wrong during login.");
+  } else {
     throw new Error("Something went wrong during login.");
   }
-
-  if (response.status === 429) {
-    throw new Error("Too many login attempts. Please try again later.");
-  }
-
-  if (!response.ok) {
-    throw new Error("Something went wrong during login.");
-  }
-
-  const json = await response.json();
-  const schema = z.object({
-    session: Session.json.nullable(),
-  });
-  const { session } = schema.parse(json);
-
-  if (session == null) {
-    throw new Error("Incorrect username or password.");
-  }
-
-  setSession(session, true);
-  return session;
 }
 
 async function logout() {
-  await callAdminApiLegacy("/api/admin/logout", {});
+  await callAdminApi(logoutApi, null);
   setSession(null, true);
 }
 

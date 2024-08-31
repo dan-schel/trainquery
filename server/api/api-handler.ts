@@ -1,3 +1,4 @@
+import { Session } from "../../shared/admin/session";
 import { ApiDefinition } from "../../shared/api/api-definition";
 import { TrainQuery } from "../ctx/trainquery";
 
@@ -9,6 +10,7 @@ export type ApiHandler<P, R, PS, RS> = {
 export type ApiHandlerFunction<P, R> = (
   ctx: TrainQuery,
   params: P,
+  session: Session | null,
 ) => Promise<R>;
 
 export function handle<P, R, PS, RS>(

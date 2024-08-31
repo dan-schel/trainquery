@@ -3,6 +3,7 @@ import { ApiHandler, BadApiCallError } from "../api/api-handler";
 import { BadApiCallError as LegacyBadApiCallError } from "../param-utils";
 import { Server, ServerParams, TrainQuery } from "./trainquery";
 import express, { Express } from "express";
+import { Session } from "../../shared/admin/session";
 
 export class ExpressServer extends Server {
   constructor(
@@ -71,13 +72,18 @@ function createApiRoute<P, R, PS, RS>(
 
   app.post(`/api/${api.endpoint}`, async (req, res) => {
     try {
+      let session: Session | null = null;
+
       if (api.requiredRole != null) {
         const parsedToken = z
           .string()
           .optional()
           .safeParse(req.headers["admin-token"]);
-        const token = parsedToken.success ? (parsedToken.data ?? null) : null;
+        const token = parsedToken.success ? parsedToken.data ?? null : null;
         await ctx.adminAuth.throwUnlessAuthenticated(token, api.requiredRole);
+        if (token != null) {
+          session = await ctx.adminAuth.getSession(token);
+        }
       }
 
       const parsed = api.paramsSchema.safeParse(req.body.params);
@@ -87,7 +93,7 @@ function createApiRoute<P, R, PS, RS>(
         return;
       }
 
-      const result = await handlerFunction(ctx, parsed.data);
+      const result = await handlerFunction(ctx, parsed.data, session);
 
       res.json({
         result: api.resultSerializer(result),

@@ -6,9 +6,9 @@ import { GtfsWorker } from "../gtfs/gtfs-worker";
 import { BadApiCallError } from "../param-utils";
 import { TrainQueryDB } from "./trainquery-db";
 import { Banners } from "./banners";
-import { loginApi } from "../api/admin/login-api";
+import { loginApiHandler } from "../api/admin/login-api";
 import { AdminAuth, LocalAdminAuthDB } from "../admin/auth";
-import { logoutApi } from "../api/admin/logout-api";
+import { logoutApiHandler } from "../api/admin/logout-api";
 import {
   disruptionInboxApi,
   disruptionInboxProcessApi,
@@ -100,16 +100,19 @@ export async function trainQuery(
 
   await server.start(
     ctx,
-    [departuresApiHandler, gtfsApiHandler, configApiHandler, logsApiHandler],
+    [
+      departuresApiHandler,
+      gtfsApiHandler,
+      configApiHandler,
+      logsApiHandler,
+      loginApiHandler,
+      logoutApiHandler,
+    ],
     async (endpoint: string, params: ServerParams) => {
       if (endpoint === "ssrAppProps") {
         return await ssrAppPropsApi(ctx);
       } else if (endpoint === "ssrRouteProps") {
         return await ssrRoutePropsApi(ctx, params);
-      } else if (endpoint === "admin/login") {
-        return await loginApi(ctx, params);
-      } else if (endpoint === "admin/logout") {
-        return await logoutApi(ctx, params);
       } else if (endpoint === "admin/disruptions/inbox") {
         return await disruptionInboxApi(ctx, params);
       } else if (endpoint === "admin/disruptions/rejected") {
