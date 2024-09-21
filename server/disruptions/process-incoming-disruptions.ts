@@ -80,7 +80,12 @@ export function processIncomingDisruptions(input: Input) {
       (d) => !rejectedEntry.hasSameID(d),
     );
     if (isDeleted) {
+      // TODO NOW: Schedule for deletion, don't delete immediately.
       rejected.delete(rejectedEntry.id);
+
+      // TODO NOW: While it would be easy to add more to this function, I don't
+      // want to handle the actual deletion here. It should be a separate job
+      // that runs periodically.
     }
   }
 
@@ -91,6 +96,8 @@ export function processIncomingDisruptions(input: Input) {
     const rejection = rejected.find((r) => r.hasSameID(incoming));
     if (rejection != null) {
       if (!rejection.overturnsRejection(incoming)) {
+        // TODO NOW: Check if the rejection was scheduled for deletion, and
+        // cancel the deletion if so.
         continue;
       } else {
         rejected.delete(rejection.id);
