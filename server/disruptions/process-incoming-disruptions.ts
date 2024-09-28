@@ -14,10 +14,14 @@ import {
 } from "./provider/auto-disruption-parser";
 import { DisruptionData } from "../../shared/disruptions/processed/disruption-data";
 import { Transaction } from "./transaction";
+import { QUtcDateTime } from "../../shared/qtime/qdatetime";
+import { QDuration } from "../../shared/qtime/qduration";
 
 interface Input {
   readonly incomingDisruptions: ExternalDisruption[];
   readonly parsers: AutoDisruptionParser[];
+  readonly now: QUtcDateTime;
+  readonly rejectedDeleteAfter: QDuration;
 
   readonly disruptions: Transaction<Disruption, DisruptionID>;
   readonly inbox: Transaction<ExternalDisruptionInInbox, ExternalDisruptionID>;
@@ -39,7 +43,15 @@ const deletionStrategies = {
 } as const;
 
 export function processIncomingDisruptions(input: Input) {
-  const { incomingDisruptions, parsers, disruptions, inbox, rejected } = input;
+  const {
+    incomingDisruptions,
+    parsers,
+    disruptions,
+    inbox,
+    rejected,
+    now,
+    rejectedDeleteAfter,
+  } = input;
 
   // Run through all disruptions, updating sources if need be.
   for (const disruption of disruptions) {
@@ -63,8 +75,7 @@ export function processIncomingDisruptions(input: Input) {
     }
   }
 
-  // Remove external disruptions that have since disappeared from the inbox and
-  // rejected list.
+  // Remove external disruptions that have since disappeared from the inbox.
   for (const inboxEntry of inbox) {
     // Delete inbox entries even when updated, so the below code can re-generate
     // disruptions for it.
@@ -75,12 +86,26 @@ export function processIncomingDisruptions(input: Input) {
       inbox.delete(inboxEntry.id);
     }
   }
+
+  // Schedule rejected external disruptions for deletion if they are no longer
+  // present in the incoming disruptions, and cancel the schedules if they
+  // reappear. Delete any that are now past their deletion date.
   for (const rejectedEntry of rejected) {
     const isDeleted = incomingDisruptions.every(
       (d) => !rejectedEntry.hasSameID(d),
     );
     if (isDeleted) {
-      rejected.delete(rejectedEntry.id);
+      if (rejectedEntry.deleteAt == null) {
+        rejected.update(
+          rejectedEntry.withDeletionScheduled(now.add(rejectedDeleteAfter)),
+        );
+      } else if (now.isAfter(rejectedEntry.deleteAt)) {
+        // TODO: Move cleanup logic to a separate job.
+        rejected.delete(rejectedEntry.id);
+      }
+    } else if (rejectedEntry.deleteAt != null) {
+      // If the external disruption is still present, cancel the deletion.
+      rejected.update(rejectedEntry.withDeletionCancelled());
     }
   }
 
