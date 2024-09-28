@@ -22,6 +22,10 @@ import {
   createRejected,
   expectActions,
 } from "./utils";
+import { QUtcDateTime } from "../../../shared/qtime/qdatetime";
+import { QDate } from "../../../shared/qtime/qdate";
+import { QTime } from "../../../shared/qtime/qtime";
+import { QDuration } from "../../../shared/qtime/qduration";
 
 class DummyDisruptionParser extends AutoDisruptionParser {
   process(input: ExternalDisruptionData): ParsingResults | null {
@@ -36,6 +40,9 @@ class DummyDisruptionParser extends AutoDisruptionParser {
 }
 
 const parsers = [new DummyDisruptionParser()];
+
+const now = new QUtcDateTime(new QDate(2024, 9, 28), new QTime(10, 30, 0));
+const rejectedDeleteAfter = new QDuration({ d: 7 });
 
 function identifier(data: DisruptionData) {
   if (data instanceof DummyDisruptionData) {
@@ -58,6 +65,8 @@ describe("processIncomingDisruptions", () => {
     processIncomingDisruptions({
       incomingDisruptions,
       parsers,
+      now,
+      rejectedDeleteAfter,
       disruptions,
       inbox,
       rejected,
@@ -93,6 +102,8 @@ describe("processIncomingDisruptions", () => {
     processIncomingDisruptions({
       incomingDisruptions,
       parsers,
+      now,
+      rejectedDeleteAfter,
       disruptions,
       inbox,
       rejected,
@@ -114,24 +125,21 @@ describe("processIncomingDisruptions", () => {
     });
   });
 
-  it("should clean-up disruptions that disappear from the incoming list", () => {
-    const oldDisruption1 = new ExternalDisruption(
+  it("should remove disruptions from the inbox that disappear from incoming", () => {
+    const oldDisruption = new ExternalDisruption(
       new DummyExternalDisruptionData("1", "content", false),
-    );
-    const oldDisruption2 = new ExternalDisruption(
-      new DummyExternalDisruptionData("2", "content", false),
     );
 
     const incomingDisruptions: ExternalDisruption[] = [];
     const disruptions = createDisruptions([]);
-    const inbox = createInbox([new ExternalDisruptionInInbox(oldDisruption1)]);
-    const rejected = createRejected([
-      new RejectedExternalDisruption(oldDisruption2, false),
-    ]);
+    const inbox = createInbox([new ExternalDisruptionInInbox(oldDisruption)]);
+    const rejected = createRejected([]);
 
     processIncomingDisruptions({
       incomingDisruptions,
       parsers,
+      now,
+      rejectedDeleteAfter,
       disruptions,
       inbox,
       rejected,
@@ -140,7 +148,6 @@ describe("processIncomingDisruptions", () => {
 
     expectActions(disruptions, inbox, rejected, {
       inbox: { delete: [toExternalDisruptionID("dummy-1")] },
-      rejected: { delete: [toExternalDisruptionID("dummy-2")] },
     });
   });
 
@@ -168,6 +175,8 @@ describe("processIncomingDisruptions", () => {
     processIncomingDisruptions({
       incomingDisruptions,
       parsers,
+      now,
+      rejectedDeleteAfter,
       disruptions,
       inbox,
       rejected,
@@ -201,6 +210,8 @@ describe("processIncomingDisruptions", () => {
     processIncomingDisruptions({
       incomingDisruptions,
       parsers,
+      now,
+      rejectedDeleteAfter,
       disruptions,
       inbox,
       rejected,
@@ -245,6 +256,8 @@ describe("processIncomingDisruptions", () => {
     processIncomingDisruptions({
       incomingDisruptions,
       parsers,
+      now,
+      rejectedDeleteAfter,
       disruptions,
       inbox,
       rejected,
@@ -293,6 +306,8 @@ describe("processIncomingDisruptions", () => {
     processIncomingDisruptions({
       incomingDisruptions,
       parsers,
+      now,
+      rejectedDeleteAfter,
       disruptions,
       inbox,
       rejected,
@@ -341,6 +356,8 @@ describe("processIncomingDisruptions", () => {
     processIncomingDisruptions({
       incomingDisruptions,
       parsers,
+      now,
+      rejectedDeleteAfter,
       disruptions,
       inbox,
       rejected,
@@ -378,6 +395,8 @@ describe("processIncomingDisruptions", () => {
     processIncomingDisruptions({
       incomingDisruptions,
       parsers,
+      now,
+      rejectedDeleteAfter,
       disruptions,
       inbox,
       rejected,
@@ -408,12 +427,14 @@ describe("processIncomingDisruptions", () => {
     const disruptions = createDisruptions([]);
     const inbox = createInbox([]);
     const rejected = createRejected([
-      new RejectedExternalDisruption(incoming, true),
+      new RejectedExternalDisruption(incoming, true, null),
     ]);
 
     processIncomingDisruptions({
       incomingDisruptions,
       parsers,
+      now,
+      rejectedDeleteAfter,
       disruptions,
       inbox,
       rejected,
@@ -435,12 +456,14 @@ describe("processIncomingDisruptions", () => {
     const disruptions = createDisruptions([]);
     const inbox = createInbox([]);
     const rejected = createRejected([
-      new RejectedExternalDisruption(oldSource, true),
+      new RejectedExternalDisruption(oldSource, true, null),
     ]);
 
     processIncomingDisruptions({
       incomingDisruptions,
       parsers,
+      now,
+      rejectedDeleteAfter,
       disruptions,
       inbox,
       rejected,
@@ -478,12 +501,14 @@ describe("processIncomingDisruptions", () => {
     const disruptions = createDisruptions([]);
     const inbox = createInbox([]);
     const rejected = createRejected([
-      new RejectedExternalDisruption(oldSource, false),
+      new RejectedExternalDisruption(oldSource, false, null),
     ]);
 
     processIncomingDisruptions({
       incomingDisruptions,
       parsers,
+      now,
+      rejectedDeleteAfter,
       disruptions,
       inbox,
       rejected,
@@ -491,5 +516,111 @@ describe("processIncomingDisruptions", () => {
     });
 
     expectActions(disruptions, inbox, rejected, {});
+  });
+
+  it("should schedule rejected disruptions for deletion when they disappear from incoming", () => {
+    const oldDisruption = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "content", false),
+    );
+
+    const incomingDisruptions: ExternalDisruption[] = [];
+    const disruptions = createDisruptions([]);
+    const inbox = createInbox([]);
+    const rejected = createRejected([
+      new RejectedExternalDisruption(oldDisruption, false, null),
+    ]);
+
+    processIncomingDisruptions({
+      incomingDisruptions,
+      parsers,
+      now,
+      rejectedDeleteAfter,
+      disruptions,
+      inbox,
+      rejected,
+      identifier,
+    });
+
+    expectActions(disruptions, inbox, rejected, {
+      rejected: {
+        update: [
+          new RejectedExternalDisruption(
+            oldDisruption,
+            false,
+            new QUtcDateTime(new QDate(2024, 10, 5), new QTime(10, 30, 0)),
+          ),
+        ],
+      },
+    });
+  });
+
+  it("should cancel deletion of rejected disruptions if they reappear", () => {
+    const returningDisruption = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "content", false),
+    );
+
+    const incomingDisruptions: ExternalDisruption[] = [returningDisruption];
+    const disruptions = createDisruptions([]);
+    const inbox = createInbox([]);
+    const rejected = createRejected([
+      new RejectedExternalDisruption(
+        returningDisruption,
+        false,
+        new QUtcDateTime(new QDate(2024, 9, 29), new QTime(10, 39, 0)),
+      ),
+    ]);
+
+    processIncomingDisruptions({
+      incomingDisruptions,
+      parsers,
+      now,
+      rejectedDeleteAfter,
+      disruptions,
+      inbox,
+      rejected,
+      identifier,
+    });
+
+    expectActions(disruptions, inbox, rejected, {
+      rejected: {
+        update: [
+          new RejectedExternalDisruption(returningDisruption, false, null),
+        ],
+      },
+    });
+  });
+
+  it("should delete rejected disruptions when the scheduled time arrives", () => {
+    const oldDisruption = new ExternalDisruption(
+      new DummyExternalDisruptionData("1", "content", false),
+    );
+
+    const incomingDisruptions: ExternalDisruption[] = [];
+    const disruptions = createDisruptions([]);
+    const inbox = createInbox([]);
+    const rejected = createRejected([
+      new RejectedExternalDisruption(
+        oldDisruption,
+        false,
+        new QUtcDateTime(new QDate(2024, 9, 27), new QTime(10, 41, 0)),
+      ),
+    ]);
+
+    processIncomingDisruptions({
+      incomingDisruptions,
+      parsers,
+      now,
+      rejectedDeleteAfter,
+      disruptions,
+      inbox,
+      rejected,
+      identifier,
+    });
+
+    expectActions(disruptions, inbox, rejected, {
+      rejected: {
+        delete: [oldDisruption.id],
+      },
+    });
   });
 });
