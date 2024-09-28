@@ -28,7 +28,9 @@ export function rejectDisruption(input: Input) {
   const { toReject, resurfaceIfUpdated, disruptions, inbox, rejected } = input;
 
   // Add the disruption to the rejected list.
-  rejected.add(new RejectedExternalDisruption(toReject, resurfaceIfUpdated));
+  rejected.add(
+    new RejectedExternalDisruption(toReject, resurfaceIfUpdated, null),
+  );
 
   // Remove the disruption from the inbox.
   inbox.delete(toReject.id);

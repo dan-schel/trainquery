@@ -14,7 +14,7 @@ export class RejectedExternalDisruption {
   constructor(
     readonly disruption: ExternalDisruption,
     readonly resurfaceIfUpdated: boolean,
-    readonly deletedAt: QUtcDateTime | null,
+    readonly deleteAt: QUtcDateTime | null,
   ) {
     this.id = disruption.id;
   }
@@ -66,7 +66,7 @@ export class RejectedExternalDisruption {
       id: this.id,
       disruption: this.disruption.toJSON(),
       resurfaceIfUpdated: this.resurfaceIfUpdated,
-      deleteAt: this.deletedAt?.toJSON() ?? null,
+      deleteAt: this.deleteAt?.toJSON() ?? null,
     };
   }
 }
