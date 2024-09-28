@@ -90,7 +90,7 @@ function handleUpdateCounts({
       background-color: var(--color-accent);
       color: var(--color-on-accent);
       font-weight: bold;
-      padding: 0.15rem 0.3rem;
+      padding: 0.15rem 0.4rem;
       min-width: 1.25rem;
       text-align: center;
       border-radius: 1rem;

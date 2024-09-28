@@ -4,13 +4,17 @@ import {
   ExternalDisruptionIDJson,
   type ExternalDisruptionID,
 } from "../../system/ids";
+import { QUtcDateTime } from "../../qtime/qdatetime";
 
 export class RejectedExternalDisruption {
+  // TODO: Refactor to use a getter instead of a field, and only add it with
+  // toMongo() for database purposes.
   readonly id: ExternalDisruptionID;
 
   constructor(
     readonly disruption: ExternalDisruption,
     readonly resurfaceIfUpdated: boolean,
+    readonly deleteAt: QUtcDateTime | null,
   ) {
     this.id = disruption.id;
   }
@@ -23,6 +27,22 @@ export class RejectedExternalDisruption {
     return this.id === other.id;
   }
 
+  withDeletionScheduled(at: QUtcDateTime) {
+    return new RejectedExternalDisruption(
+      this.disruption,
+      this.resurfaceIfUpdated,
+      at,
+    );
+  }
+
+  withDeletionCancelled() {
+    return new RejectedExternalDisruption(
+      this.disruption,
+      this.resurfaceIfUpdated,
+      null,
+    );
+  }
+
   static readonly json = z
     .object({
       // Redundant, but allows makes delete commands in MongoDB cleaner.
@@ -30,9 +50,15 @@ export class RejectedExternalDisruption {
       id: ExternalDisruptionIDJson,
       disruption: ExternalDisruption.json,
       resurfaceIfUpdated: z.boolean(),
+      deleteAt: QUtcDateTime.json.nullable(),
     })
     .transform(
-      (x) => new RejectedExternalDisruption(x.disruption, x.resurfaceIfUpdated),
+      (x) =>
+        new RejectedExternalDisruption(
+          x.disruption,
+          x.resurfaceIfUpdated,
+          x.deleteAt,
+        ),
     );
 
   toJSON(): z.input<typeof RejectedExternalDisruption.json> {
@@ -40,6 +66,7 @@ export class RejectedExternalDisruption {
       id: this.id,
       disruption: this.disruption.toJSON(),
       resurfaceIfUpdated: this.resurfaceIfUpdated,
+      deleteAt: this.deleteAt?.toJSON() ?? null,
     };
   }
 }

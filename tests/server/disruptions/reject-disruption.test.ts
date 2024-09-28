@@ -37,7 +37,7 @@ describe("rejectDisruption", () => {
         delete: [toReject.id],
       },
       rejected: {
-        add: [new RejectedExternalDisruption(toReject, false)],
+        add: [new RejectedExternalDisruption(toReject, false, null)],
       },
     });
   });
@@ -64,7 +64,7 @@ describe("rejectDisruption", () => {
         delete: [toReject.id],
       },
       rejected: {
-        add: [new RejectedExternalDisruption(toReject, true)],
+        add: [new RejectedExternalDisruption(toReject, true, null)],
       },
     });
   });
@@ -116,7 +116,7 @@ describe("rejectDisruption", () => {
         delete: [toReject.id],
       },
       rejected: {
-        add: [new RejectedExternalDisruption(toReject, false)],
+        add: [new RejectedExternalDisruption(toReject, false, null)],
       },
       disruptions: {
         delete: [toDisruptionID("1"), toDisruptionID("2")],

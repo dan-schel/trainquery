@@ -29,9 +29,11 @@ import { ExternalDisruptionInInbox } from "../../shared/disruptions/external/ext
 import { RejectedExternalDisruption } from "../../shared/disruptions/external/rejected-external-disruption";
 import { rejectDisruption } from "./reject-disruption";
 import { restoreDisruption } from "./restore-disruption";
+import { QDuration } from "../../shared/qtime/qduration";
 
 const disruptionsConsideredFreshMinutes = 15;
 const databaseRefreshIntervalMinutes = 5;
+const deleteRejectedDisruptionsAfter = new QDuration({ d: 7 });
 
 type FullDisruptionData = {
   disruptions: Disruption[];
@@ -121,6 +123,8 @@ export class DisruptionsManager {
     processIncomingDisruptions({
       incomingDisruptions: incoming,
       parsers: this._parsers,
+      now: nowUTC(),
+      rejectedDeleteAfter: deleteRejectedDisruptionsAfter,
       ...transactions,
     });
 
