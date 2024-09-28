@@ -7,6 +7,8 @@ import type { RejectedExternalDisruption } from "shared/disruptions/external/rej
 import SimpleButton from "@/components/common/SimpleButton.vue";
 import { useAdminAuth } from "@/utils/admin-auth-provider";
 import { useRouter } from "vue-router";
+import { formatDateTime } from "shared/qtime/format";
+import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 
 const { callAdminApi } = useAdminAuth();
 const router = useRouter();
@@ -22,6 +24,18 @@ const disruptionHtml = computed(() => {
       useClassesOverSemanticHtml: true,
     },
   );
+});
+
+const deleteDate = computed(() => {
+  return props.rejected.deleteAt != null
+    ? toLocalDateTimeLuxon(getConfig(), props.rejected.deleteAt)
+    : null;
+});
+
+const resurfaceText = computed(() => {
+  return props.rejected.resurfaceIfUpdated
+    ? "This disruption will return to the inbox if it's content changes."
+    : "This disruption is rejected permanently.";
 });
 
 const restoring = ref<boolean>(false);
@@ -57,13 +71,19 @@ async function handleRestore() {
 <template>
   <div class="workspace">
     <section class="incoming" v-html="disruptionHtml"></section>
-    <div class="row">
+    <div class="notice delete-notice" v-if="deleteDate != null">
       <p>
-        {{
-          rejected.resurfaceIfUpdated
-            ? "This disruption will return to the inbox if it's content changes."
-            : "This disruption is rejected permanently."
-        }}
+        {{ getConfig().frontend.appName }}'s disruption sources no longer list
+        this disruption. Unless it reappears, it will be deleted from the
+        rejection list on {{ formatDateTime(deleteDate) }}.
+      </p>
+      <p>
+        {{ resurfaceText }}
+      </p>
+    </div>
+    <div class="notice restore-notice" v-else>
+      <p>
+        {{ resurfaceText }}
       </p>
       <div class="flex-grow"></div>
       <SimpleButton
@@ -100,7 +120,7 @@ async function handleRestore() {
     @include utils.h3;
   }
 }
-.row {
+.notice {
   @include utils.raised-surface;
 
   border-radius: 0.75rem;
@@ -110,6 +130,9 @@ async function handleRestore() {
     flex-shrink: 1;
   }
 }
+.delete-notice {
+  gap: 1rem;
+}
 .flex-grow {
   @include template.flex-grow;
   height: 1rem;
@@ -118,7 +141,7 @@ async function handleRestore() {
 
 // Desktop layout.
 @media screen and (min-width: 48rem) {
-  .row {
+  .restore-notice {
     @include template.row;
   }
 }
