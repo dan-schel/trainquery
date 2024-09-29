@@ -60,7 +60,7 @@ export class GtfsParsingRules {
 }
 
 /** All supported authentication methods potentially required by GTFS-R API(s). */
-export const GtfsRealtimeAuthMethods = ["none", "melbourne"] as const;
+export const GtfsRealtimeAuthMethods = ["none", "melbourne", "relay"] as const;
 /** Which authentication method is required by the GTFS-R API(s). */
 export type GtfsRealtimeAuthMethod = (typeof GtfsRealtimeAuthMethods)[number];
 /** Matches a value in {@link GtfsRealtimeAuthMethods}. */
