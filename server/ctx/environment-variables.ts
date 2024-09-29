@@ -14,6 +14,7 @@ const names = {
   gtfsRealtimeKey: "GTFS_REALTIME_KEY",
   superadminUsername: "SUPERADMIN_USERNAME",
   superadminPassword: "SUPERADMIN_PASSWORD",
+  relayKey: "RELAY_KEY",
 };
 
 const defaults = {
@@ -59,6 +60,7 @@ export class EnvironmentVariables {
     readonly ptv: PtvVars | null,
     readonly gtfsRealtimeKey: string | null,
     readonly superadmin: SuperadminVars | null,
+    readonly relayKey: string | null,
   ) {}
 
   isProduction() {
@@ -87,6 +89,12 @@ export class EnvironmentVariables {
       throw notSet(names.gtfsRealtimeKey);
     }
     return this.gtfsRealtimeKey;
+  }
+  requireRelayKey() {
+    if (this.relayKey == null) {
+      throw notSet(names.relayKey);
+    }
+    return this.relayKey;
   }
 
   /** Parses the environment variables from `process.env`. */
@@ -179,6 +187,9 @@ export class EnvironmentVariables {
       };
     }
 
+    // RELAY_KEY.
+    const relayKey = process.env[names.relayKey] ?? null;
+
     return new EnvironmentVariables(
       nodeEnv,
       port,
@@ -189,6 +200,7 @@ export class EnvironmentVariables {
       ptv,
       gtfsRealtimeKey,
       superadmin,
+      relayKey,
     );
   }
 }
