@@ -14,7 +14,7 @@ import {
 } from "./download-utils";
 
 const refreshMs = 1000 * 60 * 10;
-const supportedVersion = "v1";
+const supportedVersion = "v2";
 
 export class OnlineConfigProvider extends ConfigProvider {
   constructor(
