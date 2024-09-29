@@ -3,7 +3,6 @@ import { PtvConfig } from "../../../config/ptv-config";
 import { EnvironmentVariables } from "../../../ctx/environment-variables";
 import { TrainQuery } from "../../../ctx/trainquery";
 import { QUtcDateTime } from "../../../../shared/qtime/qdatetime";
-import { callPtvApi } from "./call-ptv-api";
 import { nonNull, unique } from "@dan-schel/js-utils";
 import { DisruptionProvider } from "../disruption-provider";
 import { PtvExternalDisruptionData } from "../../../../shared/disruptions/external/types/ptv";
@@ -15,18 +14,11 @@ const refreshInterval = 5 * 60 * 1000;
 const blacklistedUrls = ["https://ptv.vic.gov.au/live-travel-updates/"];
 
 export class PtvDisruptionProvider extends DisruptionProvider {
-  private readonly _devID: string;
-  private readonly _devKey: string;
-
   constructor(
     private readonly _ctx: TrainQuery,
     private readonly _ptvConfig: PtvConfig,
   ) {
     super();
-
-    const ptv = EnvironmentVariables.get().requirePtv();
-    this._devID = ptv.devId;
-    this._devKey = ptv.devKey;
   }
 
   async init(): Promise<void> {
@@ -37,11 +29,7 @@ export class PtvDisruptionProvider extends DisruptionProvider {
   private async _refresh(): Promise<void> {
     try {
       this._ctx.logger.logFetchingDisruptions("ptv-api");
-      const disruptions = await fetchPtvDisruptions(
-        this._ptvConfig,
-        this._devID,
-        this._devKey,
-      );
+      const disruptions = await fetchPtvDisruptions(this._ptvConfig);
       this._ctx.logger.logFetchingDisruptionsSuccess(
         "ptv-api",
         disruptions.length,
@@ -103,19 +91,21 @@ const PtvDisruptionsSchema = z.object({
   }),
 });
 
-async function fetchPtvDisruptions(
-  ptvConfig: PtvConfig,
-  devID: string,
-  devKey: string,
-) {
-  const json = await callPtvApi(
-    "/v3/disruptions",
-    {
-      route_types: ["0", "3"],
-    },
-    devID,
-    devKey,
-  );
+async function fetchPtvDisruptions(ptvConfig: PtvConfig) {
+  const json = await (
+    await fetch(ptvConfig.disruptionsRelayUrl, {
+      headers: { "relay-key": EnvironmentVariables.get().requireRelayKey() },
+    })
+  ).json();
+
+  // const json = await callPtvApi(
+  //   "/v3/disruptions",
+  //   {
+  //     route_types: ["0", "3"],
+  //   },
+  //   devID,
+  //   devKey,
+  // );
 
   const result = PtvDisruptionsSchema.parse(json);
   const list = [
