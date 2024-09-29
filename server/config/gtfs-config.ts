@@ -146,9 +146,26 @@ export class GtfsSubfeedConfig extends GtfsFeedConfig {
     );
 }
 
+const GtfsSourceJson = z.union([
+  z.object({
+    method: z.literal("local"),
+    path: z.string(),
+  }),
+  z.object({
+    method: z.literal("url"),
+    url: z.string(),
+  }),
+  z.object({
+    method: z.literal("relay"),
+    url: z.string(),
+  }),
+]);
+
+type GtfsSource = z.infer<typeof GtfsSourceJson>;
+
 export class GtfsConfig<UsesSubfeeds extends boolean> {
   constructor(
-    readonly staticData: string,
+    readonly staticData: GtfsSource,
     readonly refreshHourUtc: number,
     readonly persist: boolean,
     readonly usesSubfeeds: UsesSubfeeds,
@@ -159,7 +176,7 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
   static readonly json = z.union([
     z
       .object({
-        staticData: z.string(),
+        staticData: GtfsSourceJson,
         refreshHourUtc: z.number(),
         persist: z.boolean(),
         subfeeds: GtfsSubfeedConfig.json.array(),
@@ -177,7 +194,7 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
       ),
     GtfsFeedConfig.rawJson
       .extend({
-        staticData: z.string(),
+        staticData: GtfsSourceJson,
         refreshHourUtc: z.number(),
         persist: z.boolean(),
       })
@@ -218,9 +235,6 @@ export class GtfsConfig<UsesSubfeeds extends boolean> {
   }
 
   isOnlineSource() {
-    return (
-      this.staticData.startsWith("http://") ||
-      this.staticData.startsWith("https://")
-    );
+    return this.staticData.method !== "local";
   }
 }

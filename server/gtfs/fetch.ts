@@ -11,6 +11,7 @@ import { GtfsConfig } from "../config/gtfs-config";
 import { TrainQuery } from "../ctx/trainquery";
 import { GtfsData } from "./data/gtfs-data";
 import { parseGtfsFiles } from "./parse-gtfs-files";
+import { EnvironmentVariables } from "../ctx/environment-variables";
 
 export async function downloadGtfs(
   ctx: TrainQuery,
@@ -18,14 +19,21 @@ export async function downloadGtfs(
 ): Promise<GtfsData> {
   const dataFolder = generateDataFolderPath();
 
-  const zipPath = gtfsConfig.isOnlineSource()
-    ? path.join(dataFolder, "gtfs.zip")
-    : gtfsConfig.staticData;
+  const zipPath =
+    gtfsConfig.staticData.method === "local"
+      ? gtfsConfig.staticData.path
+      : path.join(dataFolder, "gtfs.zip");
 
   await fsp.mkdir(dataFolder);
 
-  if (gtfsConfig.isOnlineSource()) {
-    await download(gtfsConfig.staticData, zipPath);
+  if (gtfsConfig.staticData.method !== "local") {
+    const headers: Record<string, string> =
+      gtfsConfig.staticData.method === "relay"
+        ? {
+            "relay-key": EnvironmentVariables.get().requireRelayKey(),
+          }
+        : {};
+    await download(gtfsConfig.staticData.url, zipPath, headers);
   }
 
   const zip = new AdmZip(zipPath);

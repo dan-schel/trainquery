@@ -8,8 +8,12 @@ export function generateDataFolderPath(): string {
   return `data-${uuid()}`;
 }
 
-export async function download(url: string, destinationPath: string) {
-  const response = await fetch(url);
+export async function download(
+  url: string,
+  destinationPath: string,
+  headers: Record<string, string> = {},
+) {
+  const response = await fetch(url, { headers: headers });
 
   await new Promise<void>((resolve, reject) => {
     if (response.body == null) {
