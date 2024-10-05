@@ -9,7 +9,7 @@ const password = ref("");
 const loading = ref(false);
 const error = ref<string | null>(null);
 const buttonDisabled = computed(
-  () => loading.value || username.value.length < 1 || password.value.length < 1,
+  () => username.value.length < 1 || password.value.length < 1,
 );
 
 const { login } = useAdminAuth();
@@ -44,9 +44,10 @@ async function handleFormSubmit(e: Event) {
       <input type="password" v-model="password" />
     </label>
     <SimpleButton
-      :content="{ text: loading ? 'Loading...' : 'Sign in' }"
+      :content="{ text: 'Sign in' }"
       theme="filled"
       :submit="true"
+      :loading="loading"
       :disabled="buttonDisabled"
     ></SimpleButton>
     <p class="notice">Admin dashboard access is for site admins only.</p>

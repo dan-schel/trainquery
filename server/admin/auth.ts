@@ -8,8 +8,8 @@ import {
 } from "../../shared/admin/session";
 import { nowUTC } from "../../shared/qtime/luxon-conversions";
 
-/** Disregard admin tokens that were created over 2 hours ago. */
-const tokenLifespanMins = 2 * 60;
+/** Disregard admin tokens that were created over 2 weeks ago. */
+const tokenLifespanDays = 14;
 
 /** Run a job to cleanup expired tokens every 60 minutes. */
 const cleanupIntervalMillis = 60 * 60 * 1000;
@@ -137,7 +137,7 @@ export class AdminAuth {
       username,
       roles,
       generateRandomToken(),
-      nowUTC().add({ m: tokenLifespanMins }),
+      nowUTC().add({ d: tokenLifespanDays }),
     );
     await this._db.writeAdminAuthSession(session);
     return session;
