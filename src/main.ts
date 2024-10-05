@@ -27,6 +27,8 @@ export default viteSSR(
   async ({ app, router, initialState, isClient, url }) => {
     const baseUrl = isClient ? "" : url.origin;
 
+    console.log("MAIN.TS?");
+
     // Download app props during SSR. They will be already set if using the
     // prod server, so this is only really for dev mode.
     if (import.meta.env.SSR && initialState.app == null) {
@@ -102,6 +104,8 @@ export default viteSSR(
     router.afterEach(() => {
       finishedNavigating();
     });
+
+    console.log("END OF MAIN.TS?");
 
     return { head };
   },
