@@ -44,17 +44,25 @@ export default viteSSR(
     const head = createHead();
     app.use(head);
 
+    console.log("2-1");
+
     if (import.meta.env.SSR) {
+      console.log("2-2");
       const response = await callApi(configApi, null, {
         baseUrl,
         resilient: false,
       });
+      console.log("2-3");
       if (response.type === "success") {
+        console.log("2-4");
         provideConfig(response.data);
       } else if (response.type === "error") {
+        console.log("2-5");
         throw response.error;
       }
+      console.log("2-6");
     } else {
+      console.log("2-7");
       await initConfig(initialState.app.configHash);
     }
 
