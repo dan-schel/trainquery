@@ -39,6 +39,8 @@ export default viteSSR(
       initialState.app = await res.json();
     }
 
+    console.log("2");
+
     const head = createHead();
     app.use(head);
 
@@ -56,18 +58,24 @@ export default viteSSR(
       await initConfig(initialState.app.configHash);
     }
 
+    console.log("3");
+
     provideNavigating(app);
     provideBanners(app);
     setBanners(
       initialState.app.banners.map((x: unknown) => Banner.json.parse(x)),
     );
 
+    console.log("4");
+
     // Download route props when navigating pages (the first route's props are
     // downloaded with this code too, but on the server during SSR).
     router.beforeEach(async (to, from, next) => {
+      console.log("BEFORE");
       // When applying a filter on the stop page, a full page reload is not
       // required, but I still want to change the URL, ok?
       if (to.name === "stop" && to.path === from.path) {
+        console.log("BEFORE END");
         return next();
       }
 
@@ -75,6 +83,7 @@ export default viteSSR(
 
       // I get several of these calls when loading every page for some reason.
       if (to.name === "notfound") {
+        console.log("BEFORE END");
         return next();
       }
 
@@ -84,6 +93,7 @@ export default viteSSR(
         typeof to.meta.state === "object" &&
         "route" in to.meta.state
       ) {
+        console.log("BEFORE END");
         return next();
       }
 
@@ -98,11 +108,16 @@ export default viteSSR(
         ...(to.meta.state ?? {}),
         route: await res.json(),
       };
+      console.log("BEFORE END");
       next();
     });
 
+    console.log("5");
+
     router.afterEach(() => {
+      console.log("AFTER");
       finishedNavigating();
+      console.log("AFTER END");
     });
 
     console.log("END OF MAIN.TS?");
