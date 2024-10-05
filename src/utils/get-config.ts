@@ -1,4 +1,6 @@
 import { FrontendConfig } from "shared/system/config/frontend-config";
+import { callApi } from "./call-api";
+import { configApi } from "shared/api/config-api";
 
 const lsKey = "trainquery-config";
 
@@ -19,10 +21,14 @@ export async function initConfig(latestHash: string) {
     return;
   }
 
-  const res = await fetch("/api/config");
-  const json = await res.json();
-  config = FrontendConfig.json.parse(json);
-  localStorage.setItem(lsKey, JSON.stringify(config.toJSON()));
+  const result = await callApi(configApi, null);
+
+  if (result.type === "success") {
+    config = result.data;
+    localStorage.setItem(lsKey, JSON.stringify(config.toJSON()));
+  } else if (result.type === "error") {
+    throw result.error;
+  }
 }
 
 export function provideConfig(ssrConfig: FrontendConfig) {

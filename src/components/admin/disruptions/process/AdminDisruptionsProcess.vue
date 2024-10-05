@@ -3,44 +3,38 @@ import PageContent from "@/components/common/PageContent.vue";
 import { useAdminAuth } from "@/utils/admin-auth-provider";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { z } from "zod";
 import { ExternalDisruptionInInbox } from "shared/disruptions/external/external-disruption-in-inbox";
 import { Disruption } from "shared/disruptions/processed/disruption";
 import AsyncData, { type AsyncState } from "@/components/common/AsyncData.vue";
 import Workspace from "./Workspace.vue";
-
-const ResponseSchema = z.object({
-  inbox: ExternalDisruptionInInbox.json,
-  provisional: Disruption.json.array(),
-});
+import { disruptionInboxSingleApi } from "shared/api/admin/disruptions-api";
+import { toExternalDisruptionID } from "shared/system/ids";
 
 const route = useRoute();
-const encodedDisruptionID = route.params.id as string;
+const disruptionID = route.params.id as string;
 
 const { callAdminApi } = useAdminAuth();
-const state = ref<AsyncState<z.infer<typeof ResponseSchema>>>("loading");
+const state = ref<
+  AsyncState<{
+    inbox: ExternalDisruptionInInbox;
+    provisional: Disruption[];
+  }>
+>("loading");
 
 async function handleMounted() {
-  const schema = z.union([
-    ResponseSchema,
-    z.object({
-      notFound: z.literal(true),
-    }),
-  ]);
   state.value = "loading";
-  try {
-    const response = await callAdminApi("/api/admin/disruptions/inbox/single", {
-      id: encodedDisruptionID,
-    });
-    const raw = await response.json();
-    const parsed = schema.parse(raw);
-    if ("notFound" in parsed) {
+  const response = await callAdminApi(disruptionInboxSingleApi, {
+    id: toExternalDisruptionID(disruptionID),
+  });
+
+  if (response.type === "success") {
+    if ("notFound" in response.data) {
       state.value = "not-found";
     } else {
-      state.value = { data: parsed };
+      state.value = { data: response.data };
     }
-  } catch (e) {
-    console.warn("Failed to fetch disruptions.", e);
+  } else if (response.type === "error") {
+    console.warn("Failed to fetch disruptions.", response.error);
     state.value = "error";
   }
 }

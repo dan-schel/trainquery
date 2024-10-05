@@ -111,15 +111,22 @@ export class AdminLogWindow {
     },
   ) {}
 
-  static readonly json = z.object({
-    instance: z.string(),
-    logs: z.array(AdminLog.json),
-  });
+  static readonly json = z
+    .object({
+      instance: z.string(),
+      logs: z.array(AdminLog.json),
+      query: z.object({
+        beforeSequence: z.number(),
+        count: z.number(),
+      }),
+    })
+    .transform((x) => new AdminLogWindow(x.instance, x.logs, x.query));
 
   toJSON(): z.input<typeof AdminLogWindow.json> {
     return {
       instance: this.instance,
       logs: this.logs.map((l) => l.toJSON()),
+      query: this.query,
     };
   }
 }

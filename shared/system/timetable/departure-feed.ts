@@ -1,4 +1,4 @@
-import { type StopID, isStopID } from "../ids";
+import { type StopID, StopIDJson, isStopID } from "../ids";
 import {
   alpha,
   base48Safe,
@@ -8,6 +8,7 @@ import {
   tryReencode,
 } from "@dan-schel/js-utils";
 import { DepartureFilter } from "./departure-filter";
+import { z } from "zod";
 
 const encodedAlpha = alpha + decimal + "- |";
 
@@ -17,6 +18,25 @@ export class DepartureFeed {
     readonly count: number,
     readonly filter: DepartureFilter,
   ) {}
+
+  static readonly json = z
+    .object({
+      stop: StopIDJson,
+      count: z.number(),
+      filter: DepartureFilter.json,
+    })
+    .transform((x) => new DepartureFeed(x.stop, x.count, x.filter));
+
+  toJSON(): z.input<typeof DepartureFeed.json> {
+    return {
+      stop: this.stop,
+      count: this.count,
+      filter: this.filter.toJSON(),
+    };
+  }
+
+  // TODO: Maybe I can remove everything beneath here when the API refactor is
+  // finished?
 
   asString(): string {
     return `${this.stop.toFixed()}|${this.count.toFixed()}|${this.filter.asString()}`;

@@ -2,12 +2,12 @@
 import PageContent from "@/components/common/PageContent.vue";
 import { useAdminAuth } from "@/utils/admin-auth-provider";
 import { onMounted, ref } from "vue";
-import { z } from "zod";
 import AdminRequestState from "@/components/admin/AdminRequestState.vue";
-import { AdminLog, AdminLogWindow } from "shared/admin/logs";
+import { AdminLog } from "shared/admin/logs";
 import { formatDateTime } from "shared/qtime/format";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
 import { getConfig } from "@/utils/get-config";
+import { logsApi } from "shared/api/admin/logs-api";
 
 const { callAdminApi } = useAdminAuth();
 
@@ -18,22 +18,18 @@ const logs = ref<AdminLog[]>([]);
 const state = ref<"loading" | "error" | "success">("loading");
 
 async function handleMounted() {
-  const schema = z.object({
-    logWindow: AdminLogWindow.json,
-    availableInstances: z.string().array(),
+  state.value = "loading";
+  const response = await callAdminApi(logsApi, {
+    instance: null,
+    beforeSequence: null,
+    count: 100,
   });
 
-  state.value = "loading";
-  try {
-    const response = await callAdminApi("/api/admin/logs", {
-      count: "100",
-    });
-    const data = await response.json();
-    const parsed = schema.parse(data);
-    logs.value = parsed.logWindow.logs;
+  if (response.type === "success") {
+    logs.value = response.data.logWindow.logs;
     state.value = "success";
-  } catch (e) {
-    console.warn("Failed to fetch logs.", e);
+  } else if (response.type === "error") {
+    console.warn("Failed to fetch logs.", response.error);
     state.value = "error";
   }
 }

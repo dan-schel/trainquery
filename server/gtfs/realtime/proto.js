@@ -574,8 +574,8 @@
               options.longs === String
                 ? long.toString()
                 : options.longs === Number
-                ? long.toNumber()
-                : long;
+                  ? long.toNumber()
+                  : long;
           } else object.timestamp = options.longs === String ? "0" : 0;
         }
         if (
@@ -608,11 +608,11 @@
               options.longs === String
                 ? $util.Long.prototype.toString.call(message.timestamp)
                 : options.longs === Number
-                ? new $util.LongBits(
-                    message.timestamp.low >>> 0,
-                    message.timestamp.high >>> 0,
-                  ).toNumber(true)
-                : message.timestamp;
+                  ? new $util.LongBits(
+                      message.timestamp.low >>> 0,
+                      message.timestamp.high >>> 0,
+                    ).toNumber(true)
+                  : message.timestamp;
         return object;
       };
 
@@ -1456,8 +1456,8 @@
               options.longs === String
                 ? long.toString()
                 : options.longs === Number
-                ? long.toNumber()
-                : long;
+                  ? long.toNumber()
+                  : long;
           } else object.timestamp = options.longs === String ? "0" : 0;
           object.delay = 0;
           object.tripProperties = null;
@@ -1492,11 +1492,11 @@
               options.longs === String
                 ? $util.Long.prototype.toString.call(message.timestamp)
                 : options.longs === Number
-                ? new $util.LongBits(
-                    message.timestamp.low >>> 0,
-                    message.timestamp.high >>> 0,
-                  ).toNumber(true)
-                : message.timestamp;
+                  ? new $util.LongBits(
+                      message.timestamp.low >>> 0,
+                      message.timestamp.high >>> 0,
+                    ).toNumber(true)
+                  : message.timestamp;
         if (message.delay != null && message.hasOwnProperty("delay"))
           object.delay = message.delay;
         if (
@@ -1752,9 +1752,8 @@
           if (object.delay != null) message.delay = object.delay | 0;
           if (object.time != null)
             if ($util.Long)
-              (message.time = $util.Long.fromValue(
-                object.time,
-              )).unsigned = false;
+              (message.time = $util.Long.fromValue(object.time)).unsigned =
+                false;
             else if (typeof object.time === "string")
               message.time = parseInt(object.time, 10);
             else if (typeof object.time === "number")
@@ -1789,8 +1788,8 @@
                 options.longs === String
                   ? long.toString()
                   : options.longs === Number
-                  ? long.toNumber()
-                  : long;
+                    ? long.toNumber()
+                    : long;
             } else object.time = options.longs === String ? "0" : 0;
             object.uncertainty = 0;
           }
@@ -1805,11 +1804,11 @@
                 options.longs === String
                   ? $util.Long.prototype.toString.call(message.time)
                   : options.longs === Number
-                  ? new $util.LongBits(
-                      message.time.low >>> 0,
-                      message.time.high >>> 0,
-                    ).toNumber()
-                  : message.time;
+                    ? new $util.LongBits(
+                        message.time.low >>> 0,
+                        message.time.high >>> 0,
+                      ).toNumber()
+                    : message.time;
           if (
             message.uncertainty != null &&
             message.hasOwnProperty("uncertainty")
@@ -3611,8 +3610,8 @@
               options.longs === String
                 ? long.toString()
                 : options.longs === Number
-                ? long.toNumber()
-                : long;
+                  ? long.toNumber()
+                  : long;
           } else object.timestamp = options.longs === String ? "0" : 0;
           object.congestionLevel =
             options.enums === String ? "UNKNOWN_CONGESTION_LEVEL" : 0;
@@ -3661,11 +3660,11 @@
               options.longs === String
                 ? $util.Long.prototype.toString.call(message.timestamp)
                 : options.longs === Number
-                ? new $util.LongBits(
-                    message.timestamp.low >>> 0,
-                    message.timestamp.high >>> 0,
-                  ).toNumber(true)
-                : message.timestamp;
+                  ? new $util.LongBits(
+                      message.timestamp.low >>> 0,
+                      message.timestamp.high >>> 0,
+                    ).toNumber(true)
+                  : message.timestamp;
         if (
           message.congestionLevel != null &&
           message.hasOwnProperty("congestionLevel")
@@ -5528,9 +5527,8 @@
         let message = new $root.transit_realtime.TimeRange();
         if (object.start != null)
           if ($util.Long)
-            (message.start = $util.Long.fromValue(
-              object.start,
-            )).unsigned = true;
+            (message.start = $util.Long.fromValue(object.start)).unsigned =
+              true;
           else if (typeof object.start === "string")
             message.start = parseInt(object.start, 10);
           else if (typeof object.start === "number")
@@ -5573,8 +5571,8 @@
               options.longs === String
                 ? long.toString()
                 : options.longs === Number
-                ? long.toNumber()
-                : long;
+                  ? long.toNumber()
+                  : long;
           } else object.start = options.longs === String ? "0" : 0;
           if ($util.Long) {
             let long = new $util.Long(0, 0, true);
@@ -5582,8 +5580,8 @@
               options.longs === String
                 ? long.toString()
                 : options.longs === Number
-                ? long.toNumber()
-                : long;
+                  ? long.toNumber()
+                  : long;
           } else object.end = options.longs === String ? "0" : 0;
         }
         if (message.start != null && message.hasOwnProperty("start"))
@@ -5595,11 +5593,11 @@
               options.longs === String
                 ? $util.Long.prototype.toString.call(message.start)
                 : options.longs === Number
-                ? new $util.LongBits(
-                    message.start.low >>> 0,
-                    message.start.high >>> 0,
-                  ).toNumber(true)
-                : message.start;
+                  ? new $util.LongBits(
+                      message.start.low >>> 0,
+                      message.start.high >>> 0,
+                    ).toNumber(true)
+                  : message.start;
         if (message.end != null && message.hasOwnProperty("end"))
           if (typeof message.end === "number")
             object.end =
@@ -5609,11 +5607,11 @@
               options.longs === String
                 ? $util.Long.prototype.toString.call(message.end)
                 : options.longs === Number
-                ? new $util.LongBits(
-                    message.end.low >>> 0,
-                    message.end.high >>> 0,
-                  ).toNumber(true)
-                : message.end;
+                  ? new $util.LongBits(
+                      message.end.low >>> 0,
+                      message.end.high >>> 0,
+                    ).toNumber(true)
+                  : message.end;
         return object;
       };
 

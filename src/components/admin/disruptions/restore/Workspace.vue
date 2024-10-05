@@ -9,6 +9,7 @@ import { useAdminAuth } from "@/utils/admin-auth-provider";
 import { useRouter } from "vue-router";
 import { formatDateTime } from "shared/qtime/format";
 import { toLocalDateTimeLuxon } from "shared/qtime/luxon-conversions";
+import { disruptionRejectedRestoreApi } from "shared/api/admin/disruptions-api";
 
 const { callAdminApi } = useAdminAuth();
 const router = useRouter();
@@ -42,17 +43,12 @@ const restoring = ref<boolean>(false);
 
 async function handleRestore() {
   restoring.value = true;
-  try {
-    await callAdminApi(
-      "/api/admin/disruptions/rejected/restore",
-      {
-        action: JSON.stringify({
-          restore: props.rejected.id,
-        }),
-      },
-      true,
-    );
 
+  const response = await callAdminApi(disruptionRejectedRestoreApi, {
+    restore: props.rejected.id,
+  });
+
+  if (response.type === "success") {
     // Now that it's restored, the admin can start processing right away.
     // Use "replace" so that the back button doesn't lead back to this page
     // (whichwould just give a not found error).
@@ -60,9 +56,9 @@ async function handleRestore() {
       name: "admin-disruptions-process",
       params: { id: props.rejected.id },
     });
-  } catch (err) {
+  } else if (response.type === "error") {
     // TODO: A toast notification?
-    console.warn("Failed to restore disruption.", err);
+    console.warn("Failed to restore disruption.", response.error);
   }
   restoring.value = false;
 }

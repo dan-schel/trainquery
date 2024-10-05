@@ -1,6 +1,8 @@
 import { Session } from "shared/admin/session";
+import type { ApiDefinition } from "shared/api/api-definition";
 import { nowUTC } from "shared/qtime/luxon-conversions";
 import { ref, type InjectionKey, inject, type Ref } from "vue";
+import type { FetchResult } from "./call-api-fetcher";
 
 const lsKey = "trainquery-admin-auth";
 
@@ -9,11 +11,11 @@ export const adminAuthInjectionKey = Symbol() as InjectionKey<{
   requireSession: () => Session;
   login: (username: string, password: string) => Promise<Session>;
   logout: () => Promise<void>;
-  callAdminApi: (
-    apiPath: string,
-    params: Record<string, string>,
-    usePost?: boolean,
-  ) => Promise<Response>;
+  callAdminApi: <P, R, PS, RS>(
+    api: ApiDefinition<P, R, PS, RS>,
+    params: P,
+    options?: { resilient?: boolean },
+  ) => Promise<FetchResult<R>>;
 }>;
 
 export function useAdminAuth() {

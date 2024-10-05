@@ -5,7 +5,6 @@ import routes from "./router/routes";
 import viteSSR from "vite-ssr/vue";
 import { createHead } from "@vueuse/head";
 import { initConfig, provideConfig } from "./utils/get-config";
-import { FrontendConfig } from "shared/system/config/frontend-config";
 import {
   finishedNavigating,
   provideNavigating,
@@ -13,6 +12,8 @@ import {
 } from "./utils/navigating-provider";
 import { provideBanners, setBanners } from "./utils/banners-provider";
 import { Banner } from "shared/banner";
+import { callApi } from "./utils/call-api";
+import { configApi } from "shared/api/config-api";
 
 export default viteSSR(
   App,
@@ -23,12 +24,20 @@ export default viteSSR(
         savedPosition ?? { top: 0 },
     },
   },
-  async ({ app, router, initialState, isClient, url }) => {
-    const baseUrl = isClient ? "" : url.origin;
+  async ({ app, router, initialState, isClient }) => {
+    // When running fetch on the server we need to specify the full URL, but
+    // since its the server communicating with itself, we can use localhost.
+    // TODO: Ideally we wouldn't duplicate the default port logic here.
+    const baseUrl = isClient
+      ? ""
+      : `http://localhost:${process.env.PORT ?? "3000"}`;
 
     // Download app props during SSR. They will be already set if using the
     // prod server, so this is only really for dev mode.
     if (import.meta.env.SSR && initialState.app == null) {
+      // Keep this as a fetch, don't use callApi(), because we don't need/want
+      // the parsing from JSON logic. THe serialized JSON goes straight into the
+      // HTML.
       const res = await fetch(`${baseUrl}/api/ssrAppProps`);
       initialState.app = await res.json();
     }
@@ -37,9 +46,23 @@ export default viteSSR(
     app.use(head);
 
     if (import.meta.env.SSR) {
-      const res = await fetch(`${baseUrl}/api/config`);
-      const json = await res.json();
-      provideConfig(FrontendConfig.json.parse(json));
+      const response = await callApi(configApi, null, {
+        baseUrl,
+        resilient: false,
+      });
+      if (response.type === "success") {
+        provideConfig(response.data);
+      } else if (response.type === "error") {
+        // Throwing here results in a server crash because of an unhandled
+        // promise. Looks like viteSSR doesn't treat this function as a promise.
+        // Using console.error (not console.warn) because this in NOT handling
+        // the exception, just doing the best we can without using throw.
+        console.error(
+          `[PAGE RENDERING ERROR] Call to config API failed (code=${response.httpCode}).`,
+          response.error,
+        );
+        return;
+      }
     } else {
       await initConfig(initialState.app.configHash);
     }
@@ -75,6 +98,7 @@ export default viteSSR(
         return next();
       }
 
+      // Keep this as a fetch. See comment on the api/ssrAppProps fetch above.
       const res = await fetch(
         `${baseUrl}/api/ssrRouteProps?page=${String(
           to.name,

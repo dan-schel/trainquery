@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useAdminAuth } from "@/utils/admin-auth-provider";
 import { onMounted, ref } from "vue";
-import { z } from "zod";
 import { extractSummaryFromDisruption } from "@/components/admin/disruptions/extract-summary";
 import UilCheckCircle from "@/components/icons/UilCheckCircle.vue";
 import AsyncData from "@/components/common/AsyncData.vue";
 import { RejectedExternalDisruption } from "shared/disruptions/external/rejected-external-disruption";
+import { disruptionRejectedApi } from "shared/api/admin/disruptions-api";
 
 const { callAdminApi } = useAdminAuth();
 
@@ -18,23 +18,15 @@ const state = ref<"loading" | "error" | { data: RejectedExternalDisruption[] }>(
 );
 
 async function handleMounted() {
-  const schema = z.object({
-    rejected: RejectedExternalDisruption.json.array(),
-    counts: z.object({
-      inbox: z.number(),
-      updated: z.number(),
-    }),
-  });
-
   state.value = "loading";
-  try {
-    const response = await callAdminApi("/api/admin/disruptions/rejected", {});
-    const data = await response.json();
-    const parsed = schema.parse(data);
-    state.value = { data: parsed.rejected };
-    emit("updateCounts", parsed.counts);
-  } catch (e) {
-    console.warn("Failed to fetch disruptions.", e);
+
+  const response = await callAdminApi(disruptionRejectedApi, null);
+
+  if (response.type === "success") {
+    state.value = { data: response.data.rejected };
+    emit("updateCounts", response.data.counts);
+  } else if (response.type === "error") {
+    console.warn("Failed to fetch disruptions.", response.error);
     state.value = "error";
   }
 }

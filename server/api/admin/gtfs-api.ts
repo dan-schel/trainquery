@@ -1,25 +1,17 @@
-import { ServerParams, TrainQuery } from "../../ctx/trainquery";
+import { handle } from "../api-handler";
+import { gtfsApi } from "../../../shared/api/admin/gtfs-api";
 
-// TODO: Is this API going to be wrapped with the network data like the
-// departures API? It would cause similar issues if this API returns data
-// assuming different stops/lines than the frontend has.
-
-export async function gtfsApi(
-  ctx: TrainQuery,
-  params: ServerParams,
-): Promise<object> {
-  await ctx.adminAuth.throwUnlessAuthenticated(params, "superadmin");
-
+export const gtfsApiHandler = handle(gtfsApi, async (ctx) => {
   const report = ctx.gtfs?.getDataNoRealtime()?.parsingReport;
   if (report == null) {
     return {
-      hasData: false,
+      hasData: false as const,
     };
   }
 
   return {
-    hasData: true,
+    hasData: true as const,
     unsupportedGtfsStopIDs: Array.from(report.unsupportedGtfsStopIDs),
     unsupportedRoutes: report.unsupportedRoutes,
   };
-}
+});

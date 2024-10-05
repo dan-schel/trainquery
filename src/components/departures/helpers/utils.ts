@@ -126,8 +126,8 @@ export function getDelayString(
         delayMins < 2
           ? ("positive" as const)
           : delayMins < 5
-          ? ("medium" as const)
-          : ("negative" as const),
+            ? ("medium" as const)
+            : ("negative" as const),
     };
   } else {
     return {

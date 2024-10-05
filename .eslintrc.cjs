@@ -23,7 +23,7 @@ module.exports = {
     eqeqeq: ["error", "always", { null: "ignore" }],
 
     // Warn on console.log uses, but allow console.warn.
-    "no-console": ["warn", { allow: ["warn"] }],
+    "no-console": ["warn", { allow: ["warn", "error"] }],
   },
   parserOptions: {
     ecmaVersion: "latest",

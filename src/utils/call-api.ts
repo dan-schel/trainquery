@@ -1,65 +1,59 @@
-import { z } from "zod";
-import { getConfig } from "./get-config";
+import type { ApiDefinition } from "shared/api/api-definition";
+import { fetchApi, type FetchResult } from "./call-api-fetcher";
+import type { Session } from "shared/admin/session";
 
-export async function callAPI<T extends z.ZodType>(
-  endpoint: string,
-  params: Record<string, string>,
-  schema: T,
-): Promise<z.infer<T>> {
-  const paramStrings = [];
-  for (const key of Object.keys(params)) {
-    paramStrings.push(`${key}=${encodeURIComponent(params[key])}`);
-  }
+const resilienceTimeouts = [500, 2000];
 
-  const raw = await resilientFetch(
-    paramStrings.length === 0
-      ? `/api/${endpoint}`
-      : `/api/${endpoint}?${paramStrings.join("&")}`,
+/**
+ * Sends a request to the backend, and parses the result. Retries multiple times
+ * unless `resilient` is explicitly set to false.
+ */
+export async function callApi<P, R, PS, RS>(
+  api: ApiDefinition<P, R, PS, RS>,
+  params: P,
+  {
+    resilient = true,
+    authSession = null,
+    baseUrl = "",
+  }: {
+    resilient?: boolean;
+    authSession?: Session | null;
+    baseUrl?: string;
+  } = {},
+): Promise<FetchResult<R>> {
+  return await fetchApiResilient(
+    api,
+    params,
+    authSession,
+    resilient ? resilienceTimeouts : [],
+    baseUrl,
   );
-
-  const json = z
-    .object({
-      hash: z.string(),
-      result: schema,
-    })
-    .parse(raw);
-
-  if (getConfig().hash !== json.hash) {
-    // The cached config the client has is outdated, so refresh the page to
-    // load the new config!
-    window.location.reload();
-  }
-
-  return json.result;
 }
 
-export async function resilientFetch(url: string) {
-  const response = await multiFetch(url, [500, 2000]);
-  throwUnlessOk(response);
-  return await response.json();
-}
+async function fetchApiResilient<P, R, PS, RS>(
+  api: ApiDefinition<P, R, PS, RS>,
+  params: P,
+  authSession: Session | null,
+  timeouts: number[],
+  baseUrl: string,
+): Promise<FetchResult<R>> {
+  const result = await fetchApi(api, params, authSession, baseUrl);
 
-async function multiFetch(url: string, timeouts: number[]): Promise<Response> {
-  // If we're not gonna attempt to retry anyway, don't even bother catching the
-  // error.
-  if (timeouts.length === 0) {
-    return await fetch(url);
+  if (
+    result.type !== "error" ||
+    !result.worthRetrying ||
+    timeouts.length === 0
+  ) {
+    return result;
   }
 
-  try {
-    // Just try/catch getting a response. We shouldn't retry if we get a
-    // response with a bad status code because that's probably our fault!
-    return await fetch(url);
-  } catch {
-    await new Promise((resolve) => setTimeout(resolve, timeouts[0]));
-    return await multiFetch(url, timeouts.slice(1));
-  }
-}
-
-export function throwUnlessOk(response: Response) {
-  if (!response.ok) {
-    throw new Error(
-      `Status code ${response.status} when fetching "${response.url}".`,
-    );
-  }
+  const [timeout, ...nextTimeouts] = timeouts;
+  await new Promise((resolve) => setTimeout(resolve, timeout));
+  return await fetchApiResilient(
+    api,
+    params,
+    authSession,
+    nextTimeouts,
+    baseUrl,
+  );
 }

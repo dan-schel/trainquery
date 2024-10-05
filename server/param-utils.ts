@@ -6,6 +6,9 @@ import { ServerParams, TrainQuery } from "./ctx/trainquery";
 import { QUtcDateTime } from "../shared/qtime/qdatetime";
 import { ZodSchema } from "zod";
 
+// TODO: Once the API migration is completed, this whole file should be able to
+// be deleted.
+
 export class BadApiCallError extends Error {
   readonly type = "bad-api-call";
   constructor(

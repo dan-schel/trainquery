@@ -1,8 +1,9 @@
-import { BadApiCallError } from "../param-utils";
+import { z } from "zod";
+import { ApiHandler, BadApiCallError } from "../api/api-handler";
+import { BadApiCallError as LegacyBadApiCallError } from "../param-utils";
 import { Server, ServerParams, TrainQuery } from "./trainquery";
 import express, { Express } from "express";
-
-const ignoreLoggingApiRoutes = ["ssrAppProps", "config"];
+import { Session } from "../../shared/admin/session";
 
 export class ExpressServer extends Server {
   constructor(
@@ -17,6 +18,7 @@ export class ExpressServer extends Server {
 
   async start(
     ctx: TrainQuery,
+    handlers: ApiHandler<any, any, any, any>[],
     requestListener: (
       endpoint: string,
       params: ServerParams,
@@ -25,22 +27,14 @@ export class ExpressServer extends Server {
     const app = express();
     app.use(express.json());
 
+    for (const handler of handlers) {
+      createApiRoute(ctx, app, handler);
+    }
+
+    // <legacy api handler code>
+    // TODO: Remove this.
     app.all("/api/*", async (req, res) => {
       const path = req.path.replace(/^\/api\//, "");
-
-      if (!ignoreLoggingApiRoutes.includes(path)) {
-        const ip = req.ip ?? "<unknown>";
-        const userAgent = req.header("user-agent") ?? "<unknown>";
-
-        if (path === "ssrRouteProps") {
-          if (userAgent !== "node") {
-            const path = String(req.query.path ?? "<unknown>");
-            ctx.logger.logPageRequest(path, ip, userAgent, true);
-          }
-        } else {
-          ctx.logger.logApiRequest(req.url, ip, userAgent);
-        }
-      }
 
       try {
         const params: ServerParams = {
@@ -53,7 +47,7 @@ export class ExpressServer extends Server {
         const data = await requestListener(path, params);
         res.json(data);
       } catch (e) {
-        if (BadApiCallError.detect(e)) {
+        if (LegacyBadApiCallError.detect(e)) {
           res.status(e.statusCode).send(e.message);
         } else {
           console.warn(e);
@@ -61,11 +55,59 @@ export class ExpressServer extends Server {
         }
       }
     });
+    // </legacy api handler code>
 
     this._setupFrontend(ctx, app);
 
     await new Promise<void>((resolve) => app.listen(this.port, resolve));
   }
+}
+
+function createApiRoute<P, R, PS, RS>(
+  ctx: TrainQuery,
+  app: express.Application,
+  handler: ApiHandler<P, R, PS, RS>,
+) {
+  const { api, handler: handlerFunction } = handler;
+
+  app.post(`/api/${api.endpoint}`, async (req, res) => {
+    try {
+      let session: Session | null = null;
+
+      if (api.requiredRole != null) {
+        const parsedToken = z
+          .string()
+          .optional()
+          .safeParse(req.headers["admin-token"]);
+        const token = parsedToken.success ? parsedToken.data ?? null : null;
+        await ctx.adminAuth.throwUnlessAuthenticated(token, api.requiredRole);
+        if (token != null) {
+          session = await ctx.adminAuth.getSession(token);
+        }
+      }
+
+      const parsed = api.paramsSchema.safeParse(req.body.params);
+
+      if (!parsed.success) {
+        res.status(400).send(`Invalid params.\n\n${parsed.error}`);
+        return;
+      }
+
+      const result = await handlerFunction(ctx, parsed.data, session);
+
+      res.json({
+        result: api.resultSerializer(result),
+        hash: api.checkConfigHash ? ctx.getConfig().hash : undefined,
+      });
+    } catch (e) {
+      if (BadApiCallError.detect(e)) {
+        res.status(e.statusCode).send(e.message);
+      } else {
+        console.warn(e);
+        res.status(500).send("Internal server error.");
+      }
+    }
+  });
 }
 
 function paramify(obj: { [index: string]: any }): Record<string, string> {
