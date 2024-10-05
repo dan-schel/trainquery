@@ -31,24 +31,6 @@ export async function fetchApi<P, R, PS, RS>(
   baseUrl: string,
 ): Promise<FetchResult<R>> {
   try {
-    console.log("");
-    console.log("");
-    console.log("CALLING FETCH -------");
-    console.log(`url: ${baseUrl}/api/${api.endpoint}`);
-    console.log(`method: POST`);
-    console.log(
-      `body: ${JSON.stringify({ params: api.paramsSerializer(params) })}`,
-    );
-    console.log(
-      `headers: ${JSON.stringify({
-        "Content-Type": "application/json",
-        ...(authSession != null ? { "admin-token": authSession.token } : {}),
-      })}`,
-    );
-    console.log("---------------------");
-    console.log("");
-    console.log("");
-
     const response = await fetch(`${baseUrl}/api/${api.endpoint}`, {
       method: "POST",
       body: JSON.stringify({ params: api.paramsSerializer(params) }),

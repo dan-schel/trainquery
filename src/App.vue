@@ -13,8 +13,6 @@ import LoadingSpinner from "./components/common/LoadingSpinner.vue";
 import { useNavigating } from "./utils/navigating-provider";
 import Banners from "./components/common/Banners.vue";
 
-console.log("APP.VUE?");
-
 const navigating = useNavigating();
 
 const settings = ref<Settings | null>(null);

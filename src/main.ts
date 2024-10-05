@@ -24,12 +24,13 @@ export default viteSSR(
         savedPosition ?? { top: 0 },
     },
   },
-  async ({ app, router, initialState, isClient, url }) => {
+  async ({ app, router, initialState, isClient }) => {
+    // When running fetch on the server we need to specify the full URL, but
+    // since its the server communicating with itself, we can use localhost.
+    // TODO: Ideally we wouldn't duplicate the default port logic here.
     const baseUrl = isClient
       ? ""
       : `http://localhost:${process.env.PORT ?? "3000"}`;
-
-    console.log("MAIN.TS?");
 
     // Download app props during SSR. They will be already set if using the
     // prod server, so this is only really for dev mode.
@@ -41,41 +42,30 @@ export default viteSSR(
       initialState.app = await res.json();
     }
 
-    console.log("2");
-
     const head = createHead();
     app.use(head);
 
-    console.log("2-1");
-
     if (import.meta.env.SSR) {
-      console.log("2-2");
       const response = await callApi(configApi, null, {
         baseUrl,
         resilient: false,
       });
-      console.log("2-3");
       if (response.type === "success") {
-        console.log("2-4");
         provideConfig(response.data);
       } else if (response.type === "error") {
-        console.log("2-5");
-
         // Throwing here results in a server crash because of an unhandled
         // promise. Looks like viteSSR doesn't treat this function as a promise.
+        // Using console.error (not console.warn) because this in NOT handling
+        // the exception, just doing the best we can without using throw.
         console.error(
           `[PAGE RENDERING ERROR] Call to config API failed (code=${response.httpCode}).`,
           response.error,
         );
         return;
       }
-      console.log("2-6");
     } else {
-      console.log("2-7");
       await initConfig(initialState.app.configHash);
     }
-
-    console.log("3");
 
     provideNavigating(app);
     provideBanners(app);
@@ -83,16 +73,12 @@ export default viteSSR(
       initialState.app.banners.map((x: unknown) => Banner.json.parse(x)),
     );
 
-    console.log("4");
-
     // Download route props when navigating pages (the first route's props are
     // downloaded with this code too, but on the server during SSR).
     router.beforeEach(async (to, from, next) => {
-      console.log("BEFORE");
       // When applying a filter on the stop page, a full page reload is not
       // required, but I still want to change the URL, ok?
       if (to.name === "stop" && to.path === from.path) {
-        console.log("BEFORE END");
         return next();
       }
 
@@ -100,7 +86,6 @@ export default viteSSR(
 
       // I get several of these calls when loading every page for some reason.
       if (to.name === "notfound") {
-        console.log("BEFORE END");
         return next();
       }
 
@@ -110,7 +95,6 @@ export default viteSSR(
         typeof to.meta.state === "object" &&
         "route" in to.meta.state
       ) {
-        console.log("BEFORE END");
         return next();
       }
 
@@ -125,19 +109,12 @@ export default viteSSR(
         ...(to.meta.state ?? {}),
         route: await res.json(),
       };
-      console.log("BEFORE END");
       next();
     });
 
-    console.log("5");
-
     router.afterEach(() => {
-      console.log("AFTER");
       finishedNavigating();
-      console.log("AFTER END");
     });
-
-    console.log("END OF MAIN.TS?");
 
     return { head };
   },
