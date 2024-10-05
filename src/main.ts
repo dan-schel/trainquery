@@ -58,10 +58,14 @@ export default viteSSR(
         provideConfig(response.data);
       } else if (response.type === "error") {
         console.log("2-5");
-        console.log(response.httpCode);
-        console.log(response.error);
-        console.log(JSON.stringify(response.error));
-        throw response.error;
+
+        // Throwing here results in a server crash because of an unhandled
+        // promise. Looks like viteSSR doesn't treat this function as a promise.
+        console.error(
+          `[PAGE RENDERING ERROR] Call to config API failed (code=${response.httpCode}).`,
+          response.error,
+        );
+        return;
       }
       console.log("2-6");
     } else {
