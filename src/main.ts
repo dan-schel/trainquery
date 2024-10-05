@@ -25,7 +25,9 @@ export default viteSSR(
     },
   },
   async ({ app, router, initialState, isClient, url }) => {
-    const baseUrl = isClient ? "" : url.origin;
+    const baseUrl = isClient
+      ? ""
+      : `http://localhost:${process.env.PORT ?? "3000"}`;
 
     console.log("MAIN.TS?");
 
