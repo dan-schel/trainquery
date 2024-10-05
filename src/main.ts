@@ -58,6 +58,9 @@ export default viteSSR(
         provideConfig(response.data);
       } else if (response.type === "error") {
         console.log("2-5");
+        console.log(response.httpCode);
+        console.log(response.error);
+        console.log(JSON.stringify(response.error));
         throw response.error;
       }
       console.log("2-6");
