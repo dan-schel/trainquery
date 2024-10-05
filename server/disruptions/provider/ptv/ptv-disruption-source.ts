@@ -8,8 +8,8 @@ import { DisruptionProvider } from "../disruption-provider";
 import { PtvExternalDisruptionData } from "../../../../shared/disruptions/external/types/ptv";
 import { LineID, StopID } from "../../../../shared/system/ids";
 
-// Refresh disruptions from the PTV API every 5 minutes.
-const refreshInterval = 5 * 60 * 1000;
+// Refresh disruptions from VTAR every 10 seconds.
+const refreshInterval = 10 * 1000;
 
 const blacklistedUrls = ["https://ptv.vic.gov.au/live-travel-updates/"];
 
