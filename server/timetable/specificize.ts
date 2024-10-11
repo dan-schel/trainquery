@@ -18,6 +18,7 @@ import { getGtfsServiceNoRealtime } from "./get-service";
 import { GtfsTrip, GtfsTripIDPair } from "../gtfs/data/gtfs-trip";
 import { GtfsRealtimeTrip } from "../gtfs/data/gtfs-realtime-trip";
 import { itsOk } from "@dan-schel/js-utils";
+import { PtvPlatformsServiceTransform } from "../service/transforms/ptv-platforms/ptv-platforms";
 
 export function specificize(
   ctx: TrainQuery,
@@ -137,7 +138,7 @@ export function specificizeGtfsTrip(
     }),
   );
 
-  return new Service(
+  const service = new Service(
     trip.line,
     [],
     trip.route,
@@ -153,6 +154,11 @@ export function specificizeGtfsTrip(
     null,
     getGtfsTripDebugInfo(ctx, trip, idPair, gtfsCalendarID, date),
   );
+
+  const transformedService =
+    new PtvPlatformsServiceTransform<CompletePattern>().transform(service);
+
+  return transformedService;
 }
 
 export function specificizeGtfsDeparture(

@@ -16,14 +16,13 @@ export type ServiceSource = {
   id: string;
 };
 
+export type StoppingPatternType =
+  | CompletePattern
+  | KnownOriginPattern
+  | KnownPerspectivePattern;
+
 export class Service<
-  Pattern extends
-    | CompletePattern
-    | KnownOriginPattern
-    | KnownPerspectivePattern =
-    | CompletePattern
-    | KnownOriginPattern
-    | KnownPerspectivePattern,
+  Pattern extends StoppingPatternType = StoppingPatternType,
 > {
   constructor(
     readonly line: LineID,
