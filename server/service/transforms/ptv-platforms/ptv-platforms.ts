@@ -8,13 +8,15 @@ import { ServiceTransform } from "../transform";
 export class PtvPlatformsServiceTransform<
   T extends StoppingPatternType,
 > extends ServiceTransform<T> {
+  constructor(private readonly subsystem: PtvPlatformsSubsystem) {
+    super();
+  }
+
   transform(service: Service<T>): Service<T> {
-    // TODO: Work out how this transform fetches the PTV platforms subsystem.
-    // Maybe instead of taking ctx via the constructor it could just take the
-    // PtvPlatformsSubsystem instance directly?
-    const knownPlatforms = ctx.subsystems
-      .require(PtvPlatformsSubsystem.id, PtvPlatformsSubsystem)
-      .getKnownPlatforms();
+    const knownPlatforms = this.subsystem.getKnownPlatforms();
+
+    // eslint-disable-next-line no-console
+    console.log(`About to transform with: ${knownPlatforms}`);
 
     // TODO: Implement this.
     return service;

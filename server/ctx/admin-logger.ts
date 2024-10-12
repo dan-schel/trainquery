@@ -316,4 +316,12 @@ export class AdminLogger extends Logger {
     const bulletPoints = statements.map((x) => `  - ${x}`).join("\n");
     this._log("info", "disruptions", `Modified disruptions:\n${bulletPoints}`);
   }
+
+  logFetchingPtvPlatformsFailure(err: unknown): void {
+    this._log(
+      "warn",
+      "ptv-platforms",
+      `Failed to refresh/parse platform data from PTV. ${err}`,
+    );
+  }
 }

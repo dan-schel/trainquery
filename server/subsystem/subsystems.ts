@@ -2,55 +2,68 @@ import { FullConfig } from "../config/computed-config";
 import { Logger } from "../ctx/logger";
 import { TrainQuery } from "../ctx/trainquery";
 import { TrainQueryDB } from "../ctx/trainquery-db";
-import { Subsystem } from "./subsystem";
+import { type Subsystem, SubsystemBuilder, SubsystemCtx } from "./subsystem";
 
 // This is the right-hand side value of the instanceof check. Apparently it
-// models a class constructor.
-type ClassOf<T> = new (...args: any[]) => T;
+// models a class constructor. The `& { id: string }` part checks that the class
+// has a static property `id`. Maybe that's a bit overkill.
+export type SubsystemClass<T> = (new (...args: any[]) => T) & { id: string };
 
 export class Subsystems {
-  private _subsystems: Map<string, Subsystem>;
+  private readonly _builders: Map<string, SubsystemBuilder>;
+  private _subsystems: Map<string, Subsystem> | null;
 
   constructor() {
+    this._builders = new Map();
     this._subsystems = new Map();
   }
 
-  add(subsystem: Subsystem) {
-    this._subsystems.set(subsystem.id, subsystem);
+  add(builder: SubsystemBuilder) {
+    this._builders.set(builder.subsystemID, builder);
   }
 
-  get(id: string): Subsystem | null {
-    return this._subsystems.get(id) ?? null;
+  async init(
+    getConfig: () => FullConfig,
+    logger: Logger,
+    database: TrainQueryDB | null,
+  ) {
+    const ctx: SubsystemCtx = { getConfig, logger, database, subsystems: this };
+    const builders = Array.from(this._builders.values());
+    const subsystems = await Promise.all(builders.map((x) => x.build(ctx)));
+    this._subsystems = new Map(subsystems.map((x) => [x.id, x]));
   }
 
-  require<T extends Subsystem>(subsystemId: string, type: ClassOf<T>): T {
-    const subsystem = this.get(subsystemId);
-    if (subsystem == null) {
-      throw new Error(`Subsystem "${subsystemId}" not found.`);
+  ready(ctx: TrainQuery) {
+    if (this._subsystems == null) {
+      throw new Error(`Cannot launch subsystems - call init() first.`);
     }
+    const subsystems = Array.from(this._subsystems.values());
+    subsystems.forEach((x) => x.ready(ctx));
+  }
+
+  get<T extends Subsystem>(type: SubsystemClass<T>): T | null {
+    if (this._subsystems == null) {
+      throw new Error(`Cannot access subsystems - call init() first.`);
+    }
+
+    const subsystem = this._subsystems.get(type.id) ?? null;
+    if (subsystem == null) {
+      return null;
+    }
+
     if (!(subsystem instanceof type)) {
       throw new Error(
-        `Subsystem "${subsystemId}" was not the expected subsystem type.`,
+        `Subsystem "${type.id}" was not the expected subsystem type.`,
       );
     }
     return subsystem;
   }
 
-  asArray(): Subsystem[] {
-    return Array.from(this._subsystems.values());
-  }
-
-  async init(
-    config: FullConfig,
-    logger: Logger,
-    database: TrainQueryDB | null,
-  ) {
-    await Promise.all(
-      this.asArray().map((x) => x.init(config, logger, database)),
-    );
-  }
-
-  async ready(ctx: TrainQuery) {
-    this.asArray().forEach((x) => x.ready(ctx));
+  require<T extends Subsystem>(type: SubsystemClass<T>): T {
+    const subsystem = this.get(type);
+    if (subsystem == null) {
+      throw new Error(`Subsystem "${type.id}" not found.`);
+    }
+    return subsystem;
   }
 }

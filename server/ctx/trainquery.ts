@@ -24,7 +24,7 @@ import { ApiHandler } from "../api/api-handler";
 import { departuresApiHandler } from "../api/departures-api";
 import { gtfsApiHandler } from "../api/admin/gtfs-api";
 import { Subsystems } from "../subsystem/subsystems";
-import { PtvPlatformsSubsystem } from "../subsystem/ptv-platforms/ptv-platforms";
+import { PtvPlatformsSubsystemBuilder } from "../subsystem/ptv-platforms/ptv-platforms";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -78,14 +78,16 @@ export async function trainQuery(
   const subsystems = new Subsystems();
 
   if (config.server.ptv) {
-    subsystems.add(new PtvPlatformsSubsystem());
+    subsystems.add(new PtvPlatformsSubsystemBuilder());
   }
+
+  const getConfig = () => config;
 
   const ctx: TrainQuery = {
     instanceID,
     isOffline,
     isProduction,
-    getConfig: () => config,
+    getConfig,
     server,
     database,
     adminAuth,
@@ -98,7 +100,7 @@ export async function trainQuery(
 
   await database?.init();
   await logger.init(ctx);
-  await subsystems.init(config, logger, database);
+  await subsystems.init(getConfig, logger, database);
 
   // TODO: Move all this stuff to the subsystem model.
   // <LIST OF LOOSE JUNK>

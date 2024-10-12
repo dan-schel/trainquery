@@ -2,36 +2,48 @@ import { FullConfig } from "../config/computed-config";
 import { Logger } from "../ctx/logger";
 import { TrainQuery } from "../ctx/trainquery";
 import { TrainQueryDB } from "../ctx/trainquery-db";
+import { SubsystemClass, type Subsystems } from "./subsystems";
 
-export abstract class Subsystem<T extends object = object> {
-  private _postInitData: T | null = null;
+export type SubsystemCtx = {
+  readonly getConfig: () => FullConfig;
+  readonly database: TrainQueryDB | null;
+  readonly logger: Logger;
+  readonly subsystems: Subsystems;
+};
 
-  constructor(readonly id: string) {}
+export abstract class Subsystem {
+  constructor(
+    private readonly ctx: SubsystemCtx,
+    readonly id: string,
+  ) {}
 
-  async init(
-    config: FullConfig,
-    logger: Logger,
-    database: TrainQueryDB | null,
-  ) {
-    this._postInitData = await this.onInit(config, logger, database);
+  abstract ready(ctx: TrainQuery): void;
+
+  protected getConfig(): FullConfig {
+    return this.ctx.getConfig();
   }
 
-  ready(ctx: TrainQuery) {
-    this.onReady(ctx, this.requirePostInitData());
+  protected getDatabase(): TrainQueryDB | null {
+    return this.ctx.database;
   }
 
-  requirePostInitData() {
-    if (this._postInitData == null) {
-      throw new Error("Subsystem not initialized.");
-    }
-    return this._postInitData;
+  protected getLogger(): Logger {
+    return this.ctx.logger;
   }
 
-  protected abstract onInit(
-    config: FullConfig,
-    logger: Logger,
-    database: TrainQueryDB | null,
-  ): Promise<T>;
+  protected getSubsystem<T extends Subsystem>(
+    type: SubsystemClass<T>,
+  ): T | null {
+    return this.ctx.subsystems.get(type);
+  }
 
-  protected abstract onReady(ctx: TrainQuery, postInitData: T): void;
+  protected requireSubsystem<T extends Subsystem>(type: SubsystemClass<T>): T {
+    return this.ctx.subsystems.require(type);
+  }
+}
+
+export abstract class SubsystemBuilder {
+  constructor(readonly subsystemID: string) {}
+
+  abstract build(ctx: SubsystemCtx): Promise<Subsystem>;
 }

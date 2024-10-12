@@ -18,7 +18,7 @@ import { getGtfsServiceNoRealtime } from "./get-service";
 import { GtfsTrip, GtfsTripIDPair } from "../gtfs/data/gtfs-trip";
 import { GtfsRealtimeTrip } from "../gtfs/data/gtfs-realtime-trip";
 import { itsOk } from "@dan-schel/js-utils";
-import { PtvPlatformsServiceTransform } from "../service/transforms/ptv-platforms/ptv-platforms";
+import { ServiceTransform } from "../service/transforms/transform";
 
 export function specificize(
   ctx: TrainQuery,
@@ -90,6 +90,7 @@ export function specificizeGtfsTrip(
   trip: GtfsTrip,
   gtfsCalendarID: string,
   date: QDate,
+  transforms: ServiceTransform<CompletePattern>[],
 ): Service<CompletePattern> {
   // TODO: Encode trip ID (for the given calendar ID), continuation index, and
   // date into a single string.
@@ -152,11 +153,13 @@ export function specificizeGtfsTrip(
       },
     ],
     null,
-    getGtfsTripDebugInfo(ctx, trip, idPair, gtfsCalendarID, date),
+    getGtfsTripDebugInfo(ctx, trip, idPair, gtfsCalendarID, date, transforms),
   );
 
-  const transformedService =
-    new PtvPlatformsServiceTransform<CompletePattern>().transform(service);
+  const transformedService = transforms.reduce(
+    (s, t) => t.transform(s),
+    service,
+  );
 
   return transformedService;
 }
@@ -167,8 +170,15 @@ export function specificizeGtfsDeparture(
   gtfsCalendarID: string,
   date: QDate,
   perspectiveIndex: number,
+  transforms: ServiceTransform<CompletePattern>[],
 ): Departure {
-  const service = specificizeGtfsTrip(ctx, trip, gtfsCalendarID, date);
+  const service = specificizeGtfsTrip(
+    ctx,
+    trip,
+    gtfsCalendarID,
+    date,
+    transforms,
+  );
   return Departure.fromService(service, perspectiveIndex);
 }
 
@@ -178,6 +188,7 @@ function getGtfsTripDebugInfo(
   idPair: GtfsTripIDPair,
   gtfsCalendarID: string,
   date: QDate,
+  transforms: ServiceTransform<CompletePattern>[],
 ) {
   let previousTripID: object = {};
   if (idPair.continuationIndex > 0) {
@@ -187,7 +198,11 @@ function getGtfsTripDebugInfo(
       trip.gtfsSubfeedID,
       date,
     );
-    const originalService = getGtfsServiceNoRealtime(ctx, originalID);
+    const originalService = getGtfsServiceNoRealtime(
+      ctx,
+      originalID,
+      transforms,
+    );
 
     if (originalService != null) {
       const url = getServicePageRoute(originalService);
