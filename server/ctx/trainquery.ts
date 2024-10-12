@@ -23,6 +23,8 @@ import { DisruptionsManager } from "../disruptions/disruptions-manager";
 import { ApiHandler } from "../api/api-handler";
 import { departuresApiHandler } from "../api/departures-api";
 import { gtfsApiHandler } from "../api/admin/gtfs-api";
+import { Subsystems } from "../subsystem/subsystems";
+import { PtvPlatformsSubsystemBuilder } from "../subsystem/ptv-platforms/ptv-platforms";
 
 export type ServerBuilder = () => Server;
 export type TrainQuery = {
@@ -37,6 +39,7 @@ export type TrainQuery = {
   readonly banners: Banners;
   gtfs: GtfsWorker | null;
   readonly logger: Logger;
+  readonly subsystems: Subsystems;
 };
 
 export async function trainQuery(
@@ -72,12 +75,21 @@ export async function trainQuery(
   const disruptions = new DisruptionsManager();
   const adminAuth = new AdminAuth(database ?? new LocalAdminAuthDB());
   const banners = new Banners();
+  const subsystems = new Subsystems();
+
+  if (config.server.ptv != null && config.server.ptv.platformsApi.length > 0) {
+    subsystems.add(
+      new PtvPlatformsSubsystemBuilder(config.server.ptv.platformsApi),
+    );
+  }
+
+  const getConfig = () => config;
 
   const ctx: TrainQuery = {
     instanceID,
     isOffline,
     isProduction,
-    getConfig: () => config,
+    getConfig,
     server,
     database,
     adminAuth,
@@ -85,11 +97,15 @@ export async function trainQuery(
     banners,
     gtfs: null,
     logger,
+    subsystems,
   };
 
-  // TODO: Do some of these things in parallel?
   await database?.init();
   await logger.init(ctx);
+  await subsystems.init(getConfig, logger, database);
+
+  // TODO: Move all this stuff to the subsystem model.
+  // <LIST OF LOOSE JUNK>
   await disruptions.init(ctx);
   await adminAuth.init();
   banners.init(ctx);
@@ -97,6 +113,7 @@ export async function trainQuery(
   const gtfs = ctx.getConfig().server.gtfs != null ? new GtfsWorker(ctx) : null;
   ctx.gtfs = gtfs;
   gtfs?.init();
+  // </LIST OF LOOSE JUNK>
 
   await server.start(
     ctx,
@@ -124,7 +141,9 @@ export async function trainQuery(
       }
     },
   );
+
   logger.logServerListening(server);
+  subsystems.ready(ctx);
 
   return ctx;
 }

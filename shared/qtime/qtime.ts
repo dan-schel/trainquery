@@ -1,4 +1,4 @@
-import { parseIntThrow, posMod } from "@dan-schel/js-utils";
+import { parseFloatThrow, parseIntThrow, posMod } from "@dan-schel/js-utils";
 import { type InformalDuration, QDuration } from "./qduration";
 import { z } from "zod";
 import { QDate } from "./qdate";
@@ -144,13 +144,21 @@ export class QTime extends QTimeBase<QTime> {
     return thisSeconds - otherSeconds;
   }
 
-  /** Accepts "09:45", "14:55:32", etc. Does not check for time validity. */
+  /**
+   * Accepts "09:45", "14:55:32", etc. Does not check for time validity.
+   * Decimal seconds will be ignored, i.e. "09:45:00.861" will be parsed as
+   * "09:45:00".
+   */
   static parse(input: string): QTime | null {
-    if (!/^[0-9]{2}:[0-9]{2}(:[0-9]{2})?$/.test(input)) {
+    if (!/^[0-9]{2}:[0-9]{2}(:[0-9]{2}(\.[0-9]+)?)?$/.test(input)) {
       return null;
     }
-    const numbers = input.split(":").map((x) => parseIntThrow(x));
-    return new QTime(numbers[0], numbers[1], numbers[2] ?? 0);
+    const [h, m, s] = input.split(":");
+    return new QTime(
+      parseIntThrow(h),
+      parseIntThrow(m),
+      Math.floor(parseFloatThrow(s ?? "0")),
+    );
   }
 
   toJSON(): z.input<typeof QTime.json> {

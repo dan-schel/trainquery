@@ -9,6 +9,8 @@ import { TrainQuery } from "../../ctx/trainquery";
 import { CompletePattern } from "../../../shared/system/service/complete-pattern";
 import { Service } from "../../../shared/system/service/service";
 import { GtfsServiceIDComponents } from "../../gtfs/gtfs-service-id";
+import { PtvPlatformsServiceTransform } from "../../service/transforms/ptv-platforms/ptv-platforms";
+import { PtvPlatformsSubsystem } from "../../subsystem/ptv-platforms/ptv-platforms";
 
 export async function getTrainPageProps(ctx: TrainQuery, path: string) {
   const url = new URL(path, "https://example.com");
@@ -85,6 +87,12 @@ async function getGtfsTrain(
     return null;
   }
 
+  const transforms = [
+    new PtvPlatformsServiceTransform<CompletePattern>(
+      ctx.subsystems.require(PtvPlatformsSubsystem),
+    ),
+  ];
+
   // Fetch the service from the GTFS data.
-  return await getGtfsService(ctx, id);
+  return await getGtfsService(ctx, id, transforms);
 }

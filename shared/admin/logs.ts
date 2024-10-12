@@ -15,6 +15,7 @@ export const AdminLogServices = [
   "auth",
   "page",
   "api",
+  "ptv-platforms",
 ] as const;
 export type AdminLogService = (typeof AdminLogServices)[number];
 export const AdminLogServicesJson = z.enum(AdminLogServices);

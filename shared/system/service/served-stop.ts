@@ -74,4 +74,23 @@ export class ServedStop {
             },
     };
   }
+
+  with({
+    platform,
+  }: {
+    platform?: {
+      id: PlatformID;
+      confidence: ConfidenceLevel;
+    } | null;
+  }): any {
+    return new ServedStop(
+      this.stop,
+      this.stopListIndex,
+      this.scheduledTime,
+      this.liveTime,
+      this.setsDown,
+      this.picksUp,
+      platform === undefined ? this.platform : platform,
+    );
+  }
 }

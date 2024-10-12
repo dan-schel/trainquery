@@ -38,4 +38,7 @@ export abstract class Logger {
   abstract logDisruptionTransactions(
     transactions: DisruptionTransactions,
   ): void;
+
+  abstract logFetchingPtvPlatformsFailure(err: unknown): void;
+  abstract logUnknownPtvPlatform(stopName: string, ptvPlatformID: string): void;
 }

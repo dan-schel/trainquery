@@ -9,6 +9,7 @@ import {
 } from "./helpers/available-filters";
 import { computed } from "vue";
 import type { StopID } from "shared/system/ids";
+import UilInfoCircle from "../icons/UilInfoCircle.vue";
 
 const props = defineProps<{
   stop: StopID;
@@ -72,6 +73,16 @@ const noAvailableFilters =
         </button>
       </div>
       <h6 v-if="availableFilters.platforms != null">By platform</h6>
+      <div
+        class="platform-filtering-disclaimer"
+        v-if="availableFilters.platforms != null"
+      >
+        <UilInfoCircle />
+        <p>
+          Platform filtering can be unreliable, especially if the platform a
+          train will use is unknown.
+        </p>
+      </div>
       <div class="filter-row" v-if="availableFilters.platforms != null">
         <button
           class="filter-button platform"
@@ -191,5 +202,18 @@ h6 {
   margin-top: 0.5rem;
   margin-bottom: 1.5rem;
   font-size: 0.8rem;
+}
+.platform-filtering-disclaimer {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.75rem;
+  p {
+    font-size: 0.8rem;
+  }
+  svg {
+    font-size: 0.8rem;
+  }
 }
 </style>

@@ -5,6 +5,8 @@ import { TrainQuery } from "../ctx/trainquery";
 import { getTimetableForDay } from "./get-timetables-for-day";
 import { specificize, specificizeGtfsTrip } from "./specificize";
 import { StaticServiceIDComponents } from "./static-service-id";
+import { CompletePattern } from "../../shared/system/service/complete-pattern";
+import { ServiceTransform } from "../service/transforms/transform";
 
 export function getTimetableService(
   ctx: TrainQuery,
@@ -39,27 +41,30 @@ export function getTimetableService(
 export async function getGtfsService(
   ctx: TrainQuery,
   id: GtfsServiceIDComponents,
+  transforms: ServiceTransform<CompletePattern>[],
 ) {
   if (ctx.gtfs == null) {
     return null;
   }
-  return _getGtfsService(ctx, id, await ctx.gtfs.getData());
+  return _getGtfsService(ctx, id, await ctx.gtfs.getData(), transforms);
 }
 
 export function getGtfsServiceNoRealtime(
   ctx: TrainQuery,
   id: GtfsServiceIDComponents,
+  transforms: ServiceTransform<CompletePattern>[],
 ) {
   if (ctx.gtfs == null) {
     return null;
   }
-  return _getGtfsService(ctx, id, ctx.gtfs.getDataNoRealtime());
+  return _getGtfsService(ctx, id, ctx.gtfs.getDataNoRealtime(), transforms);
 }
 
 function _getGtfsService(
   ctx: TrainQuery,
   id: GtfsServiceIDComponents,
   gtfsData: GtfsData | null,
+  transforms: ServiceTransform<CompletePattern>[],
 ) {
   if (gtfsData == null) {
     return null;
@@ -94,6 +99,7 @@ function _getGtfsService(
       trip,
       match.gtfsCalendarID,
       id.date,
+      transforms,
     );
     return service;
   }
