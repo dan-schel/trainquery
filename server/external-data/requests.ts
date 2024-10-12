@@ -1,10 +1,10 @@
 import { EnvironmentVariables } from "../ctx/environment-variables";
 
-export abstract class ExternalDataRequest {
+export abstract class RequestBuilder {
   abstract call(): Promise<Response>;
 }
 
-export class SimpleExternalDataRequest extends ExternalDataRequest {
+export class SimpleRequestBuilder extends RequestBuilder {
   constructor(readonly url: string) {
     super();
   }
@@ -14,7 +14,7 @@ export class SimpleExternalDataRequest extends ExternalDataRequest {
   }
 }
 
-export class RelayExternalDataRequest extends ExternalDataRequest {
+export class RelayRequestBuilder extends RequestBuilder {
   private _relayKey: string;
 
   constructor(readonly url: string) {
@@ -31,7 +31,7 @@ export class RelayExternalDataRequest extends ExternalDataRequest {
   }
 }
 
-export class GtfsRealtimeMelbourneExternalDataRequest extends ExternalDataRequest {
+export class GtfsRealtimeMelbourneRequestBuilder extends RequestBuilder {
   private _apiKey: string;
 
   constructor(readonly url: string) {

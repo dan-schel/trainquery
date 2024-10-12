@@ -15,19 +15,19 @@ export abstract class PolledExternalData<T> {
 
   startPolling() {
     setInterval(async () => {
-      await this._fetch();
+      try {
+        await this._fetch();
+      } catch (e) {
+        this.onError(e);
+      }
     }, this.refreshMs);
   }
 
   async _fetch() {
-    try {
-      this.value = {
-        data: await this.fetch(),
-        timestamp: nowUTC(),
-      };
-    } catch (e) {
-      this.onError(e);
-    }
+    this.value = {
+      data: await this.fetch(),
+      timestamp: nowUTC(),
+    };
   }
 
   protected abstract fetch(): Promise<T>;
