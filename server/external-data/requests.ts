@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { EnvironmentVariables } from "../ctx/environment-variables";
 
 export abstract class RequestBuilder {
@@ -31,7 +32,7 @@ export class RelayRequestBuilder extends RequestBuilder {
   }
 }
 
-export class GtfsRealtimeMelbourneRequestBuilder extends RequestBuilder {
+export class VicDataExchangeRequestBuilder extends RequestBuilder {
   private _apiKey: string;
 
   constructor(readonly url: string) {
@@ -47,3 +48,31 @@ export class GtfsRealtimeMelbourneRequestBuilder extends RequestBuilder {
     });
   }
 }
+
+export const requestBuilderJson = z
+  .discriminatedUnion("type", [
+    z.object({
+      type: z.literal("simple"),
+      url: z.string(),
+    }),
+    z.object({
+      type: z.literal("relay"),
+      url: z.string(),
+    }),
+    z.object({
+      type: z.literal("vic-data-exchange"),
+      url: z.string(),
+    }),
+  ])
+  .transform((x) => {
+    switch (x.type) {
+      case "simple":
+        return new SimpleRequestBuilder(x.url);
+      case "relay":
+        return new RelayRequestBuilder(x.url);
+      case "vic-data-exchange":
+        return new VicDataExchangeRequestBuilder(x.url);
+      default:
+        throw new Error("Unknown request builder type");
+    }
+  });

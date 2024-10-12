@@ -1,4 +1,5 @@
 import { TrainQuery } from "../../ctx/trainquery";
+import { RequestBuilder } from "../../external-data/requests";
 import { Subsystem, SubsystemBuilder, SubsystemCtx } from "../subsystem";
 import {
   KnownPlatforms,
@@ -25,17 +26,18 @@ export class PtvPlatformsSubsystem extends Subsystem {
 }
 
 export class PtvPlatformsSubsystemBuilder extends SubsystemBuilder {
-  constructor(/* ptv platforms config */) {
+  constructor(private readonly platformsApi: RequestBuilder[]) {
     super(PtvPlatformsSubsystem.id);
   }
 
   async build(ctx: SubsystemCtx): Promise<Subsystem> {
     const platforms = new PlatformsExternalData(
+      ctx,
+      this.platformsApi,
       ctx.logger,
-      /* ptv platforms config */
     );
     await platforms.init({ startPolling: false });
 
-    return new PtvPlatformsSubsystem(ctx, /* ptv platforms config */ platforms);
+    return new PtvPlatformsSubsystem(ctx, platforms);
   }
 }

@@ -40,4 +40,5 @@ export abstract class Logger {
   ): void;
 
   abstract logFetchingPtvPlatformsFailure(err: unknown): void;
+  abstract logUnknownPtvPlatform(stopName: string, ptvPlatformID: string): void;
 }

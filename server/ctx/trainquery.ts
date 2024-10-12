@@ -77,8 +77,10 @@ export async function trainQuery(
   const banners = new Banners();
   const subsystems = new Subsystems();
 
-  if (config.server.ptv) {
-    subsystems.add(new PtvPlatformsSubsystemBuilder());
+  if (config.server.ptv != null && config.server.ptv.platformsApi.length > 0) {
+    subsystems.add(
+      new PtvPlatformsSubsystemBuilder(config.server.ptv.platformsApi),
+    );
   }
 
   const getConfig = () => config;

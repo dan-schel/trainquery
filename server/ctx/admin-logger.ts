@@ -324,4 +324,12 @@ export class AdminLogger extends Logger {
       `Failed to refresh/parse platform data from PTV. ${err}`,
     );
   }
+
+  logUnknownPtvPlatform(stopName: string, ptvPlatformID: string): void {
+    this._log(
+      "warn",
+      "ptv-platforms",
+      `Unrecognized platform from PTV "${ptvPlatformID}" for stop "${stopName}".`,
+    );
+  }
 }
