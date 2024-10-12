@@ -35,4 +35,18 @@ export class Service<
     readonly continuation: Continuation | null,
     readonly debugInfo: Record<string, string>,
   ) {}
+
+  with({ pattern }: { pattern?: Pattern }): Service<Pattern> {
+    return new Service(
+      this.line,
+      this.associatedLines,
+      this.route,
+      this.direction,
+      pattern ?? this.pattern,
+      this.staticID,
+      this.sources,
+      this.continuation,
+      this.debugInfo,
+    );
+  }
 }

@@ -51,4 +51,8 @@ export class CompletePattern {
   getStop(stopListIndex: number): ServedStop | SkippedStop | null {
     return this.stops.find((s) => s.stopListIndex === stopListIndex) ?? null;
   }
+
+  with({ stops }: { stops?: (ServedStop | SkippedStop)[] }): CompletePattern {
+    return new CompletePattern(stops ?? this.stops);
+  }
 }
