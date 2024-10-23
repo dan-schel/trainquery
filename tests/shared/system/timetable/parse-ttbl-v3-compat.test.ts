@@ -124,17 +124,10 @@ describe("parseTtblV3Compat", () => {
     expect(timetable.ends).toBeNull();
     expect(timetable.created.toISO()).toBe("2023-10-02");
 
-    // <TEMP>
-    const sundayServices = timetable.entries.filter((x) =>
-      x.weekdayRange.includes(QDayOfWeek.sun),
-    );
-    console.log(sundayServices.map((x) => x.rows[0]?.toTtblString(false)));
-    // </TEMP>
-
-    const isSunday = (x: FullTimetableEntry) =>
-      x.weekdayRange.includes(QDayOfWeek.sun);
     const isUp = (x: FullTimetableEntry) => x.direction === "up";
     const isDown = (x: FullTimetableEntry) => x.direction === "down";
+    const isSunday = (x: FullTimetableEntry) =>
+      x.weekdayRange.includes(QDayOfWeek.sun);
 
     expect(timetable.entries.length).toBe(70);
     expect(timetable.entries.filter(isUp).length).toBe(37);

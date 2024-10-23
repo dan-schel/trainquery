@@ -197,13 +197,13 @@ function parseGrid(
   }
 
   // Treat every other line as a row in the grid.
-  let rowCount: number | null = null;
+  let colCount: number | null = null;
   const potentialRows = gridInput.slice(1).map((r) => {
     const terms = r.split(/\s+/g).map((s) => s.trim());
-    if (rowCount != null && terms.length !== rowCount) {
+    if (colCount != null && terms.length !== colCount) {
       return error(`Rows in the grid have inconsistent numbers of columns.`);
     }
-    rowCount = terms.length;
+    colCount = terms.length;
 
     // Ensure the first term is a stop ID.
     const stopID = parseIntNull(terms[0]);
@@ -214,8 +214,7 @@ function parseGrid(
     // Ensure every other term is a timetable time or "-".
     const potentialTimes = terms.slice(2).map((t) => ({
       input: t,
-      time:
-        t === "-" ? null : (QTimetableTime.parse(t) ?? ("INVALID!" as const)),
+      time: t === "-" ? null : QTimetableTime.parse(t) ?? ("INVALID!" as const),
     }));
     const badTime = potentialTimes.find((t) => t.time === "INVALID!");
     if (badTime != null) {
@@ -232,10 +231,12 @@ function parseGrid(
   }
   const rows = potentialRows.filter(nonNull);
 
+  // Ignore the columns for the stop ID and stop name.
+  const entryCount = colCount! - 2;
+
   // Convert rows to entries.
   const entries = [];
-
-  for (let i = 0; i < rowCount!; i++) {
+  for (let i = 0; i < entryCount; i++) {
     entries.push(
       new TimetableEntry(
         route.variant,
