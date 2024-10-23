@@ -1,6 +1,5 @@
 import { expect, describe, it } from "vitest";
 import { parseTtbl } from "../../../../shared/system/timetable/parse-ttbl";
-import { QDayOfWeek } from "../../../../shared/qtime/qdayofweek";
 import { FullTimetableEntry } from "../../../../shared/system/timetable/timetable";
 
 const str = `
