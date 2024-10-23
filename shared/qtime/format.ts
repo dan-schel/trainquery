@@ -76,7 +76,10 @@ export function formatRelativeTime(
     return `${timeString} yesterday`;
   } else if (dayDiff > 1 && dayDiff < 7) {
     return `${timeString} ${QDayOfWeek.fromDate(time.date).toName()}`;
-  } else if (dayDiff < -1 && dayDiff > -7) {
+  } else if (dayDiff < -1 && dayDiff >= -7) {
+    // TODO: This could be confusing, e.g. if today is Wednesday it will call
+    // two days ago "last Monday" which could be confused for the week before.
+    // Maybe consider "[time] this past [weekday]"?
     return `${timeString} last ${QDayOfWeek.fromDate(time.date).toName()}`;
   } else {
     return `${timeString} (${formatDate(time.date)})`;
