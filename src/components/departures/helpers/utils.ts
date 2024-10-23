@@ -86,7 +86,7 @@ export function getTimeStrings(departure: Departure, now: QUtcDateTime) {
   const formatDiff = (diff: QDuration) =>
     diff.inMins < 1 && !diff.isNegative ? "Now" : formatDuration(diff);
 
-  if (Math.abs(scheduledDiff.inHrs) <= 2) {
+  if (Math.abs(scheduledDiff.inHrs) <= 1) {
     const primary = formatDiff(diff);
     const struckout = formatDiff(scheduledDiff);
     return {
