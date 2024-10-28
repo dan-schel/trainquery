@@ -34,7 +34,7 @@ export function getSearchTimes(
     start1: QUtcDateTime,
     end1: QUtcDateTime,
     start2: QUtcDateTime,
-    end2: QUtcDat eTime,
+    end2: QUtcDateTime,
   ) => {
     if (end1.isBeforeOrEqual(start2)) {
       return null;
