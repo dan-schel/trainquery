@@ -25,7 +25,7 @@ const lines = computed(() => {
     <template v-for="line in lines.all.slice(0, -1)" :key="line.id">
       <RouterLink
         :to="getLinePageRoute(getConfig(), line.id)"
-        class="link"
+        class="link-secret"
         :class="`accent-${line.color}`"
       >
         {{ line.name }}
@@ -36,7 +36,7 @@ const lines = computed(() => {
     <span v-if="lines.all.length > 1"> and </span>
     <RouterLink
       :to="getLinePageRoute(getConfig(), lines.last.id)"
-      class="link"
+      class="link-secret"
       :class="`accent-${lines.last.color}`"
     >
       {{ lines.last.name }}
@@ -54,7 +54,7 @@ const lines = computed(() => {
 .lines {
   @include line-colors.accent-classes;
   font-size: 0.8rem;
-  .link {
+  .link-secret {
     font-weight: bold;
   }
 }

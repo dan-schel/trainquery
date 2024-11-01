@@ -19,6 +19,14 @@
 .link {
   @include template.link;
 }
+.link-secret {
+  @include template.link;
+  text-decoration-color: transparent;
+
+  @include template.on-hover {
+    text-decoration-color: var(--color-accent);
+  }
+}
 
 code {
   background-color: var(--color-soft);
