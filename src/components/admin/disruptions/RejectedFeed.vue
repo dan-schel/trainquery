@@ -94,7 +94,7 @@ onMounted(() => {
     bottom: 0;
     left: 1rem;
     right: 1rem;
-    border-bottom: 1px solid var(--color-ink-20);
+    border-bottom: 1px solid var(--color-soft-border);
   }
 }
 .disruption-message {
@@ -105,7 +105,7 @@ onMounted(() => {
   text-decoration: line-through;
 }
 .delete-badge {
-  background-color: var(--color-ink-60);
+  background-color: var(--color-text-weak);
   color: var(--color-on-accent);
   align-self: flex-start;
   padding: 0.15rem 0.4rem;

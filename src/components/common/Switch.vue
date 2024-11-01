@@ -19,7 +19,25 @@ defineEmits<{
       "
     />
     <div>
-      <div class="switch-graphic"></div>
+      <svg
+        class="switch-graphic"
+        viewBox="0 0 32 20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <clipPath id="a">
+            <rect width="32" height="20" rx="10" />
+          </clipPath>
+        </defs>
+        <rect
+          width="32"
+          height="20"
+          rx="10"
+          stroke-width="4"
+          clip-path="url(#a)"
+        />
+        <circle r="1" />
+      </svg>
       <div class="switch-content">
         <slot></slot>
       </div>
@@ -30,7 +48,7 @@ defineEmits<{
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
 .switch {
-  @include template.checkbox-switch(
+  @include template.checkbox-switch-svg(
     $graphic-class: "switch-graphic",
     $content-class: "switch-content"
   );

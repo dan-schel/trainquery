@@ -292,7 +292,7 @@ main {
       }
       .stop-name {
         font-weight: bold;
-        color: var(--color-ink-100);
+        color: var(--color-text-strong);
       }
     }
   }
@@ -305,7 +305,7 @@ main {
   margin-bottom: 1rem;
   p {
     font-weight: bold;
-    color: var(--color-ink-100);
+    color: var(--color-text-strong);
     font-size: 1rem;
   }
   svg {

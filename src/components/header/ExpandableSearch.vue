@@ -63,7 +63,7 @@ form {
   position: relative;
 
   svg {
-    color: var(--color-ink-50);
+    color: var(--color-text-weak);
     position: absolute;
     left: 1.6rem;
     top: 50%;
@@ -80,7 +80,7 @@ input {
   margin-left: 1rem;
   margin-right: 1rem;
   height: 1px;
-  border-top: 1px solid var(--color-ink-10);
+  border-top: 1px solid var(--color-soft-border);
 }
 .results {
   max-height: min(60vh, 20rem);

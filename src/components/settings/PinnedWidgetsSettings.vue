@@ -123,7 +123,7 @@ function handleMoveDown(widget: PinnedWidget) {
 }
 .stop-name {
   font-weight: bold;
-  color: var(--color-ink-100);
+  color: var(--color-text-strong);
   margin-left: 0.5rem;
 }
 .status {
@@ -132,6 +132,6 @@ function handleMoveDown(widget: PinnedWidget) {
 }
 .divider {
   margin: 0.5rem;
-  border-bottom: 1px solid var(--color-ink-20);
+  border-bottom: 1px solid var(--color-soft-border);
 }
 </style>

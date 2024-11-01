@@ -29,7 +29,7 @@ import { getConfig } from "@/utils/get-config";
   @include template.no-select;
   font-size: 1em;
   font-weight: 700;
-  color: var(--color-ink-100);
+  color: var(--color-text-strong);
   margin-left: 0.4em;
 }
 .beta {

@@ -20,7 +20,7 @@ const developerMode = computed(() => settings.value?.developerMode ?? false);
   <div>
     <p>
       <RouterLink
-        class="link"
+        class="link-ghost"
         :class="{ express: stopData.express }"
         :to="getStopPageRoute(getConfig(), stop.id, null, null)"
       >
@@ -38,12 +38,12 @@ const developerMode = computed(() => settings.value?.developerMode ?? false);
 div {
   @include template.row;
 }
-.link {
-  --color-accent: var(--color-ink-100);
+.link-ghost {
+  --color-accent: var(--color-text-strong);
   font-weight: bold;
 
   &.express {
-    --color-accent: var(--color-ink-80);
+    --color-accent: var(--color-text);
     font-weight: normal;
     font-size: 0.8rem;
     font-style: italic;

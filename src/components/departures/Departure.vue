@@ -191,7 +191,7 @@ const detail = computed(() => {
 
     .struckout-time :deep(p) {
       text-decoration: line-through;
-      color: var(--color-ink-50-on-paper-20);
+      color: var(--color-text-weak-on-raised-surface);
     }
     .struckout-time,
     .primary-time {
@@ -274,7 +274,7 @@ const detail = computed(() => {
   padding: 0.25rem 0.4rem 0.15rem 0.4rem;
   justify-items: center;
 
-  border: 2px solid var(--color-ink-20);
+  border: 2px solid var(--color-soft-border);
   border-radius: 0.25rem;
 
   :nth-child(1) {

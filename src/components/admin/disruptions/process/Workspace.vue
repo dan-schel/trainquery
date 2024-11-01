@@ -160,7 +160,7 @@ async function handleApply() {
   margin: 1rem;
   margin-bottom: 0;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-ink-20);
+  border-bottom: 1px solid var(--color-soft-border);
 
   > :first-child {
     margin-right: 0.5rem;
@@ -185,7 +185,7 @@ async function handleApply() {
   margin: 1rem;
   margin-top: 0;
   padding-top: 1rem;
-  border-top: 1px solid var(--color-ink-20);
+  border-top: 1px solid var(--color-soft-border);
   justify-content: flex-end;
 }
 .arrow-locator {

@@ -80,7 +80,7 @@ defineProps<{
 }
 .title {
   font-weight: bold;
-  color: var(--color-ink-100);
+  color: var(--color-text-strong);
 }
 .description {
   font-stretch: semi-condensed;

@@ -30,7 +30,7 @@ footer {
   top: 0;
   left: 1rem;
   right: 1rem;
-  border-top: 1px solid var(--color-ink-20);
+  border-top: 1px solid var(--color-soft-border);
 }
 p {
   font-size: 0.75rem;

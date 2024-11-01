@@ -49,9 +49,9 @@ svg {
   fill: rgb(162, 54, 227);
 }
 .inner {
-  fill: var(--color-on-accent);
+  fill: var(--color-stop-notch-inner);
 }
 .outer {
-  fill: var(--color-ink-100);
+  fill: var(--color-stop-notch-outer);
 }
 </style>

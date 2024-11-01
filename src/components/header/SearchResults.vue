@@ -91,11 +91,11 @@ svg {
   min-width: 0;
 }
 .title {
-  color: var(--color-ink-100);
+  color: var(--color-text-strong);
   font-weight: bold;
 }
 .subtitle {
-  color: var(--color-ink-80);
+  color: var(--color-text);
   font-size: 0.75rem;
   margin-top: 0.5rem;
 }

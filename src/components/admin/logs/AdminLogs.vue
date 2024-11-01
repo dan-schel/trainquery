@@ -95,10 +95,10 @@ onMounted(() => {
     }
     .metadata {
       font-size: 0.6rem;
-      color: var(--color-ink-50);
+      color: var(--color-text-weak);
     }
     &:nth-child(2n) {
-      background-color: var(--color-paper-30);
+      background-color: var(--color-dropdown-bg);
     }
   }
 }

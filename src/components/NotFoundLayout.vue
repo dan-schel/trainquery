@@ -34,7 +34,7 @@ h1 {
   font-weight: 700;
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: var(--color-ink-100);
+  color: var(--color-text-strong);
 }
 .decor {
   @include template.no-select;

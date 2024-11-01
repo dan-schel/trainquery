@@ -66,7 +66,7 @@ const delay = computed(() => {
 
 .container {
   border-radius: 0.75rem;
-  border: 1px solid var(--color-ink-20);
+  border: 1px solid var(--color-soft-border);
   display: grid;
   grid-template-columns: 2.5rem 1fr;
   grid-template-areas: "icon text";

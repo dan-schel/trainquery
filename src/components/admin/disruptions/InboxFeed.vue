@@ -87,7 +87,7 @@ onMounted(() => {
     bottom: 0;
     left: 1rem;
     right: 1rem;
-    border-bottom: 1px solid var(--color-ink-20);
+    border-bottom: 1px solid var(--color-soft-border);
   }
 }
 .disruption > p {
