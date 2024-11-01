@@ -142,14 +142,14 @@ const noAvailableFilters =
 h5,
 h6 {
   font-weight: bold;
-  color: var(--color-ink-100);
+  color: var(--color-text-strong);
 }
 h5 {
   font-size: 1rem;
 }
 .scrollable {
-  border-top: 1px solid var(--color-ink-20);
-  border-bottom: 1px solid var(--color-ink-20);
+  border-top: 1px solid var(--color-soft-border);
+  border-bottom: 1px solid var(--color-soft-border);
   padding-top: 1rem;
   max-height: 20rem;
   overflow-y: scroll;

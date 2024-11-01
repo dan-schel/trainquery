@@ -73,20 +73,20 @@ p {
   left: 50%;
   transform: translate(-50%, -50%);
   font-weight: bold;
-  color: var(--color-ink-20);
+  color: var(--color-text-suggestion);
   font-size: 2.5rem;
-  border-right: 2px solid var(--color-ink-80);
+  border-right: 2px solid var(--color-text);
   animation-name: cursor-blink;
   animation-duration: 1s;
   animation-iteration-count: infinite;
 
   strong {
-    color: var(--color-ink-80);
+    color: var(--color-text);
   }
 }
 @keyframes cursor-blink {
   0% {
-    border-right-color: var(--color-ink-80);
+    border-right-color: var(--color-text);
   }
   1% {
     border-right-color: transparent;
@@ -95,7 +95,7 @@ p {
     border-right-color: transparent;
   }
   51% {
-    border-right-color: var(--color-ink-80);
+    border-right-color: var(--color-text);
   }
 }
 </style>

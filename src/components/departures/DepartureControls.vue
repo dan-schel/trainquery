@@ -217,7 +217,7 @@ onUnmounted(() => {
 }
 .time-button {
   grid-area: time;
-  border-bottom: 1px solid var(--color-ink-20);
+  border-bottom: 1px solid var(--color-soft-border);
 }
 .filter-button {
   grid-area: filter;
@@ -308,7 +308,7 @@ svg {
     grid-template-areas: "time filter";
   }
   .time-button {
-    border-right: 1px solid var(--color-ink-20);
+    border-right: 1px solid var(--color-soft-border);
     border-bottom: none;
   }
   .controls.can-reset .dropdowns {

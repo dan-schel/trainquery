@@ -76,13 +76,10 @@ nav {
   right: 0;
   z-index: 0;
 
-  background-color: var(--color-paper-30);
+  background-color: var(--color-navbar);
   @include utils.shadow;
   opacity: 100%;
   transition: opacity 0.25s;
-
-  // Removed since the PWA status bar should now match the navbar color.
-  // border-top: 1px solid var(--color-navbar-glint);
 
   &.blend {
     opacity: 0%;

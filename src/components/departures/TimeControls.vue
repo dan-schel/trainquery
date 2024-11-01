@@ -77,7 +77,7 @@ function handleSubmitButton() {
 h5,
 h6 {
   font-weight: bold;
-  color: var(--color-ink-100);
+  color: var(--color-text-strong);
 }
 h5 {
   font-size: 1rem;

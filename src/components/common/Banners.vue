@@ -35,7 +35,7 @@ const bannersHtml = computed(() => {
   background-color: var(--color-banner-bg);
 
   &:not(:last-child) {
-    border-bottom: 1px solid var(--color-ink-20);
+    border-bottom: 1px solid var(--color-soft-border);
   }
 
   .banner-content {

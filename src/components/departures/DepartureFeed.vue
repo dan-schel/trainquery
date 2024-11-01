@@ -200,22 +200,22 @@ function handlePin() {
   min-width: 0;
 }
 .title {
-  --color-accent: var(--color-ink-100);
+  --color-accent: var(--color-text-strong);
   font-weight: bold;
   font-size: 1rem;
 
   // For when it's not a link.
-  color: var(--color-ink-100);
+  color: var(--color-text-strong);
 }
 .dot {
   @include template.no-select;
 }
 .subtitle {
-  --color-accent: var(--color-ink-80);
+  --color-accent: var(--color-text);
   font-size: 1rem;
 
   // For when it's not a link.
-  color: var(--color-ink-80);
+  color: var(--color-text);
 }
 .pin-button.pinned {
   :deep(svg) {
@@ -243,7 +243,7 @@ function handlePin() {
     bottom: 0;
     left: 1rem;
     right: 1rem;
-    border-bottom: 1px solid var(--color-ink-20);
+    border-bottom: 1px solid var(--color-soft-border);
   }
   &.loading {
     opacity: 50%;

@@ -134,8 +134,8 @@ function handleCloseTimeEditor() {
 .time-wheels,
 .time-editor {
   height: 8rem;
-  border-top: 1px solid var(--color-ink-20);
-  border-bottom: 1px solid var(--color-ink-20);
+  border-top: 1px solid var(--color-soft-border);
+  border-bottom: 1px solid var(--color-soft-border);
   margin-bottom: 0.5rem;
 }
 .time-wheels {

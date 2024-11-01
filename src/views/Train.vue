@@ -56,8 +56,8 @@ const data = computed(() => {
         ? "Arrived at"
         : "Arrives at"
       : departureTime.isBefore(local.value)
-        ? "Departed"
-        : "Departs";
+      ? "Departed"
+      : "Departs";
     const departureText = `${verb} ${perspectiveName} at ${relativeTimeString}`;
 
     return {
@@ -180,7 +180,7 @@ useHead(head as UseHeadInput<{}>);
   margin-top: 1rem;
 }
 .dev-info {
-  border-top: 1px solid var(--color-ink-20);
+  border-top: 1px solid var(--color-soft-border);
   padding-top: 2rem;
   margin-bottom: 2rem;
   gap: 0.75rem;

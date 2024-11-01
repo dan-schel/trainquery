@@ -39,11 +39,11 @@ div {
   @include template.row;
 }
 .link {
-  --color-accent: var(--color-ink-100);
+  --color-accent: var(--color-text-strong);
   font-weight: bold;
 
   &.express {
-    --color-accent: var(--color-ink-80);
+    --color-accent: var(--color-text);
     font-weight: normal;
     font-size: 0.8rem;
     font-style: italic;

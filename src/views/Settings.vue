@@ -104,7 +104,7 @@ function handleReset() {
   margin-top: 2rem;
 
   > h2 {
-    color: var(--color-ink-100);
+    color: var(--color-text-strong);
     font-weight: bold;
     font-size: 1rem;
     margin-bottom: 0.75rem;
@@ -131,6 +131,8 @@ function handleReset() {
 }
 .reset-button {
   --color-accent: var(--color-error);
+  --color-accent-hover: var(--color-error-hover);
+  --color-accent-active: var(--color-error-active);
   align-self: flex-start;
 }
 </style>

@@ -19,7 +19,7 @@ svg {
   animation: flip 1s ease-out 0s infinite;
   width: 1em;
   height: 1em;
-  color: var(--color-ink-30);
+  color: var(--color-loading-spinner);
   font-size: 2rem;
 }
 circle:nth-child(2) {

@@ -60,11 +60,11 @@ const platformString = computed(() => {
 <style scoped lang="scss">
 @use "@/assets/css-template/import" as template;
 .stop-name {
-  --color-accent: var(--color-ink-100);
+  --color-accent: var(--color-text-strong);
   font-weight: bold;
 
   &.express {
-    --color-accent: var(--color-ink-80);
+    --color-accent: var(--color-text);
     font-weight: normal;
     font-style: italic;
     :deep(p) {
@@ -73,7 +73,7 @@ const platformString = computed(() => {
   }
 }
 .time {
-  --color-accent: var(--color-ink-80);
+  --color-accent: var(--color-text);
   min-width: 0;
   flex-shrink: 1;
 }
@@ -98,12 +98,10 @@ const platformString = computed(() => {
   margin-bottom: -0.5rem;
   padding: 0 0.2rem;
 
-  //background-color: var(--color-ink-80);
-  border: 2px solid var(--color-ink-20);
+  border: 2px solid var(--color-soft-border);
   border-radius: 0.25rem;
 
   p {
-    //color: var(--color-paper-20);
     font-size: 0.8rem;
     font-weight: bold;
     text-align: center;

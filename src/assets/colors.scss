@@ -1,0 +1,127 @@
+@use "sass:list";
+@use "css-template/import" as template;
+
+$ui-colors: (
+  "text-strong": (
+    "light": template.theme-light-ink(100),
+    "dark": template.theme-dark-ink(100),
+  ),
+
+  "navbar": (
+    "light": template.theme-light-paper(30),
+    "dark": template.theme-dark-paper(30),
+  ),
+  "dropdown-bg": (
+    "light": template.theme-light-paper(30),
+    "dark": template.theme-dark-paper(30),
+  ),
+  "raised-surface": (
+    "light": template.theme-light-paper(20),
+    "dark": template.theme-dark-paper(20),
+  ),
+
+  "shadow-weak": (
+    "light": rgba(0, 0, 0, 10%),
+    "dark": rgba(0, 0, 0, 20%),
+  ),
+
+  "loading-spinner": (
+    "light": template.theme-light-ink(30),
+    "dark": template.theme-dark-ink(30),
+  ),
+  "text-suggestion": (
+    "light": template.theme-light-ink(20),
+    "dark": template.theme-dark-ink(20),
+  ),
+
+  "text-weak-on-raised-surface": (
+    // Used for struckout text (can't use semi-transparent colors).
+    "light": #7a8497,
+    "dark": #727d92,
+  ),
+
+  "stop-notch-inner": (
+    "light": white,
+    "dark": black,
+  ),
+  "stop-notch-outer": (
+    "light": black,
+    "dark": white,
+  ),
+  "map-track": (
+    "light": #bac3d2,
+    "dark": #2f3644,
+  ),
+
+  "banner-bg": (
+    "light": hsl(210, 100%, 45%),
+    "dark": hsl(210, 100%, 45%),
+  ),
+  "banner-text": (
+    "light": #ffffff,
+    "dark": #ffffff,
+  ),
+
+  "error": (
+    "light": hsl(0, 87%, 46%),
+    "dark": hsl(0, 100%, 66%),
+  ),
+  "error-hover": (
+    "light": hsl(0, 87%, 51%),
+    "dark": hsl(0, 100%, 71%),
+  ),
+  "error-active": (
+    "light": hsl(0, 87%, 41%),
+    "dark": hsl(0, 100%, 61%),
+  ),
+
+  "warning": (
+    "light": #d19700,
+    "dark": #ffc122,
+  ),
+  "success": (
+    "light": #1bae0e,
+    "dark": #32cf25,
+  ),
+);
+
+// TODO: One day we might want hover and active variants for all these colors.
+// If so, use +5% for hover lightness and -5% for active lightness (as is done
+// for error colors above).
+$line-colors: (
+  "accent-red": (
+    "light": hsl(0, 87%, 46%),
+    "dark": hsl(0, 100%, 66%),
+  ),
+  "accent-yellow": (
+    "light": hsl(43, 100%, 41%),
+    "dark": hsl(43, 100%, 57%),
+  ),
+  "accent-green": (
+    "light": hsl(115, 85%, 37%),
+    "dark": hsl(115, 70%, 48%),
+  ),
+  "accent-cyan": (
+    "light": hsl(191, 100%, 40%),
+    "dark": hsl(191, 100%, 55%),
+  ),
+  "accent-blue": (
+    "light": hsl(227, 58%, 48%),
+    "dark": hsl(227, 100%, 77%),
+  ),
+  "accent-purple": (
+    "light": hsl(277, 76%, 55%),
+    "dark": hsl(277, 100%, 74%),
+  ),
+  "accent-pink": (
+    "light": hsl(317, 66%, 54%),
+    "dark": hsl(317, 100%, 69%),
+  ),
+  "accent-none": (
+    // Same as --color-text.
+    "light": #000714cc,
+    "dark": #ebf1ffcc,
+  ),
+);
+
+$custom-colors: list.join($ui-colors, $line-colors);

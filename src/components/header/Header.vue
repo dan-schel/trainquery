@@ -134,7 +134,7 @@ header {
   left: 0;
   right: 0;
 
-  background-color: var(--color-paper-20);
+  background-color: var(--color-raised-surface);
   @include utils.shadow;
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;

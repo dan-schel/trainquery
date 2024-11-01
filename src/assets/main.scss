@@ -1,85 +1,7 @@
 @use "css-template/import" as template;
-@include template.init(
-  $custom-colors: (
-    "accent-red": (
-      "light": #dc0f0f,
-      "dark": #ff5252,
-    ),
-    "accent-yellow": (
-      "light": #d19700,
-      "dark": #ffc122,
-    ),
-    "accent-green": (
-      "light": #1bae0e,
-      "dark": #32cf25,
-    ),
-    "accent-cyan": (
-      "light": #00a5ca,
-      "dark": #19d6ff,
-    ),
-    "accent-blue": (
-      "light": #3453c2,
-      "dark": #8aa4ff,
-    ),
-    "accent-purple": (
-      "light": #a236e3,
-      "dark": #cd7bff,
-    ),
-    "accent-pink": (
-      "light": #d73aab,
-      "dark": #ff60d2,
-    ),
-    "accent-none": (
-      // Same as --color-ink-80.
-      "light": #000714cc,
-      "dark": #ebf1ffcc,
-    ),
-    "error": (
-      "light": #dc0f0f,
-      "dark": #ff5252,
-    ),
-    "warning": (
-      "light": #d19700,
-      "dark": #ffc122,
-    ),
-    "success": (
-      "light": #1bae0e,
-      "dark": #32cf25,
-    ),
-    "navbar-glint": (
-      "light": transparent,
+@use "colors" as colors;
 
-      // Same as --color-ink-10.
-      "dark": #a3c2ff1a,
-    ),
-    "stop-notch-inner": (
-      "light": white,
-      "dark": black,
-    ),
-    "stop-notch-outer": (
-      "light": black,
-      "dark": white,
-    ),
-    "map-track": (
-      "light": #bac3d2,
-      "dark": #2f3644,
-    ),
-    // Used for struckout text, to avoid layering semi-transparent colors.
-    "ink-50-on-paper-20":
-      (
-        "light": #7a8497,
-        "dark": #727d92,
-      ),
-    "banner-bg": (
-      "light": hsl(210, 100%, 45%),
-      "dark": hsl(210, 100%, 45%),
-    ),
-    "banner-text": (
-      "light": #ffffff,
-      "dark": #ffffff,
-    ),
-  )
-);
+@include template.init($custom-colors: colors.$custom-colors);
 
 @font-face {
   font-family: "Mona Sans";
@@ -92,10 +14,6 @@
 :root {
   font-family: "Mona Sans", sans-serif;
   --font-size-default: 0.9rem;
-
-  // They don't look very good, but these are what melbpt used...?
-  // --color-light-accent: #00a5ca;
-  // --color-dark-accent: #19d6ff;
 }
 
 .link {
@@ -103,7 +21,7 @@
 }
 
 code {
-  background-color: var(--color-ink-10);
+  background-color: var(--color-soft);
   border-radius: 0.25rem;
   font-family: "Fira Code", monospace;
   padding: 0 0.25rem;

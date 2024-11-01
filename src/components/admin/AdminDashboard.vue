@@ -110,8 +110,8 @@ h2 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
   gap: 0.5rem;
-  border-top: 1px solid var(--color-ink-20);
-  border-bottom: 1px solid var(--color-ink-20);
+  border-top: 1px solid var(--color-soft-border);
+  border-bottom: 1px solid var(--color-soft-border);
   padding: 1rem 0rem;
   margin-bottom: 1rem;
 }

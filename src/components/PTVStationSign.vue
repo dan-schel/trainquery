@@ -43,7 +43,7 @@ defineProps<{
   background-color: #ffffff;
   height: var(--3p0);
   border-radius: var(--0p1) var(--0p1) var(--0p4) var(--0p4);
-  box-shadow: 0 var(--0p2) var(--0p2) var(--color-shadow-10);
+  box-shadow: 0 var(--0p2) var(--0p2) var(--color-shadow-weak);
 }
 .divider {
   background-color: #cccccc;
