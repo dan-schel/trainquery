@@ -20,7 +20,7 @@ const developerMode = computed(() => settings.value?.developerMode ?? false);
   <div>
     <p>
       <RouterLink
-        class="link-secret"
+        class="link-ghost"
         :class="{ express: stopData.express }"
         :to="getStopPageRoute(getConfig(), stop.id, null, null)"
       >
@@ -38,7 +38,7 @@ const developerMode = computed(() => settings.value?.developerMode ?? false);
 div {
   @include template.row;
 }
-.link-secret {
+.link-ghost {
   --color-accent: var(--color-text-strong);
   font-weight: bold;
 

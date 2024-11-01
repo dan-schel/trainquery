@@ -36,7 +36,7 @@ const platformString = computed(() => {
   <div class="row">
     <OneLineP class="stop-name" :class="{ express: stopData.express }">
       <RouterLink
-        class="link-secret"
+        class="link-ghost"
         :to="getStopPageRoute(getConfig(), stop.id, null, null)"
         >{{ stopData.express ? "Skips " : "" }}{{ stop.name }}</RouterLink
       >
@@ -47,7 +47,7 @@ const platformString = computed(() => {
     <p v-if="time != null">&ensp;•&ensp;</p>
     <OneLineP v-if="time != null" class="time">
       <RouterLink
-        class="link-secret"
+        class="link-ghost"
         :to="getStopPageRoute(getConfig(), stop.id, time, null)"
         >{{
           formatRelativeTime(time, now, { suppressEarlierToday: true })

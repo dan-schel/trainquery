@@ -115,7 +115,7 @@ function handlePin() {
       <OneLineP class="header">
         <RouterLink
           v-if="header.title.to != null"
-          class="link-secret title"
+          class="link-ghost title"
           :to="header.title.to"
           :replace="replaceOnNavigate"
           >{{ header.title.text }}</RouterLink
@@ -128,7 +128,7 @@ function handlePin() {
 
         <RouterLink
           v-if="header.subtitle != null && header.subtitle.to != null"
-          class="link-secret subtitle"
+          class="link-ghost subtitle"
           :to="header.subtitle.to"
           :replace="replaceOnNavigate"
           >{{ header.subtitle.text }}</RouterLink

@@ -19,7 +19,7 @@
 .link {
   @include template.link;
 }
-.link-secret {
+.link-ghost {
   @include template.link;
   text-decoration-color: transparent;
 
