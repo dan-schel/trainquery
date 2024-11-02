@@ -56,8 +56,8 @@ const data = computed(() => {
         ? "Arrived at"
         : "Arrives at"
       : departureTime.isBefore(local.value)
-      ? "Departed"
-      : "Departs";
+        ? "Departed"
+        : "Departs";
     const departureText = `${verb} ${perspectiveName} at ${relativeTimeString}`;
 
     return {
