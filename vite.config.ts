@@ -8,6 +8,13 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  css: {
+    preprocessorOptions: {
+      scss: {
+        silenceDeprecations: ["mixed-decls"],
+      },
+    },
+  },
   ssr: { format: "cjs" },
   plugins: [
     VitePWA({
