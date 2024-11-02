@@ -52,7 +52,6 @@ const onSearchEnter = (e: Event) => {
   &:focus-within {
     form {
       background-color: var(--color-dropdown-bg);
-      border-color: var(--color-soft-border);
     }
   }
   &:not(:focus-within) {
@@ -64,17 +63,10 @@ const onSearchEnter = (e: Event) => {
 form {
   @include utils.raised-surface;
 
-  &:hover {
-    border-color: var(--color-soft-border);
-  }
-
   // For the search icon.
   position: relative;
 
   border-radius: 0.75rem;
-  transition:
-    background-color 0.1s,
-    border-color 0.1s;
 
   svg {
     color: var(--color-text-weak);
