@@ -79,7 +79,7 @@ function createApiRoute<P, R, PS, RS>(
           .string()
           .optional()
           .safeParse(req.headers["admin-token"]);
-        const token = parsedToken.success ? parsedToken.data ?? null : null;
+        const token = parsedToken.success ? (parsedToken.data ?? null) : null;
         await ctx.adminAuth.throwUnlessAuthenticated(token, api.requiredRole);
         if (token != null) {
           session = await ctx.adminAuth.getSession(token);
