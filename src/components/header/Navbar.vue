@@ -76,14 +76,9 @@ nav {
   right: 0;
   z-index: 0;
 
-  background-color: var(--color-navbar);
   @include utils.shadow;
+  background-color: var(--color-navbar);
   opacity: 100%;
-  transition: opacity 0.25s;
-
-  &.blend {
-    opacity: 0%;
-  }
 }
 .content-wrapper {
   @include template.page-centerer;
