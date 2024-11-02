@@ -11,7 +11,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        silenceDeprecations: ["mixed-decls"],
+        silenceDeprecations: ["mixed-decls", "legacy-js-api"],
       },
     },
   },
