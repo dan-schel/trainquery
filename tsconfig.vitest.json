@@ -1,6 +1,6 @@
 {
   "extends": "./tsconfig.app.json",
-  "exclude": [],
+  "exclude": ["src/assets/css-template"],
   "compilerOptions": {
     "composite": true,
     "lib": [],
