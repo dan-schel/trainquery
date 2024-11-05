@@ -26,11 +26,9 @@ An unofficial guide to help you navigate Melbourne's train network, built on Vue
     # (optional - see "Developing without internet" below).
     CONFIG_OFFLINE = "offline/config.zip"
 
-    # If persisting data to a MongoDB database, the domain, username, and password
-    # to use to connect to the database (optional).
-    MONGO_DOMAIN = "db.trainquery.com"
-    MONGO_USERNAME = "..."
-    MONGO_PASSWORD = "..."
+    # If persisting data to a MongoDB database, the database connection string to
+    # use to connect to the database (optional).
+    MONGO_DATABASE_URL = "mongodb://username:password@localhost:27017/?authMechanism=DEFAULT"
 
     # If connecting to the PTV API, the credentials provided by PTV, used to query
     # the API (optional).
