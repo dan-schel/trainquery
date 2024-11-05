@@ -6,9 +6,7 @@ const names = {
   url: "URL",
   config: "CONFIG",
   configOffline: "CONFIG_OFFLINE",
-  mongoDomain: "MONGO_DOMAIN",
-  mongoUsername: "MONGO_USERNAME",
-  mongoPassword: "MONGO_PASSWORD",
+  mongoDatabaseUrl: "MONGO_DATABASE_URL",
   ptvDevId: "PTV_DEV_ID",
   ptvDevKey: "PTV_DEV_KEY",
   gtfsRealtimeKey: "GTFS_REALTIME_KEY",
@@ -23,9 +21,7 @@ const defaults = {
 };
 
 type MongoVars = {
-  domain: string;
-  username: string;
-  password: string;
+  databaseUrl: string;
 };
 
 type PtvVars = {
@@ -74,7 +70,7 @@ export class EnvironmentVariables {
   }
   requireMongo() {
     if (this.mongo == null) {
-      throw notSet(names.mongoDomain);
+      throw notSet(names.mongoDatabaseUrl);
     }
     return this.mongo;
   }
@@ -129,24 +125,14 @@ export class EnvironmentVariables {
     }
 
     // MONGO_DOMAIN, MONGO_USERNAME, and MONGO_PASSWORD.
-    const mongoDomain = process.env[names.mongoDomain] ?? null;
-    const mongoUsername = process.env[names.mongoUsername] ?? null;
-    const mongoPassword = process.env[names.mongoPassword] ?? null;
+    const mongoDatabaseUrl = process.env[names.mongoDatabaseUrl] ?? null;
     let mongo: MongoVars | null = null;
-    if (mongoDomain != null || mongoUsername != null || mongoPassword != null) {
-      if (mongoDomain == null) {
-        throw notSet(names.mongoDomain);
-      }
-      if (mongoUsername == null) {
-        throw notSet(names.mongoUsername);
-      }
-      if (mongoPassword == null) {
-        throw notSet(names.mongoPassword);
+    if (mongoDatabaseUrl != null) {
+      if (mongoDatabaseUrl == null) {
+        throw notSet(names.mongoDatabaseUrl);
       }
       mongo = {
-        domain: mongoDomain,
-        username: mongoUsername,
-        password: mongoPassword,
+        databaseUrl: mongoDatabaseUrl,
       };
     }
 

@@ -100,7 +100,7 @@ function getDatabase(isOffline: boolean): TrainQueryDB | null {
   if (mongo == null) {
     return null;
   }
-  return new TrainQueryDB(mongo.domain, mongo.username, mongo.password);
+  return new TrainQueryDB(mongo.databaseUrl);
 }
 
 async function setupDevServer(ctx: TrainQuery, app: Express) {

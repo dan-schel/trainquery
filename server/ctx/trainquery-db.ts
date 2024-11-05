@@ -21,21 +21,13 @@ export class TrainQueryDB {
   private _client: MongoClient | null;
   private _dbs: DBs | null;
 
-  constructor(
-    private readonly _domain: string,
-    private readonly _username: string,
-    private readonly _password: string,
-  ) {
+  constructor(private readonly _connectionStr: string) {
     this._client = null;
     this._dbs = null;
   }
 
   async init() {
-    const username = encodeURIComponent(this._username);
-    const password = encodeURIComponent(this._password);
-    const url = `mongodb://${username}:${password}@${this._domain}:27017/?authMechanism=DEFAULT`;
-
-    this._client = new MongoClient(url);
+    this._client = new MongoClient(this._connectionStr);
     await this._client.connect();
 
     const db = this._client.db("trainquery");
