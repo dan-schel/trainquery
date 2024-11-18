@@ -44,7 +44,7 @@ An unofficial guide to help you navigate Melbourne's train network, built on Vue
     SUPERADMIN_USERNAME = "..."
     SUPERADMIN_PASSWORD = "..."
 
-    # If using a relay, such as VTAR.
+    # If using a relay, such as VTAR (optional).
     RELAY_KEY = "..."
     ```
 
