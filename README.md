@@ -43,6 +43,9 @@ An unofficial guide to help you navigate Melbourne's train network, built on Vue
     # (optional).
     SUPERADMIN_USERNAME = "..."
     SUPERADMIN_PASSWORD = "..."
+
+    # If using a relay, such as VTAR (optional).
+    RELAY_KEY = "..."
     ```
 
 4.  Run `npm run dev` (or `npm run build` and `npm run start`)!
