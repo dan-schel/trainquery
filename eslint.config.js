@@ -8,7 +8,7 @@ import vueParser from "vue-eslint-parser";
 
 export default tseslint.config(
   {
-    ignores: ["/node_modules/", "/dist/", "/eslint.config.js"],
+    ignores: ["node_modules/", "dist/", "eslint.config.js"],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
@@ -30,7 +30,10 @@ export default tseslint.config(
       semi: "warn",
 
       // Ignore unused variables if they start with underscores.
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_" },
+      ],
 
       // Require === and !==, except when comparing to null.
       eqeqeq: ["error", "always", { null: "ignore" }],

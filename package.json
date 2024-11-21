@@ -3,7 +3,8 @@
     "dev": "tsx ./express-entry.ts",
     "build": "vite build",
     "preview": "cross-env NODE_ENV=production tsx ./express-entry.ts",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@universal-middleware/express": "^0.2.9",
