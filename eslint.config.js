@@ -8,16 +8,7 @@ import vueParser from "vue-eslint-parser";
 
 export default tseslint.config(
   {
-    ignores: [
-      "dist/*",
-      // Temporary compiled files
-      "**/*.ts.build-*.mjs",
-
-      // JS files at the root of the project
-      "*.js",
-      "*.cjs",
-      "*.mjs",
-    ],
+    ignores: ["/node_modules/", "/dist/", "/eslint.config.js"],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
@@ -32,13 +23,20 @@ export default tseslint.config(
   },
   {
     rules: {
-      "@typescript-eslint/no-unused-vars": [
-        1,
-        {
-          argsIgnorePattern: "^_",
-        },
-      ],
-      "@typescript-eslint/no-namespace": 0,
+      // Allow single-word Vue component names.
+      "vue/multi-word-component-names": 0,
+
+      // Warn about missing semicolons.
+      semi: "warn",
+
+      // Ignore unused variables if they start with underscores.
+      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+
+      // Require === and !==, except when comparing to null.
+      eqeqeq: ["error", "always", { null: "ignore" }],
+
+      // Warn on console.log uses, but allow console.warn.
+      "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
 
