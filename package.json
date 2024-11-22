@@ -6,7 +6,7 @@
     "dev": "tsx ./run.ts",
     "build": "rimraf dist && vite build",
     "preview": "cross-env NODE_ENV=production tsx ./run.ts",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0 && vue-tsc --noEmit -p tsconfig.json",
     "format": "prettier --write .",
     "prepublishOnly": "npm run build"
   },
@@ -36,7 +36,8 @@
     "typescript-eslint": "^8.15.0",
     "vike": "^0.4.204",
     "vite": "^5.4.11",
-    "vue-eslint-parser": "^9.4.3"
+    "vue-eslint-parser": "^9.4.3",
+    "vue-tsc": "^2.1.10"
   },
   "files": [
     "dist",
