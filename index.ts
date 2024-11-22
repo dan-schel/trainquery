@@ -14,15 +14,32 @@ const hmrPort = process.env.HMR_PORT
   ? parseInt(process.env.HMR_PORT, 10)
   : 24678;
 
-export default async function startServer() {
+export type TrainQueryConfig = {
+  url: string;
+  port: string;
+
+  // TODO: These don't need to be at the top level. E.g. wherever inside the
+  // config the relay is used, provide the relayKey there.
+  relayKey: string;
+  mongoDatabaseUrl: string;
+  superadminUsername: string;
+  superadminPassword: string;
+
+  // Deprecated.
+  config: string;
+  ptvDevId: string;
+  ptvDevKey: string;
+  gtfsRealtimeKey: string;
+};
+
+export default async function trainquery(config: TrainQueryConfig) {
   const app = express();
 
   if (process.env.NODE_ENV === "production") {
+    // Use the pre-compiled client code.
     app.use(express.static(`${root}/dist/client`));
   } else {
-    // Instantiate Vite's development server and integrate its middleware to our server.
-    // ⚠️ We should instantiate it *only* in development. (It isn't needed in production
-    // and would unnecessarily bloat our server in production.)
+    // Compile the client code on-the-fly with Vite (enables hot reloading).
     const vite = await import("vite");
     const viteDevMiddleware = (
       await vite.createServer({
@@ -35,11 +52,6 @@ export default async function startServer() {
 
   app.post("/api/todo/create", createHandler(createTodoHandler)());
 
-  /**
-   * Vike route
-   *
-   * @link {@see https://vike.dev}
-   **/
   if (process.env.NODE_ENV === "production") {
     await import("./dist/server/entry.mjs");
   }
