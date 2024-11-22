@@ -1,0 +1,67 @@
+import { z } from "zod";
+import { type LineID, LineIDJson, type StopID, StopIDJson } from "./ids";
+import { NumberRange } from "@dan-schel/js-utils";
+import { NumberRangeJson } from "../utils";
+
+export abstract class ContinuationGroup<Method extends string> {
+  constructor(readonly method: Method) {}
+}
+
+export class LinearContinuationGroup extends ContinuationGroup<"linear"> {
+  constructor(
+    readonly from: StopID,
+    readonly sideA: LineID[],
+    readonly sideB: LineID[],
+    readonly layoverMins: NumberRange,
+  ) {
+    super("linear");
+  }
+
+  static readonly json = z
+    .object({
+      method: z.literal("linear"),
+      from: StopIDJson,
+      sideA: LineIDJson.array(),
+      sideB: LineIDJson.array(),
+      layoverMins: NumberRangeJson,
+    })
+    .transform(
+      (x) =>
+        new LinearContinuationGroup(x.from, x.sideA, x.sideB, x.layoverMins),
+    );
+
+  toJSON(): z.input<typeof LinearContinuationGroup.json> {
+    return {
+      method: "linear",
+      from: this.from,
+      sideA: this.sideA,
+      sideB: this.sideB,
+      layoverMins: this.layoverMins.asString(),
+    };
+  }
+}
+
+export class HookContinuationGroup extends ContinuationGroup<"hook"> {
+  constructor(
+    readonly lines: LineID[],
+    readonly layoverMins: NumberRange,
+  ) {
+    super("hook");
+  }
+
+  static readonly json = z
+    .object({
+      method: z.literal("hook"),
+      lines: LineIDJson.array(),
+      layoverMins: NumberRangeJson,
+    })
+    .transform((x) => new HookContinuationGroup(x.lines, x.layoverMins));
+
+  toJSON(): z.input<typeof HookContinuationGroup.json> {
+    return {
+      method: "hook",
+      lines: this.lines,
+      layoverMins: this.layoverMins.asString(),
+    };
+  }
+}

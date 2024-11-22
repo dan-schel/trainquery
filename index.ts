@@ -32,7 +32,7 @@ export type TrainQueryConfig = {
   gtfsRealtimeKey: string;
 };
 
-export default async function trainquery(config: TrainQueryConfig) {
+export default async function trainquery(_config: TrainQueryConfig) {
   const app = express();
 
   if (process.env.NODE_ENV === "production") {
@@ -58,6 +58,7 @@ export default async function trainquery(config: TrainQueryConfig) {
   app.all("*", createHandler(vikeHandler)());
 
   app.listen(port, () => {
+    // eslint-disable-next-line no-console
     console.log(`Server listening on http://localhost:${port}`);
   });
 

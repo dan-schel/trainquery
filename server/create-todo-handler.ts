@@ -8,6 +8,7 @@ export const createTodoHandler: Get<
   // In a real case, user-provided data should ALWAYS be validated with tools like zod
   const newTodo = (await request.json()) as { text: string };
 
+  // eslint-disable-next-line no-console
   console.log("Received new todo", newTodo);
 
   return new Response(JSON.stringify({ status: "OK" }), {
