@@ -1,6 +1,9 @@
 <template>
   <div id="page-container">
-    <div id="page-content" style="padding: 20px; padding-bottom: 50px; min-height: 100vh">
+    <div
+      id="page-content"
+      style="padding: 20px; padding-bottom: 50px; min-height: 100vh"
+    >
       <slot />
     </div>
   </div>
