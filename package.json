@@ -3,9 +3,9 @@
   "version": "0.0.4",
   "type": "module",
   "scripts": {
-    "dev": "tsx ./run.ts",
+    "dev": "tsx instance/index.ts",
     "build": "rimraf dist && vite build",
-    "preview": "cross-env NODE_ENV=production tsx ./run.ts",
+    "preview": "cross-env NODE_ENV=production tsx instance/index.ts",
     "lint": "eslint . --max-warnings 0 && vue-tsc --noEmit -p tsconfig.json",
     "format": "prettier --write .",
     "prepublishOnly": "npm run build"
