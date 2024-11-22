@@ -1,11 +1,11 @@
 {
   "name": "trainquery",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "scripts": {
-    "dev": "tsx ./express-entry.ts",
+    "dev": "tsx ./run.ts",
     "build": "rimraf dist && vite build",
-    "preview": "cross-env NODE_ENV=production tsx ./express-entry.ts",
+    "preview": "cross-env NODE_ENV=production tsx ./run.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "prepublishOnly": "npm run build"
@@ -39,7 +39,9 @@
     "vue-eslint-parser": "^9.4.3"
   },
   "files": [
-    "dist"
+    "dist",
+    "index.ts",
+    "server"
   ],
   "description": "This package is a work in progress - check back later for more information :)",
   "author": "dan-schel",

@@ -14,9 +14,7 @@ const hmrPort = process.env.HMR_PORT
   ? parseInt(process.env.HMR_PORT, 10)
   : 24678;
 
-export default (await startServer()) as unknown;
-
-async function startServer() {
+export default async function startServer() {
   const app = express();
 
   if (process.env.NODE_ENV === "production") {
@@ -42,6 +40,9 @@ async function startServer() {
    *
    * @link {@see https://vike.dev}
    **/
+  if (process.env.NODE_ENV === "production") {
+    await import("./dist/server/entry.mjs");
+  }
   app.all("*", createHandler(vikeHandler)());
 
   app.listen(port, () => {
