@@ -11,4 +11,11 @@ export default defineConfig({
     }),
     md({}),
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: "modern",
+      },
+    },
+  },
 });
