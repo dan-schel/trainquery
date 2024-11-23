@@ -2,3 +2,5 @@
 /dist/
 /instance/
 /.env
+/data-*/
+/coverage/

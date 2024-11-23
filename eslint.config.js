@@ -8,7 +8,14 @@ import vueParser from "vue-eslint-parser";
 
 export default tseslint.config(
   {
-    ignores: ["node_modules/", "dist/", "eslint.config.js", "instance/"],
+    ignores: [
+      "node_modules/",
+      "dist/",
+      "eslint.config.js",
+      "instance/",
+      "data-*/",
+      "coverage/",
+    ],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
