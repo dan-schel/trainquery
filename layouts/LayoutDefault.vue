@@ -7,7 +7,7 @@
 <script setup lang="ts"></script>
 
 <style lang="scss">
-// TODO: Can put universal styles here, e.g. importing my css template.
+@use "#root/assets/main.scss" as main;
 </style>
 
 <style scoped lang="scss">

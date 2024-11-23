@@ -61,6 +61,9 @@
     "vue-eslint-parser": "^9.4.3",
     "vue-tsc": "^2.1.10"
   },
+  "imports": {
+    "#root/*": "./*.ts"
+  },
   "files": [
     "dist",
     "index.ts",

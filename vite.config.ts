@@ -11,6 +11,11 @@ export default defineConfig({
     }),
     md({}),
   ],
+  resolve: {
+    alias: {
+      "#root": __dirname,
+    },
+  },
   css: {
     preprocessorOptions: {
       scss: {

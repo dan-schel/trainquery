@@ -15,7 +15,10 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["vite/client"],
     "jsx": "preserve",
-    "jsxImportSource": "vue"
+    "jsxImportSource": "vue",
+    "paths": {
+      "#root/*": ["./*"]
+    }
   },
   "exclude": ["dist/", "instance/", "data-*/", "coverage/"]
 }
