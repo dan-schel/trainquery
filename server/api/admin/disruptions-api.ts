@@ -83,7 +83,7 @@ export const disruptionInboxProcessApiHandler = handle(
         params.reject.disruption,
         params.reject.resurfaceIfUpdated,
       );
-    } catch (e) {
+    } catch {
       // TODO: It's not really an internal server error if the inbox disruption no
       // longer exists, which is probably the most likely cause of errors here.
       throw new BadApiCallError("Failed to reject disruption.", 500);
@@ -98,7 +98,7 @@ export const disruptionRejectedRestoreApiHandler = handle(
   async (ctx, params) => {
     try {
       await ctx.disruptions.restoreDisruption(ctx, params.restore);
-    } catch (e) {
+    } catch {
       // TODO: It's not really an internal server error if the inbox disruption no
       // longer exists, which is probably the most likely cause of errors here.
       throw new BadApiCallError("Failed to restore disruption.", 500);

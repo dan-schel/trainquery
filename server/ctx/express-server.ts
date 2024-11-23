@@ -18,6 +18,7 @@ export class ExpressServer extends Server {
 
   async start(
     ctx: TrainQuery,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handlers: ApiHandler<any, any, any, any>[],
     requestListener: (
       endpoint: string,
@@ -110,7 +111,7 @@ function createApiRoute<P, R, PS, RS>(
   });
 }
 
-function paramify(obj: { [index: string]: any }): Record<string, string> {
+function paramify(obj: { [index: string]: unknown }): Record<string, string> {
   if (typeof obj !== "object" || obj == null) {
     return {};
   }

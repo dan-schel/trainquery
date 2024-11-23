@@ -34,7 +34,7 @@ export class FilteredBucket<B> extends Bucket<
   }
 }
 
-export class PassthroughBucket<B> extends Bucket<any, B> {
+export class PassthroughBucket<B> extends Bucket<unknown, B> {
   readonly items: B[] = [];
 
   constructor(
@@ -44,7 +44,7 @@ export class PassthroughBucket<B> extends Bucket<any, B> {
     super();
   }
 
-  willAccept(_possibility: any): boolean {
+  willAccept(_possibility: unknown): boolean {
     return true;
   }
   push(item: B): void {

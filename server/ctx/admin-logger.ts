@@ -295,6 +295,7 @@ export class AdminLogger extends Logger {
     };
 
     const forCollection = (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       transaction: Transaction<any, any>,
       singular: string,
       plural: string,

@@ -159,6 +159,7 @@ export type ServerParams = {
 export abstract class Server {
   abstract start(
     ctx: TrainQuery,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handlers: ApiHandler<any, any, any, any>[],
     requestListener: (
       endpoint: string,

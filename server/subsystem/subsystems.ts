@@ -7,7 +7,10 @@ import { type Subsystem, SubsystemBuilder, SubsystemCtx } from "./subsystem";
 // This is the right-hand side value of the instanceof check. Apparently it
 // models a class constructor. The `& { id: string }` part checks that the class
 // has a static property `id`. Maybe that's a bit overkill.
-export type SubsystemClass<T> = (new (...args: any[]) => T) & { id: string };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type SubsystemClass<T> = (new (...args: any[]) => T) & {
+  id: string;
+};
 
 export class Subsystems {
   private readonly _builders: Map<string, SubsystemBuilder>;
