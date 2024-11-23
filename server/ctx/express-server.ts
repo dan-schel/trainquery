@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { ApiHandler, BadApiCallError } from "../api/api-handler";
-import { BadApiCallError as LegacyBadApiCallError } from "../param-utils";
-import { Server, ServerParams, TrainQuery } from "./trainquery";
+import { Server, TrainQuery } from "./trainquery";
 import express, { Express } from "express";
 import { Session } from "../../shared/admin/session";
 
@@ -20,10 +19,6 @@ export class ExpressServer extends Server {
     ctx: TrainQuery,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handlers: ApiHandler<any, any, any, any>[],
-    requestListener: (
-      endpoint: string,
-      params: ServerParams,
-    ) => Promise<object>,
   ): Promise<void> {
     const app = express();
     app.use(express.json());
@@ -31,32 +26,6 @@ export class ExpressServer extends Server {
     for (const handler of handlers) {
       createApiRoute(ctx, app, handler);
     }
-
-    // <legacy api handler code>
-    // TODO: Remove this.
-    app.all("/api/*", async (req, res) => {
-      const path = req.path.replace(/^\/api\//, "");
-
-      try {
-        const params: ServerParams = {
-          query: paramify(req.query),
-          body: paramify(req.body),
-          header: {
-            adminToken: req.header("admin-token") ?? null,
-          },
-        };
-        const data = await requestListener(path, params);
-        res.json(data);
-      } catch (e) {
-        if (LegacyBadApiCallError.detect(e)) {
-          res.status(e.statusCode).send(e.message);
-        } else {
-          console.warn(e);
-          res.status(500).send("Internal server error.");
-        }
-      }
-    });
-    // </legacy api handler code>
 
     this._setupFrontend(ctx, app);
 
@@ -109,19 +78,4 @@ function createApiRoute<P, R, PS, RS>(
       }
     }
   });
-}
-
-function paramify(obj: { [index: string]: unknown }): Record<string, string> {
-  if (typeof obj !== "object" || obj == null) {
-    return {};
-  }
-
-  const result: Record<string, string> = {};
-  for (const key in obj) {
-    const value = obj[key];
-    if (typeof value === "string") {
-      result[key] = value;
-    }
-  }
-  return result;
 }

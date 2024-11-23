@@ -1,9 +1,7 @@
 import { configApiHandler } from "../api/config-api";
-import { ssrAppPropsApi, ssrRoutePropsApi } from "../api/ssr-props-api";
 import { FullConfig } from "../config/computed-config";
 import { ServerConfig } from "../config/server-config";
 import { GtfsWorker } from "../gtfs/gtfs-worker";
-import { BadApiCallError } from "../param-utils";
 import { TrainQueryDB } from "./trainquery-db";
 import { Banners } from "./banners";
 import { loginApiHandler } from "../api/admin/login-api";
@@ -115,32 +113,20 @@ export async function trainQuery(
   gtfs?.init();
   // </LIST OF LOOSE JUNK>
 
-  await server.start(
-    ctx,
-    [
-      departuresApiHandler,
-      loginApiHandler,
-      logoutApiHandler,
-      gtfsApiHandler,
-      configApiHandler,
-      logsApiHandler,
-      disruptionInboxApiHandler,
-      disruptionInboxSingleApiHandler,
-      disruptionInboxProcessApiHandler,
-      disruptionRejectedApiHandler,
-      disruptionRejectedSingleApiHandler,
-      disruptionRejectedRestoreApiHandler,
-    ],
-    async (endpoint: string, params: ServerParams) => {
-      if (endpoint === "ssrAppProps") {
-        return await ssrAppPropsApi(ctx);
-      } else if (endpoint === "ssrRouteProps") {
-        return await ssrRoutePropsApi(ctx, params);
-      } else {
-        throw new BadApiCallError(`"${endpoint}" API does not exist.`, 404);
-      }
-    },
-  );
+  await server.start(ctx, [
+    departuresApiHandler,
+    loginApiHandler,
+    logoutApiHandler,
+    gtfsApiHandler,
+    configApiHandler,
+    logsApiHandler,
+    disruptionInboxApiHandler,
+    disruptionInboxSingleApiHandler,
+    disruptionInboxProcessApiHandler,
+    disruptionRejectedApiHandler,
+    disruptionRejectedSingleApiHandler,
+    disruptionRejectedRestoreApiHandler,
+  ]);
 
   logger.logServerListening(server);
   subsystems.ready(ctx);
@@ -161,10 +147,6 @@ export abstract class Server {
     ctx: TrainQuery,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handlers: ApiHandler<any, any, any, any>[],
-    requestListener: (
-      endpoint: string,
-      params: ServerParams,
-    ) => Promise<object>,
   ): Promise<void>;
 }
 
