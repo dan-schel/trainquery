@@ -1,6 +1,6 @@
 {
   "name": "trainquery",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "type": "module",
   "scripts": {
     "dev": "tsx instance/index.ts",
@@ -58,7 +58,8 @@
   "files": [
     "dist",
     "index.ts",
-    "server"
+    "server",
+    "shared"
   ],
   "description": "This package is a work in progress - check back later for more information :)",
   "author": "dan-schel",
