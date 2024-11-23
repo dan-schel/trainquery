@@ -53,6 +53,10 @@ export default async function trainquery(_config: TrainQueryConfig) {
   app.post("/api/todo/create", createHandler(createTodoHandler)());
 
   if (process.env.NODE_ENV === "production") {
+    // Stop lint errors when "npm run build" hasn't been run yet (this file is
+    // only used in the production build).
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     await import("./dist/server/entry.mjs");
   }
   app.all("*", createHandler(vikeHandler)());
