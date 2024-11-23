@@ -10,7 +10,7 @@
     "format": "prettier --write .",
     "prepublishOnly": "npm run build",
     "setup": "tsx scripts/setup-instance.ts",
-    "clean": "rimraf dist node_modules instance .env",
+    "clean": "rimraf dist node_modules instance .env coverage data-*",
     "test": "vitest --run",
     "test-coverage": "vitest --run --coverage"
   },
