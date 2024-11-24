@@ -10,7 +10,7 @@ import { EnvironmentVariables } from "./ctx/environment-variables";
 import { EnvironmentOptions } from "./ctx/environment-options";
 import { AdminLogger } from "./ctx/admin-logger";
 import { createTodoHandler } from "./create-todo-handler";
-import { vikeHandler } from "./vike-handler";
+import { createVikeHandler } from "./vike-handler";
 import { createHandler } from "@universal-middleware/express";
 import { TrainQueryConfig } from "..";
 
@@ -123,7 +123,7 @@ async function setupDevServer(
   app.use(viteDevMiddleware);
 
   app.post("/api/todo/create", createHandler(createTodoHandler)());
-  app.all("*", createHandler(vikeHandler)());
+  app.all("*", createHandler(createVikeHandler(ctx))());
 }
 
 async function setupProdServer(ctx: TrainQuery, app: Express, root: string) {
@@ -139,7 +139,7 @@ async function setupProdServer(ctx: TrainQuery, app: Express, root: string) {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   await import(`${root}/dist/server/entry.mjs`);
-  app.all("*", createHandler(vikeHandler)());
+  app.all("*", createHandler(createVikeHandler(ctx))());
 }
 
 function serveSitemapXml(app: Express, ctx: TrainQuery) {

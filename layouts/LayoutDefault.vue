@@ -1,4 +1,5 @@
 <template>
+  <p>TrainQuery</p>
   <div class="layout">
     <slot />
   </div>

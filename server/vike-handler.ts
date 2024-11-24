@@ -2,14 +2,16 @@
 import { renderPage } from "vike/server";
 // TODO: stop using universal-middleware and directly integrate server middlewares instead. (Bati generates boilerplates that use universal-middleware https://github.com/magne4000/universal-middleware to make Bati's internal logic easier. This is temporary and will be removed soon.)
 import type { Get, UniversalHandler } from "@universal-middleware/core";
+import { TrainQuery } from "./ctx/trainquery";
 
-export const vikeHandler: Get<[], UniversalHandler> =
-  () => async (request, context, runtime) => {
+export function createVikeHandler(ctx: TrainQuery): Get<[], UniversalHandler> {
+  return () => async (request, context, runtime) => {
     const pageContextInit = {
       ...context,
       ...runtime,
       urlOriginal: request.url,
       headersOriginal: request.headers,
+      tqCtx: ctx,
     };
     const pageContext = await renderPage(pageContextInit);
     const response = pageContext.httpResponse;
@@ -22,3 +24,13 @@ export const vikeHandler: Get<[], UniversalHandler> =
       headers: response.headers,
     });
   };
+}
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Vike {
+    interface PageContext {
+      tqCtx: TrainQuery;
+    }
+  }
+}
