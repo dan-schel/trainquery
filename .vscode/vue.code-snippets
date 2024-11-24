@@ -1,0 +1,22 @@
+{
+  "New blank Vue file": {
+    "prefix": "init",
+    "body": [
+      "<script setup lang=\"ts\">",
+      "// TODO: Add your code here.",
+      "</script>",
+      "",
+      "<template>",
+      "  $0",
+      "</template>",
+      "",
+      "<style scoped lang=\"scss\">",
+      "@use \"#root/assets/css-template/import\" as template;",
+      "",
+      "// TODO: Add your code here.",
+      "</style>",
+      "",
+    ],
+    "description": "Initialize vue file with setup script, template, and style blocks.",
+  },
+}

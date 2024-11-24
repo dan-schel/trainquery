@@ -1,7 +1,5 @@
 /node_modules/
 /dist/
-/offline/
-/offline-*/
+/instance/
 /data-*/
 /coverage/
-/src/assets/css-template/

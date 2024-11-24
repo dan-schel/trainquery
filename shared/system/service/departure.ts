@@ -113,6 +113,7 @@ export class Departure extends Service<
   getServiceString(): Service[] {
     const result: Service[] = [];
 
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let current: Service | null = this;
     while (current != null) {
       result.push(current);

@@ -1,4 +1,4 @@
-import { parseIntNull } from "@dan-schel/js-utils";
+import { TrainQueryConfig } from "../..";
 
 const names = {
   nodeEnv: "NODE_ENV",
@@ -13,11 +13,6 @@ const names = {
   superadminUsername: "SUPERADMIN_USERNAME",
   superadminPassword: "SUPERADMIN_PASSWORD",
   relayKey: "RELAY_KEY",
-};
-
-const defaults = {
-  nodeEnv: "development",
-  port: "3000",
 };
 
 type MongoVars = {
@@ -38,10 +33,35 @@ type SuperadminVars = {
 export class EnvironmentVariables {
   private static _instance: EnvironmentVariables | null = null;
 
+  static set(config: TrainQueryConfig) {
+    // TODO: Remove this whole file. This is just duct tape between the new
+    // "pass config in to the NPM package" way of doing things and the old
+    // "load config from environment variables" way of doing things!
+    this._instance = new EnvironmentVariables(
+      config.devMode ? "development" : "production",
+      config.port,
+      config.url,
+      config.config,
+      null,
+      config.mongoDatabaseUrl ? { databaseUrl: config.mongoDatabaseUrl } : null,
+      config.ptvDevId && config.ptvDevKey
+        ? { devId: config.ptvDevId, devKey: config.ptvDevKey }
+        : null,
+      config.gtfsRealtimeKey,
+      config.superadminUsername && config.superadminPassword
+        ? {
+            username: config.superadminUsername,
+            password: config.superadminPassword,
+          }
+        : null,
+      config.relayKey,
+    );
+  }
+
   /** Get/create the singleton environment variables object. */
   static get() {
     if (this._instance == null) {
-      this._instance = this._read();
+      throw new Error("Environment variables not set.");
     }
     return this._instance;
   }
@@ -91,103 +111,6 @@ export class EnvironmentVariables {
       throw notSet(names.relayKey);
     }
     return this.relayKey;
-  }
-
-  /** Parses the environment variables from `process.env`. */
-  private static _read() {
-    // NODE_ENV.
-    const nodeEnv = process.env[names.nodeEnv] ?? defaults.nodeEnv;
-    if (nodeEnv == null) {
-      throw notSet(names.nodeEnv);
-    }
-
-    // PORT.
-    const portStr = process.env[names.port] ?? defaults.port;
-    if (portStr == null) {
-      throw notSet(names.port);
-    }
-    const port = parseIntNull(portStr);
-    if (port == null) {
-      throw new Error(`Environment variable ${names.port} is not a number.`);
-    }
-
-    // URL.
-    const url = process.env[names.url];
-    if (url == null) {
-      throw notSet(names.url);
-    }
-
-    // CONFIG and CONFIG_OFFLINE.
-    const config = process.env[names.config];
-    const configOffline = process.env[names.configOffline] ?? null;
-    if (config == null) {
-      throw notSet(names.config);
-    }
-
-    // MONGO_DOMAIN, MONGO_USERNAME, and MONGO_PASSWORD.
-    const mongoDatabaseUrl = process.env[names.mongoDatabaseUrl] ?? null;
-    let mongo: MongoVars | null = null;
-    if (mongoDatabaseUrl != null) {
-      if (mongoDatabaseUrl == null) {
-        throw notSet(names.mongoDatabaseUrl);
-      }
-      mongo = {
-        databaseUrl: mongoDatabaseUrl,
-      };
-    }
-
-    // PTV_DEV_ID and PTV_DEV_KEY.
-    const ptvDevId = process.env[names.ptvDevId] ?? null;
-    const ptvKey = process.env[names.ptvDevKey] ?? null;
-    let ptv: PtvVars | null = null;
-    if (ptvDevId != null || ptvKey != null) {
-      if (ptvDevId == null) {
-        throw notSet(names.ptvDevId);
-      }
-      if (ptvKey == null) {
-        throw notSet(names.ptvDevKey);
-      }
-      ptv = {
-        devId: ptvDevId,
-        devKey: ptvKey,
-      };
-    }
-
-    // GTFS_REALTIME_KEY.
-    const gtfsRealtimeKey = process.env[names.gtfsRealtimeKey] ?? null;
-
-    // SUPERADMIN_USERNAME and SUPERADMIN_PASSWORD.
-    const superadminUsername = process.env[names.superadminUsername] ?? null;
-    const superadminPassword = process.env[names.superadminPassword] ?? null;
-    let superadmin: SuperadminVars | null = null;
-    if (superadminUsername != null || superadminPassword != null) {
-      if (superadminUsername == null) {
-        throw notSet(names.superadminUsername);
-      }
-      if (superadminPassword == null) {
-        throw notSet(names.superadminPassword);
-      }
-      superadmin = {
-        username: superadminUsername,
-        password: superadminPassword,
-      };
-    }
-
-    // RELAY_KEY.
-    const relayKey = process.env[names.relayKey] ?? null;
-
-    return new EnvironmentVariables(
-      nodeEnv,
-      port,
-      url,
-      config,
-      configOffline,
-      mongo,
-      ptv,
-      gtfsRealtimeKey,
-      superadmin,
-      relayKey,
-    );
   }
 }
 

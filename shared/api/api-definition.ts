@@ -19,12 +19,12 @@ export type ApiDefinition<P, R, PS, RS> = {
   checkConfigHash: boolean;
 
   /** The schema of the API's input parameters. */
-  paramsSchema: z.ZodType<P, any, PS>;
+  paramsSchema: z.ZodType<P, z.ZodTypeDef, PS>;
   /** A function that can serialize the API's input parameters to JSON. */
   paramsSerializer: (input: P) => PS;
 
   /** The schema of the API's result response. */
-  resultSchema: z.ZodType<R, any, RS>;
+  resultSchema: z.ZodType<R, z.ZodTypeDef, RS>;
   /** A function that can serialize the API's result response to JSON. */
   resultSerializer: (input: R) => RS;
 };

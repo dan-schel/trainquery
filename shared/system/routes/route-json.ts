@@ -16,6 +16,7 @@ export const RouteJson = z
       linear: LinearRoute.transform,
       "y-branch": YBranchRoute.transform,
       hook: HookRoute.transform,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }[x.type](x as any);
   });
 

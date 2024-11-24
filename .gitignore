@@ -1,7 +1,6 @@
 /node_modules/
 /dist/
-/offline/
-/offline-*/
+/instance/
+/.env
 /data-*/
 /coverage/
-/.env*

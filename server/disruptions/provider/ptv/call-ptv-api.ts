@@ -31,7 +31,9 @@ export async function callPtvApi(
 }
 
 async function myip() {
+  // TODO: Remove this - or do it properly (no "as any", use zod).
   const res = await fetch("https://ipecho.io/json");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = (await res.json()) as any;
   return data.ip;
 }

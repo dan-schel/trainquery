@@ -3,7 +3,7 @@ import { type LineID, LineIDJson, type StopID, StopIDJson } from "./ids";
 import { NumberRange } from "@dan-schel/js-utils";
 import { NumberRangeJson } from "../utils";
 
-export abstract class ContinuationGroup<Method extends String> {
+export abstract class ContinuationGroup<Method extends string> {
   constructor(readonly method: Method) {}
 }
 

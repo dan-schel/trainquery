@@ -82,7 +82,7 @@ export class ServedStop {
       id: PlatformID;
       confidence: ConfidenceLevel;
     } | null;
-  }): any {
+  }) {
     return new ServedStop(
       this.stop,
       this.stopListIndex,
