@@ -19,7 +19,7 @@
     "tqlint": "tsx server/linter/main.ts"
   },
   "dependencies": {
-    "@dan-schel/js-utils": "3.2.2",
+    "@dan-schel/js-utils": "4.0.4",
     "@vueuse/head": "0.9.8",
     "adm-zip": "0.5.16",
     "chalk": "5.4.1",
