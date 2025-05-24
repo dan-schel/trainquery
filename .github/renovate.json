@@ -11,6 +11,10 @@
       "matchCurrentVersion": ">=1.0.0",
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "all non-major updates"
+    },
+    {
+      "matchPackageNames": ["zod"],
+      "groupName": "zod"
     }
   ]
 }
