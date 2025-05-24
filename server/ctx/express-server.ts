@@ -59,7 +59,9 @@ export class ExpressServer extends Server {
 
     this._setupFrontend(ctx, app);
 
-    await new Promise<void>((resolve) => app.listen(this.port, resolve));
+    await new Promise<void>((resolve) =>
+      app.listen(this.port, () => resolve()),
+    );
   }
 }
 
