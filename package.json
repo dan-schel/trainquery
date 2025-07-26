@@ -19,21 +19,21 @@
     "tqlint": "tsx server/linter/main.ts"
   },
   "dependencies": {
-    "@dan-schel/js-utils": "4.3.0",
+    "@dan-schel/js-utils": "4.4.0",
     "@vueuse/head": "0.9.8",
     "adm-zip": "0.5.16",
     "chalk": "5.4.1",
     "csv-parser": "3.2.0",
-    "dotenv": "17.2.0",
+    "dotenv": "17.2.1",
     "express": "4.21.2",
     "glob": "11.0.3",
     "long": "5.3.2",
     "luxon": "3.7.1",
-    "mongodb": "6.17.0",
+    "mongodb": "6.18.0",
     "node-fetch": "3.3.2",
     "protobufjs": "7.5.3",
     "vite-ssr": "0.17.2",
-    "vue": "3.5.17",
+    "vue": "3.5.18",
     "vue-router": "4.5.1",
     "yaml": "2.8.0",
     "zod": "3.25.76"
@@ -65,9 +65,9 @@
     "tsx": "4.20.3",
     "typescript": "5.8.3",
     "vite": "4.5.14",
-    "vite-plugin-pwa": "1.0.1",
+    "vite-plugin-pwa": "1.0.2",
     "vitest": "3.2.4",
-    "vue-tsc": "3.0.3"
+    "vue-tsc": "3.0.4"
   },
   "engines": {
     "node": "22.17.1"
