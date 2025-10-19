@@ -27,6 +27,9 @@ export function applyRealtimeData(
     return null;
   };
 
+  let matchedTrips = 0;
+  let enhancedTrips = 0;
+
   const liveTrips = schedule.trips.map((trip) => {
     const tripError = (message: string) => {
       if (logError != null) {
@@ -52,6 +55,8 @@ export function applyRealtimeData(
       // one-by-one and we want it all to remain.
       return trip;
     }
+
+    matchedTrips++;
 
     // Parse the date, making sure it's provided, and valid.
     if (matchingUpdate.trip.startDate == null) {
@@ -107,8 +112,15 @@ export function applyRealtimeData(
       })
       .filter(nonNull);
 
+    enhancedTrips++;
+
     return GtfsRealtimeTrip.enhance(trip, liveDate, liveTimes, false);
   });
+
+  // eslint-disable-next-line no-console
+  console.log(
+    `Applied realtime data for ${gtfsSubfeedID}: ${matchedTrips} matched and ${enhancedTrips} enhanced trips, of ${schedule.trips.length} total trips.`,
+  );
 
   return schedule.withTrips(liveTrips);
 }
