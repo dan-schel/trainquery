@@ -93,7 +93,8 @@ export function applyRealtimeData(
             ? timeUnixSecondsLong
             : timeUnixSecondsLong.toNumber();
 
-        const datetime = QUtcDateTime.fromUnixSeconds(timeUnixSeconds);
+        const datetime =
+          QUtcDateTime.fromUnixSeconds(timeUnixSeconds).startOfMinute();
         const localDateTime = toLocalDateTimeLuxon(config, datetime);
         const timetableTime = QTimetableTime.fromDateTime(
           liveDate,
