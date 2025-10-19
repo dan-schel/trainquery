@@ -151,7 +151,7 @@ export class GtfsWorker {
       if (realtime != null) {
         data = applyRealtimeData(
           this._ctx.getConfig(),
-          this._data,
+          data,
           realtime,
           worker.gtfsSubfeedID,
         );
