@@ -22,7 +22,7 @@
     "@dan-schel/js-utils": "4.3.0",
     "@vueuse/head": "0.9.8",
     "adm-zip": "0.5.16",
-    "chalk": "5.4.1",
+    "chalk": "6.0.0",
     "csv-parser": "3.2.0",
     "dotenv": "17.2.0",
     "express": "4.21.2",
